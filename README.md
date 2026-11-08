@@ -2,6 +2,25 @@
 
 A free suite of tools for DIY hobbyists and makers, in one program. Designed and created by **nrmluvdev**.
 
+Design stripboard circuits, model 3D-printed parts, flash microcontrollers, write SD cards and USB installers, and use your PC as an oscilloscope, multimeter, serial monitor or logic analyser — all from one small program that needs nothing installed. Runs on Windows, Mac, Linux and Raspberry Pi.
+
+## Download
+
+Get the latest version from the **[Releases page](https://github.com/normanlove/tinkerie/releases/latest)**:
+
+| Your computer | Download |
+|---|---|
+| Windows 10 or 11 (64-bit) | `Tinkerie.exe` on its own, or `Tinkerie-…-windows.zip` (with the source) |
+| Mac with Apple silicon (M1 or newer) | `Tinkerie-…-mac-apple-silicon.zip` |
+| Mac with an Intel processor | `Tinkerie-…-mac-intel.zip` |
+| Linux PC (64-bit Intel/AMD) | `Tinkerie-…-linux-x86_64.tar.gz` |
+| Raspberry Pi OS 64-bit (Pi 3, 4, 5) | `Tinkerie-…-pi-64bit.tar.gz` |
+| Raspberry Pi OS 32-bit (Pi 2, 3, 4, 5, Zero 2 W) | `Tinkerie-…-pi-32bit.tar.gz` |
+
+Each package has a **READ ME FIRST.txt** that explains how to start it and what works on that system. Windows may warn about an unrecognised app the first time: choose *More info* then *Run anyway*. Macs need the one-time *Open Anyway* step in System Settings ▸ Privacy & Security.
+
+## Using it
+
 Double-click `Tinkerie.exe` to open the launcher and pick an app. Each app opens in its own window and process, so you can run several at once. They keep running after you close the launcher.
 
 | App | What it does | Version |
@@ -56,3 +75,15 @@ Mac builds come out as `dist/<name>/Tinkerie.app`, Linux and Pi builds as `dist/
 Meterie's HID-cable meters, Bluetooth meters and Camera mode are Windows-only for now. On a Mac, USB scopes and logic analysers need Apple's IOKit, which these pure-Go builds don't use.
 
 For other platforms and how the source is laid out, see [PORTING.md](PORTING.md).
+
+## Licence
+
+Tinkerie is free software: you can use, share and change it under the terms of the **GNU General Public License, version 3 or later** ([LICENSE](LICENSE)). If you share a changed version, you must share its source code under the same licence. It comes with no warranty.
+
+Copyright © 2026 nrmluvdev.
+
+Parts made by others keep their own licences, listed with them: Go's zstd decoder (`shared/zstd/LICENSE`, BSD), the fonts in Makie and Meterie (`apps/makie/LICENSE-fonts.txt`, `apps/meterie/web/fonts/`), and Scopie's firmware, Zadig and adapted protocol code (`apps/scopie/THIRD-PARTY-NOTICES.md`).
+
+## Reporting problems
+
+Found a bug, or a board, scope or meter that doesn't work? Open an [issue](https://github.com/normanlove/tinkerie/issues) and say which app, which system, and what happened.
