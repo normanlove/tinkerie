@@ -1,4 +1,3 @@
-# Build output (made by build.sh / build.bat)
+# Build output (made by build.sh, build.bat and package.sh)
 /dist/
 /Tinkerie.exe
-*.exe

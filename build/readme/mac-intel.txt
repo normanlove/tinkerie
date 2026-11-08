@@ -1,0 +1,35 @@
+Tinkerie {VERSION} for Mac with an Intel processor, macOS 11 or newer
+Free maker tools, designed and created by nrmluvdev.
+Free software under the GNU GPL, version 3 or later (see source/LICENSE). No warranty.
+Source and updates: https://github.com/normanlove/tinkerie
+
+Starting Tinkerie
+1. Drag Tinkerie.app into your Applications folder.
+2. The first time, macOS blocks it because it isn't from the App Store: open it once, then go to
+   System Settings > Privacy & Security and click "Open Anyway". (Or in Terminal:
+   xattr -dr com.apple.quarantine /Applications/Tinkerie.app)
+3. Tinkerie's windows open in Chrome, Edge or Brave if you have one, otherwise in your default browser.
+
+What works on this system
+- Launcher, Wirie, Makie, Tunie and Flashie: everything.
+- Scopie: demo, network and bench scopes, and CSV files. USB scopes aren't available on Mac yet.
+- Tracie: the serial monitor. The USB logic analyser isn't available on Mac yet.
+- Meterie: meters with a USB-serial cable, like the HoldPeak HP-90EPC. Meters with a HID USB
+  cable, Bluetooth meters and Camera mode are Windows only for now.
+Every app has teaching mode: point at anything to see what it does. F2 turns it off.
+
+New in {VERSION}: every app opens maximised.
+
+New in 1.5.0: Flashie's "Write image" tab can now
+- set up Raspberry Pi OS before its first start, like Raspberry Pi Imager: press "OS settings"
+  for the hostname, your username and password, Wi-Fi, SSH and time zone/keyboard;
+- turn a Windows 10 or 11 .iso into a USB installer for UEFI PCs, like Rufus;
+- write Linux ISOs (Ubuntu, Fedora, Mint...) and .zst-packed images too.
+These new parts haven't been tried on real hardware yet. Please report anything odd.
+
+Updating
+The full source is in the source folder. Change anything, then in a terminal:
+    cd source
+    ./build.sh mac-intel
+The new build appears in source/dist/mac-intel. You need Go 1.24 or newer (https://go.dev/dl/).
+source/README.md explains the suite; source/PORTING.md explains the layout and what's left to port.
