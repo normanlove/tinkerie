@@ -1,27 +1,46 @@
-# Publishes a release when a version tag (like v1.5.1) is pushed:
-# builds every platform with package.sh and uploads the files.
+# Publishes a release for each new version. On every push to main (or when
+# run by hand from the Actions tab) it reads VERSION from build.sh; if there's
+# no release called v<VERSION> yet, it tests, builds every platform with
+# package.sh and publishes the files. To release: change the version in
+# build.sh (and launcher/launcher.go, build.bat), then push.
 name: Release
 on:
   push:
-    tags: ['v*']
+    branches: [main]
+  workflow_dispatch:
 permissions:
   contents: write
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
+      - name: Is this version new?
+        id: v
+        run: |
+          v=$(sed -n 's/^VERSION=//p' build.sh)
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          if gh release view "v$v" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "new=no" >> "$GITHUB_OUTPUT"; echo "v$v is already released."
+          else
+            echo "new=yes" >> "$GITHUB_OUTPUT"
+          fi
       - uses: actions/setup-go@v5
+        if: steps.v.outputs.new == 'yes'
         with:
           go-version: '1.24'
       - name: Test Flashie and shared code
+        if: steps.v.outputs.new == 'yes'
         run: go test ./apps/flashie/... ./shared/... .
       - name: Build and package
+        if: steps.v.outputs.new == 'yes'
         run: ./package.sh
       - name: Publish release
-        env:
-          GH_TOKEN: ${{ github.token }}
+        if: steps.v.outputs.new == 'yes'
         run: |
           cd dist/packages
-          gh release create "$GITHUB_REF_NAME" --title "Tinkerie ${GITHUB_REF_NAME#v}" --notes-file notes.md \
+          gh release create "v${{ steps.v.outputs.version }}" --target "$GITHUB_SHA" \
+            --title "Tinkerie ${{ steps.v.outputs.version }}" --notes-file notes.md \
             Tinkerie.exe Tinkerie-*.zip Tinkerie-*.tar.gz
