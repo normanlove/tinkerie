@@ -80,16 +80,6 @@ Meterie's HID-cable meters, Bluetooth meters and Camera mode are Windows-only fo
 
 For other platforms and how the source is laid out, see [PORTING.md](PORTING.md).
 
-## The website
-
-The website in `docs/` is built from `website/` (text in `content.py`, design in `site.css`):
-
-```
-python3 website/build.py
-```
-
-Run it again after a release so the download links point at the new version. GitHub Pages serves `docs/` from the `main` branch.
-
 ## Licence
 
 Tinkerie is free software: you can use, share and change it under the terms of the **GNU General Public License, version 3 or later** ([LICENSE](LICENSE)). If you share a changed version, you must share its source code under the same licence. It comes with no warranty.
