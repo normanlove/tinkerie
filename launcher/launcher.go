@@ -23,7 +23,7 @@ import (
 )
 
 // Version is the suite version shown in the launcher.
-const Version = "1.5.1"
+const Version = "1.5.2-alpha"
 
 // App describes one tile in the launcher.
 type App struct {
@@ -38,13 +38,13 @@ type App struct {
 
 // Apps is the suite, in launcher order.
 var Apps = []App{
-	{"wirie", "Wirie", "Circuit board designer, with Boardie, Calcie, Pinnie and Powerie", "1.2.0", "wirie.png", "", false},
-	{"makie", "Makie", "3D-printing part designer. Builds cases for Wirie boards", "1.5.1", "makie.png", "", false},
-	{"tunie", "Tunie", "3D printer tuning and calibration", "1.0.0", "tunie.png", "", false},
-	{"flashie", "Flashie", "Firmware flasher for ESP32, Pico, Arduino and STM32 — and an SD card / USB image writer", "0.7.0", "flashie.svg", "", false},
-	{"scopie", "Scopie", "Oscilloscope: Hantek 6022, network scopes and more", "3.0.0", "scopie.png", "", false},
-	{"meterie", "Meterie", "PC multimeter: HoldPeak, UNI-T, OWON, Brymen, Fluke…", "1.1.0", "meterie.png", "", false},
-	{"tracie", "Tracie", "Serial monitor and logic analyser", "1.0.0", "tracie.svg", "", false},
+	{"wirie", "Wirie", "Circuit board designer, with Boardie, Calcie, Pinnie and Powerie", "1.2.1-alpha", "wirie.png", "", false},
+	{"makie", "Makie", "3D-printing part designer. Builds cases for Wirie boards", "1.5.1-alpha", "makie.png", "", false},
+	{"tunie", "Tunie", "3D printer tuning and calibration", "1.0.0-alpha", "tunie.png", "", false},
+	{"flashie", "Flashie", "Firmware flasher for ESP32, Pico, Arduino and STM32 — and an SD card / USB image writer", "0.7.0-alpha", "flashie.svg", "", false},
+	{"scopie", "Scopie", "Oscilloscope: Hantek 6022, network scopes and more", "3.0.0-alpha", "scopie.png", "", false},
+	{"meterie", "Meterie", "PC multimeter: HoldPeak, UNI-T, OWON, Brymen, Fluke…", "1.1.0-alpha", "meterie.png", "", false},
+	{"tracie", "Tracie", "Serial monitor and logic analyser", "1.0.0-alpha", "tracie.svg", "", false},
 }
 
 // What each app can't do yet on this system (see PORTING.md).

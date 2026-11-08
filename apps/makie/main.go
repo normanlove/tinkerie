@@ -30,7 +30,7 @@ var webFS embed.FS
 
 const appName = "Makie"
 const author = "nrmluvdev"
-const version = "1.5.1"
+const version = "1.5.1-alpha"
 
 var lastPing atomic.Int64
 

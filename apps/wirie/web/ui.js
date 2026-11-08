@@ -564,6 +564,7 @@ function renderBoardProps(P, A) {
     <div class="grid2">${fieldHTML("b_cl", "Clearance", B.clear, "mm", "number")}${fieldHTML("b_vd", "Via size / drill", B.viaD + " / " + B.viaDrill, "mm")}</div>
     <h4>Ground fill</h4><p class="note">Fills empty copper with a net (usually GND) — less routing, less noise.</p>
     <div class="grid2"><label class="chk"><input type="checkbox" id="b_pt" ${B.pourTop ? "checked" : ""}><span>Top side</span></label><label class="chk"><input type="checkbox" id="b_pb" ${B.pourBot ? "checked" : ""}><span>Bottom side</span></label></div>
+    <label class="chk" data-tip="The auto-router also draws tracks for the fill net (usually GND), so every connection is visible and still works if you turn the fill off. Recommended."><input type="checkbox" id="b_pr" ${B.pourRoute !== false ? "checked" : ""}><span>Route the fill net with tracks too</span></label>
     <label class="fld"><span>Fill net</span><div class="inp"><select id="b_pn">${[...new Set(["GND", ...A.nets.map(n => n.name)])].map(n => `<option ${n === B.pourNet ? "selected" : ""}>${esc(n)}</option>`).join("")}</select></div></label>
     <h4>Grid</h4><div class="seg" id="b_grid">${[0.5, 0.635, 1, 1.27, 2.54].map(g => `<button data-g="${g}" class="${g === B.grid ? "on" : ""}">${g}</button>`).join("")}</div>
     <div class="statbox"><div><b>${S.comps.length}</b><span>parts</span></div><div><b>${A.nets.length}</b><span>nets</span></div><div><b>${S.tracks.length}</b><span>tracks</span></div><div><b>${S.vias.length}</b><span>vias</span></div></div>`;
@@ -573,7 +574,7 @@ function renderBoardProps(P, A) {
   ch("#b_shape", () => { B.round = $("#b_shape").value === "round"; if (B.round) B.h = B.w = Math.max(B.w, B.h); });
   ch("#b_tw", () => { if (num("#b_tw") >= 0.1) B.track = num("#b_tw"); }); ch("#b_pw", () => { if (num("#b_pw") >= 0.1) B.power = num("#b_pw"); }); ch("#b_cl", () => { if (num("#b_cl") >= 0.1) B.clear = num("#b_cl"); });
   ch("#b_vd", () => { const [a, b] = $("#b_vd").value.split("/").map(parseFloat); if (a > 0.3) B.viaD = a; if (b > 0.15 && b < B.viaD) B.viaDrill = b; });
-  ch("#b_pt", () => { B.pourTop = $("#b_pt").checked; }); ch("#b_pb", () => { B.pourBot = $("#b_pb").checked; }); ch("#b_pn", () => { B.pourNet = $("#b_pn").value; });
+  ch("#b_pt", () => { B.pourTop = $("#b_pt").checked; }); ch("#b_pb", () => { B.pourBot = $("#b_pb").checked; }); ch("#b_pn", () => { B.pourNet = $("#b_pn").value; }); ch("#b_pr", () => { B.pourRoute = $("#b_pr").checked; });
   $$("#b_grid button").forEach(b => b.onclick = () => { B.grid = +b.dataset.g; commit("grid"); refreshPanels(); });
   $("#b_tpl").onclick = () => templatesDialog(false);
 }

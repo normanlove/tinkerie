@@ -11,10 +11,11 @@
 #   ./build.sh all        every one of the above
 #
 # To change the icon: go run ./tools/mkicon, then (for Windows)
-#   go run ./tools/mksyso -ico build/tinkerie.ico -out rsrc_windows_amd64.syso -version 1.5.1
+#   go run ./tools/mksyso -ico build/tinkerie.ico -out rsrc_windows_amd64.syso -version 1.5.2-alpha
 set -e
 cd "$(dirname "$0")"
-VERSION=1.5.1
+VERSION=1.5.2-alpha
+NUMVER=${VERSION%%-*} # macOS wants plain numbers
 export CGO_ENABLED=0
 
 unix() { # name os arch [arm]
@@ -29,7 +30,7 @@ mac() { # name arch
   app="dist/$1/Tinkerie.app/Contents"
   mkdir -p "$app/MacOS" "$app/Resources"
   GOOS=darwin GOARCH=$2 go build -trimpath -ldflags "-s -w" -o "$app/MacOS/tinkerie" .
-  sed "s/VERSION/$VERSION/g" build/Info.plist > "$app/Info.plist"
+  sed "s/VERSION/$NUMVER/g" build/Info.plist > "$app/Info.plist"
   cp build/tinkerie.icns "$app/Resources/"
   chmod +x "$app/MacOS/tinkerie"
   echo "Built dist/$1/Tinkerie.app"

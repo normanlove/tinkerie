@@ -3,7 +3,7 @@
 
 APPS = [
   dict(
-    id="wirie", needshort="No hardware needed", name="Wirie", ver="1.2.0", color="#ef8a3c", icon="wirie.png",
+    id="wirie", needshort="No hardware needed", name="Wirie", ver="1.2.1-alpha", color="#ef8a3c", icon="wirie.png",
     tagline="Design your own circuit boards, even if you've never made one before.",
     short="Design circuit boards, plan stripboard builds, look up pinouts and work out battery life.",
     need="No hardware needed",
@@ -14,11 +14,11 @@ APPS = [
     firsts=[
       ("Open the example", "On the welcome screen, click Example project: a Pico weather station with a screen, sensor, button and LED."),
       ("Look around", "Click a part to see its pins. Point at any button and teaching mode explains what it does."),
-      ("Press Auto-route", "Wirie draws every copper track for you, on both sides of the board."),
+      ("Press Auto-route", "Wirie draws every copper track for you, on both sides of the board, ground included."),
       ("Try Boardie", "Switch to the Boardie tab and press Do it all to see the same circuit on stripboard."),
     ],
     shots=[
-      ("wirie-pcb", "PCB tab: the example Pico weather station board, ready to auto-route."),
+      ("wirie-pcb", "PCB tab: the example Pico weather station, auto-routed. Every pin is connected, ground included."),
       ("wirie-boardie", "Boardie: the same circuit planned on stripboard, with track cuts and wire links."),
       ("wirie-pinnie", "Pinnie: hover a pin to see what it can do."),
       ("wirie-powerie", "Powerie: how long will it run on a battery?"),
@@ -30,8 +30,8 @@ APPS = [
         "Every module pin is labelled (GP4, SDA, 3V3…)",
         "Smart connect wires a sensor to your microcontroller in one click (I²C, SPI, UART, power)",
         "Board templates: Raspberry Pi HAT and Zero pHAT, Pico, Nano and ESP32 carriers, round boards",
-        "Two-layer auto-router with wider power tracks and vias",
-        "Ground fill, design-rule check, realistic board preview",
+        "Two-layer auto-router with wider power tracks and vias. It routes ground too, so every connection is visible",
+        "Ground fill that's checked to really reach every ground pin, design-rule check, realistic board preview",
       ]),
       ("Boardie: stripboard and perfboard", "Build the same circuit without ordering a PCB.", [
         "Places the parts on stripboard or perfboard for you",
@@ -67,7 +67,7 @@ APPS = [
     pairs=[("makie", "Turns your board into a 3D-printable case."), ("flashie", "Puts the firmware on the board you built."), ("meterie", "Calcie can read a live value from your multimeter.")],
   ),
   dict(
-    id="makie", needshort="No hardware needed", name="Makie", ver="1.5.1", color="#2f7df6", icon="makie.png",
+    id="makie", needshort="No hardware needed", name="Makie", ver="1.5.1-alpha", color="#2f7df6", icon="makie.png",
     tagline="Design parts for your 3D printer by stacking simple shapes.",
     short="A Tinkercad-style 3D designer with threads, gears, boxes, cases and hundreds of ready parts.",
     need="No hardware needed",
@@ -129,7 +129,7 @@ APPS = [
     pairs=[("wirie", "Design the board, then build its case in Makie."), ("tunie", "Shares your printer's fit clearances with Makie."), ("flashie", "Program the board that goes in your case.")],
   ),
   dict(
-    id="tunie", needshort="Needs a 3D printer", name="Tunie", ver="1.0.0", color="#5b6cf6", icon="tunie.png",
+    id="tunie", needshort="Needs a 3D printer", name="Tunie", ver="1.0.0-alpha", color="#5b6cf6", icon="tunie.png",
     tagline="Calibrate your 3D printer one simple test at a time.",
     short="Print a test, measure it, type the number in, and Tunie tells you the new setting.",
     need="A 3D printer",
@@ -183,7 +183,7 @@ APPS = [
     pairs=[("makie", "Uses your measured clearances so printed parts fit."), ("tracie", "Watch your printer's serial output.")],
   ),
   dict(
-    id="flashie", needshort="Board or SD card", name="Flashie", ver="0.7.0", color="#7b5cf5", icon="flashie.svg",
+    id="flashie", needshort="Board or SD card", name="Flashie", ver="0.7.0-alpha", color="#7b5cf5", icon="flashie.svg",
     tagline="Put new firmware on your boards, and operating systems on SD cards.",
     short="Flash ESP32, Pico, Arduino and STM32 boards, build programs from blocks, and write SD cards and USB installers.",
     need="A microcontroller board, or an SD card / USB drive",
@@ -251,7 +251,7 @@ APPS = [
     pairs=[("tracie", "See what your freshly flashed board prints."), ("wirie", "Design the board you're flashing."), ("makie", "Print a case for it.")],
   ),
   dict(
-    id="scopie", needshort="Scope, or demo mode", name="Scopie", ver="3.0.0", color="#e8b416", icon="scopie.png",
+    id="scopie", needshort="Scope, or demo mode", name="Scopie", ver="3.0.0-alpha", color="#e8b416", icon="scopie.png",
     tagline="Turn your PC into the screen of an oscilloscope.",
     short="A friendly oscilloscope app for Hantek, Rigol, Siglent, OWON, PicoScope and more.",
     need="A USB or bench oscilloscope, or try Demo mode",
@@ -303,7 +303,7 @@ APPS = [
     pairs=[("tracie", "Decode the digital signals you see."), ("meterie", "Log slow changes with your multimeter.")],
   ),
   dict(
-    id="meterie", needshort="Meter, or demo mode", name="Meterie", ver="1.1.0", color="#1fb4cc", icon="meterie.png",
+    id="meterie", needshort="Meter, or demo mode", name="Meterie", ver="1.1.0-alpha", color="#1fb4cc", icon="meterie.png",
     tagline="A big, friendly multimeter display, with graphs and logging.",
     short="Connect your multimeter to show huge readings, graph them, log them and run guided tests.",
     need="A multimeter with a PC link, or try the demo",
@@ -364,7 +364,7 @@ APPS = [
     pairs=[("wirie", "Calcie can use your meter's live reading."), ("scopie", "For fast signals a meter can't follow.")],
   ),
   dict(
-    id="tracie", needshort="Board, or demo mode", name="Tracie", ver="1.0.0", color="#25b39f", icon="tracie.svg",
+    id="tracie", needshort="Board, or demo mode", name="Tracie", ver="1.0.0-alpha", color="#25b39f", icon="tracie.svg",
     tagline="See what your board is saying, and the signals on its wires.",
     short="A serial monitor with a live plotter, plus a logic analyser that decodes UART, I²C and SPI.",
     need="A board on USB, or a cheap logic analyser (demo included)",
@@ -415,6 +415,7 @@ APPS = [
 APP = {a["id"]: a for a in APPS}
 
 FAQ = [
+  ("What does \"alpha\" mean?", ["Tinkerie works and you can use every app today, but it's still young. Some features haven't been tried on every board, scope, meter or computer yet, and things may change between versions. If something doesn't work, please report it on GitHub: that's how alpha software gets better."]),
   ("Is Tinkerie really free?", ["Yes. Tinkerie is free software under the GNU GPL (version 3 or later). You can use it, share it and change it. There are no adverts, accounts or subscriptions."]),
   ("Do I need to install anything?", ["No. Tinkerie is one program. On Windows you just double-click Tinkerie.exe. On Linux and Raspberry Pi, ./install.sh adds it to your menu if you'd like it there."]),
   ("Windows says it's an unrecognised app. Is that OK?", ["Windows warns about any program that isn't signed with a paid certificate. Click More info, then Run anyway. The full source code is on GitHub if you'd like to check it."]),

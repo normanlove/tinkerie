@@ -1,7 +1,7 @@
 // Wirie auto-router: two-layer grid A* with rip-up & retry — by nrmluvdev
 "use strict";
 
-const ROUTER = { running: false, cancel: false };
+const ROUTER = { running: false, cancel: false, noPour: false };
 
 function isPowerNet(name) { return /^(GND|3V3|5V|VIN|VCC|RAW|VSYS|VBAT|VMOT|12V|VBUS)/i.test(name); }
 
@@ -140,6 +140,10 @@ function simplify(pts) {
 async function autoroute(progress, onlyNets) {
   if (ROUTER.running) return;
   ROUTER.running = true; ROUTER.cancel = false;
+  // Route the fill net (GND) with tracks too, unless the board says not to:
+  // a circuit whose ground only goes through the fill looks unfinished, and
+  // breaks if the fill is turned off.
+  ROUTER.noPour = S.board.pourRoute !== false; invalidate();
   const B = S.board;
   const g = B.w * B.h > 12000 ? 0.3175 : 0.254;
   const base = { tracks: S.tracks.slice(), vias: S.vias.slice() };
@@ -169,6 +173,20 @@ async function autoroute(progress, onlyNets) {
         progress && progress(passN, done / names.length, nm);
         await new Promise(r => setTimeout(r, 0));
       }
+      // Routing one net can cut the ground fill off from another net's pins
+      // (or split it), so sweep once more for anything still unconnected.
+      for (const n of analyze().nets) {
+        if (ROUTER.cancel || n.islands <= 1 || (onlyNets && !onlyNets.includes(n.name))) continue;
+        let guard = 0;
+        while (guard++ < 60) {
+          const net = analyze().netByName[n.name]; if (!net) break;
+          const r = routeNetOnce(net, RG, {});
+          if (r === "done") break;
+          if (r === "fail") { failed.push(n.name); break; }
+        }
+        if (!order.includes(n.name)) order.push(n.name);
+        await new Promise(r => setTimeout(r, 0));
+      }
       const res = { tracks: S.tracks.slice(), vias: S.vias.slice(), failed: [...new Set(failed)], unrouted: analyze().unrouted };
       if (!best || res.unrouted < best.unrouted) best = res;
       if (!res.unrouted) break;
@@ -176,7 +194,7 @@ async function autoroute(progress, onlyNets) {
     }
   } finally {
     if (best) { S.tracks = best.tracks; S.vias = best.vias; }
-    invalidate(); ROUTER.running = false;
+    ROUTER.noPour = false; invalidate(); ROUTER.running = false;
   }
   return best;
 }

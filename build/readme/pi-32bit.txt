@@ -1,5 +1,6 @@
 Tinkerie {VERSION} for Raspberry Pi OS 32-bit (Pi 2, 3, 4, 5 and Zero 2 W)
 Free maker tools, designed and created by nrmluvdev.
+This is an ALPHA version: it works, but it is still being tested, so expect rough edges.
 Free software under the GNU GPL, version 3 or later (see source/LICENSE). No warranty.
 Source and updates: https://github.com/normanlove/tinkerie
 
@@ -19,7 +20,12 @@ What works on this system
   cable, Bluetooth meters and Camera mode are Windows only for now.
 Every app has teaching mode: point at anything to see what it does. F2 turns it off.
 
-New in {VERSION}: every app opens maximised.
+New in {VERSION}:
+- Tinkerie is now marked as alpha while it is tested on real hardware.
+- Wirie: the auto-router now draws ground (GND) tracks too, so every connection is
+  visible, and it checks the ground fill really reaches each pin.
+
+New in 1.5.1: every app opens maximised.
 
 New in 1.5.0: Flashie's "Write image" tab can now
 - set up Raspberry Pi OS before its first start, like Raspberry Pi Imager: press "OS settings"

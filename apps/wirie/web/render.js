@@ -83,7 +83,7 @@ function drawPCB(cv) {
     for (const L of (active === "top" ? ["bottom", "top"] : ["top", "bottom"])) {
       if (!VIEW.show[L]) continue;
       const col = L === "top" ? COL.top : COL.bottom, dim = L !== active;
-      drawPour(ctx, L, col, dim ? 0.16 : 0.30, W, H, dpr);
+      drawPour(ctx, L, col, dim ? 0.24 : 0.34, W, H, dpr);
       setWorld(ctx, dpr);
       ctx.globalAlpha = dim ? 0.42 : 0.95;
       ctx.strokeStyle = col; ctx.fillStyle = col;

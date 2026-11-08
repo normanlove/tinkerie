@@ -41,6 +41,7 @@ jobs:
         if: steps.v.outputs.new == 'yes'
         run: |
           cd dist/packages
-          gh release create "v${{ steps.v.outputs.version }}" --target "$GITHUB_SHA" \
+          pre=""; case "${{ steps.v.outputs.version }}" in *-*) pre="--prerelease";; esac
+          gh release create "v${{ steps.v.outputs.version }}" --target "$GITHUB_SHA" $pre \
             --title "Tinkerie ${{ steps.v.outputs.version }}" --notes-file notes.md \
             Tinkerie.exe Tinkerie-*.zip Tinkerie-*.tar.gz

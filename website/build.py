@@ -94,14 +94,14 @@ def footer():
     return f"""<footer><div class="wrap">
   <div class="stack">
     <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
-    <p>Free maker tools, designed and created by <b>nrmluvdev</b>. Version {VERSION}.</p>
+    <p>Free maker tools, designed and created by <b>nrmluvdev</b>. Version {VERSION}: Tinkerie is in alpha.</p>
     <p>Free software under the GNU GPL, version 3 or later. It comes with no warranty.</p>
   </div>
   <div><h4>The apps</h4><ul>{links}</ul></div>
   <div><h4>Help and source</h4><ul>
     <li><a href="start.html">Getting started</a></li>
     <li><a href="index.html#faq">Questions</a></li>
-    <li><a href="{REPO}/releases/latest">All downloads</a></li>
+    <li><a href="{REPO}/releases">All downloads</a></li>
     <li><a href="{REPO}">Source code on GitHub</a></li>
     <li><a href="{REPO}/issues">Report a problem</a></li>
   </ul></div>
@@ -165,7 +165,7 @@ def build_index():
     body = f"""<div class="ruler" aria-hidden="true"></div>
 <section class="hero"><div class="wrap hero-grid">
   <div>
-    <span class="tape">Free · Version {VERSION}</span>
+    <span class="tape">Free · Alpha · v{VERSION.split("-")[0]}</span>
     <h1>Every tool on your workbench, in one free program.</h1>
     <p class="lead">Design circuit boards and 3D prints, flash microcontrollers, write SD cards, and turn your PC into an oscilloscope, multimeter and serial monitor.</p>
     <div class="cta">
@@ -180,6 +180,10 @@ def build_index():
   </div>
   <figure><div class="shot"><span class="tag">The launcher</span><button class="zoom" type="button" data-full="img/shots/launcher.webp" data-caption="The Tinkerie launcher: pick an app to start it." aria-label="Enlarge the launcher screenshot"><img src="img/shots/launcher.webp" alt="The Tinkerie launcher listing all seven apps" width="1470" height="960"></button></div>
   <figcaption>Open Tinkerie, pick an app. Each one runs in its own window.</figcaption></figure>
+</div></section>
+
+<section class="band" style="padding-block:0 40px"><div class="wrap">
+  <div class="callout alpha">{svg("info")}<div class="stack" style="gap:6px"><p><b>Tinkerie is in alpha.</b> Every app works and you can use them today, but they're still being tested on real hardware, so expect a few rough edges and changes between versions.</p><p class="muted">Found something that doesn't work? <a href="{REPO}/issues">Tell us on GitHub</a>. It really helps.</p></div></div>
 </div></section>
 
 <section class="band alt" id="apps"><div class="wrap">
@@ -207,8 +211,8 @@ def build_index():
 </div></section>
 
 <section class="band" id="download"><div class="wrap">
-  <div class="head"><div><span class="label">Download · version {VERSION}</span><h2>Get Tinkerie</h2><p>The one marked "Your computer" should suit you. Each download has a READ ME FIRST file that explains how to start it.</p></div>
-  <a class="btn btn-line" href="{REPO}/releases/latest">All files and release notes {svg("arrow")}</a></div>
+  <div class="head"><div><span class="label">Download · alpha version {VERSION}</span><h2>Get Tinkerie</h2><p>The one marked "Your computer" should suit you. Each download has a READ ME FIRST file that explains how to start it.</p></div>
+  <a class="btn btn-line" href="{REPO}/releases">All files and release notes {svg("arrow")}</a></div>
   <div class="dl">{dl_rows()}</div>
 </div></section>
 
@@ -317,7 +321,7 @@ def build_app(i, a):
   <nav class="crumbs" aria-label="You are here"><a href="index.html">Tinkerie</a><span aria-hidden="true">›</span><a href="index.html#apps">Apps</a><span aria-hidden="true">›</span><span>{a['name']}</span></nav>
   <div class="grid">
     <div>
-      <div class="app-title"><img src="img/icons/{a['icon']}" alt=""><div><h1>{a['name']}</h1><span class="ver">Version {a['ver']} · in Tinkerie {VERSION}</span></div></div>
+      <div class="app-title"><img src="img/icons/{a['icon']}" alt=""><div><h1>{a['name']}</h1><span class="ver">Version {a['ver']} · in Tinkerie {VERSION}</span><span class="alpha-pill">Alpha</span></div></div>
       <p class="lead">{e(a['tagline'])}</p>
       <div class="plain"><span class="label">{e(a['plain'][0])}</span><p>{e(a['plain'][1])}</p></div>
       <div class="chips">{chips}</div>

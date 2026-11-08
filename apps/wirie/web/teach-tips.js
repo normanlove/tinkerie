@@ -63,6 +63,7 @@ window.TEACH = {
     "Via size / drill": ["Via size / drill", "The outer size of each via's copper ring, and the size of the hole drilled through it."],
     "Top side": ["Ground fill on top", "Fills the empty parts of the top copper layer with the fill net (usually GND). Less routing, less electrical noise."],
     "Bottom side": ["Ground fill on the bottom", "Fills the empty parts of the bottom copper layer with the fill net (usually GND). Most boards fill the bottom."],
+    "Route the fill net with tracks too": ["Route ground with tracks too", "The auto-router also draws real tracks for the fill net (usually GND). Every connection is then easy to see, and the board still works if the fill is turned off or gets cut into pieces by other tracks. The fill stays as extra ground. Recommended, especially while you're learning."],
     "Fill net": ["Fill net", "Which connection the copper fill belongs to. Almost always GND (ground)."],
     "0.5|0.635|1|1.27|2.54": ["Grid", "The snapping grid for placing parts, in millimetres. 2.54 mm (0.1 inch) matches pin headers and breadboards; 1.27 mm is half of that."],
     "parts": ["Parts", "How many parts are on the board."],

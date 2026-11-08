@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 	"unicode/utf16"
 )
 
@@ -122,7 +123,11 @@ func versionInfo(ver string) []byte {
 	ms := uint32(a)<<16 | uint32(b)
 	ls := uint32(c) << 16
 	var fixed bytes.Buffer
-	binary.Write(&fixed, binary.LittleEndian, []uint32{0xFEEF04BD, 0x00010000, ms, ls, ms, ls, 0x3F, 0, 0x40004, 1, 0, 0, 0})
+	var flags uint32
+	if strings.Contains(ver, "-") {
+		flags = 0x2 // VS_FF_PRERELEASE: an alpha or beta build
+	}
+	binary.Write(&fixed, binary.LittleEndian, []uint32{0xFEEF04BD, 0x00010000, ms, ls, ms, ls, 0x3F, flags, 0x40004, 1, 0, 0, 0})
 	strs := vnode("040904B0", 1, nil, 0,
 		vstring("CompanyName", "nrmluvdev"),
 		vstring("FileDescription", "Tinkerie - maker tool suite"),

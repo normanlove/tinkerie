@@ -1,12 +1,12 @@
 // Wirie core: project model, geometry, nets & connectivity — by nrmluvdev
 "use strict";
 
-const APP = { name: "Wirie", version: "1.2.0", author: "nrmluvdev" };
+const APP = { name: "Wirie", version: "1.2.1-alpha", author: "nrmluvdev" };
 
 function newProject() {
   return {
     app: "wirie", version: 1, name: "Untitled board",
-    board: { w: 60, h: 40, r: 2, round: false, track: 0.3, power: 0.6, clear: 0.2, viaD: 0.8, viaDrill: 0.4, pourTop: false, pourBot: true, pourNet: "GND", pourClear: 0.35, grid: 1.27, edgeClear: 0.4 },
+    board: { w: 60, h: 40, r: 2, round: false, track: 0.3, power: 0.6, clear: 0.2, viaD: 0.8, viaDrill: 0.4, pourTop: false, pourBot: true, pourNet: "GND", pourRoute: true, pourClear: 0.35, grid: 1.27, edgeClear: 0.4 },
     comps: [], conns: [], tracks: [], vias: [], texts: [], nextId: 1,
     strip: { kind: "strip", cols: 40, rows: 26, place: {}, cuts: [], links: [], autoCuts: [], autoLinks: [] },
   };
@@ -124,6 +124,71 @@ function netPriority(name) {
 function internallyLinked(p) { const fp = compFP(p.comp); return !!(fp.body.module || /^(sw6x6|sw12x12|sw6x6smd|sw4x4smd)$/.test(fp.id) || /^(SHIELD|MP|MH)$/.test(p.name)); }
 
 // Build everything derived: pads, nets, copper connectivity, ratsnest.
+// pourLink joins the fill-net items that the copper fill on one layer really
+// reaches. The fill is traced on a 0.15 mm grid, drawn exactly as the board
+// shows and exports it (clearances, thermal spokes, holes), so a ground pin
+// cut off by other tracks is NOT counted as connected and gets routed.
+const POUR_RES = 0.15;
+let pourGrid = null;
+function pourLink(layer, items, holes, isPour, cu) {
+  const B = S.board, res = POUR_RES;
+  const W = Math.ceil(B.w / res) + 2, H = Math.ceil(B.h / res) + 2;
+  if (typeof document === "undefined" || W * H > 4e6) { // no canvas (or a huge board): trust the fill
+    let anchor = null;
+    for (const it of items) if (it.layers.includes(layer) && isPour(it)) { if (anchor === null) anchor = it.id; else cu.union(anchor, it.id); }
+    return;
+  }
+  if (!pourGrid) pourGrid = document.createElement("canvas");
+  if (pourGrid.width !== W || pourGrid.height !== H) { pourGrid.width = W; pourGrid.height = H; }
+  const p = pourGrid.getContext("2d", { willReadFrequently: true });
+  p.setTransform(1, 0, 0, 1, 0, 0); p.clearRect(0, 0, W, H);
+  p.setTransform(1 / res, 0, 0, 1 / res, 0, 0);
+  const on = items.filter(it => it.layers.includes(layer));
+  p.fillStyle = "#fff"; pathPoly(p, boardPolygon(B.edgeClear)); p.fill();
+  p.globalCompositeOperation = "destination-out"; p.fillStyle = "#000"; p.strokeStyle = "#000"; p.lineCap = "round";
+  for (const it of on) if (!isPour(it) || it.kind === "pad") itemPath(p, it, B.pourClear);
+  p.globalCompositeOperation = "source-over"; p.strokeStyle = "#fff"; p.lineWidth = SPOKE_W; p.lineCap = "butt";
+  for (const it of on) if (it.kind === "pad" && isPour(it)) for (const sp of thermalSpokes(it.ref)) { p.beginPath(); p.moveTo(sp[0], sp[1]); p.lineTo(sp[2], sp[3]); p.stroke(); }
+  p.globalCompositeOperation = "destination-out"; p.lineCap = "round";
+  for (const it of on) if (!isPour(it)) itemPath(p, it, B.pourClear);
+  for (const h of holes) { p.beginPath(); p.arc(h.x, h.y, h.d / 2 + B.pourClear, 0, 7); p.fill(); }
+  p.globalCompositeOperation = "source-over";
+  // Label the separate pieces of fill.
+  const px = p.getImageData(0, 0, W, H).data;
+  const lab = new Int32Array(W * H), stack = new Int32Array(W * H);
+  let next = 0;
+  for (let i = 0; i < W * H; i++) {
+    if (lab[i] || px[i * 4 + 3] < 128) continue;
+    next++; let sp = 0; stack[sp++] = i; lab[i] = next;
+    while (sp) {
+      const k = stack[--sp], x = k % W;
+      if (x > 0 && !lab[k - 1] && px[(k - 1) * 4 + 3] >= 128) { lab[k - 1] = next; stack[sp++] = k - 1; }
+      if (x < W - 1 && !lab[k + 1] && px[(k + 1) * 4 + 3] >= 128) { lab[k + 1] = next; stack[sp++] = k + 1; }
+      if (k >= W && !lab[k - W] && px[(k - W) * 4 + 3] >= 128) { lab[k - W] = next; stack[sp++] = k - W; }
+      if (k < W * (H - 1) && !lab[k + W] && px[(k + W) * 4 + 3] >= 128) { lab[k + W] = next; stack[sp++] = k + W; }
+    }
+  }
+  const at = (x, y) => { const i = Math.round(x / res), j = Math.round(y / res); return i < 0 || j < 0 || i >= W || j >= H ? 0 : lab[j * W + i]; };
+  // Which piece of fill touches each fill-net item: pads through their
+  // spokes, tracks and vias where they lie (the fill flows round them).
+  const first = {};
+  const join = (l, it) => { if (!l) return; if (first[l] === undefined) first[l] = it.id; else cu.union(first[l], it.id); };
+  for (const it of on) {
+    if (!isPour(it)) continue;
+    if (it.kind === "pad") {
+      const cx = it.ref.x, cy = it.ref.y; // sample each spoke from the pad outwards
+      for (const sp of thermalSpokes(it.ref)) for (const [ex, ey] of [[sp[0], sp[1]], [sp[2], sp[3]]])
+        for (let f = 0.5; f <= 1.0001; f += 0.05) join(at(cx + (ex - cx) * f, cy + (ey - cy) * f), it);
+    } else {
+      const s = it.shape;
+      for (let f = 0; f <= 1.0001; f += 0.25) {
+        const x = s.ax + (s.bx - s.ax) * f, y = s.ay + (s.by - s.ay) * f, r = s.r + res;
+        join(at(x, y), it); join(at(x + r, y), it); join(at(x - r, y), it); join(at(x, y + r), it); join(at(x, y - r), it);
+      }
+    }
+  }
+}
+
 function analyze() {
   if (CACHE) return CACHE;
   const pads = [], padByKey = {}, holes = [];
@@ -191,9 +256,12 @@ function analyze() {
   const clusterNets = {};
   for (const it of items) if (it.net) { const r = cu.find(it.id); (clusterNets[r] = clusterNets[r] || new Set()).add(it.net); }
   const pourNet = netByName[S.board.pourNet];
-  if (pourNet && pourLayers.length) {
-    let anchor = null;
-    for (const it of items) { const r = cu.find(it.id); const ns = clusterNets[r]; if (ns && ns.size === 1 && ns.has(pourNet) && it.layers.some(l => pourLayers.includes(l))) { if (anchor === null) anchor = it.id; else cu.union(anchor, it.id); } }
+  // While the auto-router works with "route the fill net too" on, the fill
+  // doesn't count, so ground gets real tracks (the fill stays as a backup).
+  const routingThroughFill = typeof ROUTER !== "undefined" && ROUTER.noPour;
+  if (pourNet && pourLayers.length && !routingThroughFill) {
+    const isPour = it => { const ns = clusterNets[cu.find(it.id)]; return !!ns && ns.size === 1 && ns.has(pourNet); };
+    for (const layer of pourLayers) pourLink(layer, items, holes, isPour, cu);
   }
   // recompute after pour merge
   const cNets = {};
