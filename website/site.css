@@ -54,7 +54,8 @@ a { color: inherit; text-decoration-color: color-mix(in srgb, var(--mat) 60%, tr
 a:hover { text-decoration-color: var(--mat); }
 :focus-visible { outline: 3px solid var(--tape); outline-offset: 2px; border-radius: 6px; }
 h1, h2, h3 { font-family: var(--display); line-height: 1.12; text-wrap: balance; margin: 0; letter-spacing: -.01em; }
-h1 { font-size: clamp(2.1rem, 5vw, 3.6rem); font-weight: 700; }
+h1 { font-size: clamp(1.9rem, 3.9vw, 2.9rem); font-weight: 650; letter-spacing: -.02em; }
+.app-title h1 { font-size: clamp(2.1rem, 4.4vw, 3.2rem); }
 h2 { font-size: clamp(1.5rem, 3vw, 2.15rem); font-weight: 600; }
 h3 { font-size: 1.12rem; font-weight: 600; }
 p { margin: 0; }
