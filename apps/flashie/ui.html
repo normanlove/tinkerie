@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Flashie — ESP32 Firmware Flasher</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="nrmluvdev">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237c5cff'/%3E%3Cstop offset='1' stop-color='%2300d4ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cpath d='M36 8 16 36h14l-4 20 22-30H34z' fill='white'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#0b0d12; --bg2:#10131a; --card:#151922; --card2:#1a1f2b; --line:#252b39; --line2:#2f3647;
+  --text:#e9ecf3; --muted:#8a93a6; --dim:#5d6578;
+  --accent:#7c5cff; --accent2:#00d4ff; --ok:#2ee59d; --warn:#ffb547; --bad:#ff5c7a;
+  --grad:linear-gradient(135deg,var(--accent),var(--accent2));
+  --r:18px; --r-sm:12px;
+  --ease:cubic-bezier(.2,.8,.2,1);
+  --font:"Segoe UI Variable Text","Segoe UI Variable","Segoe UI",system-ui,-apple-system,Inter,Roboto,sans-serif;
+  --display:"Segoe UI Variable Display","Segoe UI Variable","Segoe UI",system-ui,sans-serif;
+  --mono:"Cascadia Code","Cascadia Mono",Consolas,"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(124,92,255,.16), transparent 60%),
+    radial-gradient(900px 500px at 110% 0%, rgba(0,212,255,.10), transparent 60%),
+    var(--bg);
+  color:var(--text); font:14px/1.5 var(--font); -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+button,input,select{font:inherit;color:inherit}
+::selection{background:rgba(124,92,255,.4)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:#2a3040;border-radius:10px;border:2px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-track{background:transparent}
+
+.app{max-width:1280px;margin:0 auto;padding:22px 28px 28px;min-height:100%;display:flex;flex-direction:column;gap:20px}
+
+/* header */
+header{display:flex;align-items:center;gap:14px}
+.logo{width:44px;height:44px;border-radius:13px;background:var(--grad);display:grid;place-items:center;
+  box-shadow:0 8px 28px -6px rgba(124,92,255,.65), inset 0 1px 0 rgba(255,255,255,.25)}
+.logo svg{width:24px;height:24px}
+.brand h1{margin:0;font:700 22px/1.1 var(--display);letter-spacing:-.02em}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.spacer{flex:1}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:var(--card);
+  border:1px solid var(--line);color:var(--muted);font-size:12px;white-space:nowrap}
+.pill b{color:var(--text);font-weight:600}
+.pill.demo{border-color:rgba(255,181,71,.4);color:var(--warn)}
+
+/* stepper */
+.stepper{display:grid;grid-template-columns:repeat(3,1fr);gap:0;position:relative;padding:0 6px}
+.stepper .track{position:absolute;left:calc(16.66% + 6px);right:calc(16.66% + 6px);top:17px;height:2px;background:var(--line);border-radius:2px;overflow:hidden}
+.stepper .fill{height:100%;width:0;background:var(--grad);transition:width .6s var(--ease)}
+.step{display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;z-index:1;cursor:pointer;user-select:none}
+.step .dot{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:700;
+  background:var(--bg2);border:2px solid var(--line2);color:var(--muted);transition:all .35s var(--ease)}
+.step .lbl{font-size:13px;color:var(--muted);font-weight:600;transition:color .3s}
+.step.active .dot{border-color:transparent;background:var(--grad);color:#fff;box-shadow:0 0 0 6px rgba(124,92,255,.15)}
+.step.active .lbl{color:var(--text)}
+.step.done .dot{border-color:var(--ok);color:var(--ok);background:rgba(46,229,157,.08)}
+.step.done .lbl{color:var(--text)}
+.step .dot svg{width:16px;height:16px}
+
+/* cards */
+.grid{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:18px;flex:1;align-items:stretch}
+@media (max-width:1100px){.grid{grid-template-columns:1fr 1fr}.card.flash{grid-column:1/-1}}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:var(--r);
+  padding:20px;display:flex;flex-direction:column;gap:14px;position:relative;
+  transition:border-color .35s var(--ease), box-shadow .35s var(--ease), transform .35s var(--ease), opacity .35s;
+  animation:rise .5s var(--ease) both}
+.card:nth-child(2){animation-delay:.06s}.card:nth-child(3){animation-delay:.12s}
+.card.focus{border-color:rgba(124,92,255,.55);box-shadow:0 18px 50px -20px rgba(124,92,255,.45), 0 0 0 1px rgba(124,92,255,.15) inset}
+.card.waiting{opacity:.55}
+.card.waiting:hover{opacity:.8}
+.card-h{display:flex;align-items:center;gap:10px}
+.card-h .n{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:12px;font-weight:700;
+  background:var(--card2);border:1px solid var(--line2);color:var(--muted);transition:all .3s}
+.card.focus .card-h .n{background:var(--grad);border-color:transparent;color:#fff}
+.card.complete .card-h .n{background:rgba(46,229,157,.12);border-color:rgba(46,229,157,.4);color:var(--ok)}
+.card-h h2{margin:0;font:650 17px/1.2 var(--display);letter-spacing:-.01em}
+.card-h .sub{color:var(--muted);font-size:12.5px}
+.card-h .right{margin-left:auto}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+
+/* buttons */
+.btn{appearance:none;border:1px solid var(--line2);background:var(--card2);border-radius:var(--r-sm);padding:9px 14px;
+  cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:13px;
+  transition:all .2s var(--ease)}
+.btn:hover{border-color:#3d4560;background:#1f2533}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn svg{width:15px;height:15px}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--text);background:var(--card2)}
+.btn.icon{padding:7px}
+.spin{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* port tiles */
+.ports{display:flex;flex-direction:column;gap:8px;overflow:auto;max-height:290px;padding-right:2px;margin-right:-4px}
+.port{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--bg2);border:1px solid var(--line);
+  cursor:pointer;transition:all .22s var(--ease);animation:fadeIn .3s var(--ease) both;position:relative}
+.port:hover{border-color:var(--line2);background:#131722}
+.port.sel{border-color:rgba(124,92,255,.7);background:linear-gradient(135deg,rgba(124,92,255,.10),rgba(0,212,255,.05))}
+.port.unlikely{opacity:.6}
+.port .ic{width:38px;height:38px;border-radius:11px;background:var(--card2);border:1px solid var(--line2);display:grid;place-items:center;flex:none;transition:all .25s}
+.port.sel .ic{background:var(--grad);border-color:transparent}
+.port .ic svg{width:20px;height:20px}
+.port .meta{min-width:0;flex:1}
+.port .top{display:flex;align-items:center;gap:8px}
+.port .com{font:700 15px var(--display)}
+.port .lab{font-size:13px;color:var(--text);margin-top:1px}
+.port .det{font:11.5px var(--mono);color:var(--dim);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.port .radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--line2);flex:none;margin-top:10px;transition:all .2s;position:relative}
+.port.sel .radio{border-color:var(--accent)}
+.port.sel .radio::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--grad)}
+.tag{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:6px;letter-spacing:.03em;text-transform:uppercase}
+.tag.high{background:rgba(46,229,157,.12);color:var(--ok)}
+.tag.medium{background:rgba(0,212,255,.12);color:var(--accent2)}
+.tag.low{background:rgba(255,181,71,.12);color:var(--warn)}
+.tag.none{background:rgba(138,147,166,.12);color:var(--muted)}
+.tag.chip{background:rgba(124,92,255,.15);color:#b7a6ff}
+
+.empty{border:1.5px dashed var(--line2);border-radius:14px;padding:26px 18px;text-align:center;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:10px}
+.empty .pulse{width:46px;height:46px;border-radius:50%;background:var(--card2);display:grid;place-items:center;position:relative}
+.empty .pulse::before{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--accent);animation:ping 1.8s var(--ease) infinite}
+.empty .pulse svg{width:22px;height:22px;color:var(--accent2)}
+@keyframes ping{0%{transform:scale(1);opacity:.8}100%{transform:scale(1.8);opacity:0}}
+.empty b{color:var(--text)}
+
+/* select & inputs */
+.field{position:relative}
+select,.input{width:100%;appearance:none;background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r-sm);
+  padding:10px 36px 10px 12px;outline:none;transition:border-color .2s, box-shadow .2s}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a93a6' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;background-size:16px;cursor:pointer}
+select:focus,.input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,255,.2)}
+select option,select optgroup{background:#151922;color:var(--text)}
+.input{padding-right:12px}
+.input.mono{font-family:var(--mono);font-size:15px;letter-spacing:.02em}
+.input.bad{border-color:var(--bad);box-shadow:0 0 0 3px rgba(255,92,122,.15)}
+
+.note{display:flex;gap:10px;padding:10px 12px;border-radius:12px;font-size:12.5px;line-height:1.45;animation:fadeIn .3s var(--ease)}
+.note svg{width:16px;height:16px;flex:none;margin-top:1px}
+.note.info{background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.2);color:#bfefff}
+.note.warn{background:rgba(255,181,71,.08);border:1px solid rgba(255,181,71,.25);color:#ffe0b0}
+.note.ok{background:rgba(46,229,157,.08);border:1px solid rgba(46,229,157,.25);color:#c4f7e0}
+.note.bad{background:rgba(255,92,122,.08);border:1px solid rgba(255,92,122,.3);color:#ffd0da}
+
+.chipbox{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;padding:12px 14px;border-radius:12px;background:var(--bg2);border:1px solid var(--line);font-size:13px;animation:fadeIn .3s var(--ease)}
+.chipbox dt{color:var(--muted)} .chipbox dd{margin:0;font-family:var(--mono);font-size:12.5px}
+
+/* drop zone */
+.drop{border:1.5px dashed var(--line2);border-radius:16px;padding:26px 16px;text-align:center;cursor:pointer;
+  transition:all .25s var(--ease);background:var(--bg2);display:flex;flex-direction:column;align-items:center;gap:8px}
+.drop:hover,.drop.over{border-color:var(--accent);background:rgba(124,92,255,.06)}
+.drop.over{transform:scale(1.01)}
+.drop .big{width:52px;height:52px;border-radius:16px;background:var(--card2);display:grid;place-items:center;transition:all .3s}
+.drop:hover .big,.drop.over .big{background:var(--grad)}
+.drop .big svg{width:24px;height:24px}
+.drop b{font-size:14px}
+.drop span{color:var(--muted);font-size:12.5px}
+.file{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;background:linear-gradient(135deg,rgba(124,92,255,.10),rgba(0,212,255,.05));border:1px solid rgba(124,92,255,.5);animation:fadeIn .3s var(--ease)}
+.file .ic{width:40px;height:40px;border-radius:11px;background:var(--grad);display:grid;place-items:center;flex:none}
+.file .ic svg{width:20px;height:20px}
+.file .meta{flex:1;min-width:0}
+.file .nm{font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file .sz{color:var(--muted);font-size:12px}
+
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chipbtn{border:1px solid var(--line2);background:var(--bg2);border-radius:999px;padding:4px 10px;font:12px var(--mono);cursor:pointer;color:var(--muted);transition:all .2s}
+.chipbtn:hover{color:var(--text);border-color:#3d4560}
+.chipbtn.on{color:#fff;background:rgba(124,92,255,.22);border-color:rgba(124,92,255,.7)}
+.chipbtn small{font-family:var(--font);opacity:.75;margin-left:4px}
+
+details.adv{border-top:1px solid var(--line);padding-top:12px}
+details.adv summary{cursor:pointer;color:var(--muted);font-size:12.5px;font-weight:600;list-style:none;display:flex;align-items:center;gap:6px;user-select:none}
+details.adv summary::-webkit-details-marker{display:none}
+details.adv summary svg{width:14px;height:14px;transition:transform .25s var(--ease)}
+details.adv[open] summary svg{transform:rotate(90deg)}
+.advgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;animation:fadeIn .3s var(--ease)}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;grid-column:1/-1;padding:10px 12px;border-radius:12px;background:var(--bg2);border:1px solid var(--line2);cursor:pointer;font-size:13px}
+.toggle small{display:block;color:var(--muted);font-size:11.5px}
+.sw{width:38px;height:22px;border-radius:999px;background:var(--line2);position:relative;transition:background .25s;flex:none}
+.sw::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .25s var(--ease)}
+.toggle input{display:none}
+.toggle input:checked + .sw{background:var(--accent)}
+.toggle input:checked + .sw::after{transform:translateX(16px)}
+
+/* flash card */
+.summary{display:flex;flex-direction:column;gap:2px;padding:4px 0}
+.srow{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+.srow:last-child{border-bottom:0}
+.srow span{color:var(--muted)}
+.srow b{font-weight:600;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62%}
+.srow b.mono{font-family:var(--mono);font-weight:500}
+.srow b.missing{color:var(--dim);font-weight:500}
+
+.flashbtn{position:relative;overflow:hidden;border:0;border-radius:16px;padding:17px;font:700 17px var(--display);letter-spacing:.01em;
+  color:#fff;background:var(--grad);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 14px 34px -12px rgba(124,92,255,.8);transition:transform .2s var(--ease), box-shadow .3s, filter .3s}
+.flashbtn:hover{transform:translateY(-1px);box-shadow:0 18px 40px -12px rgba(124,92,255,.95)}
+.flashbtn:active{transform:scale(.98)}
+.flashbtn:disabled{filter:grayscale(.85) brightness(.6);cursor:not-allowed;box-shadow:none;transform:none}
+.flashbtn svg{width:20px;height:20px}
+.flashbtn::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.25) 50%,transparent 70%);transform:translateX(-100%)}
+.flashbtn:not(:disabled):hover::after{animation:sheen 1.1s var(--ease)}
+@keyframes sheen{to{transform:translateX(100%)}}
+
+.prog{display:flex;flex-direction:column;gap:10px}
+.bar{height:12px;border-radius:999px;background:var(--bg2);border:1px solid var(--line);overflow:hidden;position:relative}
+.bar i{position:absolute;inset:0 auto 0 0;width:0;background:var(--grad);border-radius:999px;transition:width .25s linear, background .4s}
+.bar i::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(-45deg,rgba(255,255,255,.14) 0 10px,transparent 10px 20px);background-size:28px 28px;animation:stripes .8s linear infinite}
+.bar.idle i::after,.bar.ok i::after,.bar.bad i::after{display:none}
+.bar.ok i{background:var(--ok)} .bar.bad i{background:var(--bad)}
+@keyframes stripes{to{background-position:28px 0}}
+.pstats{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.pct{font:700 30px/1 var(--display);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.status{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:14px;background:var(--bg2);border:1px solid var(--line);min-height:62px;transition:all .35s var(--ease)}
+.status .si{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--card2);transition:all .3s}
+.status .si svg{width:16px;height:16px}
+.status .st{font-size:13.5px;line-height:1.45;padding-top:4px}
+.status.ok{border-color:rgba(46,229,157,.4);background:rgba(46,229,157,.06)} .status.ok .si{background:var(--ok);color:#06281a}
+.status.bad{border-color:rgba(255,92,122,.4);background:rgba(255,92,122,.06)} .status.bad .si{background:var(--bad);color:#2b0610}
+.status.run .si{background:rgba(124,92,255,.2);color:#b7a6ff}
+.check path{stroke-dasharray:30;stroke-dashoffset:30;animation:draw .5s .1s var(--ease) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+.log{background:#07090d;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:11.5px/1.55 var(--mono);color:#9aa3b5;max-height:180px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin-top:10px}
+.log .s{color:#d6dbea}
+
+footer{display:flex;align-items:center;gap:12px;color:var(--dim);font-size:12px;padding-top:2px}
+footer a{color:var(--muted);text-decoration:none}
+footer .heart{color:var(--accent)}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+  background:#1d2230;border:1px solid var(--line2);border-radius:14px;padding:11px 16px;box-shadow:0 20px 50px -12px rgba(0,0,0,.7);
+  transition:all .35s var(--ease);font-size:13px;max-width:560px;z-index:9}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.toast.bad{border-color:rgba(255,92,122,.5)}
+.hidden{display:none!important}
+.seg{position:relative;display:grid;grid-template-columns:1fr 1fr;background:var(--bg2);border:1px solid var(--line2);border-radius:13px;padding:3px}
+.seg button{position:relative;z-index:1;border:0;background:none;padding:8px 6px;border-radius:10px;font-weight:650;font-size:12.5px;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:color .25s}
+.seg button svg{width:15px;height:15px}
+.seg button.on{color:#fff}
+.seg-pill{position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);border-radius:10px;background:linear-gradient(135deg,rgba(124,92,255,.55),rgba(0,212,255,.35));transition:transform .35s var(--ease)}
+.seg.file .seg-pill{transform:translateX(100%)}
+.libbtn{width:100%;border:1px dashed var(--line2);background:var(--bg2);border-radius:16px;padding:18px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .25s var(--ease);color:var(--text)}
+.libbtn:hover{border-color:var(--accent);background:rgba(124,92,255,.06)}
+.libbtn .big{width:48px;height:48px;border-radius:15px;background:var(--grad);display:grid;place-items:center}
+.libbtn .big svg{width:22px;height:22px}
+.libbtn b{font-size:14px}.libbtn span{color:var(--muted);font-size:12.5px}
+.quick{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.qchip{border:1px solid var(--line2);background:var(--card2);border-radius:999px;padding:5px 11px;font-size:12px;cursor:pointer;color:var(--text);transition:all .2s;display:inline-flex;gap:6px;align-items:center}
+.qchip:hover{border-color:var(--accent);transform:translateY(-1px)}
+.qchip .dot{width:7px;height:7px;border-radius:50%}
+.libsel{border-radius:14px;border:1px solid rgba(124,92,255,.55);background:linear-gradient(135deg,rgba(124,92,255,.10),rgba(0,212,255,.05));padding:13px 14px;display:flex;flex-direction:column;gap:8px;animation:fadeIn .3s var(--ease)}
+.libsel .t{display:flex;align-items:center;gap:10px}
+.libsel .t b{font-size:14.5px}
+.libsel .meta{color:var(--muted);font-size:12px}
+.tile{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font:700 15px var(--display);color:#fff;flex:none}
+.vpill{font:600 11px var(--mono);padding:2px 7px;border-radius:6px;background:rgba(0,212,255,.12);color:var(--accent2)}
+.shield{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--ok)}
+.shield.no{color:var(--warn)}
+.shield svg{width:13px;height:13px}
+.sheet-bg{position:fixed;inset:0;z-index:8;background:rgba(5,7,12,.6);backdrop-filter:blur(6px);display:grid;place-items:center;opacity:0;pointer-events:none;transition:opacity .3s var(--ease)}
+.sheet-bg.open{opacity:1;pointer-events:auto}
+.sheet{width:min(1180px,calc(100vw - 40px));height:min(820px,calc(100vh - 40px));background:linear-gradient(180deg,#161a24,#10131a);border:1px solid var(--line2);border-radius:22px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 40px 120px -30px rgba(0,0,0,.8);transform:translateY(18px) scale(.985);transition:transform .38s var(--ease)}
+.sheet-bg.open .sheet{transform:none}
+.sheet-h{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}
+.sheet-h h2{margin:0;font:700 18px var(--display)}
+.sheet-h .sub{color:var(--muted);font-size:12.5px}
+.lib-ic{width:40px;height:40px;border-radius:12px;background:var(--grad);display:grid;place-items:center}
+.lib-ic svg{width:20px;height:20px}
+.search{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--line2);border-radius:12px;padding:0 10px;width:260px;transition:border-color .2s}
+.search:focus-within{border-color:var(--accent)}
+.search svg{width:15px;height:15px;color:var(--muted)}
+.search input{border:0;background:none;outline:none;padding:9px 0;width:100%}
+.cats{display:flex;gap:6px;padding:10px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.sheet-body{flex:1;display:grid;grid-template-columns:400px 1fr;min-height:0}
+.liblist{overflow:auto;padding:12px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.libdetail{overflow:auto;padding:22px 26px;display:flex;flex-direction:column;gap:14px}
+.lsec{font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.07em;margin:8px 4px 2px}
+.litem{display:flex;gap:12px;align-items:center;padding:10px 11px;border-radius:13px;cursor:pointer;border:1px solid transparent;transition:all .2s var(--ease);animation:fadeIn .25s var(--ease) both}
+.litem:hover{background:var(--card2)}
+.litem.sel{background:linear-gradient(135deg,rgba(124,92,255,.14),rgba(0,212,255,.06));border-color:rgba(124,92,255,.5)}
+.litem.na{opacity:.45}
+.litem .m{min-width:0;flex:1}
+.litem .n{font-weight:650;display:flex;gap:7px;align-items:center}
+.litem .s{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dh{display:flex;gap:14px;align-items:center}
+.dh .tile{width:52px;height:52px;border-radius:15px;font-size:21px}
+.dh h3{margin:0;font:700 21px var(--display);letter-spacing:-.01em}
+.dh .meta{color:var(--muted);font-size:12.5px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:3px}
+.dabout{color:#c9cfdc;line-height:1.55}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip2{font-size:11.5px;padding:3px 9px;border-radius:999px;background:var(--card2);border:1px solid var(--line2);color:var(--muted)}
+.chip2.hl{color:#fff;border-color:rgba(124,92,255,.6);background:rgba(124,92,255,.18)}
+.ftable{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.frow{display:grid;grid-template-columns:90px 1fr auto auto;gap:12px;align-items:center;padding:9px 12px;border-bottom:1px solid var(--line);font-size:12.5px}
+.frow:last-child{border-bottom:0}
+.frow .o{font-family:var(--mono);color:var(--accent2)}
+.frow .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.frow .sz{color:var(--muted);font-variant-numeric:tabular-nums}
+.badge{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:6px;text-transform:uppercase;letter-spacing:.03em}
+.badge.ok{background:rgba(46,229,157,.12);color:var(--ok)}.badge.warn{background:rgba(255,181,71,.12);color:var(--warn)}.badge.info{background:rgba(0,212,255,.12);color:var(--accent2)}
+.links{display:flex;gap:8px;flex-wrap:wrap}
+.links a{color:var(--accent2);text-decoration:none;font-size:12.5px;display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:9px;background:var(--bg2);border:1px solid var(--line2)}
+.links a:hover{border-color:var(--accent2)}
+.notesbox{white-space:pre-wrap;background:#0b0e14;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:12.5px;color:#aab2c3;max-height:180px;overflow:auto}
+.dact{display:flex;gap:10px;align-items:center;margin-top:4px}
+.sheet-f{display:flex;align-items:center;gap:12px;padding:10px 18px;border-top:1px solid var(--line);color:var(--dim);font-size:12px}
+.skeleton{height:14px;border-radius:7px;background:linear-gradient(90deg,var(--card2),#232938,var(--card2));background-size:200% 100%;animation:sk 1.2s linear infinite}
+@keyframes sk{to{background-position:-200% 0}}
+.empty2{color:var(--muted);text-align:center;padding:40px 20px}
+.cydpanel{animation:rise .45s var(--ease) both;gap:18px}
+.cyd-h{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.cyd-badge{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,#ffd447,#ff9f1c);display:grid;place-items:center;flex:none;box-shadow:0 8px 24px -8px rgba(255,180,40,.6)}
+.cyd-badge svg{width:24px;height:24px}
+.cyd-h h2{margin:0;font:650 18px/1.2 var(--display);letter-spacing:-.01em}
+.cyd-h .sub{color:var(--muted);font-size:12.5px}
+.specs{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.spec{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:11px 13px;animation:fadeIn .35s var(--ease) both}
+.spec .k{font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.07em}
+.spec .v{font-weight:650;margin-top:3px;font-size:14px}
+.spec .s{color:var(--muted);font-size:12px;margin-top:1px}
+.pingrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.pgroup{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:12px 14px;animation:fadeIn .4s var(--ease) both}
+.pgroup h3{margin:0;font:650 13.5px var(--display)}
+.pgroup .bus{color:var(--muted);font-size:11.5px;margin:1px 0 9px}
+.pins{display:flex;flex-wrap:wrap;gap:6px}
+.pin{display:inline-flex;align-items:center;border-radius:8px;overflow:hidden;border:1px solid var(--line2);font-size:11.5px;transition:transform .15s,border-color .15s}
+.pin:hover{transform:translateY(-1px);border-color:#4a5372}
+.pin span{padding:3px 7px;color:var(--muted);background:var(--card2)}
+.pin b{padding:3px 7px;font:600 11.5px var(--mono);color:#fff;background:rgba(124,92,255,.18)}
+.pgroup .pn{color:var(--dim);font-size:11.5px;margin-top:8px;line-height:1.45}
+.cydnotes{display:flex;flex-direction:column;gap:8px}
+.src{color:var(--dim);font-size:11.5px}
+.note a.act{color:#fff;font-weight:650;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.fams{color:var(--dim)}
+.tag.fam{background:rgba(255,255,255,.06);color:var(--muted)}
+.port.drive .ic{border-style:dashed}
+.chipbox dd.big{font-family:var(--font);font-weight:650;color:#fff;font-size:13.5px}
+.row{display:flex;gap:8px;align-items:center}
+.grow{flex:1}
+</style>
+<link rel="stylesheet" href="/creator.css">
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo"><svg viewBox="0 0 24 24" fill="#fff"><path d="M13.5 2 5 13.5h6L9.5 22 19 9.5h-6.2z"/></svg></div>
+    <div class="brand">
+      <h1>Flashie</h1>
+      <p>Firmware flasher · <span class="fams">ESP32 · ESP8266 · Pico · Arduino · STM32</span></p>
+    </div>
+    <div class="spacer"></div>
+    <span class="pill demo hidden" id="demoPill">Demo mode — simulated boards</span>
+    <span class="pill">by <b>nrmluvdev</b></span>
+    <span class="pill" id="ver">v0.1.0</span>
+  </header>
+
+  <div class="stepper">
+    <div class="track"><div class="fill" id="trackFill"></div></div>
+    <div class="step" data-step="1"><div class="dot">1</div><div class="lbl">Pick board</div></div>
+    <div class="step" data-step="2"><div class="dot">2</div><div class="lbl">Pick firmware</div></div>
+    <div class="step" data-step="3"><div class="dot">3</div><div class="lbl">Flash</div></div>
+  </div>
+
+  <main class="grid">
+    <!-- STEP 1 -->
+    <section class="card" id="card1">
+      <div class="card-h">
+        <div class="n">1</div>
+        <div><h2>Pick board</h2><div class="sub">Plug it in — Flashie finds it</div></div>
+        <button class="btn ghost icon right" id="refresh" title="Rescan ports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
+      </div>
+      <div>
+        <div class="label">Connected ports <span id="portCount" class="tag none">0</span></div>
+        <div class="ports" id="ports"></div>
+      </div>
+      <div>
+        <div class="label">Board type</div>
+        <select id="boardSel"></select>
+      </div>
+      <div id="boardNote"></div>
+      <div class="row">
+        <button class="btn grow" id="identify" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg>
+          <span>Identify chip</span>
+        </button>
+      </div>
+      <div id="chipInfo"></div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="card waiting" id="card2">
+      <div class="card-h">
+        <div class="n">2</div>
+        <div><h2>Pick firmware</h2><div class="sub" id="fwSub">A firmware file from your computer</div></div>
+      </div>
+      <div class="seg" id="srcSeg">
+        <button data-mode="lib" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5V5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2zM8 7h6"/></svg>Firmware library</button>
+        <button data-mode="file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>My own file</button>
+        <i class="seg-pill"></i>
+      </div>
+      <div id="libMode"><div id="libPick"></div></div>
+      <div id="fileMode" class="hidden">
+      <input type="file" id="fileIn" accept=".bin,.hex,.uf2,.ihex,application/octet-stream" hidden>
+      <div class="drop" id="drop">
+        <div class="big"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M20 15v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-4"/></svg></div>
+        <b id="dropTitle">Choose a firmware file</b>
+        <span id="dropHint">.bin, .hex or .uf2 — or drag &amp; drop it here</span>
+      </div>
+      <div id="fileBox" class="hidden"></div>
+      <div id="fileNote"></div>
+      <div id="offWrap">
+        <div class="label" id="offLabel">Flash offset</div>
+        <input class="input mono" id="offset" value="0x1000" spellcheck="false" autocomplete="off">
+        <div class="presets" id="presets"></div>
+      </div>
+      <div id="famNote"></div>
+      </div>
+      <details class="adv" id="advWrap">
+        <summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>Advanced</summary>
+        <div class="advgrid">
+          <div id="baudWrap">
+            <div class="label">Speed</div>
+            <select id="baud"></select>
+          </div>
+          <div id="sizeWrap">
+            <div class="label">Flash size</div>
+            <select id="flashmb">
+              <option value="2">2 MB</option><option value="4" selected>4 MB</option>
+              <option value="8">8 MB</option><option value="16">16 MB</option><option value="32">32 MB</option>
+            </select>
+          </div>
+          <label class="toggle" id="compWrap">
+            <div>Compress while sending<small>Much faster. Turn off only if flashing fails.</small></div>
+            <input type="checkbox" id="compress" checked><span class="sw"></span>
+          </label>
+        </div>
+      </details>
+    </section>
+
+    <!-- STEP 3 -->
+    <section class="card flash waiting" id="card3">
+      <div class="card-h">
+        <div class="n">3</div>
+        <div><h2>Flash</h2><div class="sub">Write, verify, restart</div></div>
+      </div>
+      <div class="summary">
+        <div class="srow"><span>Board</span><b id="sBoard" class="missing">Not picked yet</b></div>
+        <div class="srow"><span>Port</span><b id="sPort" class="mono missing">—</b></div>
+        <div class="srow"><span>Firmware</span><b id="sFile" class="missing">Not picked yet</b></div>
+        <div class="srow"><span>Method</span><b id="sMethod" class="missing">—</b></div>
+        <div class="srow"><span>Writes to</span><b id="sOff" class="mono">0x1000</b></div>
+      </div>
+      <button class="flashbtn" id="flashBtn" disabled>
+        <svg viewBox="0 0 24 24" fill="#fff"><path d="M13.5 2 5 13.5h6L9.5 22 19 9.5h-6.2z"/></svg>
+        <span id="flashLbl">Flash</span>
+      </button>
+      <div class="prog">
+        <div class="row" style="align-items:flex-end">
+          <div class="pct" id="pct">0%</div>
+          <div class="grow"></div>
+          <button class="btn ghost hidden" id="cancel">Cancel</button>
+        </div>
+        <div class="bar idle" id="bar"><i></i></div>
+        <div class="pstats"><span id="pBytes">Ready when you are</span><span id="pSpeed"></span></div>
+      </div>
+      <div class="status" id="status">
+        <div class="si" id="sIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></div>
+        <div class="st" id="sText">Pick a board and a firmware file, then press <b>Flash</b>.</div>
+      </div>
+      <details class="adv" id="logWrap">
+        <summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>Technical details</summary>
+        <div class="log" id="log"></div>
+      </details>
+    </section>
+  </main>
+
+  <section class="card cydpanel hidden" id="cydPanel"></section>
+
+  <footer>
+    <span>Flashie — part of a free maker tool suite · made with <span class="heart">♥</span> by nrmluvdev</span>
+    <div class="spacer"></div>
+    <span>Native ESP ROM · UF2 · STK500 · AVR109 · STM32 UART — no esptool, avrdude or drivers bundled</span>
+  </footer>
+</div>
+<div class="sheet-bg" id="libSheet" aria-hidden="true">
+  <div class="sheet" role="dialog" aria-label="Firmware library">
+    <div class="sheet-h">
+      <div class="lib-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M4 19.5V5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2zM8 7h6M8 11h4"/></svg></div>
+      <div><h2>Firmware library</h2><div class="sub" id="libFor">Popular firmware, downloaded from each project's official source</div></div>
+      <div class="spacer"></div>
+      <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="libSearch" placeholder="Search firmware…" autocomplete="off"></div>
+      <button class="btn ghost icon" id="libClose" title="Close (Esc)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="cats" id="libCats"></div>
+    <div class="sheet-body">
+      <div class="liblist" id="libList"></div>
+      <div class="libdetail" id="libDetail"></div>
+    </div>
+    <div class="sheet-f"><span id="cacheInfo"></span><button class="btn ghost" id="clearCache">Clear download cache</button><div class="spacer"></div><span>Files come straight from GitHub releases and each project's own site — Flashie never re-hosts firmware.</span></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const ICON = {
+  usb:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v14"/><path d="m9 5 3-3 3 3"/><circle cx="12" cy="19" r="3"/><path d="M12 12 7 9V7M12 14l5-3V9"/><rect x="5.5" y="5" width="3" height="2"/><circle cx="17" cy="8" r="1.2"/></svg>',
+  drive:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M5 13 7.5 5h9L19 13"/><path d="M7 16.5h.01M11 16.5h.01"/></svg>',
+  plug:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 2v6M15 2v6M6 8h12v3a6 6 0 0 1-12 0zM12 17v5"/></svg>',
+  chip:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg>',
+  file:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>',
+  info:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',
+  warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>',
+  ok:'<svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17 19 7"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+  spin:'<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-9-9"/></svg>',
+  tick:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17 19 7"/></svg>',
+};
+const IMG_CHIPS = {0:'ESP32',2:'ESP32-S2',5:'ESP32-C3',9:'ESP32-S3',12:'ESP32-C2',13:'ESP32-C6',16:'ESP32-H2',18:'ESP32-P4',23:'ESP32-C5'};
+const BOOT_OFF = {'ESP32':0x1000,'ESP32-S2':0x1000,'ESP32-S3':0,'ESP32-C3':0,'ESP32-C2':0,'ESP32-C6':0,'ESP32-H2':0,'ESP32-P4':0x2000,'ESP32-C5':0x2000,'ESP8266':0};
+const UF2_FAM = {0xe48bff56:'RP2040',0xe48bff57:'RP2350',0xe48bff58:'RP2350',0xe48bff59:'RP2350',0xe48bff5a:'RP2350',0xe48bff5b:'RP2350',
+  0x1c5f21b0:'ESP32',0xbfdd4eee:'ESP32-S2',0xc47e5767:'ESP32-S3',0xd42ba06c:'ESP32-C3',0xada52840:'nRF52840',0x68ed2b88:'SAMD21',0x55114460:'SAMD51'};
+const FAM = {
+  esp:  {name:'ESP32 / ESP8266', files:'.bin', accept:'.bin', offset:true, offLabel:'Flash offset', defOff:0x1000, adv:['baud','size','comp'],
+         bauds:[[115200,'115,200 (safest)'],[230400,'230,400'],[460800,'460,800 (recommended)'],[921600,'921,600 (fastest)']], defBaud:460800,
+         method:'ESP ROM bootloader'},
+  avr:  {name:'Arduino (AVR)', files:'.hex', accept:'.hex,.ihex,.bin', offset:false, adv:[], method:'Arduino bootloader',
+         note:'Use the sketch’s <b>.hex</b> file (Arduino IDE: Sketch → Export Compiled Binary). Speed is picked automatically.'},
+  stm32:{name:'STM32', files:'.bin or .hex', accept:'.bin,.hex,.ihex', offset:true, offLabel:'Start address', defOff:0x08000000, adv:['baud'],
+         bauds:[[115200,'115,200 (recommended)'],[57600,'57,600'],[19200,'19,200'],[9600,'9,600 (safest)']], defBaud:115200,
+         method:'STM32 UART bootloader', note:'The whole chip is erased first, then your firmware is written and checked.'},
+  rp2:  {name:'Raspberry Pi Pico', files:'.uf2', accept:'.uf2,.bin,.hex', offset:false, adv:[], method:'UF2 drive copy',
+         note:'Pick a <b>.uf2</b> file. A .bin is converted to UF2 for you.'},
+};
+
+const S = {
+  boards:[], ports:[], port:null, boardId:'auto', chip:null,
+  file:null, data:null, analysis:null, offs:{}, offsetTouched:{}, flashing:false, lastResult:null, statusKind:'idle',
+};
+
+/* ---------- helpers ---------- */
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const hex = n => '0x' + n.toString(16).toUpperCase().padStart(n >= 0x1000000 ? 8 : 1, '0');
+const human = n => n >= 1048576 ? (n/1048576).toFixed(2)+' MB' : n >= 1024 ? (n/1024).toFixed(1)+' KB' : n+' bytes';
+const vp = (v,p) => v.toString(16).toUpperCase().padStart(4,'0') + ':' + p.toString(16).toUpperCase().padStart(4,'0');
+function note(kind, html){ return `<div class="note ${kind}">${ICON[kind==='bad'?'warn':kind==='ok'?'tick':kind]}<div>${html}</div></div>`; }
+let toastT;
+function toast(msg, bad){ const t=$('#toast'); t.textContent=msg; t.className='toast show'+(bad?' bad':''); clearTimeout(toastT); toastT=setTimeout(()=>t.className='toast',4200); }
+async function api(path, opts={}){
+  const r = await fetch(path, opts); let j={};
+  try{ j = await r.json(); }catch{}
+  if(!r.ok) throw new Error(j.error || ('Request failed ('+r.status+')'));
+  return j;
+}
+function parseOffset(s){
+  s = String(s).trim().toLowerCase().replace(/[_\s]/g,'');
+  if(!s) return NaN;
+  if(/^0x[0-9a-f]+$/.test(s)) return parseInt(s,16);
+  if(/^[0-9]+$/.test(s)) return parseInt(s,10);
+  if(/^[0-9a-f]+$/.test(s)) return parseInt(s,16);
+  return NaN;
+}
+const curPort = () => S.ports.find(p=>p.name===S.port);
+
+/* ---------- board / family logic ---------- */
+function currentBoard(){
+  if(S.boardId !== 'auto') return S.boards.find(b=>b.id===S.boardId) || null;
+  if(S.chip && S.chip.boardId) return S.boards.find(b=>b.id===S.chip.boardId) || null;
+  const p = curPort();
+  if(p && p.guess.boardId && p.guess.family) return S.boards.find(b=>b.id===p.guess.boardId) || null;
+  return null;
+}
+function family(){
+  if(S.boardId !== 'auto'){ const b=currentBoard(); return b ? b.family : null; }
+  if(S.chip && S.chip.family) return S.chip.family;
+  const p = curPort();
+  return p && p.guess.family || null;
+}
+function expectedChip(){
+  if(S.chip) return S.chip.chip;
+  const b = currentBoard(); if(b) return b.chip;
+  const p = curPort(); return p && p.guess.chip || null;
+}
+function boardLabel(){
+  if(S.boardId !== 'auto'){ const b=currentBoard(); return b ? b.name : '—'; }
+  const p = curPort();
+  if(!p) return null;
+  if(S.chip){ const b=currentBoard(); return b && b.family!=='esp' ? b.name+' · '+S.chip.chip : S.chip.chip + ' board'; }
+  return p.guess.label;
+}
+
+function renderBoards(){
+  const groups = {};
+  for(const b of S.boards){ (groups[b.group] ||= []).push(b); }
+  let h = `<option value="auto">✨ Auto-detect</option>`;
+  for(const g in groups){
+    h += `<optgroup label="${esc(g)}">` + groups[g].map(b=>`<option value="${b.id}">${esc(b.name)}</option>`).join('') + `</optgroup>`;
+  }
+  $('#boardSel').innerHTML = h;
+  $('#boardSel').value = S.boardId;
+}
+
+const FAMTAG = {esp:'ESP', avr:'Arduino', stm32:'STM32', rp2:'Pico'};
+function renderPorts(){
+  const el = $('#ports');
+  $('#portCount').textContent = S.ports.length;
+  $('#portCount').className = 'tag ' + (S.ports.some(p=>p.guess.likely) ? 'medium' : 'none');
+  if(!S.ports.length){
+    el.innerHTML = `<div class="empty"><div class="pulse">${ICON.plug}</div>
+      <div><b>No boards found yet</b><br>Plug your board in with a <b>data</b> USB cable. For a Pico, hold <b>BOOTSEL</b> while plugging in. Flashie keeps looking.</div></div>`;
+    return;
+  }
+  el.innerHTML = S.ports.map(p => {
+    const g = p.guess;
+    const conf = {high:'Sure',medium:'Likely',low:'Maybe',none:'Unlikely'}[g.confidence] || '';
+    const chipTag = g.chip ? `<span class="tag chip">${esc(g.chip)}</span>` : (g.family ? `<span class="tag fam">${FAMTAG[g.family]}</span>` : '');
+    const det = p.kind==='drive' ? `UF2 bootloader drive · ${esc(p.friendly)}`
+      : p.usb ? `${vp(p.vid,p.pid)} · ${esc(g.usbChip || p.friendly || 'USB')}` : esc(p.friendly || p.device || 'System port');
+    return `<div class="port ${p.kind} ${p.name===S.port?'sel':''} ${g.likely?'':'unlikely'}" data-port="${esc(p.name)}" title="${esc(p.friendly||'')}">
+      <div class="ic">${p.kind==='drive'?ICON.drive:p.usb?ICON.usb:ICON.plug}</div>
+      <div class="meta">
+        <div class="top"><span class="com">${esc(p.name)}</span><span class="tag ${g.confidence}">${conf}</span>${chipTag}</div>
+        <div class="lab">${esc(g.label)}</div>
+        <div class="det">${det}</div>
+      </div>
+      <div class="radio"></div>
+    </div>`;
+  }).join('');
+}
+
+function renderBoardNote(){
+  const p = curPort(), b = currentBoard();
+  let h = '';
+  if(p && p.kind==='drive' && S.boardId==='auto'){ if(p.guess.hint) h += note('info', esc(p.guess.hint)); else h += note('ok', 'Board is in BOOTSEL mode and ready for a UF2 file.'); }
+  else if(S.boardId !== 'auto' && b && b.note) h += note('info', esc(b.note));
+  else if(p && p.guess.hint && !S.chip) h += note('info', esc(p.guess.hint));
+  else if(b && b.note) h += note('info', esc(b.note));
+  if(p && !p.guess.likely && S.boardId==='auto') h += note('warn', 'This port doesn’t look like a dev board. If it is, pick your board from the list above.');
+  if(S.chip && b && b.family==='esp' && S.chip.family==='esp' && b.chip !== S.chip.chip && S.boardId!=='auto')
+    h += note('warn', `The connected chip is an <b>${esc(S.chip.chip)}</b>, but the <b>${esc(b.name)}</b> uses an <b>${esc(b.chip)}</b>. Check the model printed on the back.`);
+  if(p && S.boardId!=='auto' && p.kind==='drive' && b && b.family!=='rp2') h += note('warn', 'That’s a UF2 drive, but you picked a non-Pico board.');
+  if(S.boardId==='auto' && p && p.kind!=='drive' && (p.guess.families||[]).includes('esp') && !S.chip)
+    h += `<div class="src" style="padding:0 2px">Using a Cheap Yellow Display? <a href="#" class="act" id="pickCyd" style="color:var(--accent2)">Choose its model</a> — the number is printed on the back (e.g. ESP32-2432S028R).</div>`;
+  $('#boardNote').innerHTML = h;
+  const pc = $('#pickCyd'); if(pc) pc.onclick = e => { e.preventDefault(); selectBoard('cyd-2432s028r'); $('#boardSel').focus(); toast('Pick your exact CYD model from the “Cheap Yellow Display” group.'); };
+}
+
+/* ---------- CYD database ---------- */
+const curCYD = () => { const b = currentBoard(); return b && b.cyd ? S.cyds.find(c=>c.id===b.cyd) : null; };
+const cydById = id => S.cyds.find(c=>c.id===id);
+function selectBoard(id){
+  S.boardId = id; $('#boardSel').value = id; touch();
+  const b = currentBoard(); if(b && b.flashMB){ const fs=$('#flashmb'); if([...fs.options].some(o=>+o.value===b.flashMB)) fs.value=b.flashMB; }
+  if(S.chip && b && b.family!==S.chip.family){ S.chip=null; renderChip(); }
+  S._offFam = null; update();
+}
+const CYD_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="#3a2600" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><rect x="5" y="7" width="11" height="8" rx="1"/><path d="M8 21h8M12 18v3M19 8v.01M19 11v.01"/></svg>';
+
+function renderCYD(){
+  const c = curCYD(), el = $('#cydPanel');
+  if(!c){ el.classList.add('hidden'); S._cydShown = null; return; }
+  if(S._cydShown === c.id + (S.cydMatch?'m':'')){ return; }
+  S._cydShown = c.id + (S.cydMatch?'m':'');
+  const spec = (k,v,sub) => `<div class="spec"><div class="k">${k}</div><div class="v">${esc(v)}</div>${sub?`<div class="s">${esc(sub)}</div>`:''}</div>`;
+  const mem = `${c.flashMB} MB flash` + (c.psramMB ? ` · ${c.psramMB} MB PSRAM` : '');
+  let h = `<div class="cyd-h"><div class="cyd-badge">${CYD_ICON}</div>
+    <div><h2>${esc(c.model)}</h2><div class="sub">Cheap Yellow Display · ${esc(c.size)} · ${esc(c.res)}</div></div>
+    <div class="spacer"></div>
+    <button class="btn" id="copyPins">${ICON.file.replace('#fff','currentColor')}<span>Copy pins as #defines</span></button></div>
+    <div class="specs">
+      ${spec('Display', c.display, c.displayBus + (c.colorOrder ? ' · '+c.colorOrder+' colour order' : ''))}
+      ${spec('Touch', c.touch, c.touchBus)}
+      ${spec('Chip', c.chip, c.module)}
+      ${spec('Memory', mem)}
+      ${spec('USB', c.usb)}
+      ${c.audio || (c.extras&&c.extras.length) ? spec('Extras', (c.extras||[]).join(', ') || 'Audio', c.audio ? 'Audio: '+c.audio : '') : ''}
+    </div>
+    <div class="pingrid">` + c.groups.map((g,i) => `<div class="pgroup" style="animation-delay:${i*50}ms"><h3>${esc(g.name)}</h3><div class="bus">${esc(g.bus||'GPIO')}</div>
+      <div class="pins">${g.pins.map(p=>`<span class="pin" title="${esc(p.f)} → GPIO ${p.g}"><span>${esc(p.f)}</span><b>${p.g}</b></span>`).join('')}</div>
+      ${g.note?`<div class="pn">${esc(g.note)}</div>`:''}</div>`).join('') + `</div>`;
+  const notes = (c.notes||[]).map(n => note('info', esc(n))).join('');
+  h += `<div class="cydnotes">${notes}</div>
+    <div class="src">Verified: ${esc(c.verified)}. Source: ${esc(c.source)}. Flashie can't tell CYD models apart over USB, so check the model printed on the back of the board.</div>`;
+  el.innerHTML = h;
+  el.classList.remove('hidden');
+  $('#copyPins').onclick = () => copyText(pinDefines(c));
+}
+
+function pinDefines(c){
+  const id = s => s.toUpperCase().replace(/[^A-Z0-9]+/g,'_').replace(/^_|_$/g,'');
+  const pre = g => 'CYD_' + (/^Display/.test(g.name) ? 'TFT_' : /^Touch/.test(g.name) ? 'TOUCH_' : /^SD/.test(g.name) ? 'SD_' : /^Relay/.test(g.name) ? '' : '');
+  let out = `// ${c.model} (${c.size} ${c.res}) — pin map from Flashie by nrmluvdev\n// Display: ${c.display}, ${c.displayBus}. Touch: ${c.touch}${c.touchBus?', '+c.touchBus:''}\n`;
+  for(const g of c.groups){
+    out += `\n// ${g.name}${g.bus?' — '+g.bus:''}\n`;
+    for(const p of g.pins){
+      let n = id(p.f).replace(/^BACKLIGHT$/,'BL');
+      out += `#define ${pre(g)}${n} ${p.g}\n`;
+    }
+  }
+  if(c.tftDriver){
+    const g = c.groups.find(g=>/^Display/.test(g.name)), get = f => (g.pins.find(p=>p.f===f)||{}).g;
+    const [w,hh] = c.res.split('×');
+    const shared = c.groups.find(g=>/^Touch/.test(g.name) && /shares the display/.test(g.bus||''));
+    out += `\n// ---- TFT_eSPI: paste into User_Setup.h ----\n#define ${c.tftDriver}\n#define TFT_WIDTH  ${w}\n#define TFT_HEIGHT ${hh}\n`;
+    if(get('MISO')!=null) out += `#define TFT_MISO ${get('MISO')}\n`;
+    out += `#define TFT_MOSI ${get('MOSI')}\n#define TFT_SCLK ${get('SCK')}\n#define TFT_CS   ${get('CS')}\n#define TFT_DC   ${get('DC')}\n#define TFT_RST  ${get('RST') ?? -1}\n#define TFT_BL   ${get('Backlight')}\n#define TFT_BACKLIGHT_ON HIGH\n`;
+    if(c.tftDriver==='ST7789_DRIVER' && c.family==='2432S028') out += `#define TFT_INVERSION_ON\n`;
+    if(shared) out += `#define TOUCH_CS ${shared.pins.find(p=>p.f==='CS').g}\n`;
+    out += `#define SPI_FREQUENCY 40000000\n#define SPI_READ_FREQUENCY 20000000\n#define SPI_TOUCH_FREQUENCY 2500000\n`;
+  }
+  return out;
+}
+
+async function copyText(t){
+  try{ await navigator.clipboard.writeText(t); }
+  catch{ const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+  toast('Pin #defines copied to the clipboard.');
+}
+
+/* firmware ↔ CYD matching (server scans the file for model + driver names) */
+function cydNotes(){
+  const m = S.cydMatch, c = curCYD(), out = [];
+  if(!m || !S.file) return out;
+  const fams = m.families || [], exactIds = [...new Set((m.hits||[]).filter(h=>h.id).map(h=>h.id))];
+  const modelOf = fam => { const x = S.cyds.find(y=>y.family===fam); return x ? x.model.replace(/ \(.*\)$/,'') : fam; };
+  const link = id => `<a class="act" data-board="cyd-${id}">Switch to ${esc(cydById(id).model)}</a>`;
+  if(c){
+    if(fams.length && !fams.includes(c.family)){
+      const target = exactIds[0] || (S.cyds.find(y=>y.family===fams[0])||{}).id;
+      const names = exactIds.length ? exactIds.map(id=>cydById(id).model) : fams.map(modelOf);
+      out.push(['warn', `This firmware mentions <b>${esc(names.join(', '))}</b>, but you picked the <b>${esc(c.model)}</b>. It will flash, but the screen or touch probably won't work.` + (target ? ' '+link(target) : '')]);
+    } else if(fams.includes(c.family)){
+      const other = exactIds.filter(id => id!==c.id && cydById(id) && cydById(id).family===c.family);
+      if(other.length && !exactIds.includes(c.id))
+        out.push(['warn', `This firmware is for the <b>${esc(cydById(other[0]).model)}</b> — a different revision of your board (${esc(cydById(other[0]).display)} vs ${esc(c.display)} display, for example). ${link(other[0])}`]);
+      else { const hit = m.hits.find(h=>h.id===c.id) || m.hits.find(h=>h.family===c.family) || {}; out.push(['ok', `Firmware matches your board — it mentions <b>${esc(hit.token||c.family)}</b>.`]); }
+    } else if(m.drivers && m.drivers.length){
+      const dispIC = c.display.split(' ')[0].replace('A',''), touchIC = c.touch.split(' ')[0];
+      const disp = m.drivers.filter(d => ['ILI9341','ST7789','ST7796','ST7262','ST7701','GC9A01','NV3041A'].includes(d));
+      if(disp.length && !disp.some(d => c.display.toUpperCase().includes(d.replace('A','')) || dispIC.startsWith(d)))
+        out.push(['info', `The firmware contains display driver code for <b>${esc(disp.join(', '))}</b>; this board uses <b>${esc(c.display)}</b>. Multi-board firmware often includes several drivers, so this may be fine.`]);
+    }
+  } else if(fams.length){
+    const opts = exactIds.length ? exactIds : S.cyds.filter(y=>fams.includes(y.family)).map(y=>y.id);
+    out.push(['info', `This firmware is for a Cheap Yellow Display: <b>${esc((exactIds.length ? exactIds.map(id=>cydById(id).model) : fams.map(modelOf)).join(', '))}</b>. ` +
+      opts.slice(0,3).map(id => `<a class="act" data-board="cyd-${id}">Use ${esc(cydById(id).model)}</a>`).join(' · ')]);
+  }
+  return out;
+}
+
+
+function renderChip(){
+  const el = $('#chipInfo');
+  if(!S.chip){ el.innerHTML=''; return; }
+  const c = S.chip;
+  const rows = (c.details||[]).map(([k,v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
+  el.innerHTML = `<dl class="chipbox"><dt>Chip</dt><dd class="big">${esc(c.chip)}</dd>${rows}</dl>`
+    + (c.note ? note('info', esc(c.note)) : '')
+    + (c.supported ? '' : note('bad', `${esc(c.chip)} isn't supported in this version of Flashie.`));
+}
+
+/* ---------- firmware analysis ---------- */
+function analyse(name, buf){
+  const u8 = new Uint8Array(buf), dv = new DataView(buf), n = u8.length;
+  const a = {fmt:'bin', kind:'unknown', suggest:{}, why:'', imgChip:null, app:null, uf2:null, hex:null};
+  // UF2
+  if(n >= 512 && dv.getUint32(0,true)===0x0A324655 && dv.getUint32(4,true)===0x9E5D5157){
+    a.fmt='uf2'; a.kind='uf2';
+    const fams = new Set(); let blocks = n/512|0;
+    for(let i=0;i<n;i+=512){ if(dv.getUint32(i+8,true)&0x2000) fams.add(UF2_FAM[dv.getUint32(i+28,true)] || ('0x'+dv.getUint32(i+28,true).toString(16))); }
+    a.uf2 = {blocks, fams:[...fams]};
+    a.imgChip = a.uf2.fams.length===1 ? a.uf2.fams[0] : null;
+    a.why = `UF2 file for ${a.uf2.fams.join(' + ') || 'an unknown chip'} (${blocks} blocks).`;
+    return a;
+  }
+  // Intel HEX
+  const head = new TextDecoder().decode(u8.slice(0, Math.min(n, 400))).replace(/^﻿/,'').trimStart();
+  if(head.startsWith(':') && /^[:0-9A-Fa-f\r\n]+$/.test(head)){
+    a.fmt='hex'; a.kind='hex';
+    const text = new TextDecoder().decode(u8); let upper=0, lo=Infinity, hi=0, bad=0;
+    for(const raw of text.split('\n')){
+      const l = raw.trim(); if(!l.startsWith(':')) continue;
+      const len = parseInt(l.substr(1,2),16), addr = parseInt(l.substr(3,4),16), type = parseInt(l.substr(7,2),16);
+      if(isNaN(len)) { bad++; continue; }
+      if(type===0){ const s=upper+addr; lo=Math.min(lo,s); hi=Math.max(hi,s+len); }
+      else if(type===4) upper = parseInt(l.substr(9,4),16)*65536;
+      else if(type===2) upper = parseInt(l.substr(9,4),16)*16;
+      else if(type===1) break;
+    }
+    a.hex = {lo, hi, size: hi-lo};
+    if(lo >= 0x08000000 && lo < 0x09000000){ a.target='stm32'; a.why = `Intel HEX for an STM32 at ${hex(lo)} (${human(hi-lo)}).`; }
+    else if(lo >= 0x10000000 && lo < 0x11000000){ a.target='rp2'; a.why = `Intel HEX for a Raspberry Pi Pico (${human(hi-lo)}).`; }
+    else if(lo === 0){ a.target='avr'; a.why = `Intel HEX sketch, ${human(hi)} of code.`; if(hi > 0x7000 && hi <= 0x8000) a.withBoot = true; }
+    else if(lo >= 0x7000 && lo < 0x40000) { a.target='avr'; a.bootOnly = true; a.why = 'This HEX only contains an Arduino bootloader.'; }
+    else a.why = `Intel HEX starting at ${hex(lo)}.`;
+    return a;
+  }
+  // Raw binary — look for ESP / STM32 / RP2 signatures
+  const isPart = o => n > o+1 && u8[o]===0xAA && u8[o+1]===0x50;
+  const imgChipAt = o => (n > o+13 && u8[o]===0xE9) ? dv.getUint16(o+12, true) : null;
+  const cstr = (o,len) => { let s=''; for(let i=o;i<o+len && i<n && u8[i];i++) s+=String.fromCharCode(u8[i]); return s; };
+  const allFF = (s,e) => { for(let i=s;i<e && i<n;i++) if(u8[i]!==0xFF) return false; return true; };
+  if(isPart(0)){ a.kind='partitions'; a.target='esp'; a.suggest.esp=0x8000; a.why='ESP partition table — it always goes at 0x8000.'; return a; }
+  if(n > 0x1010 && allFF(0,0x1000) && u8[0x1000]===0xE9){
+    a.kind='merged'; a.target='esp'; a.suggest.esp=0; a.imgChip = IMG_CHIPS[imgChipAt(0x1000)] ?? null;
+    a.why='Complete merged ESP image (bootloader + partitions + app). It goes at 0x0.'; return a;
+  }
+  if(u8[0]===0xE9){
+    a.target='esp'; a.imgChip = IMG_CHIPS[imgChipAt(0)] ?? null;
+    if(n > 0x30 && dv.getUint32(0x20,true)===0xABCD5432){
+      a.kind='app'; a.suggest.esp=0x10000; a.app = {version:cstr(0x30,32), project:cstr(0x50,32)};
+      a.why='ESP application image — the usual spot is 0x10000.'; return a;
+    }
+    if(isPart(0x8000) || isPart(0x7000)){
+      a.kind='merged'; a.suggest.esp = isPart(0x8000) ? 0 : 0x1000;
+      a.why = `Merged ESP image starting with the bootloader — it goes at ${hex(a.suggest.esp)}.`; return a;
+    }
+    if(n <= 0x10000){
+      a.kind='bootloader'; if(a.imgChip!=null) a.suggest.esp = BOOT_OFF[a.imgChip] ?? 0x1000;
+      a.why = a.imgChip ? `ESP bootloader for ${a.imgChip}.` : 'ESP bootloader.'; return a;
+    }
+    // ESP8266 apps also start with E9 but have no app descriptor
+    a.kind='image'; a.why='ESP firmware image without an app header — ESP8266 firmware usually goes at 0x0, ESP32 apps at 0x10000. Check the project’s instructions.'; return a;
+  }
+  // Cortex-M vector table: initial SP in RAM, reset vector in flash
+  if(n >= 8){
+    const sp = dv.getUint32(0,true), rv = dv.getUint32(4,true);
+    if((sp & 0xFFF00000)===0x20000000 && (rv & 0xFF000000)===0x08000000 && (rv&1)){
+      a.kind='cortex'; a.target='stm32'; a.suggest.stm32=0x08000000; a.why='STM32 firmware (ARM vector table) — goes at the start of flash, 0x08000000.'; return a;
+    }
+    if((sp & 0xFFF00000)===0x20000000 && (rv & 0xFF000000)===0x10000000 && (rv&1)){
+      a.kind='cortex'; a.target='rp2'; a.why='Raspberry Pi Pico firmware (.bin) — Flashie converts it to UF2 for you.'; return a;
+    }
+  }
+  a.kind='raw'; a.why='Raw binary with no recognisable header — fine for data images (SPIFFS/LittleFS), but double-check the address.';
+  return a;
+}
+
+const FMT_FOR = {esp:['bin','hex'], avr:['hex','bin'], stm32:['bin','hex'], rp2:['uf2','bin','hex']};
+function fileProblems(){
+  const a = S.analysis, f = family(), exp = expectedChip();
+  const out = [];
+  if(!a) return out;
+  if(f && !FMT_FOR[f].includes(a.fmt))
+    out.push(['bad', `That's a ${a.fmt.toUpperCase()} file, which ${FAM[f].name} boards can't use — they need ${FAM[f].files}.`]);
+  else if(f && a.target && a.target!==f)
+    out.push(['warn', `This looks like firmware for ${FAM[a.target].name}, but your board is ${FAM[f].name}. Double-check you picked the right file.`]);
+  if(a.imgChip && exp && f==='esp' && a.imgChip !== exp && a.fmt==='bin')
+    out.push(['bad', `This firmware was built for <b>${esc(a.imgChip)}</b>, but your board is <b>${esc(exp)}</b>. It won't run.`]);
+  if(a.uf2 && f==='rp2' && exp && /^RP2/.test(exp) && a.uf2.fams.length && !a.uf2.fams.includes(exp))
+    out.push(['bad', `This UF2 is for <b>${esc(a.uf2.fams.join(', '))}</b>, but your board is <b>${esc(exp)}</b>. Download the matching version.`]);
+  if(a.withBoot && f==='avr') out.push(['bad', 'This is a “with_bootloader” HEX. Use the normal sketch .hex instead.']);
+  if(a.bootOnly) out.push(['bad', 'This HEX only contains a bootloader — it can’t be uploaded over serial.']);
+  return out;
+}
+
+function renderFile(){
+  if(!S.file){ $('#drop').classList.remove('hidden'); $('#fileBox').classList.add('hidden'); $('#fileNote').innerHTML=''; return; }
+  $('#drop').classList.add('hidden');
+  const a = S.analysis;
+  const kinds = {app:'ESP application',bootloader:'ESP bootloader',merged:'Merged ESP image',partitions:'Partition table',image:'ESP image',raw:'Raw binary',
+    uf2:'UF2', hex:'Intel HEX', cortex:'ARM firmware', unknown:'File'};
+  const extra = a.app && (a.app.project || a.app.version) ? ` · ${esc(a.app.project)} ${esc(a.app.version)}` : '';
+  $('#fileBox').innerHTML = `<div class="file"><div class="ic">${ICON.file}</div>
+    <div class="meta"><div class="nm">${esc(S.file.name)}</div><div class="sz">${human(S.file.size)} · ${kinds[a.kind]||'File'}${a.imgChip?' for '+esc(a.imgChip):''}${extra}</div></div>
+    <button class="btn ghost" id="changeFile">Change</button></div>`;
+  $('#fileBox').classList.remove('hidden');
+  $('#changeFile').onclick = () => $('#fileIn').click();
+}
+
+function renderFileNote(){
+  if(!S.file){ $('#fileNote').innerHTML=''; return; }
+  const a = S.analysis, f = family();
+  let h = '';
+  const sug = f && a.suggest[f];
+  if(a.why) h += note(a.kind==='raw'?'warn':'info', esc(a.why) + (sug!=null && parseOffset($('#offset').value)!==sug && FAM[f].offset
+      ? ` <a href="#" id="useSuggest" style="color:#fff;font-weight:600">Use ${hex(sug)}</a>` : ''));
+  for(const [k,m] of fileProblems()) h += note(k, m);
+  for(const [k,m] of cydNotes()) h += note(k, m);
+  if(f==='esp' && S.file.size > 4*1048576 && +$('#flashmb').value === 4)
+    h += note('warn', 'This file is bigger than 4 MB. If your board has more flash, set the size under Advanced.');
+  $('#fileNote').innerHTML = h;
+  const u = $('#useSuggest'); if(u) u.onclick = e => { e.preventDefault(); setOffset(sug, true); };
+}
+
+function offsetVisible(){
+  const f = family();
+  if(!f) return S.analysis ? S.analysis.fmt==='bin' : true;
+  return FAM[f].offset && !(S.analysis && S.analysis.fmt==='hex');
+}
+function offFam(){ return family() || (S.analysis && S.analysis.target) || 'esp'; }
+
+function syncFamilyUI(){
+  const f = family(), cfg = f ? FAM[f] : null, of = offFam();
+  // offset field
+  const showOff = offsetVisible();
+  $('#offWrap').classList.toggle('hidden', !showOff);
+  $('#offLabel').textContent = (FAM[of] && FAM[of].offLabel) || 'Flash offset';
+  if(S._offFam !== of){
+    S._offFam = of;
+    const v = S.offs[of] ?? (S.analysis && S.analysis.suggest[of]) ?? (FAM[of] && FAM[of].defOff) ?? 0x1000;
+    $('#offset').value = hex(v);
+  }
+  // file picker
+  $('#fileIn').accept = cfg ? cfg.accept : '.bin,.hex,.uf2,.ihex';
+  $('#dropTitle').textContent = cfg ? `Choose a ${cfg.files} file` : 'Choose a firmware file';
+  $('#dropHint').textContent = cfg ? 'or drag & drop it here' : '.bin, .hex or .uf2 — or drag & drop it here';
+  $('#fwSub').textContent = S.mode==='lib' ? 'Ready-made firmware, or your own file' : cfg ? `${cfg.files} for ${cfg.name}` : 'A firmware file from your computer';
+  // advanced
+  const adv = cfg ? cfg.adv : ['baud','size','comp'];
+  $('#advWrap').classList.toggle('hidden', adv.length===0);
+  $('#baudWrap').classList.toggle('hidden', !adv.includes('baud'));
+  $('#sizeWrap').classList.toggle('hidden', !adv.includes('size'));
+  $('#compWrap').classList.toggle('hidden', !adv.includes('comp') || expectedChip()==='ESP8266');
+  const bf = cfg && cfg.bauds ? f : 'esp';
+  if(S._baudFam !== bf){
+    S._baudFam = bf;
+    $('#baud').innerHTML = FAM[bf].bauds.map(([v,l]) => `<option value="${v}" ${v===FAM[bf].defBaud?'selected':''}>${l}</option>`).join('');
+  }
+  let fn = '';
+  if(cfg && cfg.note) fn += note('info', cfg.note);
+  if(f==='esp' && expectedChip()==='ESP8266') fn += note('info', 'ESP8266 flashes at 115,200 baud (its ROM can’t go faster) and starts at 0x0 for most firmware.');
+  if(!f && S.port) fn += note('info', 'Flashie isn’t sure what kind of board this is yet. Press <b>Identify chip</b>, pick it from the list, or just press Flash and Flashie will work it out.');
+  $('#famNote').innerHTML = fn;
+}
+
+function renderPresets(){
+  const of = offFam(), cur = parseOffset($('#offset').value);
+  let list;
+  if(of==='stm32') list = [[0x08000000,'start of flash'],[0x08002000,'after 8 KB bootloader'],[0x08005000,'after 20 KB bootloader']];
+  else { const boot = BOOT_OFF[expectedChip()] ?? 0x1000; list = [[0,'full image'],[boot,'bootloader'],[0x8000,'partitions'],[0x10000,'app']]; }
+  const seen = new Set();
+  $('#presets').innerHTML = list.filter(([o])=>!seen.has(o) && seen.add(o)).map(([o,l]) =>
+    `<button class="chipbtn ${o===cur?'on':''}" data-off="${o}">${hex(o)}<small>${l}</small></button>`).join('');
+}
+
+function setOffset(v, touched){
+  $('#offset').value = hex(v);
+  S.offs[offFam()] = v;
+  if(touched) S.offsetTouched[offFam()] = true;
+  $('#offset').classList.remove('bad');
+  touch(); update();
+}
+
+async function pickFile(f){
+  if(!f) return;
+  if(f.size === 0){ toast('That file is empty.', true); return; }
+  if(f.size > 64*1048576){ toast('That file is far too big for a microcontroller.', true); return; }
+  S.file = f; S.data = await f.arrayBuffer(); S.analysis = analyse(f.name, S.data);
+  if(!/\.(bin|hex|ihex|uf2)$/i.test(f.name) && S.analysis.kind==='raw') toast('Heads up: that isn’t a .bin, .hex or .uf2 file.');
+  for(const k in S.analysis.suggest){ if(!S.offsetTouched[k]) S.offs[k] = S.analysis.suggest[k]; }
+  S._offFam = null; S.cydMatch = null;
+  renderFile(); update();
+  if(S.analysis.fmt==='bin' || S.analysis.fmt==='hex'){
+    const want = f;
+    try{
+      const m = await api('/api/cydmatch?name='+encodeURIComponent(f.name), {method:'POST', headers:{'Content-Type':'application/octet-stream'}, body:S.data});
+      if(S.file === want){ S.cydMatch = m; update(); }
+    }catch{}
+  }
+}
+
+/* ---------- flow state ---------- */
+function offsetOk(){
+  if(!offsetVisible()) return true;
+  const off = parseOffset($('#offset').value), f = offFam();
+  if(!Number.isFinite(off)) return false;
+  if(f==='stm32') return off % 4 === 0 && ((off >= 0x08000000 && off < 0x09000000) || off < 0x01000000);
+  return off % 0x1000 === 0 && off < 0x2000000;
+}
+function update(){
+  syncFamilyUI();
+  const off = parseOffset($('#offset').value);
+  const offOk = offsetOk();
+  $('#offset').classList.toggle('bad', !offOk);
+  if(S.lib && S.lib.key !== libKey()){ S.lib = null; toast('Firmware choice cleared — the board changed.'); }
+  const libMode = S.mode === 'lib';
+  const blocking = libMode ? false : fileProblems().some(([k])=>k==='bad');
+  const s1 = !!S.port, s2 = libMode ? !!S.lib : (!!S.file && offOk);
+  renderLibPick();
+  const step = !s1 ? 1 : !s2 ? 2 : 3;
+
+  document.querySelectorAll('.step').forEach(el => {
+    const n = +el.dataset.step;
+    el.classList.toggle('active', n===step);
+    el.classList.toggle('done', (n===1&&s1)||(n===2&&s2)||(n===3&&S.lastResult==='ok'));
+    el.querySelector('.dot').innerHTML = el.classList.contains('done') && n!==step ? ICON.tick : n;
+  });
+  $('#trackFill').style.width = (s1 && s2 ? 100 : s1 ? 50 : 0) + '%';
+  [['#card1',1,s1],['#card2',2,s2],['#card3',3,S.lastResult==='ok']].forEach(([id,n,done]) => {
+    const c=$(id); c.classList.toggle('focus', n===step); c.classList.toggle('complete', done && n!==step); c.classList.toggle('waiting', n>step);
+  });
+
+  const f = family(), p = curPort();
+  setSum('#sBoard', boardLabel(), 'Not picked yet');
+  setSum('#sPort', S.port, '—');
+  setSum('#sFile', libMode ? (S.lib && `${S.lib.res.name} ${S.lib.res.version}`) : (S.file && `${S.file.name} (${human(S.file.size)})`), 'Not picked yet');
+  let method = f ? FAM[f].method : (S.port ? 'Auto-detect when you flash' : null);
+  if(f==='rp2' && p && p.kind!=='drive') method = 'Reboot to BOOTSEL, then UF2 copy';
+  if(f==='avr' && currentBoard() && currentBoard().protocol==='avr109') method = 'Arduino bootloader (AVR109)';
+  setSum('#sMethod', method, '—');
+  let to;
+  if(f==='avr') to = 'Sketch area (from 0x0000)';
+  else if(f==='rp2') to = p && p.kind==='drive' ? `Drive ${p.name}` : 'BOOTSEL drive';
+  else if(S.analysis && S.analysis.fmt==='hex' && S.analysis.hex) to = `${hex(S.analysis.hex.lo)} (from HEX)`;
+  else if(!offOk) to = 'invalid address';
+  else to = hex(off) + (S.file && S.analysis.fmt==='bin' ? ' – ' + hex(off + S.file.size - 1) : '');
+  if(libMode && S.lib){
+    const r = S.lib.res;
+    to = r.format==='esp' ? r.parts.map(p=>hex(p.offset)).join(' · ') : r.format==='uf2' ? (p && p.kind==='drive' ? `Drive ${p.name}` : 'BOOTSEL drive') : 'Sketch area (from 0x0000)';
+  } else if(libMode) to = '—';
+  $('#sOff').textContent = to;
+  $('#identify').disabled = !S.port || S.flashing || S.identifying;
+  $('#flashBtn').disabled = !(s1 && s2) || S.flashing || S.identifying || blocking || (S.chip && !S.chip.supported);
+  $('#refresh').disabled = S.flashing;
+  $('#flashLbl').textContent = S.flashing ? 'Flashing…' : S.lastResult==='ok' ? 'Flash again' : 'Flash';
+  if(!S.flashing && S.statusKind==='idle'){
+    $('#status').className='status'; $('#sIcon').innerHTML=ICON.info;
+    $('#sText').innerHTML = !s1 ? 'Start by picking your board on the left.' :
+      libMode && !S.lib ? 'Now pick a firmware from the library, or switch to “My own file”.' :
+      libMode ? `All set. Press <b>Flash</b> to download and install <b>${esc(S.lib.res.name+' '+S.lib.res.version)}</b> on <b>${esc(S.port)}</b>.` :
+      !S.file ? 'Now choose the firmware file you want to put on it.' :
+      !offOk ? (offFam()==='stm32' ? 'The start address should be in flash, like 0x08000000.' : 'The offset must be a hex address on a 4 KB boundary, like 0x1000.') :
+      blocking ? 'Fix the problem with the firmware file first (see step 2).' :
+      `All set. Press <b>Flash</b> to write <b>${esc(S.file.name)}</b> to <b>${esc(S.port)}</b>.`;
+  }
+  renderPresets(); renderBoardNote(); renderFileNote(); renderCYD();
+}
+function setSum(id, val, empty){ const e=$(id); e.textContent = val || empty; e.classList.toggle('missing', !val); }
+function touch(){
+  S.lastResult=null; S.statusKind='idle';
+  if(!S.flashing){ $('#bar').className='bar idle'; $('#bar i').style.width='0%'; $('#pct').textContent='0%'; $('#pBytes').textContent='Ready when you are'; $('#pSpeed').textContent=''; }
+}
+
+/* ---------- ports polling ---------- */
+async function loadPorts(manual){
+  if(S.flashing || S.identifying) return;
+  const btn = $('#refresh'); if(manual) btn.querySelector('svg').classList.add('spin');
+  try{
+    const ports = await api('/api/ports');
+    const sig = JSON.stringify(ports.map(p=>p.name+p.vid+p.pid));
+    const changed = sig !== S._sig; S._sig = sig;
+    const before = new Set(S.ports.map(p=>p.name));
+    S.ports = ports;
+    if(S.port && !ports.find(p=>p.name===S.port)){ toast(`${S.port} disappeared.`, true); S.port=null; S.chip=null; renderChip(); }
+    const fresh = ports.find(p => !before.has(p.name) && p.guess.likely && S._loaded);
+    if(fresh && !S.flashing){ S.port = fresh.name; S.chip=null; renderChip(); touch(); toast(`Found ${fresh.name}: ${fresh.guess.label}`); }
+    if(!S.port){ const best = ports.find(p=>p.guess.likely); if(best && (!S._loaded || changed)) S.port = best.name; }
+    S._loaded = true;
+    if(changed || manual) renderPorts();
+    update();
+  }catch(e){}
+  finally{ if(manual) setTimeout(()=>btn.querySelector('svg').classList.remove('spin'), 400); }
+}
+
+/* ---------- identify ---------- */
+async function identify(){
+  S.identifying = true;
+  const b = $('#identify'); b.disabled = true; b.innerHTML = ICON.spin + '<span>Talking to the board…</span>';
+  setStatus('run', 'Connecting to the board to see what it is…');
+  try{
+    const c = await api('/api/identify', {method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({port:S.port, board:S.boardId==='auto'?'':S.boardId})});
+    S.chip = c; renderChip();
+    setStatus('ok', `Found ${/^([AEIOU]|[FHLMNRSX][A-Z0-9])/.test(c.chip)?'an':'a'} <b>${esc(c.chip)}</b>. ${S.file?'Ready to flash.':'Now pick your firmware.'}`);
+    if(S.boardId!=='auto'){ const bd=currentBoard(); if(bd && bd.family==='esp' && bd.chip!==c.chip) toast(`Heads up: you picked a ${bd.chip} board but the chip says ${c.chip}.`, true); }
+  }catch(e){ setStatus('bad', esc(e.message)); }
+  finally{ S.identifying = false; b.innerHTML = ICON.chip + '<span>Identify chip</span>'; S.lastResult=null; S._offFam=null; update(); }
+}
+
+/* ---------- flash ---------- */
+let pStart=0;
+function setStatus(kind, html){
+  S.statusKind = kind;
+  $('#status').className='status '+kind;
+  $('#sIcon').innerHTML = {run:ICON.spin, ok:ICON.ok, bad:ICON.x, idle:ICON.info}[kind] || ICON.info;
+  $('#sText').innerHTML = html;
+}
+function setProgress(done,total){
+  const pct = total ? Math.floor(done*100/total) : 0;
+  if(done < S._lastDone){ pStart = 0; }   // a new phase (e.g. verify) started
+  S._lastDone = done;
+  $('#bar i').style.width = pct + '%';
+  $('#pct').textContent = pct + '%';
+  if(!pStart && done>0) pStart = performance.now();
+  const secs = (performance.now()-pStart)/1000;
+  $('#pBytes').textContent = `${human(done)} of ${human(total)}`;
+  if(secs > .5 && done>0){
+    const rate = done/secs, left = (total-done)/rate;
+    $('#pSpeed').textContent = `${human(rate)}/s · ${left<1?'almost done':Math.ceil(left)+'s left'}`;
+  }
+}
+
+async function flash(){
+  const f = family();
+  S.flashing = true; S.lastResult = null; pStart = 0; S._lastDone = 0;
+  $('#log').innerHTML = '';
+  $('#bar').className='bar'; $('#bar i').style.width='0%'; $('#pct').textContent='0%';
+  $('#pBytes').textContent='Starting…'; $('#pSpeed').textContent='';
+  $('#cancel').classList.remove('hidden');
+  setStatus('run', 'Starting…'); update();
+  if(S.mode === 'lib'){
+    const body = {item:S.lib.id, port:S.port, board:libBoardId(), chip:libChip(), baud:+$('#baud').value, flashMB:+$('#flashmb').value, compress:$('#compress').checked};
+    if(S.chip){ Object.assign(body, {hFamily:S.chip.family||'', hProto:S.chip.proto||'', hBaud:S.chip.baud||0, hBoard:S.chip.boardId||''}); }
+    try{ await api('/api/library/flash', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)}); }
+    catch(e){ finish(false, e.message); }
+    return;
+  }
+  const q = new URLSearchParams({port:S.port, board:S.boardId==='auto'?'':S.boardId, name:S.file.name,
+    baud:$('#baud').value, flashmb:$('#flashmb').value, compress:$('#compress').checked?'1':'0'});
+  if(offsetVisible()) q.set('offset', hex(parseOffset($('#offset').value)));
+  if(S.chip){ q.set('hfamily', S.chip.family||''); q.set('hproto', S.chip.proto||''); q.set('hbaud', S.chip.baud||0); q.set('hboard', S.chip.boardId||''); }
+  try{
+    await api('/api/flash?'+q, {method:'POST', headers:{'Content-Type':'application/octet-stream'}, body:S.data});
+  }catch(e){ finish(false, e.message); }
+}
+function finish(ok, msg){
+  S.flashing=false; S.lastResult = ok?'ok':'bad';
+  $('#cancel').classList.add('hidden');
+  $('#bar').className = 'bar ' + (ok?'ok':'bad');
+  if(ok){ $('#bar i').style.width='100%'; $('#pct').textContent='100%'; $('#pSpeed').textContent=''; }
+  setStatus(ok?'ok':'bad', esc(msg));
+  if(!ok) $('#logWrap').open = true;
+  update();
+  setTimeout(()=>loadPorts(true), 800);
+}
+
+/* ---------- events ---------- */
+function connectEvents(){
+  const es = new EventSource('/api/events');
+  es.onmessage = ev => {
+    const m = JSON.parse(ev.data);
+    if(m.type==='log'){ const l=$('#log'); const d=document.createElement('div'); if(m.text.startsWith('»')) d.className='s'; d.textContent=m.text; l.appendChild(d); l.scrollTop=l.scrollHeight; }
+    else if(m.type==='status' && S.flashing) setStatus('run', esc(m.text));
+    else if(m.type==='progress' && S.flashing){ setProgress(m.done, m.total); }
+    else if(m.type==='chip'){ S.chip = Object.assign({}, S.chip||{}, m.chip); renderChip(); }
+    else if(m.type==='done') finish(m.ok, m.text);
+  };
+}
+
+/* ---------- wiring ---------- */
+$('#ports').addEventListener('click', e => {
+  const t = e.target.closest('.port'); if(!t || S.flashing || S.identifying) return;
+  if(S.port !== t.dataset.port){ S.port = t.dataset.port; S.chip = null; renderChip(); touch(); }
+  renderPorts(); update();
+});
+$('#boardSel').onchange = e => { selectBoard(e.target.value); };
+
+$('#refresh').onclick = () => loadPorts(true);
+$('#fileNote').addEventListener('click', e => { const a = e.target.closest('a[data-board]'); if(a){ e.preventDefault(); selectBoard(a.dataset.board); toast('Board set to ' + currentBoard().name); } });
+$('#identify').onclick = identify;
+$('#drop').onclick = () => $('#fileIn').click();
+$('#fileIn').onchange = e => { touch(); pickFile(e.target.files[0]); e.target.value=''; };
+['dragenter','dragover'].forEach(t => document.addEventListener(t, e => { e.preventDefault(); $('#drop').classList.add('over'); }));
+['dragleave','drop'].forEach(t => document.addEventListener(t, e => { e.preventDefault(); if(t==='drop' || !e.relatedTarget) $('#drop').classList.remove('over'); }));
+document.addEventListener('drop', e => { const f=e.dataTransfer.files[0]; if(f && !S.flashing){ touch(); pickFile(f); } });
+$('#offset').oninput = () => { S.offsetTouched[offFam()] = true; const v=parseOffset($('#offset').value); if(Number.isFinite(v)) S.offs[offFam()]=v; touch(); update(); };
+$('#offset').onblur = () => { const v=parseOffset($('#offset').value); if(Number.isFinite(v)) $('#offset').value = hex(v); update(); };
+$('#presets').onclick = e => { const b=e.target.closest('.chipbtn'); if(b) setOffset(+b.dataset.off, true); };
+$('#flashmb').onchange = update;
+$('#flashBtn').onclick = flash;
+$('#cancel').onclick = () => api('/api/cancel',{method:'POST'}).catch(()=>{});
+document.querySelectorAll('.step').forEach(s => s.onclick = () => {
+  const c = $('#card'+s.dataset.step); c.scrollIntoView({behavior:'smooth', block:'nearest'});
+  c.animate([{transform:'scale(1)'},{transform:'scale(1.012)'},{transform:'scale(1)'}],{duration:350,easing:'ease-out'});
+});
+window.addEventListener('beforeunload', e => { if(S.flashing){ e.preventDefault(); e.returnValue=''; } });
+
+/* ---------- firmware library ---------- */
+S.mode = 'lib'; S.lib = null; S.libItems = []; S.libSel = null; S.libCat = 'All'; S.resCache = {};
+const CAT_COL = {'Programming':'#7c5cff','Smart home':'#00b4d8','Lighting':'#ff9f1c','Radio':'#2ee59d','Wi-Fi & Bluetooth tools':'#ff5c7a','Fun':'#f7c948','CNC & 3D printing':'#8a93a6'};
+const libBoardId = () => { const b = currentBoard(); return b ? b.id : ''; };
+const libChip = () => { const b = currentBoard(); if(S.chip && S.chip.family==='esp') return S.chip.chip; return (b && b.chip) || expectedChip() || ''; };
+const libKey = () => libBoardId() + '|' + libChip();
+const tileFor = it => `<div class="tile" style="background:${CAT_COL[it.category]||'#555'}">${esc(it.name[0])}</div>`;
+const SHIELD = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>';
+
+async function loadLibrary(){
+  const k = libKey();
+  if(S._libLoaded === k) return;
+  try{
+    const j = await api('/api/library?board='+encodeURIComponent(libBoardId())+'&chip='+encodeURIComponent(libChip()));
+    S.libItems = j.items; S._libLoaded = k;
+    $('#cacheInfo').textContent = j.cacheFiles ? `Cache: ${j.cacheFiles} file${j.cacheFiles>1?'s':''}, ${human(j.cacheBytes)}` : 'Cache is empty';
+  }catch(e){ S.libItems = []; }
+}
+
+function renderLibPick(){
+  const el = $('#libPick');
+  if(!el) return;
+  const known = !!libChip();
+  if(S.lib){
+    const r = S.lib.res, it = S.libItems.find(i=>i.id===S.lib.id) || {name:r.name, category:''};
+    const allSigned = /^Every file/.test(r.verified);
+    const sig = r.itemId + r.version + allSigned;
+    if(el.dataset.sig === sig) return;
+    el.dataset.sig = sig;
+    el.innerHTML = `<div class="libsel"><div class="t">${tileFor(it)}<div style="flex:1;min-width:0"><b>${esc(r.name)}</b> <span class="vpill">${esc(r.version)}</span>
+      <div class="meta">${r.parts.length} part${r.parts.length>1?'s':''} · ${esc(r.format==='esp'?'ESP flash':r.format==='uf2'?'UF2 copy':'Arduino upload')}${r.date?' · '+esc(r.date):''}</div></div>
+      <button class="btn ghost" id="libChange">Change</button></div>
+      <span class="shield ${allSigned?'':'no'}">${SHIELD}${esc(allSigned?'Checksums published — every file is verified':'Partly or not checksummed by the source — see details')}</span></div>`;
+    $('#libChange').onclick = () => openSheet(S.lib.id);
+    return;
+  }
+  const sig = 'pick' + libKey() + S.libItems.length;
+  if(el.dataset.sig === sig) return;
+  el.dataset.sig = sig;
+  const avail = S.libItems.filter(i=>i.available && !i.build).slice(0,5);
+  el.innerHTML = `<button class="libbtn" id="libOpen"><div class="big"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M4 19.5V5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2zM8 7h6M8 11h4"/></svg></div>
+    <b>Browse firmware library</b><span>${known ? `${S.libItems.filter(i=>i.available).length} firmware${S.libItems.filter(i=>i.available).length===1?'':'s'} for your board` : 'Pick or identify your board to see what fits'}</span></button>
+    ${avail.length ? `<div class="quick">${avail.map(i=>`<button class="qchip" data-id="${i.id}"><i class="dot" style="background:${CAT_COL[i.category]}"></i>${esc(i.name)}</button>`).join('')}</div>` : ''}`;
+  $('#libOpen').onclick = () => openSheet();
+  el.querySelectorAll('.qchip').forEach(b => b.onclick = () => openSheet(b.dataset.id));
+}
+
+async function openSheet(id){
+  await loadLibrary();
+  const b = currentBoard();
+  $('#libFor').innerHTML = libChip() ? `Showing firmware for <b style="color:#fff">${esc(b ? b.name : libChip())}</b>${b && b.chip!==libChip() ? ' ('+esc(libChip())+')' : ''}` : 'Pick or identify your board to see which firmware fits';
+  renderCats();
+  S.libSel = id || (S.lib && S.lib.id) || (S.libItems.find(i=>i.available)||{}).id || null;
+  renderLibList();
+  $('#libSheet').classList.add('open'); $('#libSheet').setAttribute('aria-hidden','false');
+  setTimeout(()=>$('#libSearch').focus(), 50);
+  if(S.libSel) showDetail(S.libSel);
+}
+function closeSheet(){ $('#libSheet').classList.remove('open'); $('#libSheet').setAttribute('aria-hidden','true'); }
+
+function renderCats(){
+  const cats = ['All', ...new Set(S.libItems.map(i=>i.category))];
+  $('#libCats').innerHTML = cats.map(c => `<button class="chipbtn ${c===S.libCat?'on':''}" data-cat="${esc(c)}" style="font-family:var(--font)">${esc(c)}</button>`).join('');
+}
+
+function renderLibList(){
+  const q = $('#libSearch').value.trim().toLowerCase();
+  const match = i => (S.libCat==='All' || i.category===S.libCat) && (!q || (i.name+' '+i.summary+' '+(i.tags||[]).join(' ')+' '+(i.supports||[]).join(' ')).toLowerCase().includes(q));
+  const items = S.libItems.filter(match);
+  const row = (i,k) => `<div class="litem ${i.available?'':'na'} ${i.id===S.libSel?'sel':''}" data-id="${i.id}" style="animation-delay:${k*25}ms">${tileFor(i)}
+    <div class="m"><div class="n">${esc(i.name)}${i.targetFor==='board'?'<span class="badge info">for this board</span>':''}${i.build?'<span class="badge warn">build it</span>':''}</div><div class="s">${esc(i.summary)}</div></div></div>`;
+  const yes = items.filter(i=>i.available), no = items.filter(i=>!i.available);
+  let h = '';
+  if(yes.length) h += `<div class="lsec">Works on your board</div>` + yes.map(row).join('');
+  if(no.length) h += `<div class="lsec">${libChip() ? 'Other boards' : 'All firmware'}</div>` + no.map((i,k)=>row(i,k+yes.length)).join('');
+  if(!items.length) h = `<div class="empty2">Nothing matches “${esc(q)}”.</div>`;
+  $('#libList').innerHTML = h;
+}
+
+async function showDetail(id){
+  S.libSel = id; renderLibList();
+  const it = S.libItems.find(i=>i.id===id); if(!it) return;
+  const el = $('#libDetail');
+  const head = (ver, meta) => `<div class="dh">${tileFor(it)}<div><h3>${esc(it.name)}</h3><div class="meta">${ver||''}<span>${esc(it.category)}</span>${it.license?`<span>· ${esc(it.license)} licence</span>`:''}${meta||''}</div></div></div>`;
+  const supports = `<div><div class="label">Runs on</div><div class="chips">${(it.supports||[]).map(s=>`<span class="chip2 ${s===libChip()||(currentBoard()&&s===currentBoard().name)?'hl':''}">${esc(s)}</span>`).join('')}</div></div>`;
+  const links = (rel) => `<div class="links"><a href="#" data-href="${esc(it.homepage)}">↗ Project website</a>${rel?`<a href="#" data-href="${esc(rel)}">↗ Release page</a>`:''}</div>`;
+  const intro = `<div class="dabout">${esc(it.summary)} ${esc(it.about)}</div>` + (it.warn ? note('warn', esc(it.warn)) : '');
+  if(it.build){
+    el.innerHTML = head('') + intro + note('info', '<b>How to get it:</b> ' + esc(it.build)) + supports + links('') +
+      `<div class="dact"><button class="btn" id="goFile">Use my own file instead</button></div>`;
+    $('#goFile').onclick = () => { closeSheet(); setMode('file'); };
+    wireLinks(); return;
+  }
+  if(!it.available){
+    el.innerHTML = head('') + intro + note('warn', libChip() ? `No build of ${esc(it.name)} for your board (${esc(libChip())}). It supports the boards below.` : 'Pick your board on the left (or press Identify chip) first.') + supports + links('');
+    wireLinks(); return;
+  }
+  el.innerHTML = head('<span class="vpill">checking…</span>') + intro +
+    `<div class="skeleton" style="width:60%"></div><div class="skeleton" style="width:85%"></div><div class="skeleton" style="width:40%"></div>`;
+  const key = id + '|' + libKey();
+  let res = S.resCache[key];
+  if(!res){
+    try{ res = await api(`/api/library/resolve?id=${id}&board=${encodeURIComponent(libBoardId())}&chip=${encodeURIComponent(libChip())}`); S.resCache[key] = res; }
+    catch(e){
+      if(S.libSel!==id) return;
+      el.innerHTML = head('') + intro + note('bad', esc(e.message)) + supports + links('') +
+        `<div class="dact"><button class="btn" id="retry">Try again</button></div>`;
+      $('#retry').onclick = () => { delete S.resCache[key]; showDetail(id); };
+      wireLinks(); return;
+    }
+  }
+  if(S.libSel!==id) return;
+  const rows = res.parts.map(p => `<div class="frow"><span class="o">${hex(p.offset)}</span><span class="nm" title="${esc(p.name)}">${esc(p.name)}</span>
+    <span class="sz">${p.size?human(p.size):p.kind==='fill'?human(p.fillLen):p.kind==='ptable'?'3 KB':''}</span>
+    <span>${p.cached?'<span class="badge info">cached</span> ':''}<span class="badge ${/published|Git hash/.test(p.checksum)?'ok':p.kind==='download'?'warn':'info'}">${esc(p.checksum)}</span></span></div>`).join('');
+  const allSigned = /^Every file/.test(res.verified);
+  el.innerHTML = head(`<span class="vpill">${esc(res.version)}</span>`, res.date ? `<span>· released ${esc(res.date)}</span>` : '') + intro + supports +
+    `<div><div class="label">What gets written</div><div class="ftable">${rows}</div></div>
+     <span class="shield ${allSigned?'':'no'}">${SHIELD}${esc(res.verified)}</span>` +
+    (res.note ? note('info', esc(res.note)) : '') + links(res.releaseUrl) +
+    (res.notes ? `<details class="adv"><summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>Release notes</summary><div class="notesbox" style="margin-top:10px">${esc(res.notes)}</div></details>` : '') +
+    `<div class="dact"><button class="flashbtn" id="useLib" style="padding:13px 22px;font-size:15px">Use ${esc(it.name)} ${esc(res.version)}</button><span class="src">Downloaded when you press Flash, then kept in the cache.</span></div>`;
+  $('#useLib').onclick = () => { S.lib = {id, res, key: libKey()}; touch(); closeSheet(); setMode('lib'); update(); toast(`${it.name} ${res.version} selected.`); };
+  wireLinks();
+}
+function wireLinks(){ document.querySelectorAll('#libDetail a[data-href]').forEach(a => a.onclick = e => { e.preventDefault(); window.open(a.dataset.href, '_blank', 'noopener'); }); }
+
+function setMode(m){
+  S.mode = m; touch();
+  $('#srcSeg').classList.toggle('file', m==='file');
+  $('#srcSeg').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.mode===m));
+  $('#libMode').classList.toggle('hidden', m!=='lib');
+  $('#fileMode').classList.toggle('hidden', m!=='file');
+  update();
+}
+$('#srcSeg').addEventListener('click', e => { const b = e.target.closest('button'); if(b) setMode(b.dataset.mode); });
+$('#libClose').onclick = closeSheet;
+$('#libSheet').addEventListener('mousedown', e => { if(e.target.id==='libSheet') closeSheet(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape' && $('#libSheet').classList.contains('open')) closeSheet(); });
+$('#libSearch').oninput = renderLibList;
+$('#libCats').onclick = e => { const b = e.target.closest('[data-cat]'); if(b){ S.libCat = b.dataset.cat; renderCats(); renderLibList(); } };
+$('#libList').onclick = e => { const r = e.target.closest('.litem'); if(r) showDetail(r.dataset.id); };
+$('#clearCache').onclick = async () => { try{ await api('/api/library/clearcache',{method:'POST'}); S._libLoaded=null; S.resCache={}; await loadLibrary(); toast('Download cache cleared.'); if(S.libSel) showDetail(S.libSel); }catch(e){ toast(e.message,true); } };
+setInterval(() => { if(libKey() !== S._libLoaded && !S.flashing) loadLibrary().then(()=>{ if(!$('#libSheet').classList.contains('open')) update(); }); }, 1500);
+
+(async function init(){
+  try{
+    const info = await api('/api/info');
+    S.boards = info.boards; S.cyds = info.cyds || []; $('#ver').textContent = 'v'+info.version;
+    if(info.demo) $('#demoPill').classList.remove('hidden');
+  }catch{}
+  renderBoards(); renderPorts(); await loadLibrary(); update();
+  connectEvents();
+  await loadPorts(false); renderPorts();
+  setInterval(()=>loadPorts(false), 2000);
+})();
+
+</script>
+<script src="/creator.js"></script>
+<script src="/imager.js"></script>
+<script src="/teach-tips.js"></script>
+<script src="/teach.js"></script>
+</body>
+</html>

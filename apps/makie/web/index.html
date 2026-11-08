@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Makie</title>
+<meta name="author" content="nrmluvdev">
+<link rel="icon" href="icon.svg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="dark">
+<header id="toolbar">
+  <div class="brand" title="Makie by nrmluvdev"><img src="icon.svg" alt=""><span>Makie<small>by nrmluvdev</small></span></div>
+  <input id="projname" class="projname" value="Untitled part" spellcheck="false" title="Project name">
+  <div id="tools"></div>
+  <div class="spacer"></div>
+  <div id="tools-right"></div>
+</header>
+
+<aside id="library">
+  <div class="lib-search"><input id="libsearch" type="search" placeholder="Search shapes, screws, holes…" spellcheck="false"></div>
+  <div id="libcats"></div>
+  <div id="libgrid"></div>
+  <div class="lib-foot">Click a shape, then click where it goes — or drag it in.</div>
+</aside>
+
+<main id="stage">
+  <canvas id="gl"></canvas>
+  <div id="labels"></div>
+  <div id="viewcube-wrap"><div id="viewcube"></div>
+    <div class="vc-btns">
+      <button data-view="iso" title="Home view (H)">⌂</button>
+      <button id="btn-fit" title="Zoom to fit (F)">⤢</button>
+      <button id="btn-ortho" title="Toggle perspective / orthographic">P</button>
+    </div>
+  </div>
+  <div id="modes" class="modes floating-top" title="Workspace">
+    <button data-ws="design" class="on" title="Build and edit your parts">Design</button>
+    <button data-ws="motion" title="Add joints and test how parts move together">Motion</button>
+    <button data-ws="layout" title="See every part laid out separately for printing">Print layout</button>
+  </div>
+  <button id="printer-chip" title="Choose your printer — sets the size of the build plate"></button>
+  <div id="motion-panel" class="side-float hidden"></div>
+  <div id="layout-panel" class="side-float hidden"></div>
+  <div id="section-ctl" class="floating hidden">
+    <b>Section view</b>
+    <select id="section-axis"><option value="0">X</option><option value="1">Y</option><option value="2" selected>Z</option></select>
+    <input id="section-pos" type="range" min="-100" max="200" step="0.5">
+    <span id="section-val"></span>
+    <button id="section-close" class="mini">✕</button>
+  </div>
+  <div id="welcome" class="hidden">
+    <h2>Welcome to Makie</h2>
+    <ol>
+      <li><b>Add shapes</b> — click any shape on the left, then click on the bed. Drag shapes in too.</li>
+      <li><b>Move &amp; resize</b> — drag a part to slide it, use the coloured arrows to move up/down, or type exact sizes on the right.</li>
+      <li><b>Make holes</b> — set a shape to <span class="pill hole">Hole</span>, then <b>Group</b> it with a solid. The hole is cut out, just like Tinkercad.</li>
+      <li><b>Print</b> — press <b>Export</b> to save an STL or 3MF for your slicer.</li>
+    </ol>
+    <div class="welcome-actions">
+      <button id="w-demo" class="primary">Show me an example</button>
+      <button id="w-wirie">Open a Wirie board</button>
+      <button id="w-close">Start with an empty bed</button>
+    </div>
+    <p class="faint">Mouse: left-drag empty space or right-drag to orbit · middle-drag or Shift+right-drag to pan · wheel to zoom · press <kbd>?</kbd> for all shortcuts.</p>
+  </div>
+</main>
+
+<aside id="side">
+  <section id="inspector"></section>
+  <div id="splitter" title="Drag to resize"></div>
+  <section id="outliner">
+    <div class="panel-head"><span>Parts</span><div class="ol-actions"><button id="ol-group" class="mini" title="Group selected (Ctrl+G)">Group</button><button id="ol-ungroup" class="mini" title="Ungroup (Ctrl+Shift+G)">Ungroup</button></div></div>
+    <div id="tree"></div>
+    <div class="ol-tip">Drag a part onto another to group them. Drag it out to ungroup.</div>
+  </section>
+</aside>
+
+<footer id="status">
+  <span id="engine" title="Engine ready"></span>
+  <span id="hint"></span>
+  <span class="spacer"></span>
+  <span id="selinfo"></span>
+  <span id="snapinfo"></span>
+</footer>
+
+<div id="menu" class="menu hidden"></div>
+<div id="modal-root"></div>
+<div id="toasts"></div>
+<input id="file-open" type="file" accept=".makie,.makie.json,.smithers,.partsmith,.json" hidden>
+<input id="file-import" type="file" accept=".stl,.obj" hidden multiple>
+<script type="module" src="js/main.js"></script>
+<script src="teach-tips.js"></script>
+<script src="teach.js"></script>
+</body>
+</html>

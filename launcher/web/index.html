@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tinkerie</title>
+<link rel="icon" href="tinkerie.png">
+<style>
+:root {
+  --bg: #0a0c11; --card: #151a24; --card2: #1b2130; --line: #242b3a; --line2: #2f3749;
+  --text: #e8ebf2; --muted: #8d95aa; --dim: #5f677c; --accent: #7c5cff; --accent2: #22d3ee;
+  --grad: linear-gradient(135deg, #7c5cff 0%, #4f8cff 55%, #22d3ee 100%);
+  --good: #34d399; --bad: #f87171; --r: 16px;
+  --font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", sans-serif;
+  --display: "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: radial-gradient(1200px 500px at 15% -10%, rgba(124, 92, 255, .16), transparent 60%),
+              radial-gradient(900px 500px at 110% 110%, rgba(34, 211, 238, .10), transparent 60%), var(--bg);
+  color: var(--text); font: 14px/1.45 var(--font); display: flex; flex-direction: column;
+  -webkit-user-select: none; user-select: none;
+}
+header { display: flex; align-items: center; gap: 14px; padding: 26px 32px 6px; }
+header img { width: 46px; height: 46px; filter: drop-shadow(0 6px 18px rgba(124, 92, 255, .35)); }
+h1 { font: 650 26px/1.1 var(--display); margin: 0; letter-spacing: -.01em; }
+h1 span { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.sub { color: var(--muted); margin-top: 3px; }
+main { flex: 1; padding: 18px 32px 8px; overflow: auto; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 14px; }
+.tile {
+  position: relative; display: flex; gap: 14px; align-items: center; text-align: left; width: 100%;
+  padding: 16px; border-radius: var(--r); border: 1px solid var(--line); background: var(--card);
+  color: inherit; font: inherit; cursor: pointer; overflow: hidden;
+  transition: transform .18s cubic-bezier(.2, .8, .2, 1), border-color .18s, background .18s, box-shadow .18s;
+  opacity: 0; animation: rise .45s cubic-bezier(.2, .8, .2, 1) forwards;
+}
+.tile:hover, .tile:focus-visible { transform: translateY(-2px); border-color: var(--line2); background: var(--card2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .35); outline: none; }
+.tile:focus-visible { border-color: var(--accent); }
+.tile:active { transform: translateY(0) scale(.99); }
+.tile img { width: 52px; height: 52px; flex: none; border-radius: 12px; }
+.tile .t { font: 650 16px/1.2 var(--display); display: flex; align-items: baseline; gap: 8px; }
+.tile .v { font: 500 11.5px var(--font); color: var(--dim); }
+.tile .a { color: var(--muted); margin-top: 3px; font-size: 13px; }
+.tile .note { display: inline-block; margin-top: 6px; font-size: 11.5px; color: #fbbf24; border: 1px solid rgba(251, 191, 36, .35); border-radius: 6px; padding: 0 6px; }
+.tile.off { opacity: .55; cursor: not-allowed; }
+.tile.off:hover { transform: none; box-shadow: none; }
+.tile .k { position: absolute; top: 10px; right: 12px; font: 600 11px var(--font); color: var(--dim);
+  border: 1px solid var(--line2); border-radius: 6px; padding: 0 6px; }
+.tile.go::after { content: ""; position: absolute; inset: 0; background: var(--grad); opacity: .16; animation: flash .9s ease-out forwards; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes flash { from { opacity: .28; } to { opacity: 0; } }
+footer { display: flex; justify-content: space-between; color: var(--dim); font-size: 12px; padding: 12px 32px 18px; }
+footer b { color: var(--muted); font-weight: 600; }
+#toast { position: fixed; left: 50%; bottom: 46px; transform: translate(-50%, 12px); opacity: 0; pointer-events: none;
+  background: var(--card2); border: 1px solid var(--line2); border-radius: 12px; padding: 9px 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .4); transition: opacity .2s, transform .2s; }
+#toast.show { opacity: 1; transform: translate(-50%, 0); }
+#toast.bad { border-color: rgba(248, 113, 113, .5); }
+#toast .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--good); margin-right: 8px; }
+#toast.bad .dot { background: var(--bad); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } .tile { opacity: 1; } }
+</style>
+</head>
+<body>
+<header>
+  <img src="tinkerie.png" alt="">
+  <div>
+    <h1><span>Tinkerie</span></h1>
+    <div class="sub">Free tools for makers. Pick one to start it.</div>
+  </div>
+</header>
+<main><div class="grid" id="grid"></div></main>
+<footer>
+  <span>Tinkerie <span id="ver"></span> · designed and created by <b>nrmluvdev</b></span>
+  <span>Tip: press 1–7. Apps keep running when you close this window.</span>
+</footer>
+<div id="toast"><span class="dot"></span><span id="msg"></span></div>
+<script>
+const grid = document.getElementById('grid');
+let toastTimer;
+function toast(text, bad) {
+  const t = document.getElementById('toast');
+  document.getElementById('msg').textContent = text;
+  t.className = 'show' + (bad ? ' bad' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = bad ? 'bad' : ''; }, 2600);
+}
+const busy = new Set();
+async function launch(app, tile) {
+  if (app.off) { toast(`${app.title}: ${app.note}.`, true); return; }
+  if (busy.has(app.name)) return; // one click is enough while it starts
+  busy.add(app.name);
+  setTimeout(() => busy.delete(app.name), 2500);
+  tile.classList.remove('go'); void tile.offsetWidth; tile.classList.add('go');
+  try {
+    const r = await fetch('/api/launch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ app: app.name }) });
+    if (!r.ok) throw new Error((await r.text()).trim() || r.statusText);
+    toast(`Starting ${app.title}…`);
+  } catch (e) {
+    toast(`Couldn't start ${app.title}: ${e.message}`, true);
+  }
+}
+fetch('/api/apps').then(r => r.json()).then(d => {
+  document.getElementById('ver').textContent = d.version;
+  d.apps.forEach((a, i) => {
+    const b = document.createElement('button');
+    b.className = 'tile';
+    b.style.animationDelay = (i * 45) + 'ms';
+    b.title = `Start ${a.title}`;
+    const img = document.createElement('img'); img.src = 'icons/' + a.icon; img.alt = '';
+    const box = document.createElement('div');
+    const t = document.createElement('div'); t.className = 't'; t.textContent = a.title;
+    const v = document.createElement('span'); v.className = 'v'; v.textContent = a.version; t.append(v);
+    const ab = document.createElement('div'); ab.className = 'a'; ab.textContent = a.about;
+    const k = document.createElement('span'); k.className = 'k'; k.textContent = i + 1;
+    box.append(t, ab);
+    if (a.note) { const n = document.createElement('span'); n.className = 'note'; n.textContent = a.note; box.append(n); }
+    if (a.off) { b.classList.add('off'); b.title = `${a.title}: ${a.note}`; }
+    b.append(img, box, k);
+    b.onclick = () => launch(a, b);
+    grid.append(b);
+  });
+  addEventListener('keydown', e => {
+    const n = parseInt(e.key, 10);
+    if (n >= 1 && n <= d.apps.length && !e.ctrlKey && !e.altKey && !e.metaKey) grid.children[n - 1].click();
+  });
+}).catch(() => toast('The launcher stopped. Start Tinkerie again.', true));
+// Holding this connection open tells the launcher its window is still here.
+new EventSource('/api/live');
+</script>
+</body>
+</html>

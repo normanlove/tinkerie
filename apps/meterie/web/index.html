@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Meterie</title>
+<link rel="icon" href="icon.png">
+<style>
+@font-face { font-family: "MeterieR"; src: url(fonts/r.woff) format("woff"); }
+@font-face { font-family: "MeterieS"; src: url(fonts/s.woff) format("woff"); }
+@font-face { font-family: "MeterieB"; src: url(fonts/b.woff) format("woff"); }
+@font-face { font-family: "MeterieM"; src: url(fonts/m.woff) format("woff"); }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #0d1117; }
+canvas { display: block; width: 100vw; height: 100vh; outline: none; }
+#gone { display: none; position: fixed; inset: 0; color: #9aa4b2; font: 15px system-ui, sans-serif;
+  align-items: center; justify-content: center; text-align: center; }
+</style>
+</head>
+<body>
+<canvas id="c" tabindex="0"></canvas>
+<div id="gone">Meterie has closed. You can close this window.</div>
+<script src="icons.js"></script>
+<script src="front.js"></script>
+</body>
+</html>

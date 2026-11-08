@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scopie</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="favicon.ico">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="bg-glow"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <img src="icon.png" class="logo" alt="">
+    <div class="brand-text">
+      <div class="brand-name">Scopie</div>
+      <div class="brand-sub">oscilloscope</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn run" id="btnRun" data-help="run">
+      <svg viewBox="0 0 24 24" class="i-stop"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+      <svg viewBox="0 0 24 24" class="i-play"><path d="M8 5.5v13l11-6.5z"/></svg>
+      <span>Stop</span></button>
+    <button class="btn" id="btnSingle" data-help="single">
+      <svg viewBox="0 0 24 24"><path d="M3 17h5l3-10 3 10h7"/></svg>Single</button>
+    <button class="btn primary" id="btnAuto" data-help="autoset">
+      <svg viewBox="0 0 24 24"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>Auto setup</button>
+    <button class="btn ghost" id="btnDefault" data-help="default">Default</button>
+    <button class="btn ghost" id="btnClear" data-help="clear">Clear</button>
+    <span class="tsep"></span>
+    <button class="btn ghost" id="btnConnect" data-help="connect">
+      <svg viewBox="0 0 24 24"><path d="M9 7V3M15 7V3M7 7h10v4a5 5 0 0 1-10 0zM12 16v5"/></svg>Connect…</button>
+    <span class="tsep"></span>
+    <button class="icon-btn" id="btnShot" data-help="screenshot"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
+    <button class="icon-btn" id="btnCSV" data-help="csv"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 20h14"/></svg></button>
+    <button class="icon-btn" id="btnOpen" data-help="open_csv"><svg viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3z"/></svg></button>
+  </div>
+
+  <div class="top-right">
+    <div class="menus">
+      <div class="menu" data-help="menu_file"><button class="mbtn">File</button>
+        <div class="mdrop">
+          <button data-act="openCSV">Open CSV…<kbd>Ctrl+O</kbd></button>
+          <button data-act="exportCSV">Export CSV<kbd>Ctrl+S</kbd></button>
+          <button data-act="screenshot">Save screenshot<kbd>Ctrl+P</kbd></button>
+          <hr>
+          <button data-act="saveSetup">Save setup…</button>
+          <button data-act="loadSetup">Load setup…</button>
+          <hr>
+          <button data-act="openExports">Open Scopie folder</button>
+        </div></div>
+      <div class="menu" data-help="menu_device"><button class="mbtn">Device</button>
+        <div class="mdrop">
+          <button data-act="connect">Connect…<kbd>Ctrl+K</kbd></button>
+          <button data-act="demoStream">Demo: USB scope (2 channels)</button>
+          <button data-act="demoBench">Demo: bench scope (4 channels)</button>
+          <button data-act="disconnect">Disconnect</button>
+          <hr>
+          <button data-act="drivers" class="win-only">Install USB driver…</button>
+          <button data-act="pico">Get PicoScope drivers…</button>
+        </div></div>
+      <div class="menu" data-help="menu_help"><button class="mbtn">Help</button>
+        <div class="mdrop right">
+          <button data-act="guide">Beginner's guide<kbd>F1</kbd></button>
+          <button data-act="supported">Supported oscilloscopes</button>
+          <hr>
+          <button data-act="logs">Open log folder</button>
+          <button data-act="licences">Licences</button>
+          <button data-act="about">About Scopie</button>
+        </div></div>
+    </div>
+    <div class="chip devchip" id="devChip" data-help="status_dev"><span class="dot"></span><span class="lbl">Not connected</span></div>
+  </div>
+</header>
+
+<main class="layout">
+  <section class="scope-col">
+    <div class="chips" id="chips">
+      <div class="schip" id="chipC0" data-help="chip_ch"></div>
+      <div class="schip" id="chipC1" data-help="chip_ch"></div>
+      <div class="schip" id="chipC2" data-help="chip_ch"></div>
+      <div class="schip" id="chipC3" data-help="chip_ch"></div>
+      <div class="schip" id="chipM" data-help="math_enable"></div>
+      <div class="schip" id="chipH" data-help="chip_h"></div>
+      <div class="schip" id="chipT" data-help="chip_trig"></div>
+      <div class="state" id="chipState" data-help="status_state">NO SCOPE</div>
+    </div>
+    <div class="panel screen" id="screenPanel">
+      <div class="scope-wrap" id="scopeWrap">
+        <canvas id="scope"></canvas>
+        <div class="screen-msg" id="screenMsg"></div>
+        <div class="drop-hint" id="dropHint">Drop a CSV file to view it</div>
+      </div>
+      <div class="splitter hidden" id="splitter"></div>
+      <div class="fft-wrap hidden" id="fftWrap" data-help="fft_plot"><canvas id="fft"></canvas></div>
+    </div>
+    <div class="readouts">
+      <div class="panel meas">
+        <div class="ph"><span>Measurements</span>
+          <button class="btn sm ghost" id="btnMeas" data-help="measure_btn">Measurements…</button></div>
+        <div class="meas-scroll" data-help="measure_table"><table class="mtable" id="measTable"></table></div>
+      </div>
+      <div class="panel curs">
+        <div class="ph"><span>Cursors</span></div>
+        <div class="cur-read mono" id="curRead" data-help="cursor_readout"></div>
+      </div>
+    </div>
+    <div class="helpbar" id="helpBar"></div>
+  </section>
+
+  <aside class="side" id="side"></aside>
+</main>
+
+<footer class="statusbar">
+  <span id="stDev" data-help="status_dev">Not connected</span>
+  <span class="grow"></span>
+  <span id="stWfm" data-help="status_wfms">0 wfm/s</span>
+  <span id="stFps" data-help="status_fps">0 fps</span>
+  <span id="stUsb" data-help="status_usb">0.00 MB/s</span>
+  <span class="credit-s">Scopie <span id="ver"></span> · nrmluvdev</span>
+</footer>
+
+<div class="popover hidden" id="measPop"></div>
+<div class="toasts" id="toasts"></div>
+<div id="modals"></div>
+<input type="file" id="fileCSV" accept=".csv,.CSV,.txt,text/csv" class="hidden">
+<input type="file" id="fileSetup" accept=".json,application/json" class="hidden">
+<input type="file" id="fileFW" accept=".sys,.SYS,.zip,.hex" class="hidden">
+
+<script src="tips.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

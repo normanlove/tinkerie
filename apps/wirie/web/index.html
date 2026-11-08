@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="nrmluvdev">
+<title>Wirie — by nrmluvdev</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='56' height='56' rx='14' fill='%23141a24'/%3E%3Cpath d='M14 22h10l8 10h8l8-10' fill='none' stroke='%23f08a4b' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14 42h8l6-6h8l6 6h8' fill='none' stroke='%233fe0d0' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-mode="pcb">
+<header id="top">
+  <div id="brand"></div>
+  <div class="projbox"><input id="projname" spellcheck="false" title="Project name"></div>
+  <nav id="modes" class="modes"></nav>
+  <div id="filebtns"></div>
+</header>
+<main id="app">
+  <aside id="left">
+    <div class="lhead"><div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="libq" placeholder="Search parts — pico, oled, 10k, header…" spellcheck="false"></div><div class="libmeta"><span>Parts library</span><em id="libcount"></em></div></div>
+    <div id="liblist"></div>
+  </aside>
+  <section id="center">
+    <div id="topbar2" class="floatbar"></div>
+    <div id="tools" class="floattools"></div>
+    <canvas id="cv" tabindex="0"></canvas>
+    <div id="guide"></div>
+    <div id="tip"></div>
+    <section id="calc" class="fullpage"></section>
+    <section id="pinnie" class="fullpage"></section>
+    <section id="power" class="fullpage"></section>
+  </section>
+  <aside id="right">
+    <div id="rtabs" class="tabs"><button data-t="props" class="on">Properties</button><button data-t="nets">Nets</button><button data-t="check">Check</button></div>
+    <div id="props"></div>
+  </aside>
+</main>
+<footer id="status"><span id="hint"></span><span class="grow"></span><span id="coords"></span><span id="stats"></span><span id="credit"></span></footer>
+<div id="toasts"></div>
+<div id="btip"></div>
+<script src="lib.js"></script>
+<script src="lib2.js"></script>
+<script src="font.js"></script>
+<script src="core.js"></script>
+<script src="calc.js"></script>
+<script src="route.js"></script>
+<script src="export.js"></script>
+<script src="mech.js"></script>
+<script src="render.js"></script>
+<script src="strip.js"></script>
+<script src="makie.js"></script>
+<script src="parts.js"></script>
+<script src="pinnie.js"></script>
+<script src="powerie.js"></script>
+<script src="ui.js"></script>
+<script src="teach-tips.js"></script>
+<script src="teach.js"></script>
+</body>
+</html>
