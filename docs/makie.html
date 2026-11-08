@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Makie · Tinkerie</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Makie: A Tinkercad-style 3D designer with threads, gears, boxes, cases and hundreds of ready parts. Part of Tinkerie, free maker tools by nrmluvdev.">
+<meta property="og:title" content="Makie · Tinkerie">
+<meta property="og:description" content="Makie: A Tinkercad-style 3D designer with threads, gears, boxes, cases and hundreds of ready parts. Part of Tinkerie, free maker tools by nrmluvdev.">
+<link rel="icon" href="img/icons/tinkerie.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&family=Unbounded:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div style="--app:#2f7df6">
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top"><div class="wrap">
+  <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
+  <nav class="nav" aria-label="Main">
+    <div class="apps-menu"><button type="button" aria-expanded="false" aria-haspopup="true">Apps <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><div class="menu"><a href="wirie.html"><img src="img/icons/wirie.png" alt=""><span><b>Wirie</b><small>Design circuit boards</small></span></a><a href="makie.html"><img src="img/icons/makie.png" alt=""><span><b>Makie</b><small>A Tinkercad-style 3D designer with threads</small></span></a><a href="tunie.html"><img src="img/icons/tunie.png" alt=""><span><b>Tunie</b><small>Print a test</small></span></a><a href="flashie.html"><img src="img/icons/flashie.svg" alt=""><span><b>Flashie</b><small>Flash ESP32</small></span></a><a href="scopie.html"><img src="img/icons/scopie.png" alt=""><span><b>Scopie</b><small>A friendly oscilloscope app for Hantek</small></span></a><a href="meterie.html"><img src="img/icons/meterie.png" alt=""><span><b>Meterie</b><small>Connect your multimeter to show huge readings</small></span></a><a href="tracie.html"><img src="img/icons/tracie.svg" alt=""><span><b>Tracie</b><small>A serial monitor with a live plotter</small></span></a><a class="menu-start" href="start.html">Getting started guide →</a></div></div>
+    <a class="hide-s" href="start.html">Getting started</a>
+    <a class="hide-s" href="https://github.com/normanlove/tinkerie">GitHub</a>
+    <a class="btn btn-go" href="index.html#download" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg><span class="lbl">Download</span></a>
+    <button class="theme" id="theme" type="button" aria-label="Switch theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></button>
+  </nav>
+</div></header>
+<main id="main">
+<div class="ruler" aria-hidden="true"></div>
+<section class="app-hero"><div class="wrap">
+  <nav class="crumbs" aria-label="You are here"><a href="index.html">Tinkerie</a><span aria-hidden="true">›</span><a href="index.html#apps">Apps</a><span aria-hidden="true">›</span><span>Makie</span></nav>
+  <div class="grid">
+    <div>
+      <div class="app-title"><img src="img/icons/makie.png" alt=""><div><h1>Makie</h1><span class="ver">Version 1.5.1 · in Tinkerie 1.5.1</span></div></div>
+      <p class="lead">Design parts for your 3D printer by stacking simple shapes.</p>
+      <div class="plain"><span class="label">In plain words</span><p>Drop shapes onto the build plate, turn some of them into holes, and group them: the holes are cut out. That&#x27;s all it takes to make a bracket, a box or a replacement knob. When it looks right, export an STL or 3MF for your slicer.</p></div>
+      <div class="chips"><span class="chip">Threads that fit</span><span class="chip">Gears and mechanisms</span><span class="chip">Cases for 70 boards</span><span class="chip">Motion and collision check</span><span class="chip">Multi-colour 3MF</span></div>
+      <div class="hero" style="padding:0"><div class="cta"><a class="btn btn-go" href="index.html#download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg>Download Tinkerie</a><a class="btn btn-line" href="#first">First five minutes</a></div><p class="osnote">You'll need: No hardware needed.</p></div>
+    </div>
+    <figure><div class="shot"><span class="tag">Makie</span><button class="zoom" type="button" data-full="img/shots/makie-gearbox.webp" data-caption="The example gearbox, built from Makie&#x27;s gear parts." aria-label="Enlarge: The example gearbox, built from Makie&#x27;s gear parts."><img src="img/shots/makie-gearbox.webp" alt="The example gearbox, built from Makie&#x27;s gear parts." width="1440" height="900"></button></div><figcaption>The example gearbox, built from Makie&#x27;s gear parts.</figcaption></figure>
+  </div>
+</div></section>
+
+<section class="band alt" id="first"><div class="wrap">
+  <div class="head"><div><span class="label">Your first five minutes</span><h2>Try this first</h2></div></div>
+  <ol class="firsts"><li><h3>Show me an example</h3><p>Click Show me an example on the welcome screen. Makie builds a hand-cranked 9:1 gearbox.</p></li><li><h3>Press Play</h3><p>Open Motion and press Play to watch the gears turn. If parts would collide, Makie shows them in red.</p></li><li><h3>Make your own</h3><p>Click Box in the library, click the bed, then drag the white handles to resize it.</p></li><li><h3>Export</h3><p>Press Export to save an STL or 3MF for your slicer.</p></li></ol>
+</div></section>
+
+<section class="band"><div class="wrap"><div class="head"><div><span class="label">Screenshots</span><h2>A closer look</h2><p>Click any picture to see it bigger.</p></div></div><div class="thumbs"><figure><div class="shot"><button class="zoom" type="button" data-full="img/shots/makie-motion.webp" data-caption="Motion mode: crank it and watch every gear move." aria-label="Enlarge: Motion mode: crank it and watch every gear move."><img src="img/shots/makie-motion-sm.webp" alt="Motion mode: crank it and watch every gear move." width="720" height="450" loading="lazy"></button></div><figcaption>Motion mode: crank it and watch every gear move.</figcaption></figure></div></div></section>
+
+<section class="band"><div class="wrap">
+  <div class="head"><div><span class="label">Everything it does</span><h2>Features</h2></div></div>
+  <div class="features"><div class="feature"><h3>Shapes and holes</h3><p>The Tinkercad idea, with more to build from.</p><ul><li>Box, cylinder, cone, sphere, dome, torus, tube, wedge, pyramid, star, capsule and more</li><li>3D text with 34 open-licence fonts, embossed or engraved</li><li>Sketch your own outline in 2D, then extrude, twist, taper or revolve it</li><li>Any shape can be a hole. Group it with a solid and it&#x27;s cut out</li><li>Screw holes placed on a face go all the way through</li></ul></div><div class="feature"><h3>Threads that actually fit</h3><p>Screws, nuts and threaded holes made for printing.</p><ul><li>ISO metric, trapezoidal, square and buttress threads</li><li>Coarse, fine or custom pitch; multi-start; left or right hand</li><li>A fit clearance so printed parts screw together</li><li>Make matching screw / threaded hole creates the other half in one click</li></ul></div><div class="feature"><h3>Hundreds of ready parts</h3><p>Hardware, holes and mechanisms you don&#x27;t have to model.</p><ul><li>33 hardware parts: bolts, nuts, washers, standoffs, bearings, heat-set inserts…</li><li>35 smart holes: nut traps, magnet pockets, fan and stepper mounts, USB-C and HDMI cut-outs</li><li>50 mechanical parts: gears, pulleys, cams, hinges, springs, knobs, brackets, boxes, jars</li><li>Hose fittings, cable channels, drag-chain links, IKEA SKÅDIS hooks and bins</li></ul></div><div class="feature"><h3>Gears and motion</h3><p>Design mechanisms, then check they work.</p><ul><li>Spur, helical, herringbone, bevel, worm, rack, planetary, cycloidal and non-circular gears</li><li>A gear ratio calculator that adds the gears already meshed</li><li>Rotating and sliding joints, driven by gears, racks and lead screws</li><li>Live collision detection: a moving part stops the moment it hits another, just like the real thing would jam</li></ul></div><div class="feature"><h3>Cases for your electronics</h3><p>Mounts and enclosures for 70 boards and modules.</p><ul><li>Raspberry Pi, Pico, Arduino, ESP32, XIAO, screens, sensors, relays, motors…</li><li>Mount plates, standoffs, snap-in trays, cases with port openings, lids with windows, bezels</li><li>Import any STL and Makie works out a case for it</li><li>Opens Wirie boards and builds a case around them, with a clash check</li></ul></div><div class="feature"><h3>Ready to print</h3><p>Checks and exports that save failed prints.</p><ul><li>Pick your printer from about 70 models, or type your bed size</li><li>Print check: bed fit, overhangs, thin walls, floating parts, watertightness, weight</li><li>Print layout lays every part flat on the bed without changing your design</li><li>STL, OBJ and 3MF, including multi-colour 3MF for Bambu Studio and OrcaSlicer (up to 16 filaments)</li></ul></div></div>
+</div></section>
+
+
+
+<section class="band alt"><div class="wrap stack">
+  <div class="head" style="margin:0"><div><span class="label">Before you start</span><h2>Good to know</h2></div></div><div class="stack"><div class="callout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-9.5v.5"/></svg><p>Board sizes are typical published values, and clone boards vary. Check your own board before printing a tight-fitting case.</p></div></div>
+  <div class="head" style="margin:30px 0 0"><div><span class="label">Works well with</span><h2>Pairs nicely with</h2></div></div>
+  <div class="pairs"><a class="pair" href="wirie.html"><img src="img/icons/wirie.png" alt=""><div><b>Wirie</b><p>Design the board, then build its case in Makie.</p></div></a><a class="pair" href="tunie.html"><img src="img/icons/tunie.png" alt=""><div><b>Tunie</b><p>Shares your printer&#x27;s fit clearances with Makie.</p></div></a><a class="pair" href="flashie.html"><img src="img/icons/flashie.svg" alt=""><div><b>Flashie</b><p>Program the board that goes in your case.</p></div></a></div>
+  <nav class="pager" aria-label="Other apps" style="margin-top:30px">
+    <a href="wirie.html"><span class="muted">← Previous app</span><b>Wirie</b></a>
+    <a href="tunie.html"><span class="muted">Next app →</span><b>Tunie</b></a>
+  </nav>
+</div></section>
+</main>
+<footer><div class="wrap">
+  <div class="stack">
+    <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
+    <p>Free maker tools, designed and created by <b>nrmluvdev</b>. Version 1.5.1.</p>
+    <p>Free software under the GNU GPL, version 3 or later. It comes with no warranty.</p>
+  </div>
+  <div><h4>The apps</h4><ul><li><a href="wirie.html">Wirie</a></li><li><a href="makie.html">Makie</a></li><li><a href="tunie.html">Tunie</a></li><li><a href="flashie.html">Flashie</a></li><li><a href="scopie.html">Scopie</a></li><li><a href="meterie.html">Meterie</a></li><li><a href="tracie.html">Tracie</a></li></ul></div>
+  <div><h4>Help and source</h4><ul>
+    <li><a href="start.html">Getting started</a></li>
+    <li><a href="index.html#faq">Questions</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie/releases/latest">All downloads</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie">Source code on GitHub</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie/issues">Report a problem</a></li>
+  </ul></div>
+</div></footer>
+<script src="site.js"></script>
+</div>
+</body>
+</html>

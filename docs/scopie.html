@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Scopie · Tinkerie</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Scopie: A friendly oscilloscope app for Hantek, Rigol, Siglent, OWON, PicoScope and more. Part of Tinkerie, free maker tools by nrmluvdev.">
+<meta property="og:title" content="Scopie · Tinkerie">
+<meta property="og:description" content="Scopie: A friendly oscilloscope app for Hantek, Rigol, Siglent, OWON, PicoScope and more. Part of Tinkerie, free maker tools by nrmluvdev.">
+<link rel="icon" href="img/icons/tinkerie.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&family=Unbounded:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div style="--app:#e8b416">
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top"><div class="wrap">
+  <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
+  <nav class="nav" aria-label="Main">
+    <div class="apps-menu"><button type="button" aria-expanded="false" aria-haspopup="true">Apps <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><div class="menu"><a href="wirie.html"><img src="img/icons/wirie.png" alt=""><span><b>Wirie</b><small>Design circuit boards</small></span></a><a href="makie.html"><img src="img/icons/makie.png" alt=""><span><b>Makie</b><small>A Tinkercad-style 3D designer with threads</small></span></a><a href="tunie.html"><img src="img/icons/tunie.png" alt=""><span><b>Tunie</b><small>Print a test</small></span></a><a href="flashie.html"><img src="img/icons/flashie.svg" alt=""><span><b>Flashie</b><small>Flash ESP32</small></span></a><a href="scopie.html"><img src="img/icons/scopie.png" alt=""><span><b>Scopie</b><small>A friendly oscilloscope app for Hantek</small></span></a><a href="meterie.html"><img src="img/icons/meterie.png" alt=""><span><b>Meterie</b><small>Connect your multimeter to show huge readings</small></span></a><a href="tracie.html"><img src="img/icons/tracie.svg" alt=""><span><b>Tracie</b><small>A serial monitor with a live plotter</small></span></a><a class="menu-start" href="start.html">Getting started guide →</a></div></div>
+    <a class="hide-s" href="start.html">Getting started</a>
+    <a class="hide-s" href="https://github.com/normanlove/tinkerie">GitHub</a>
+    <a class="btn btn-go" href="index.html#download" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg><span class="lbl">Download</span></a>
+    <button class="theme" id="theme" type="button" aria-label="Switch theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></button>
+  </nav>
+</div></header>
+<main id="main">
+<div class="ruler" aria-hidden="true"></div>
+<section class="app-hero"><div class="wrap">
+  <nav class="crumbs" aria-label="You are here"><a href="index.html">Tinkerie</a><span aria-hidden="true">›</span><a href="index.html#apps">Apps</a><span aria-hidden="true">›</span><span>Scopie</span></nav>
+  <div class="grid">
+    <div>
+      <div class="app-title"><img src="img/icons/scopie.png" alt=""><div><h1>Scopie</h1><span class="ver">Version 3.0.0 · in Tinkerie 1.5.1</span></div></div>
+      <p class="lead">Turn your PC into the screen of an oscilloscope.</p>
+      <div class="plain"><span class="label">In plain words</span><p>An oscilloscope draws a voltage as a line moving over time, so you can see signals: a PWM output, a serial message, a noisy power supply. Scopie gives your scope a big, clear screen on your PC, and every button explains itself. No scope yet? Demo mode has 13 practice signals.</p></div>
+      <div class="chips"><span class="chip">Hantek 6022BE / BL</span><span class="chip">Rigol, Siglent, Keysight, Tektronix</span><span class="chip">OWON</span><span class="chip">PicoScope</span><span class="chip">FFT</span><span class="chip">Demo mode</span></div>
+      <div class="hero" style="padding:0"><div class="cta"><a class="btn btn-go" href="index.html#download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg>Download Tinkerie</a><a class="btn btn-line" href="#first">First five minutes</a></div><p class="osnote">You'll need: A USB or bench oscilloscope, or try Demo mode.</p></div>
+    </div>
+    <figure><div class="shot"><span class="tag">Scopie</span><button class="zoom" type="button" data-full="img/shots/scopie.webp" data-caption="Demo mode: a square wave and a sine wave, with automatic measurements." aria-label="Enlarge: Demo mode: a square wave and a sine wave, with automatic measurements."><img src="img/shots/scopie.webp" alt="Demo mode: a square wave and a sine wave, with automatic measurements." width="1440" height="900"></button></div><figcaption>Demo mode: a square wave and a sine wave, with automatic measurements.</figcaption></figure>
+  </div>
+</div></section>
+
+<section class="band alt" id="first"><div class="wrap">
+  <div class="head"><div><span class="label">Your first five minutes</span><h2>Try this first</h2></div></div>
+  <ol class="firsts"><li><h3>Start Demo mode</h3><p>No scope needed: pick a practice signal like the probe calibration square.</p></li><li><h3>Press Auto setup</h3><p>Scopie picks the volts and time per division so the signal fits the screen.</p></li><li><h3>Drag the trigger line</h3><p>The trigger holds the wave still. Drag the line to where the wave crosses.</p></li><li><h3>Read the measurements</h3><p>Frequency, peak-to-peak, RMS and more appear under the screen. Press F1 for the beginner&#x27;s guide.</p></li></ol>
+</div></section>
+
+
+
+<section class="band"><div class="wrap">
+  <div class="head"><div><span class="label">Everything it does</span><h2>Features</h2></div></div>
+  <div class="features"><div class="feature"><h3>Everyday scope controls</h3><p>The front panel, on your screen.</p><ul><li>Run / Stop, Single, Auto setup and Default setup</li><li>Up to 4 channels: volts/div, ×1/×10/×100 probes, DC/AC coupling, invert</li><li>Trigger on rising, falling or either edge, with a level line you drag</li><li>Roll mode on streaming scopes</li></ul></div><div class="feature"><h3>See more of the signal</h3><p>Display options for tricky waveforms.</p><ul><li>Lines or dots, sin(x)/x smoothing, averaging</li><li>Colour-graded persistence, like an analogue scope</li><li>XY mode</li></ul></div><div class="feature"><h3>Measure and analyse</h3><p>Numbers without counting squares.</p><ul><li>13 automatic measurements, plus phase and delay</li><li>Time and voltage cursors</li><li>FFT with 5 windows, to see the frequencies in a signal</li><li>Maths channel: A+B, A−B, A×B</li></ul></div><div class="feature"><h3>Save and share</h3><p>Keep what you captured.</p><ul><li>PNG screenshots and CSV export</li><li>Open a CSV by dropping it on the screen</li><li>Save and load setups</li></ul></div></div>
+</div></section>
+
+<section class="band alt"><div class="wrap">
+  <div class="head"><div><span class="label">Compatibility</span><h2>Supported oscilloscopes</h2></div></div>
+  <div class="table-wrap"><table><thead><tr><th>Family</th><th>Models</th><th>Connection</th></tr></thead><tbody><tr><td>Hantek 6022 family</td><td>DSO-6022BE, 6022BL, 6021, Voltcraft DSO-2020, Sainsmart DDS120</td><td>USB, firmware built in</td></tr><tr><td>Bench scopes</td><td>Rigol DS1000Z / DS2000 / MSO5000 / DHO, Keysight InfiniiVision, Tektronix TBS/TDS, Siglent SDS</td><td>USB or network</td></tr><tr><td>OWON</td><td>HDS200 / HDS300 handhelds, SDS / XDS / TAO bench scopes</td><td>USB or network</td></tr><tr><td>PicoScope</td><td>2000, 3000, 4000 and 5000 series</td><td>USB (needs Pico&#x27;s free PicoSDK)</td></tr><tr><td>Hantek handhelds</td><td>2C42, 2C72, 2D42, 2D72</td><td>USB (experimental)</td></tr><tr><td>Old Hantek DSO</td><td>DSO-2090, 2150, 2250, 5200</td><td>USB (experimental)</td></tr></tbody></table></div>
+</div></section>
+
+<section class="band"><div class="wrap stack">
+  <div class="head" style="margin:0"><div><span class="label">Before you start</span><h2>Good to know</h2></div></div><div class="stack"><div class="callout warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 20h20L12 3zm0 7v5m0 3v.5"/></svg><p>On USB and bench scopes the probe&#x27;s ground clip is connected to your computer&#x27;s ground. Never connect it to mains, or anything plugged into mains, without proper isolation.</p></div><div class="callout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-9.5v.5"/></svg><p>USB scopes work on Windows, Linux and Raspberry Pi. On a Mac, Scopie works with network bench scopes, CSV files and Demo mode.</p></div></div>
+  <div class="head" style="margin:30px 0 0"><div><span class="label">Works well with</span><h2>Pairs nicely with</h2></div></div>
+  <div class="pairs"><a class="pair" href="tracie.html"><img src="img/icons/tracie.svg" alt=""><div><b>Tracie</b><p>Decode the digital signals you see.</p></div></a><a class="pair" href="meterie.html"><img src="img/icons/meterie.png" alt=""><div><b>Meterie</b><p>Log slow changes with your multimeter.</p></div></a></div>
+  <nav class="pager" aria-label="Other apps" style="margin-top:30px">
+    <a href="flashie.html"><span class="muted">← Previous app</span><b>Flashie</b></a>
+    <a href="meterie.html"><span class="muted">Next app →</span><b>Meterie</b></a>
+  </nav>
+</div></section>
+</main>
+<footer><div class="wrap">
+  <div class="stack">
+    <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
+    <p>Free maker tools, designed and created by <b>nrmluvdev</b>. Version 1.5.1.</p>
+    <p>Free software under the GNU GPL, version 3 or later. It comes with no warranty.</p>
+  </div>
+  <div><h4>The apps</h4><ul><li><a href="wirie.html">Wirie</a></li><li><a href="makie.html">Makie</a></li><li><a href="tunie.html">Tunie</a></li><li><a href="flashie.html">Flashie</a></li><li><a href="scopie.html">Scopie</a></li><li><a href="meterie.html">Meterie</a></li><li><a href="tracie.html">Tracie</a></li></ul></div>
+  <div><h4>Help and source</h4><ul>
+    <li><a href="start.html">Getting started</a></li>
+    <li><a href="index.html#faq">Questions</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie/releases/latest">All downloads</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie">Source code on GitHub</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie/issues">Report a problem</a></li>
+  </ul></div>
+</div></footer>
+<script src="site.js"></script>
+</div>
+</body>
+</html>

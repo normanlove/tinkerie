@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tracie · Tinkerie</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Tracie: A serial monitor with a live plotter, plus a logic analyser that decodes UART, I²C and SPI. Part of Tinkerie, free maker tools by nrmluvdev.">
+<meta property="og:title" content="Tracie · Tinkerie">
+<meta property="og:description" content="Tracie: A serial monitor with a live plotter, plus a logic analyser that decodes UART, I²C and SPI. Part of Tinkerie, free maker tools by nrmluvdev.">
+<link rel="icon" href="img/icons/tinkerie.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&family=Unbounded:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div style="--app:#25b39f">
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top"><div class="wrap">
+  <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
+  <nav class="nav" aria-label="Main">
+    <div class="apps-menu"><button type="button" aria-expanded="false" aria-haspopup="true">Apps <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><div class="menu"><a href="wirie.html"><img src="img/icons/wirie.png" alt=""><span><b>Wirie</b><small>Design circuit boards</small></span></a><a href="makie.html"><img src="img/icons/makie.png" alt=""><span><b>Makie</b><small>A Tinkercad-style 3D designer with threads</small></span></a><a href="tunie.html"><img src="img/icons/tunie.png" alt=""><span><b>Tunie</b><small>Print a test</small></span></a><a href="flashie.html"><img src="img/icons/flashie.svg" alt=""><span><b>Flashie</b><small>Flash ESP32</small></span></a><a href="scopie.html"><img src="img/icons/scopie.png" alt=""><span><b>Scopie</b><small>A friendly oscilloscope app for Hantek</small></span></a><a href="meterie.html"><img src="img/icons/meterie.png" alt=""><span><b>Meterie</b><small>Connect your multimeter to show huge readings</small></span></a><a href="tracie.html"><img src="img/icons/tracie.svg" alt=""><span><b>Tracie</b><small>A serial monitor with a live plotter</small></span></a><a class="menu-start" href="start.html">Getting started guide →</a></div></div>
+    <a class="hide-s" href="start.html">Getting started</a>
+    <a class="hide-s" href="https://github.com/normanlove/tinkerie">GitHub</a>
+    <a class="btn btn-go" href="index.html#download" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg><span class="lbl">Download</span></a>
+    <button class="theme" id="theme" type="button" aria-label="Switch theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></button>
+  </nav>
+</div></header>
+<main id="main">
+<div class="ruler" aria-hidden="true"></div>
+<section class="app-hero"><div class="wrap">
+  <nav class="crumbs" aria-label="You are here"><a href="index.html">Tinkerie</a><span aria-hidden="true">›</span><a href="index.html#apps">Apps</a><span aria-hidden="true">›</span><span>Tracie</span></nav>
+  <div class="grid">
+    <div>
+      <div class="app-title"><img src="img/icons/tracie.svg" alt=""><div><h1>Tracie</h1><span class="ver">Version 1.0.0 · in Tinkerie 1.5.1</span></div></div>
+      <p class="lead">See what your board is saying, and the signals on its wires.</p>
+      <div class="plain"><span class="label">In plain words</span><p>When your Arduino or ESP32 prints messages, Tracie shows them, and turns any numbers into live graphs automatically. With a cheap 8-channel logic analyser it also records the digital signals on your wires and decodes them into readable bytes.</p></div>
+      <div class="chips"><span class="chip">Serial monitor</span><span class="chip">Live plotter</span><span class="chip">UART, I²C, SPI decoders</span><span class="chip">8-channel logic analyser</span><span class="chip">Shared timeline</span></div>
+      <div class="hero" style="padding:0"><div class="cta"><a class="btn btn-go" href="index.html#download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg>Download Tinkerie</a><a class="btn btn-line" href="#first">First five minutes</a></div><p class="osnote">You'll need: A board on USB, or a cheap logic analyser (demo included).</p></div>
+    </div>
+    <figure><div class="shot"><span class="tag">Tracie</span><button class="zoom" type="button" data-full="img/shots/tracie-serial.webp" data-caption="Serial: the demo board&#x27;s messages, plotted live." aria-label="Enlarge: Serial: the demo board&#x27;s messages, plotted live."><img src="img/shots/tracie-serial.webp" alt="Serial: the demo board&#x27;s messages, plotted live." width="1440" height="900"></button></div><figcaption>Serial: the demo board&#x27;s messages, plotted live.</figcaption></figure>
+  </div>
+</div></section>
+
+<section class="band alt" id="first"><div class="wrap">
+  <div class="head"><div><span class="label">Your first five minutes</span><h2>Try this first</h2></div></div>
+  <ol class="firsts"><li><h3>Try the DEMO board</h3><p>Pick DEMO in the port list and press Connect. No hardware needed.</p></li><li><h3>Watch the plotter</h3><p>Lines like temp:21.5,hum:40 are graphed by themselves.</p></li><li><h3>Send a command</h3><p>Type at the bottom, or use the quick buttons like LED on.</p></li><li><h3>Try Logic</h3><p>The Logic tab has a demo signal generator with UART, I²C, SPI and PWM.</p></li></ol>
+</div></section>
+
+<section class="band"><div class="wrap"><div class="head"><div><span class="label">Screenshots</span><h2>A closer look</h2><p>Click any picture to see it bigger.</p></div></div><div class="thumbs"><figure><div class="shot"><button class="zoom" type="button" data-full="img/shots/tracie-logic.webp" data-caption="Logic: eight channels captured and decoded." aria-label="Enlarge: Logic: eight channels captured and decoded."><img src="img/shots/tracie-logic-sm.webp" alt="Logic: eight channels captured and decoded." width="720" height="450" loading="lazy"></button></div><figcaption>Logic: eight channels captured and decoded.</figcaption></figure></div></div></section>
+
+<section class="band"><div class="wrap">
+  <div class="head"><div><span class="label">Everything it does</span><h2>Features</h2></div></div>
+  <div class="features"><div class="feature"><h3>Serial monitor</h3><p>Better than the Arduino one.</p><ul><li>Ports show each board&#x27;s USB chip (Arduino, ESP32, Pico, CH340, CP210x, FTDI…)</li><li>Any baud rate, plus DTR/RTS and a Reset board button</li><li>Reconnects by itself when boards like the ESP32-S3 and Pico reset</li><li>Timestamps, ESP-IDF colours, search and command history</li><li>Hex view, quick command buttons and CSV logging</li></ul></div><div class="feature"><h3>Live plotter</h3><p>Graphs from plain printed numbers.</p><ul><li>Prints like temp:21.5,hum:40 or 1.2 3.4 5.6 are graphed automatically</li><li>Shared or stacked axes, windows from 5 seconds to 5 minutes</li></ul></div><div class="feature"><h3>Logic analyser</h3><p>For the cheap 24 MHz 8-channel analysers.</p><ul><li>Sample rates from 20 kHz to 24 MHz, up to 100 million samples</li><li>Triggers on high, low, rising, falling or any edge</li><li>Decoders for UART, I²C and SPI, with a searchable list</li><li>Cursors and measurements: frequency, period, duty cycle</li><li>Export to VCD (PulseView, GTKWave), CSV or PNG</li></ul></div><div class="feature"><h3>One timeline</h3><p>Everything lines up.</p><ul><li>Serial lines, plotted values and logic channels on one zoomable timeline</li><li>Logic captures show the serial messages alongside</li></ul></div></div>
+</div></section>
+
+
+
+<section class="band alt"><div class="wrap stack">
+  <div class="head" style="margin:0"><div><span class="label">Before you start</span><h2>Good to know</h2></div></div><div class="stack"><div class="callout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-9.5v.5"/></svg><p>Logic analysers need a one-time setup: a USB driver on Windows (Zadig) and the free fx2lafw firmware, which Tracie finds automatically if PulseView is installed. On Linux and Raspberry Pi, run install-usb.sh once instead.</p></div></div>
+  <div class="head" style="margin:30px 0 0"><div><span class="label">Works well with</span><h2>Pairs nicely with</h2></div></div>
+  <div class="pairs"><a class="pair" href="flashie.html"><img src="img/icons/flashie.svg" alt=""><div><b>Flashie</b><p>Flash a board, then watch it here.</p></div></a><a class="pair" href="scopie.html"><img src="img/icons/scopie.png" alt=""><div><b>Scopie</b><p>For analogue signals, not just digital ones.</p></div></a></div>
+  <nav class="pager" aria-label="Other apps" style="margin-top:30px">
+    <a href="meterie.html"><span class="muted">← Previous app</span><b>Meterie</b></a>
+    <a href="wirie.html"><span class="muted">Next app →</span><b>Wirie</b></a>
+  </nav>
+</div></section>
+</main>
+<footer><div class="wrap">
+  <div class="stack">
+    <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
+    <p>Free maker tools, designed and created by <b>nrmluvdev</b>. Version 1.5.1.</p>
+    <p>Free software under the GNU GPL, version 3 or later. It comes with no warranty.</p>
+  </div>
+  <div><h4>The apps</h4><ul><li><a href="wirie.html">Wirie</a></li><li><a href="makie.html">Makie</a></li><li><a href="tunie.html">Tunie</a></li><li><a href="flashie.html">Flashie</a></li><li><a href="scopie.html">Scopie</a></li><li><a href="meterie.html">Meterie</a></li><li><a href="tracie.html">Tracie</a></li></ul></div>
+  <div><h4>Help and source</h4><ul>
+    <li><a href="start.html">Getting started</a></li>
+    <li><a href="index.html#faq">Questions</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie/releases/latest">All downloads</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie">Source code on GitHub</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie/issues">Report a problem</a></li>
+  </ul></div>
+</div></footer>
+<script src="site.js"></script>
+</div>
+</body>
+</html>

@@ -6,6 +6,8 @@ Design stripboard circuits, model 3D-printed parts, flash microcontrollers, writ
 
 ## Download
 
+**Website:** https://normanlove.github.io/tinkerie/ (screenshots and a guide for every app)
+
 Get the latest version from the **[Releases page](https://github.com/normanlove/tinkerie/releases/latest)**:
 
 | Your computer | Download |
@@ -75,6 +77,16 @@ Mac builds come out as `dist/<name>/Tinkerie.app`, Linux and Pi builds as `dist/
 Meterie's HID-cable meters, Bluetooth meters and Camera mode are Windows-only for now. On a Mac, USB scopes and logic analysers need Apple's IOKit, which these pure-Go builds don't use.
 
 For other platforms and how the source is laid out, see [PORTING.md](PORTING.md).
+
+## The website
+
+The website in `docs/` is built from `website/` (text in `content.py`, design in `site.css`):
+
+```
+python3 website/build.py
+```
+
+Run it again after a release so the download links point at the new version. GitHub Pages serves `docs/` from the `main` branch.
 
 ## Licence
 

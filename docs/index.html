@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tinkerie</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Free maker tools in one program: circuit boards, 3D parts, firmware, SD cards, oscilloscope, multimeter and serial monitor. By nrmluvdev.">
+<meta property="og:title" content="Tinkerie">
+<meta property="og:description" content="Free maker tools in one program: circuit boards, 3D parts, firmware, SD cards, oscilloscope, multimeter and serial monitor. By nrmluvdev.">
+<link rel="icon" href="img/icons/tinkerie.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&family=Unbounded:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top"><div class="wrap">
+  <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
+  <nav class="nav" aria-label="Main">
+    <div class="apps-menu"><button type="button" aria-expanded="false" aria-haspopup="true">Apps <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><div class="menu"><a href="wirie.html"><img src="img/icons/wirie.png" alt=""><span><b>Wirie</b><small>Design circuit boards</small></span></a><a href="makie.html"><img src="img/icons/makie.png" alt=""><span><b>Makie</b><small>A Tinkercad-style 3D designer with threads</small></span></a><a href="tunie.html"><img src="img/icons/tunie.png" alt=""><span><b>Tunie</b><small>Print a test</small></span></a><a href="flashie.html"><img src="img/icons/flashie.svg" alt=""><span><b>Flashie</b><small>Flash ESP32</small></span></a><a href="scopie.html"><img src="img/icons/scopie.png" alt=""><span><b>Scopie</b><small>A friendly oscilloscope app for Hantek</small></span></a><a href="meterie.html"><img src="img/icons/meterie.png" alt=""><span><b>Meterie</b><small>Connect your multimeter to show huge readings</small></span></a><a href="tracie.html"><img src="img/icons/tracie.svg" alt=""><span><b>Tracie</b><small>A serial monitor with a live plotter</small></span></a><a class="menu-start" href="start.html">Getting started guide →</a></div></div>
+    <a class="hide-s" href="start.html">Getting started</a>
+    <a class="hide-s" href="https://github.com/normanlove/tinkerie">GitHub</a>
+    <a class="btn btn-go" href="index.html#download" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg><span class="lbl">Download</span></a>
+    <button class="theme" id="theme" type="button" aria-label="Switch theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></button>
+  </nav>
+</div></header>
+<main id="main">
+<div class="ruler" aria-hidden="true"></div>
+<section class="hero"><div class="wrap hero-grid">
+  <div>
+    <span class="tape">Free · Version 1.5.1</span>
+    <h1>Every tool on your workbench, in one free program.</h1>
+    <p class="lead">Design circuit boards and 3D prints, flash microcontrollers, write SD cards, and turn your PC into an oscilloscope, multimeter and serial monitor.</p>
+    <div class="cta">
+      <a class="btn btn-go" id="heroDownload" href="#download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg><span>Download Tinkerie</span></a>
+      <a class="btn btn-line" href="start.html">New here? Start here</a>
+    </div>
+    <div class="facts">
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12v8H4v-8M2 7h20v5H2zM12 20V7m0 0H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7zm0 0h4.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7z"/></svg>Free, no account</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4-9 4-9-4zm0 0v10l9 4 9-4V7M12 11v10"/></svg>Nothing to install</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8m-4-4v4"/></svg>Windows, Mac, Linux, Raspberry Pi</span>
+    </div>
+  </div>
+  <figure><div class="shot"><span class="tag">The launcher</span><button class="zoom" type="button" data-full="img/shots/launcher.webp" data-caption="The Tinkerie launcher: pick an app to start it." aria-label="Enlarge the launcher screenshot"><img src="img/shots/launcher.webp" alt="The Tinkerie launcher listing all seven apps" width="1470" height="960"></button></div>
+  <figcaption>Open Tinkerie, pick an app. Each one runs in its own window.</figcaption></figure>
+</div></section>
+
+<section class="band alt" id="apps"><div class="wrap">
+  <div class="head"><div><span class="label">Seven apps</span><h2>What's in the box</h2><p>Each app has its own page with screenshots, a getting-started guide and everything it can do.</p></div></div>
+  <div class="apps"><a class="app-card" href="wirie.html" style="--app:#ef8a3c">
+  <div class="pic"><img src="img/shots/wirie-pcb-sm.webp" alt="Wirie: PCB tab: the example Pico weather station board, ready to auto-route." loading="lazy" width="720" height="450"></div>
+  <div class="body"><div class="name"><img src="img/icons/wirie.png" alt=""><h3>Wirie</h3></div><p>Design circuit boards, plan stripboard builds, look up pinouts and work out battery life.</p></div>
+  <div class="foot"><span class="need">No hardware needed</span><span class="more">Explore <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></div>
+</a><a class="app-card" href="makie.html" style="--app:#2f7df6">
+  <div class="pic"><img src="img/shots/makie-gearbox-sm.webp" alt="Makie: The example gearbox, built from Makie&#x27;s gear parts." loading="lazy" width="720" height="450"></div>
+  <div class="body"><div class="name"><img src="img/icons/makie.png" alt=""><h3>Makie</h3></div><p>A Tinkercad-style 3D designer with threads, gears, boxes, cases and hundreds of ready parts.</p></div>
+  <div class="foot"><span class="need">No hardware needed</span><span class="more">Explore <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></div>
+</a><a class="app-card" href="tunie.html" style="--app:#5b6cf6">
+  <div class="pic"><img src="img/shots/tunie-home-sm.webp" alt="Tunie: Your printer&#x27;s checklist, in the recommended order." loading="lazy" width="720" height="450"></div>
+  <div class="body"><div class="name"><img src="img/icons/tunie.png" alt=""><h3>Tunie</h3></div><p>Print a test, measure it, type the number in, and Tunie tells you the new setting.</p></div>
+  <div class="foot"><span class="need">Needs a 3D printer</span><span class="more">Explore <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></div>
+</a><a class="app-card" href="flashie.html" style="--app:#7b5cf5">
+  <div class="pic"><img src="img/shots/flashie-flash-sm.webp" alt="Flashie: Flash in three steps: pick the board, pick the firmware, flash." loading="lazy" width="720" height="450"></div>
+  <div class="body"><div class="name"><img src="img/icons/flashie.svg" alt=""><h3>Flashie</h3></div><p>Flash ESP32, Pico, Arduino and STM32 boards, build programs from blocks, and write SD cards and USB installers.</p></div>
+  <div class="foot"><span class="need">Board or SD card</span><span class="more">Explore <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></div>
+</a><a class="app-card" href="scopie.html" style="--app:#e8b416">
+  <div class="pic"><img src="img/shots/scopie-sm.webp" alt="Scopie: Demo mode: a square wave and a sine wave, with automatic measurements." loading="lazy" width="720" height="450"></div>
+  <div class="body"><div class="name"><img src="img/icons/scopie.png" alt=""><h3>Scopie</h3></div><p>A friendly oscilloscope app for Hantek, Rigol, Siglent, OWON, PicoScope and more.</p></div>
+  <div class="foot"><span class="need">Scope, or demo mode</span><span class="more">Explore <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></div>
+</a><a class="app-card" href="meterie.html" style="--app:#1fb4cc">
+  <div class="pic"><img src="img/shots/meterie-live-sm.webp" alt="Meterie: Live: a big readout, statistics and a graph over time." loading="lazy" width="720" height="450"></div>
+  <div class="body"><div class="name"><img src="img/icons/meterie.png" alt=""><h3>Meterie</h3></div><p>Connect your multimeter to show huge readings, graph them, log them and run guided tests.</p></div>
+  <div class="foot"><span class="need">Meter, or demo mode</span><span class="more">Explore <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></div>
+</a><a class="app-card" href="tracie.html" style="--app:#25b39f">
+  <div class="pic"><img src="img/shots/tracie-serial-sm.webp" alt="Tracie: Serial: the demo board&#x27;s messages, plotted live." loading="lazy" width="720" height="450"></div>
+  <div class="body"><div class="name"><img src="img/icons/tracie.svg" alt=""><h3>Tracie</h3></div><p>A serial monitor with a live plotter, plus a logic analyser that decodes UART, I²C and SPI.</p></div>
+  <div class="foot"><span class="need">Board, or demo mode</span><span class="more">Explore <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></div>
+</a><a class="app-card intro" href="start.html">
+  <span class="label" style="color:inherit;opacity:.8">New to all this?</span>
+  <div class="stack"><h3>Start with the getting-started guide</h3><p>How to open Tinkerie on your computer, how teaching mode works, and an easy first thing to try in every app.</p></div>
+  <span class="more">Get started <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
+</a></div>
+</div></section>
+
+<section class="band"><div class="wrap">
+  <div class="head"><div><span class="label">Made for beginners</span><h2>You don't need to know it all already</h2></div></div>
+  <div class="pillars">
+    <div class="pillar"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6m-5 3h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0 0 12 3z"/></svg></div><h3>Every button explains itself</h3><p>Teaching mode is on in every app. Point at anything and a card says what it does, in plain language. Press <kbd>F2</kbd> when you don't need it any more.</p></div>
+    <div class="pillar"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l14 9-14 9V3z"/></svg></div><h3>Try it without hardware</h3><p>Scopie, Meterie, Tracie and Flashie have demo modes with pretend scopes, meters and boards, so you can learn before you buy anything.</p></div>
+    <div class="pillar"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4-9 4-9-4zm0 0v10l9 4 9-4V7M12 11v10"/></svg></div><h3>Nothing to set up</h3><p>One program, no installer, no Python, no extra drivers for most things. Download it, open it, and pick an app.</p></div>
+  </div>
+</div></section>
+
+<section class="band alt"><div class="wrap">
+  <div class="head"><div><span class="label">How they fit together</span><h2>From idea to working gadget</h2><p>The apps share their work, so a project can flow from one to the next.</p></div></div>
+  <div class="flow">
+    <div><span class="step">DESIGN</span><h3>Draw the circuit</h3><p><a href="wirie.html">Wirie</a> lays out the board, or plans it on stripboard.</p></div>
+    <div><span class="step">MAKE</span><h3>Print a case</h3><p><a href="makie.html">Makie</a> builds a case around your Wirie board. <a href="tunie.html">Tunie</a> gets your printer dialled in.</p></div>
+    <div><span class="step">PROGRAM</span><h3>Flash the firmware</h3><p><a href="flashie.html">Flashie</a> puts firmware on the board, or builds a program from blocks.</p></div>
+    <div><span class="step">TEST</span><h3>See what it's doing</h3><p><a href="tracie.html">Tracie</a>, <a href="scopie.html">Scopie</a> and <a href="meterie.html">Meterie</a> show its messages, signals and voltages.</p></div>
+  </div>
+</div></section>
+
+<section class="band" id="download"><div class="wrap">
+  <div class="head"><div><span class="label">Download · version 1.5.1</span><h2>Get Tinkerie</h2><p>The one marked "Your computer" should suit you. Each download has a READ ME FIRST file that explains how to start it.</p></div>
+  <a class="btn btn-line" href="https://github.com/normanlove/tinkerie/releases/latest">All files and release notes <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a></div>
+  <div class="dl"><a class="row" data-os="windows" data-name="Windows" href="https://github.com/normanlove/tinkerie/releases/download/v1.5.1/Tinkerie.exe"><span class="os">Windows 10 or 11</span><span><span class="file">Tinkerie.exe</span><br><span class="muted" style="font-size:.9rem">Just run it. Or get the zip below if your network blocks .exe files.</span></span><span class="get"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg> Download</span></a><a class="row" data-os="windows-zip" data-name="Windows" href="https://github.com/normanlove/tinkerie/releases/download/v1.5.1/Tinkerie-1.5.1-windows.zip"><span class="os">Windows (zip, with source)</span><span><span class="file">Tinkerie-1.5.1-windows.zip</span><br><span class="muted" style="font-size:.9rem">The same program in a zip, with the source code.</span></span><span class="get"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg> Download</span></a><a class="row" data-os="mac" data-name="Mac (Apple silicon)" href="https://github.com/normanlove/tinkerie/releases/download/v1.5.1/Tinkerie-1.5.1-mac-apple-silicon.zip"><span class="os">Mac with M1, M2, M3 or M4</span><span><span class="file">Tinkerie-1.5.1-mac-apple-silicon.zip</span><br><span class="muted" style="font-size:.9rem">macOS 11 or newer.</span></span><span class="get"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg> Download</span></a><a class="row" data-os="mac-intel" data-name="Mac (Intel)" href="https://github.com/normanlove/tinkerie/releases/download/v1.5.1/Tinkerie-1.5.1-mac-intel.zip"><span class="os">Mac with an Intel processor</span><span><span class="file">Tinkerie-1.5.1-mac-intel.zip</span><br><span class="muted" style="font-size:.9rem">macOS 11 or newer.</span></span><span class="get"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg> Download</span></a><a class="row" data-os="linux" data-name="Linux" href="https://github.com/normanlove/tinkerie/releases/download/v1.5.1/Tinkerie-1.5.1-linux-x86_64.tar.gz"><span class="os">Linux PC (64-bit)</span><span><span class="file">Tinkerie-1.5.1-linux-x86_64.tar.gz</span><br><span class="muted" style="font-size:.9rem">Intel or AMD processor.</span></span><span class="get"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg> Download</span></a><a class="row" data-os="pi" data-name="Raspberry Pi" href="https://github.com/normanlove/tinkerie/releases/download/v1.5.1/Tinkerie-1.5.1-pi-64bit.tar.gz"><span class="os">Raspberry Pi OS 64-bit</span><span><span class="file">Tinkerie-1.5.1-pi-64bit.tar.gz</span><br><span class="muted" style="font-size:.9rem">Pi 3, 4, 5 and newer.</span></span><span class="get"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg> Download</span></a><a class="row" data-os="pi32" data-name="Raspberry Pi (32-bit)" href="https://github.com/normanlove/tinkerie/releases/download/v1.5.1/Tinkerie-1.5.1-pi-32bit.tar.gz"><span class="os">Raspberry Pi OS 32-bit</span><span><span class="file">Tinkerie-1.5.1-pi-32bit.tar.gz</span><br><span class="muted" style="font-size:.9rem">Pi 2, 3, 4, 5 and Zero 2 W.</span></span><span class="get"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg> Download</span></a></div>
+</div></section>
+
+<section class="band alt" id="faq"><div class="wrap">
+  <div class="head"><div><span class="label">Questions</span><h2>Good to know</h2></div></div>
+  <div class="faq"><details><summary>Is Tinkerie really free?</summary><div><p>Yes. Tinkerie is free software under the GNU GPL (version 3 or later). You can use it, share it and change it. There are no adverts, accounts or subscriptions.</p></div></details><details><summary>Do I need to install anything?</summary><div><p>No. Tinkerie is one program. On Windows you just double-click Tinkerie.exe. On Linux and Raspberry Pi, ./install.sh adds it to your menu if you&#x27;d like it there.</p></div></details><details><summary>Windows says it&#x27;s an unrecognised app. Is that OK?</summary><div><p>Windows warns about any program that isn&#x27;t signed with a paid certificate. Click More info, then Run anyway. The full source code is on GitHub if you&#x27;d like to check it.</p></div></details><details><summary>My Mac won&#x27;t open it.</summary><div><p>The first time, macOS blocks apps from outside the App Store. Open it once, then go to System Settings › Privacy &amp; Security and click Open Anyway.</p></div></details><details><summary>I don&#x27;t have any hardware yet. Can I still try it?</summary><div><p>Yes. Wirie, Makie and Calcie need no hardware at all, and Scopie, Meterie, Tracie and Flashie all have demo modes with pretend devices.</p></div></details><details><summary>How do I learn what a button does?</summary><div><p>Point at it. Every app has teaching mode, which explains each button, setting and panel in plain language. Press F2 to turn the explanations off or back on.</p></div></details><details><summary>Does it need the internet?</summary><div><p>Only for downloads: Flashie&#x27;s firmware library and OS images. Everything else works offline.</p></div></details><details><summary>I found a bug, or my board / scope / meter doesn&#x27;t work.</summary><div><p>Please open an issue on GitHub and say which app, which computer, and what happened.</p></div></details></div>
+</div></section>
+</main>
+<footer><div class="wrap">
+  <div class="stack">
+    <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
+    <p>Free maker tools, designed and created by <b>nrmluvdev</b>. Version 1.5.1.</p>
+    <p>Free software under the GNU GPL, version 3 or later. It comes with no warranty.</p>
+  </div>
+  <div><h4>The apps</h4><ul><li><a href="wirie.html">Wirie</a></li><li><a href="makie.html">Makie</a></li><li><a href="tunie.html">Tunie</a></li><li><a href="flashie.html">Flashie</a></li><li><a href="scopie.html">Scopie</a></li><li><a href="meterie.html">Meterie</a></li><li><a href="tracie.html">Tracie</a></li></ul></div>
+  <div><h4>Help and source</h4><ul>
+    <li><a href="start.html">Getting started</a></li>
+    <li><a href="index.html#faq">Questions</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie/releases/latest">All downloads</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie">Source code on GitHub</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie/issues">Report a problem</a></li>
+  </ul></div>
+</div></footer>
+<script src="site.js"></script>
+</div>
+</body>
+</html>

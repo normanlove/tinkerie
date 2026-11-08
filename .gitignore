@@ -1,3 +1,5 @@
 # Build output (made by build.sh, build.bat and package.sh)
 /dist/
 /Tinkerie.exe
+/website/artifact/
+/website/__pycache__/

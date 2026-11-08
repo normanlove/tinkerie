@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Meterie · Tinkerie</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Meterie: Connect your multimeter to show huge readings, graph them, log them and run guided tests. Part of Tinkerie, free maker tools by nrmluvdev.">
+<meta property="og:title" content="Meterie · Tinkerie">
+<meta property="og:description" content="Meterie: Connect your multimeter to show huge readings, graph them, log them and run guided tests. Part of Tinkerie, free maker tools by nrmluvdev.">
+<link rel="icon" href="img/icons/tinkerie.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&family=Unbounded:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div style="--app:#1fb4cc">
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top"><div class="wrap">
+  <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
+  <nav class="nav" aria-label="Main">
+    <div class="apps-menu"><button type="button" aria-expanded="false" aria-haspopup="true">Apps <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><div class="menu"><a href="wirie.html"><img src="img/icons/wirie.png" alt=""><span><b>Wirie</b><small>Design circuit boards</small></span></a><a href="makie.html"><img src="img/icons/makie.png" alt=""><span><b>Makie</b><small>A Tinkercad-style 3D designer with threads</small></span></a><a href="tunie.html"><img src="img/icons/tunie.png" alt=""><span><b>Tunie</b><small>Print a test</small></span></a><a href="flashie.html"><img src="img/icons/flashie.svg" alt=""><span><b>Flashie</b><small>Flash ESP32</small></span></a><a href="scopie.html"><img src="img/icons/scopie.png" alt=""><span><b>Scopie</b><small>A friendly oscilloscope app for Hantek</small></span></a><a href="meterie.html"><img src="img/icons/meterie.png" alt=""><span><b>Meterie</b><small>Connect your multimeter to show huge readings</small></span></a><a href="tracie.html"><img src="img/icons/tracie.svg" alt=""><span><b>Tracie</b><small>A serial monitor with a live plotter</small></span></a><a class="menu-start" href="start.html">Getting started guide →</a></div></div>
+    <a class="hide-s" href="start.html">Getting started</a>
+    <a class="hide-s" href="https://github.com/normanlove/tinkerie">GitHub</a>
+    <a class="btn btn-go" href="index.html#download" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg><span class="lbl">Download</span></a>
+    <button class="theme" id="theme" type="button" aria-label="Switch theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></button>
+  </nav>
+</div></header>
+<main id="main">
+<div class="ruler" aria-hidden="true"></div>
+<section class="app-hero"><div class="wrap">
+  <nav class="crumbs" aria-label="You are here"><a href="index.html">Tinkerie</a><span aria-hidden="true">›</span><a href="index.html#apps">Apps</a><span aria-hidden="true">›</span><span>Meterie</span></nav>
+  <div class="grid">
+    <div>
+      <div class="app-title"><img src="img/icons/meterie.png" alt=""><div><h1>Meterie</h1><span class="ver">Version 1.1.0 · in Tinkerie 1.5.1</span></div></div>
+      <p class="lead">A big, friendly multimeter display, with graphs and logging.</p>
+      <div class="plain"><span class="label">In plain words</span><p>Many multimeters can send their readings to a computer. Meterie shows them in big digits you can read across the room, draws a graph over time, and saves everything to a spreadsheet file. Guided wizards test batteries, sort resistors and check LEDs.</p></div>
+      <div class="chips"><span class="chip">HoldPeak HP-90EPC</span><span class="chip">UNI-T</span><span class="chip">Brymen</span><span class="chip">Fluke</span><span class="chip">OWON Bluetooth</span><span class="chip">Camera mode</span></div>
+      <div class="hero" style="padding:0"><div class="cta"><a class="btn btn-go" href="index.html#download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg>Download Tinkerie</a><a class="btn btn-line" href="#first">First five minutes</a></div><p class="osnote">You'll need: A multimeter with a PC link, or try the demo.</p></div>
+    </div>
+    <figure><div class="shot"><span class="tag">Meterie</span><button class="zoom" type="button" data-full="img/shots/meterie-live.webp" data-caption="Live: a big readout, statistics and a graph over time." aria-label="Enlarge: Live: a big readout, statistics and a graph over time."><img src="img/shots/meterie-live.webp" alt="Live: a big readout, statistics and a graph over time." width="1440" height="900"></button></div><figcaption>Live: a big readout, statistics and a graph over time.</figcaption></figure>
+  </div>
+</div></section>
+
+<section class="band alt" id="first"><div class="wrap">
+  <div class="head"><div><span class="label">Your first five minutes</span><h2>Try this first</h2></div></div>
+  <ol class="firsts"><li><h3>Connect your meter</h3><p>Plug in its USB cable, switch the meter&#x27;s PC link on, then open Meters and press Scan.</p></li><li><h3>No meter? Start a demo</h3><p>Meters › Demo &amp; manual offers practice signals like a battery discharging.</p></li><li><h3>Watch the Live page</h3><p>Big digits, a bar graph, statistics and a graph of the last few minutes.</p></li><li><h3>Learn the modes</h3><p>What am I measuring? shows which jacks to use for each mode, with safety tips.</p></li></ol>
+</div></section>
+
+<section class="band"><div class="wrap"><div class="head"><div><span class="label">Screenshots</span><h2>A closer look</h2><p>Click any picture to see it bigger.</p></div></div><div class="thumbs"><figure><div class="shot"><button class="zoom" type="button" data-full="img/shots/meterie-guide.webp" data-caption="What am I measuring? A beginner&#x27;s guide to every mode." aria-label="Enlarge: What am I measuring? A beginner&#x27;s guide to every mode."><img src="img/shots/meterie-guide-sm.webp" alt="What am I measuring? A beginner&#x27;s guide to every mode." width="720" height="450" loading="lazy"></button></div><figcaption>What am I measuring? A beginner&#x27;s guide to every mode.</figcaption></figure><figure><div class="shot"><button class="zoom" type="button" data-full="img/shots/meterie-wizards.webp" data-caption="Wizards: guided tests for batteries, parts, LEDs and power supplies." aria-label="Enlarge: Wizards: guided tests for batteries, parts, LEDs and power supplies."><img src="img/shots/meterie-wizards-sm.webp" alt="Wizards: guided tests for batteries, parts, LEDs and power supplies." width="720" height="450" loading="lazy"></button></div><figcaption>Wizards: guided tests for batteries, parts, LEDs and power supplies.</figcaption></figure></div></div></section>
+
+<section class="band"><div class="wrap">
+  <div class="head"><div><span class="label">Everything it does</span><h2>Features</h2></div></div>
+  <div class="features"><div class="feature"><h3>Live readout</h3><p>Like a premium bench meter.</p><ul><li>Big seven-segment digits with AUTO, AC/DC, HOLD, REL and low-battery symbols</li><li>A bar graph, plus min, max, average, peak-to-peak and more</li><li>Charge in mAh and energy in Wh when you measure current or power</li><li>REL zeroes a channel, for example to remove test-lead resistance</li></ul></div><div class="feature"><h3>Graphs and logging</h3><p>See and keep every reading.</p><ul><li>Every meter and maths channel on one timeline</li><li>Zoom, pan, select a range, add markers</li><li>CSV logging every reading or at a fixed interval, starting or stopping on a threshold</li></ul></div><div class="feature"><h3>Alarms and maths</h3><p>Let the PC watch for you.</p><ul><li>High and low limits with a sound and a flashing readout</li><li>A continuity beep on the PC</li><li>Power, resistance, energy, charge, or your own formula</li></ul></div><div class="feature"><h3>Guided wizards</h3><p>Step-by-step tests.</p><ul><li>Battery capacity and internal resistance</li><li>Resistor and capacitor sorter (E6 to E96, tolerance bins)</li><li>LED forward voltage, with a colour guess and series resistor</li><li>Solar panel and power supply load test, with I–V curves</li></ul></div><div class="feature"><h3>Camera mode</h3><p>For meters with no PC link at all.</p><ul><li>Point a webcam or a phone camera at the display</li><li>Meterie reads the seven-segment digits</li><li>Readings are only accepted when two frames agree</li></ul></div></div>
+</div></section>
+
+<section class="band alt"><div class="wrap">
+  <div class="head"><div><span class="label">Compatibility</span><h2>Supported multimeters</h2></div></div>
+  <div class="table-wrap"><table><thead><tr><th>Status</th><th>Meters</th></tr></thead><tbody><tr><td>Checked protocol</td><td>HoldPeak HP-90EPC, TekPower TP4000ZC, Tenma 72-7745, UNI-T UT60A/E, Voltcraft VC-820/840 and other FS9721 meters</td></tr><tr><td>Checked protocol</td><td>UNI-T UT61B/C/D/E, UT61E+, UT161, UT181A, UT71 series, UT804</td></tr><tr><td>Checked protocol</td><td>Brymen BM869s / BM867s / BM859s, BM25x; Victor 70C / 86C / 86D</td></tr><tr><td>Checked protocol</td><td>Fluke 287 / 289, 187 / 189, 87-IV / 89-IV; Mastech MAS-345</td></tr><tr><td>Community protocol</td><td>OWON Bluetooth B35T+, B41T+, OW18E; ANENG / ZOYI / BSIDE Bluetooth meters</td></tr><tr><td>Any meter</td><td>Camera mode, or typing readings in by hand</td></tr></tbody></table></div>
+</div></section>
+
+<section class="band"><div class="wrap stack">
+  <div class="head" style="margin:0"><div><span class="label">Before you start</span><h2>Good to know</h2></div></div><div class="stack"><div class="callout warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 20h20L12 3zm0 7v5m0 3v.5"/></svg><p>Meterie shows what your meter measures and adds no protection. Never measure mains or high voltage unless you&#x27;re trained, and your meter and leads have the right CAT rating.</p></div><div class="callout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-9.5v.5"/></svg><p>On Mac, Linux and Raspberry Pi, Meterie works with USB-serial meters like the HoldPeak HP-90EPC. HID-cable meters, Bluetooth and Camera mode are Windows-only for now.</p></div></div>
+  <div class="head" style="margin:30px 0 0"><div><span class="label">Works well with</span><h2>Pairs nicely with</h2></div></div>
+  <div class="pairs"><a class="pair" href="wirie.html"><img src="img/icons/wirie.png" alt=""><div><b>Wirie</b><p>Calcie can use your meter&#x27;s live reading.</p></div></a><a class="pair" href="scopie.html"><img src="img/icons/scopie.png" alt=""><div><b>Scopie</b><p>For fast signals a meter can&#x27;t follow.</p></div></a></div>
+  <nav class="pager" aria-label="Other apps" style="margin-top:30px">
+    <a href="scopie.html"><span class="muted">← Previous app</span><b>Scopie</b></a>
+    <a href="tracie.html"><span class="muted">Next app →</span><b>Tracie</b></a>
+  </nav>
+</div></section>
+</main>
+<footer><div class="wrap">
+  <div class="stack">
+    <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
+    <p>Free maker tools, designed and created by <b>nrmluvdev</b>. Version 1.5.1.</p>
+    <p>Free software under the GNU GPL, version 3 or later. It comes with no warranty.</p>
+  </div>
+  <div><h4>The apps</h4><ul><li><a href="wirie.html">Wirie</a></li><li><a href="makie.html">Makie</a></li><li><a href="tunie.html">Tunie</a></li><li><a href="flashie.html">Flashie</a></li><li><a href="scopie.html">Scopie</a></li><li><a href="meterie.html">Meterie</a></li><li><a href="tracie.html">Tracie</a></li></ul></div>
+  <div><h4>Help and source</h4><ul>
+    <li><a href="start.html">Getting started</a></li>
+    <li><a href="index.html#faq">Questions</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie/releases/latest">All downloads</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie">Source code on GitHub</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie/issues">Report a problem</a></li>
+  </ul></div>
+</div></footer>
+<script src="site.js"></script>
+</div>
+</body>
+</html>
