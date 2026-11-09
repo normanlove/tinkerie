@@ -19,4 +19,6 @@ Each package has a *READ ME FIRST.txt*.
 - Every app opens maximised.
 - Flashie's Write image tab: OS settings for Raspberry Pi, Windows 10/11 installer USB drives, Linux ISOs and .zst images.
 
-Licensed under GPL-3.0-or-later. [Code signing policy](https://tinkerie.net/code-signing.html).
+Licensed under GPL-3.0-or-later.
+
+Windows: free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org). See the [code signing policy](https://tinkerie.net/code-signing.html) and [privacy statement](https://tinkerie.net/code-signing.html#privacy).
