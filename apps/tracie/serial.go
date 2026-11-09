@@ -647,7 +647,7 @@ func (d *demoPort) emit(s string) {
 }
 
 func (d *demoPort) run() {
-	d.emit("\r\n=== Tracie demo board v1.2 ===\r\nType 'help' for commands.\r\n")
+	d.emit("\r\n=== Tracie demo board ===\r\nType 'help' for commands.\r\n")
 	t := time.NewTicker(d.period)
 	defer t.Stop()
 	n := 0
@@ -709,7 +709,7 @@ func (d *demoPort) Write(b []byte) (int, error) {
 			d.emit(fmt.Sprintf("status: uptime=%.1fs led=%v\r\n", time.Since(d.start).Seconds(), d.led))
 		case cmd == "reset":
 			d.start = time.Now()
-			d.emit("\r\nets Jun  8 2016 00:22:57\r\nrst:0x1 (POWERON_RESET)\r\n=== Tracie demo board v1.2 ===\r\n")
+			d.emit("\r\nets Jun  8 2016 00:22:57\r\nrst:0x1 (POWERON_RESET)\r\n=== Tracie demo board ===\r\n")
 		default:
 			d.emit("? unknown command: " + cmd + "\r\n")
 		}

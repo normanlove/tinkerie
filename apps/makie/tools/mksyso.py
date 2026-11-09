@@ -12,7 +12,7 @@ def ico_images(d):
 
 MANIFEST = b'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
-  <assemblyIdentity type="win32" name="Makie" version="1.0.0.0"/>
+  <assemblyIdentity type="win32" name="Makie" version="0.9.0.0"/>
   <description>Makie 3D part designer by nrmluvdev</description>
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3"><security><requestedPrivileges>
     <requestedExecutionLevel level="asInvoker" uiAccess="false"/></requestedPrivileges></security></trustInfo>
@@ -46,7 +46,7 @@ def align4(b): return b + b'\0' * ((4 - len(b) % 4) % 4)
 def version_info():
     ffi = struct.pack('<13I', 0xFEEF04BD, 0x00010000, 0x00010000, 0, 0x00010000, 0, 0x3F, 0, 0x40004, 1, 0, 0, 0)
     strs = [('CompanyName', 'nrmluvdev'), ('LegalCopyright', '© nrmluvdev'), ('FileDescription', 'Makie 3D part designer by nrmluvdev'), ('FileVersion', '1.0.0'),
-            ('InternalName', 'Makie'), ('OriginalFilename', 'Makie.exe'), ('ProductName', 'Makie'), ('ProductVersion', '1.0.0')]
+            ('InternalName', 'Makie'), ('OriginalFilename', 'Makie.exe'), ('ProductName', 'Makie'), ('ProductVersion', '0.9.0-alpha')]
     st = b''.join(align4(vs_block(k, v)) for k, v in strs)
     table = vs_block('040904B0', None, st)
     sfi = vs_block('StringFileInfo', None, align4(table))

@@ -3,7 +3,7 @@
 //
 // Usage (from the repository root):
 //
-//	go run ./tools/mksyso -ico build/tinkerie.ico -out rsrc_windows_amd64.syso -version 1.0.0
+//	go run ./tools/mksyso -ico build/tinkerie.ico -out rsrc_windows_amd64.syso -version 0.6.0-alpha
 package main
 
 import (
@@ -19,7 +19,7 @@ import (
 
 const manifest = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
-  <assemblyIdentity type="win32" name="nrmluvdev.Tinkerie" version="1.0.0.0" processorArchitecture="amd64"/>
+  <assemblyIdentity type="win32" name="nrmluvdev.Tinkerie" version="VERSION4" processorArchitecture="amd64"/>
   <description>Tinkerie - maker tool suite by nrmluvdev</description>
   <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
     <application>
@@ -46,7 +46,7 @@ type res struct {
 func main() {
 	icoPath := flag.String("ico", "build/tinkerie.ico", "icon file")
 	out := flag.String("out", "rsrc_windows_amd64.syso", "output .syso")
-	ver := flag.String("version", "1.0.0", "version")
+	ver := flag.String("version", "0.1.0", "version (e.g. 0.6.0-alpha)")
 	flag.Parse()
 	ico, err := os.ReadFile(*icoPath)
 	if err != nil {
@@ -68,7 +68,9 @@ func main() {
 	}
 	rs = append(rs, res{14, 1, grp.Bytes()})
 	rs = append(rs, res{16, 1, versionInfo(*ver)})
-	rs = append(rs, res{24, 1, []byte(manifest)})
+	var va, vb, vc int
+	fmt.Sscanf(*ver, "%d.%d.%d", &va, &vb, &vc) // "0.6.0-alpha" -> 0.6.0
+	rs = append(rs, res{24, 1, []byte(strings.Replace(manifest, "VERSION4", fmt.Sprintf("%d.%d.%d.0", va, vb, vc), 1))})
 	if err := os.WriteFile(*out, coff(rs), 0o644); err != nil {
 		fail(err)
 	}

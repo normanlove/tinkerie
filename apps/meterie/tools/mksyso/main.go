@@ -16,7 +16,7 @@ import (
 
 const manifest = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
-  <assemblyIdentity type="win32" name="nrmluvdev.Meterie" version="1.0.0.0" processorArchitecture="amd64"/>
+  <assemblyIdentity type="win32" name="nrmluvdev.Meterie" version="0.6.0.0" processorArchitecture="amd64"/>
   <description>Meterie - PC multimeter by nrmluvdev</description>
   <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
     <application>
@@ -43,7 +43,7 @@ type res struct {
 func main() {
 	icoPath := flag.String("ico", "build/meterie.ico", "icon file")
 	out := flag.String("out", "rsrc_windows_amd64.syso", "output .syso")
-	ver := flag.String("version", "1.0.0", "version")
+	ver := flag.String("version", "0.6.0-alpha", "version")
 	flag.Parse()
 	ico, err := os.ReadFile(*icoPath)
 	if err != nil {

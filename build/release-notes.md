@@ -11,7 +11,7 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 Each package has a *READ ME FIRST.txt*.
 
 ### New in {VERSION}
-- **New version numbers:** while Tinkerie is in alpha, it and every app are numbered below 1.0. Tinkerie is now 0.6.0-alpha; earlier alpha builds were numbered 1.4 to 1.5.2. Apps: Makie and Scopie 0.9, Wirie 0.8, Flashie 0.7.1, Meterie 0.6, Tunie and Tracie 0.5.
+- **New version numbers:** while Tinkerie is in alpha, it and every app are numbered below 1.0. Tinkerie is now 0.6.0-alpha. Apps: Makie and Scopie 0.9, Wirie 0.8, Flashie 0.7.1, Meterie 0.6, Tunie and Tracie 0.5.
 - **Flashie:** ESP32 Marauder and Bruce were removed from the firmware library.
 
 ### Also in recent alpha builds

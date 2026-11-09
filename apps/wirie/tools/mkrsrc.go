@@ -16,7 +16,7 @@ import (
 
 const (
 	appName = "Wirie"
-	version = "1.2.0.0"
+	version = "0.8.0.0"
 	author  = "nrmluvdev"
 )
 

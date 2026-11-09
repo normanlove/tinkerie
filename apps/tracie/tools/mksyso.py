@@ -43,8 +43,8 @@ ver=(1,0,0,0)
 ms=(ver[0]<<16)|ver[1]; ls=(ver[2]<<16)|ver[3]
 fixed=struct.pack('<13I',0xFEEF04BD,0x00010000,ms,ls,ms,ls,0x3F,0,0x40004,1,0,0,0)
 strings=[('CompanyName','nrmluvdev'),('FileDescription','Tracie - serial monitor + logic analyser'),
- ('FileVersion','1.0.0'),('InternalName','Tracie'),('LegalCopyright','(c) 2026 nrmluvdev - free to use'),
- ('OriginalFilename','Tracie.exe'),('ProductName','Tracie (nrmluvdev hobbyist suite)'),('ProductVersion','1.0.0'),('Comments','Made by nrmluvdev')]
+ ('FileVersion','0.5.0-alpha'),('InternalName','Tracie'),('LegalCopyright','(c) 2026 nrmluvdev - free to use'),
+ ('OriginalFilename','Tracie.exe'),('ProductName','Tracie (nrmluvdev hobbyist suite)'),('ProductVersion','0.5.0-alpha'),('Comments','Made by nrmluvdev')]
 st=node('040904B0',b'',0,1,[sstr(k,v) for k,v in strings])
 sfi=node('StringFileInfo',b'',0,1,[st])
 var=node('Translation',struct.pack('<HH',0x0409,0x04B0),4,0)

@@ -14,7 +14,7 @@ import (
 	"unicode/utf16"
 )
 
-const version = "3.0.0.0"
+const version = "0.9.0.0"
 
 type icon struct {
 	w, h int

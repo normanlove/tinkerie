@@ -24,7 +24,7 @@ Parts on the **bottom** side have negative z values (they hang below z = 0).
 |---|---|---|
 | `format` | `"wirie-case"` | file type tag |
 | `version` | int | format version (currently 1) |
-| `generator` | `{app, version, author, exported}` | e.g. `{"app":"Wirie","version":"1.1.0","author":"nrmluvdev","exported":"2026-11-06T22:40:00Z"}` |
+| `generator` | `{app, version, author, exported}` | e.g. `{"app":"Wirie","version":"0.8.0-alpha","author":"nrmluvdev","exported":"2026-11-06T22:40:00Z"}` |
 | `project` | string | project name |
 | `units` | `"mm"` | always millimetres |
 | `coordinates` | string | human-readable reminder of the coordinate system |

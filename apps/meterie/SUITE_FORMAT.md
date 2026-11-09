@@ -10,7 +10,7 @@ from different apps line up on one timeline without any manual offset.
 
 ```
 # nrmluv-timeline v1
-# app=Meterie version=1.0.0 author=nrmluvdev exported=2026-11-07T19:30:00Z
+# app=Meterie version=0.6.0-alpha author=nrmluvdev exported=2026-11-07T19:30:00Z
 # t0_unix_ns=1794079800000000000
 # channel id=1 name=CH1 unit=V kind=meter source=HoldPeak_HP-90EPC_·_COM5
 # channel id=2 name=CH2 unit=A kind=meter source=UNI-T_UT61E+
@@ -48,7 +48,7 @@ and records it in the discovery file below.
 
 | Endpoint | Returns |
 |---|---|
-| `GET /api/v1/ping` | `{"app":"Meterie","version":"1.0.0","author":"nrmluvdev"}` |
+| `GET /api/v1/ping` | `{"app":"Meterie","version":"0.6.0-alpha","author":"nrmluvdev"}` |
 | `GET /api/v1/readings` | all channels' latest readings (JSON, see below) |
 | `GET /api/v1/reading` | the main channel's latest reading (`?channel=2` for another) |
 | `GET /api/v1/value` | plain text, e.g. `4700 Ω` (main channel, base units) |

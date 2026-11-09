@@ -1,6 +1,6 @@
 # Meterie changes
 
-## 1.1.0
+## 0.6.0-alpha
 
 New meters (every protocol checked against libsigrok's decoder source or the community
 reference, with unit tests):
@@ -23,6 +23,6 @@ Improvements:
 * Fixed: typing in a text field and pressing Enter in the same instant (or the marker dialog's
   pre-filled label) could append to the old text instead of replacing it.
 
-## 1.0.0
+## First alpha
 
 First release.

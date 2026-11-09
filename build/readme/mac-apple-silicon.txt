@@ -21,7 +21,7 @@ Every app has teaching mode: point at anything to see what it does. F2 turns it 
 
 New in {VERSION}:
 - New version numbers: Tinkerie and every app are now numbered below 1.0 while
-  in alpha (earlier alpha builds were numbered 1.4 to 1.5.2).
+  in alpha.
 - Flashie: ESP32 Marauder and Bruce were removed from the firmware library.
 
 Also in recent alpha builds:

@@ -24,7 +24,7 @@ Whenever the active printer, filament or any calibrated value changes, Tunie wri
 
 ```json
 {
-  "app": "Tunie", "author": "nrmluvdev", "version": "1.0.0", "schema": 1,
+  "app": "Tunie", "author": "nrmluvdev", "version": "0.5.0-alpha", "schema": 1,
   "updated": "2026-11-07T12:06:09.911Z",
   "printer": {
     "id": "…", "name": "Ender 3 V2 / V2 Neo", "firmware": "marlin", "bedShape": "rect",
