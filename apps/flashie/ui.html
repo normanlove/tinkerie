@@ -1180,7 +1180,7 @@ window.addEventListener('beforeunload', e => { if(S.flashing){ e.preventDefault(
 
 /* ---------- firmware library ---------- */
 S.mode = 'lib'; S.lib = null; S.libItems = []; S.libSel = null; S.libCat = 'All'; S.resCache = {};
-const CAT_COL = {'Programming':'#7c5cff','Smart home':'#00b4d8','Lighting':'#ff9f1c','Radio':'#2ee59d','Wi-Fi & Bluetooth tools':'#ff5c7a','Fun':'#f7c948','CNC & 3D printing':'#8a93a6'};
+const CAT_COL = {'Programming':'#7c5cff','Smart home':'#00b4d8','Lighting':'#ff9f1c','Radio':'#2ee59d','Fun':'#f7c948','CNC & 3D printing':'#8a93a6'};
 const libBoardId = () => { const b = currentBoard(); return b ? b.id : ''; };
 const libChip = () => { const b = currentBoard(); if(S.chip && S.chip.family==='esp') return S.chip.chip; return (b && b.chip) || expectedChip() || ''; };
 const libKey = () => libBoardId() + '|' + libChip();

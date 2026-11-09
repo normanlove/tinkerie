@@ -2,7 +2,7 @@
 
 A free suite of tools for DIY hobbyists and makers, in one program. Designed and created by **nrmluvdev**.
 
-> **Tinkerie is in alpha.** Everything works, but it's still being tested on real hardware, so expect rough edges and changes between versions. Please [report anything odd](https://github.com/normanlove/tinkerie/issues).
+> **Tinkerie is in alpha** (version 0.x). Everything works, but it's still being tested on real hardware, so expect rough edges and changes between versions. Please [report anything odd](https://github.com/normanlove/tinkerie/issues).
 
 Design stripboard circuits, model 3D-printed parts, flash microcontrollers, write SD cards and USB installers, and use your PC as an oscilloscope, multimeter, serial monitor or logic analyser — all from one small program that needs nothing installed. Runs on Windows, Mac, Linux and Raspberry Pi.
 
@@ -29,13 +29,13 @@ Double-click `Tinkerie.exe` to open the launcher and pick an app. Each app opens
 
 | App | What it does | Version |
 |---|---|---|
-| **Wirie** | Beginner-friendly circuit board designer (Boardie stripboard, Calcie calculators, Pinnie, Powerie) | 1.2.1-alpha |
-| **Makie** | 3D-printing part designer. Builds cases for Wirie boards | 1.5.1-alpha |
-| **Tunie** | 3D printer tuning and calibration. Shares fit clearances with Makie | 1.0.0-alpha |
-| **Flashie** | Firmware flasher for microcontroller boards (ESP32, Pico, Arduino, STM32), plus a "Write image" tab that puts Raspberry Pi OS (with your Wi-Fi, user and SSH set up), Linux, or a Windows 10/11 installer onto an SD card or USB drive | 0.7.0-alpha |
-| **Scopie** | Oscilloscope program (Hantek 6022BE/BL and others, plus network scopes and demo) | 3.0.0-alpha |
-| **Meterie** | PC multimeter: HoldPeak HP-90EPC, UNI-T, OWON, Brymen, Fluke and more | 1.1.0-alpha |
-| **Tracie** | Serial monitor and logic analyser | 1.0.0-alpha |
+| **Wirie** | Beginner-friendly circuit board designer (Boardie stripboard, Calcie calculators, Pinnie, Powerie) | 0.8.0-alpha |
+| **Makie** | 3D-printing part designer. Builds cases for Wirie boards | 0.9.0-alpha |
+| **Tunie** | 3D printer tuning and calibration. Shares fit clearances with Makie | 0.5.0-alpha |
+| **Flashie** | Firmware flasher for microcontroller boards (ESP32, Pico, Arduino, STM32), plus a "Write image" tab that puts Raspberry Pi OS (with your Wi-Fi, user and SSH set up), Linux, or a Windows 10/11 installer onto an SD card or USB drive | 0.7.1-alpha |
+| **Scopie** | Oscilloscope program (Hantek 6022BE/BL and others, plus network scopes and demo) | 0.9.0-alpha |
+| **Meterie** | PC multimeter: HoldPeak HP-90EPC, UNI-T, OWON, Brymen, Fluke and more | 0.6.0-alpha |
+| **Tracie** | Serial monitor and logic analyser | 0.5.0-alpha |
 
 Every app's own guide is its `README.md` in `apps\<name>\`.
 

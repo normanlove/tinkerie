@@ -27,7 +27,7 @@ import (
 	"time"
 )
 
-const appVersion = "0.7.0-alpha"
+const appVersion = "0.7.1-alpha"
 
 //go:embed ui.html
 var uiHTML []byte

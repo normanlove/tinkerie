@@ -3,7 +3,7 @@
 
 APPS = [
   dict(
-    id="wirie", needshort="No hardware needed", name="Wirie", ver="1.2.1-alpha", color="#ef8a3c", icon="wirie.png",
+    id="wirie", needshort="No hardware needed", name="Wirie", ver="0.8.0-alpha", color="#ef8a3c", icon="wirie.png",
     tagline="Design your own circuit boards, even if you've never made one before.",
     short="Design circuit boards, plan stripboard builds, look up pinouts and work out battery life.",
     need="No hardware needed",
@@ -67,7 +67,7 @@ APPS = [
     pairs=[("makie", "Turns your board into a 3D-printable case."), ("flashie", "Puts the firmware on the board you built."), ("meterie", "Calcie can read a live value from your multimeter.")],
   ),
   dict(
-    id="makie", needshort="No hardware needed", name="Makie", ver="1.5.1-alpha", color="#2f7df6", icon="makie.png",
+    id="makie", needshort="No hardware needed", name="Makie", ver="0.9.0-alpha", color="#2f7df6", icon="makie.png",
     tagline="Design parts for your 3D printer by stacking simple shapes.",
     short="A Tinkercad-style 3D designer with threads, gears, boxes, cases and hundreds of ready parts.",
     need="No hardware needed",
@@ -129,7 +129,7 @@ APPS = [
     pairs=[("wirie", "Design the board, then build its case in Makie."), ("tunie", "Shares your printer's fit clearances with Makie."), ("flashie", "Program the board that goes in your case.")],
   ),
   dict(
-    id="tunie", needshort="Needs a 3D printer", name="Tunie", ver="1.0.0-alpha", color="#5b6cf6", icon="tunie.png",
+    id="tunie", needshort="Needs a 3D printer", name="Tunie", ver="0.5.0-alpha", color="#5b6cf6", icon="tunie.png",
     tagline="Calibrate your 3D printer one simple test at a time.",
     short="Print a test, measure it, type the number in, and Tunie tells you the new setting.",
     need="A 3D printer",
@@ -183,7 +183,7 @@ APPS = [
     pairs=[("makie", "Uses your measured clearances so printed parts fit."), ("tracie", "Watch your printer's serial output.")],
   ),
   dict(
-    id="flashie", needshort="Board or SD card", name="Flashie", ver="0.7.0-alpha", color="#7b5cf5", icon="flashie.svg",
+    id="flashie", needshort="Board or SD card", name="Flashie", ver="0.7.1-alpha", color="#7b5cf5", icon="flashie.svg",
     tagline="Put new firmware on your boards, and operating systems on SD cards.",
     short="Flash ESP32, Pico, Arduino and STM32 boards, build programs from blocks, and write SD cards and USB installers.",
     need="A microcontroller board, or an SD card / USB drive",
@@ -214,7 +214,7 @@ APPS = [
       ]),
       ("Firmware library", "Popular firmware, downloaded from the official projects.", [
         "MicroPython, CircuitPython, ESPHome, WLED, Tasmota, Meshtastic",
-        "ESP32 Marauder, Bruce, NerdMiner, Grbl",
+        "NerdMiner and Grbl",
         "Filtered to your board, with builds for your exact board first",
         "Checksums checked, and firmware for the wrong chip refused",
       ]),
@@ -251,7 +251,7 @@ APPS = [
     pairs=[("tracie", "See what your freshly flashed board prints."), ("wirie", "Design the board you're flashing."), ("makie", "Print a case for it.")],
   ),
   dict(
-    id="scopie", needshort="Scope, or demo mode", name="Scopie", ver="3.0.0-alpha", color="#e8b416", icon="scopie.png",
+    id="scopie", needshort="Scope, or demo mode", name="Scopie", ver="0.9.0-alpha", color="#e8b416", icon="scopie.png",
     tagline="Turn your PC into the screen of an oscilloscope.",
     short="A friendly oscilloscope app for Hantek, Rigol, Siglent, OWON, PicoScope and more.",
     need="A USB or bench oscilloscope, or try Demo mode",
@@ -303,7 +303,7 @@ APPS = [
     pairs=[("tracie", "Decode the digital signals you see."), ("meterie", "Log slow changes with your multimeter.")],
   ),
   dict(
-    id="meterie", needshort="Meter, or demo mode", name="Meterie", ver="1.1.0-alpha", color="#1fb4cc", icon="meterie.png",
+    id="meterie", needshort="Meter, or demo mode", name="Meterie", ver="0.6.0-alpha", color="#1fb4cc", icon="meterie.png",
     tagline="A big, friendly multimeter display, with graphs and logging.",
     short="Connect your multimeter to show huge readings, graph them, log them and run guided tests.",
     need="A multimeter with a PC link, or try the demo",
@@ -364,7 +364,7 @@ APPS = [
     pairs=[("wirie", "Calcie can use your meter's live reading."), ("scopie", "For fast signals a meter can't follow.")],
   ),
   dict(
-    id="tracie", needshort="Board, or demo mode", name="Tracie", ver="1.0.0-alpha", color="#25b39f", icon="tracie.svg",
+    id="tracie", needshort="Board, or demo mode", name="Tracie", ver="0.5.0-alpha", color="#25b39f", icon="tracie.svg",
     tagline="See what your board is saying, and the signals on its wires.",
     short="A serial monitor with a live plotter, plus a logic analyser that decodes UART, I²C and SPI.",
     need="A board on USB, or a cheap logic analyser (demo included)",

@@ -31,7 +31,7 @@ import (
 
 const (
 	appName    = "Wirie"
-	appVersion = "1.2.1-alpha"
+	appVersion = "0.8.0-alpha"
 	appAuthor  = "nrmluvdev"
 	basePort   = 47820 // Tinkerie ports: see PORTING.md
 )

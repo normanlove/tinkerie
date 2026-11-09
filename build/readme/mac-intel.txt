@@ -20,18 +20,18 @@ What works on this system
 Every app has teaching mode: point at anything to see what it does. F2 turns it off.
 
 New in {VERSION}:
-- Tinkerie is now marked as alpha while it is tested on real hardware.
-- Wirie: the auto-router now draws ground (GND) tracks too, so every connection is
-  visible, and it checks the ground fill really reaches each pin.
+- New version numbers: Tinkerie and every app are now numbered below 1.0 while
+  in alpha (earlier alpha builds were numbered 1.4 to 1.5.2).
+- Flashie: ESP32 Marauder and Bruce were removed from the firmware library.
 
-New in 1.5.1: every app opens maximised.
-
-New in 1.5.0: Flashie's "Write image" tab can now
-- set up Raspberry Pi OS before its first start, like Raspberry Pi Imager: press "OS settings"
-  for the hostname, your username and password, Wi-Fi, SSH and time zone/keyboard;
-- turn a Windows 10 or 11 .iso into a USB installer for UEFI PCs, like Rufus;
-- write Linux ISOs (Ubuntu, Fedora, Mint...) and .zst-packed images too.
-These new parts haven't been tried on real hardware yet. Please report anything odd.
+Also in recent alpha builds:
+- Wirie's auto-router draws ground (GND) tracks too, and checks the ground fill
+  really reaches each pin.
+- Every app opens maximised.
+- Flashie's "Write image" tab sets up Raspberry Pi OS before its first start
+  (OS settings: hostname, user, Wi-Fi, SSH, time zone), turns a Windows 10/11
+  .iso into a USB installer for UEFI PCs, and writes Linux ISOs and .zst images.
+  These haven't been tried on much real hardware yet. Please report anything odd.
 
 Updating
 The full source is in the source folder. Change anything, then in a terminal:

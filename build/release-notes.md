@@ -11,11 +11,12 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 Each package has a *READ ME FIRST.txt*.
 
 ### New in {VERSION}
-- **Alpha:** every version number now ends in "-alpha" while Tinkerie is tested on real hardware.
-- **Wirie:** the auto-router now draws ground (GND) tracks too, so every connection is visible on the board (the ground fill stays as extra ground). It also checks that the ground fill really reaches each pin, instead of assuming it does, and routes any pin the fill can't reach. A new *Route the fill net with tracks too* switch (on by default) is under Ground fill.
+- **New version numbers:** while Tinkerie is in alpha, it and every app are numbered below 1.0. Tinkerie is now 0.6.0-alpha; earlier alpha builds were numbered 1.4 to 1.5.2. Apps: Makie and Scopie 0.9, Wirie 0.8, Flashie 0.7.1, Meterie 0.6, Tunie and Tracie 0.5.
+- **Flashie:** ESP32 Marauder and Bruce were removed from the firmware library.
 
-### Earlier
-- 1.5.1: every app opens maximised.
-- 1.5.0: Flashie's Write image tab gained OS settings for Raspberry Pi, Windows 10/11 installer USB drives, Linux ISOs and .zst images.
+### Also in recent alpha builds
+- Wirie's auto-router draws ground (GND) tracks too, and checks that the ground fill really reaches each pin.
+- Every app opens maximised.
+- Flashie's Write image tab: OS settings for Raspberry Pi, Windows 10/11 installer USB drives, Linux ISOs and .zst images.
 
 Licensed under GPL-3.0-or-later. [Code signing policy](https://tinkerie.net/code-signing.html).

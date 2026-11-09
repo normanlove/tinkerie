@@ -57,12 +57,12 @@ func TestLibraryFiltering(t *testing.T) {
 		return out
 	}
 	cyd := strings.Join(names("cyd-2432s028r", "ESP32"), ",")
-	for _, want := range []string{"marauder", "bruce", "nerdminer", "micropython", "wled", "tasmota", "esphome"} {
+	for _, want := range []string{"nerdminer", "micropython", "wled", "tasmota", "esphome"} {
 		if !strings.Contains(cyd, want) {
 			t.Errorf("CYD list missing %s: %s", want, cyd)
 		}
 	}
-	if !strings.HasPrefix(cyd, "marauder") && !strings.HasPrefix(cyd, "bruce") && !strings.HasPrefix(cyd, "nerdminer") {
+	if !strings.HasPrefix(cyd, "nerdminer") {
 		t.Errorf("board-specific builds should sort first: %s", cyd)
 	}
 	uno := strings.Join(names("uno", "ATmega328P"), ",")
@@ -75,8 +75,22 @@ func TestLibraryFiltering(t *testing.T) {
 	}
 }
 
+// testItems adds two library entries that exist only in the tests, served by
+// the mock library: an app-only image (Flashie adds the partition table) and
+// a merged image written at 0x0.
+func testItems(t *testing.T) {
+	old := library
+	library = append(append([]LibItem{}, library...),
+		LibItem{ID: "apponly", Name: "App-only test", Category: "Fun", Targets: []LibTarget{
+			boardsT(Source{Kind: "gh-asset", Repo: "tinkerie-test/app-only", Asset: `_cyd_2432S028\.bin$`, Offset: 0x10000, AppOnly: true}, cydR...)}},
+		LibItem{ID: "merged", Name: "Merged test", Category: "Fun", Targets: []LibTarget{
+			boardsT(Source{Kind: "gh-asset", Repo: "tinkerie-test/merged", Asset: `(?i)^merged-demo-CYD-2432S028\.bin$`, Offset: 0}, cydR...)}})
+	t.Cleanup(func() { library = old })
+}
+
 func TestResolveAll(t *testing.T) {
 	withMock(t)
+	testItems(t)
 	cases := []struct {
 		id, board, chip string
 		parts           int
@@ -85,8 +99,7 @@ func TestResolveAll(t *testing.T) {
 		{"circuitpython", "pico-w", "RP2040", 1}, {"esphome", "esp32-devkitc", "ESP32", 1}, {"esphome", "nodemcu-v2", "ESP8266", 1},
 		{"wled", "esp32-devkitc", "ESP32", 2}, {"tasmota", "esp32-c3-devkitm", "ESP32-C3", 1},
 		{"meshtastic", "t-deck", "ESP32-S3", 1}, {"meshtastic", "pico", "RP2040", 1},
-		{"marauder", "cyd-2432s028r", "ESP32", 3}, {"marauder", "cyd-2432s028r-v3", "ESP32", 3},
-		{"bruce", "cyd-2432s028r-v3", "ESP32", 1}, {"nerdminer", "cyd-2432s028r", "ESP32", 4}, {"nerdminer", "t-display-s3", "ESP32-S3", 4},
+		{"apponly", "cyd-2432s028r", "ESP32", 3}, {"merged", "cyd-2432s028r", "ESP32", 1}, {"nerdminer", "cyd-2432s028r", "ESP32", 4}, {"nerdminer", "t-display-s3", "ESP32-S3", 4},
 		{"grbl", "nano", "ATmega328P", 1},
 	}
 	for _, c := range cases {
@@ -117,7 +130,8 @@ func TestResolveAll(t *testing.T) {
 
 func TestDownloadVerifyAndCache(t *testing.T) {
 	m := withMock(t)
-	res, err := resolveItem("marauder", "cyd-2432s028r", "ESP32")
+	testItems(t)
+	res, err := resolveItem("apponly", "cyd-2432s028r", "ESP32")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -129,21 +143,21 @@ func TestDownloadVerifyAndCache(t *testing.T) {
 	if len(imgs) != 3 || imgs[0].Offset != 0x8000 || imgs[1].Offset != 0xE000 || imgs[2].Offset != 0x10000 {
 		t.Fatalf("%+v", imgs)
 	}
-	hits := m.hits["/dl/justcallmekoko/ESP32Marauder/esp32_marauder_v1_14_1_20261101_cyd_2432S028.bin"]
+	hits := m.hits["/dl/tinkerie-test/app-only/app_only_demo_cyd_2432S028.bin"]
 	// Second time comes from cache.
 	if _, err := downloadParts(res, r); err != nil {
 		t.Fatal(err)
 	}
-	if m.hits["/dl/justcallmekoko/ESP32Marauder/esp32_marauder_v1_14_1_20261101_cyd_2432S028.bin"] != hits {
+	if m.hits["/dl/tinkerie-test/app-only/app_only_demo_cyd_2432S028.bin"] != hits {
 		t.Fatal("cache not used")
 	}
-	res2, _ := resolveItem("marauder", "cyd-2432s028r", "ESP32")
+	res2, _ := resolveItem("apponly", "cyd-2432s028r", "ESP32")
 	if !res2.Parts[2].Cached {
 		t.Fatal("resolve should report cached")
 	}
 	// Corrupt the published file: download must be refused.
-	res3, _ := resolveItem("bruce", "cyd-2432s028r", "ESP32")
-	p := "/dl/pr3y/Bruce/Bruce-CYD-2432S028.bin"
+	res3, _ := resolveItem("merged", "cyd-2432s028r", "ESP32")
+	p := "/dl/tinkerie-test/merged/merged-demo-CYD-2432S028.bin"
 	m.files[p] = append([]byte{}, m.files[p]...)
 	m.files[p][5000] ^= 0xFF
 	if _, err := downloadParts(res3, r); err == nil || !strings.Contains(err.Error(), "checksum mismatch") {
@@ -161,11 +175,12 @@ func TestDownloadVerifyAndCache(t *testing.T) {
 
 func TestLibraryFlashEndToEnd(t *testing.T) {
 	withMock(t)
+	testItems(t)
 	demoMode = true
 	resetDemo()
 	defer func() { demoMode = false }()
 	cases := []struct{ item, port, board, chip string }{
-		{"marauder", "COM3", "cyd-2432s028r", "ESP32"},
+		{"apponly", "COM3", "cyd-2432s028r", "ESP32"},
 		{"wled", "COM3", "esp32-devkitc", "ESP32"},
 		{"micropython", "COM3", "esp32-devkitc", "ESP32"},
 		{"nerdminer", "COM3", "cyd-2432s028r", "ESP32"},

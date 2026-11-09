@@ -27,8 +27,6 @@ Step 2 has two tabs: **Firmware library** and **My own file**. The library is fi
 | WLED | wled/WLED GitHub release, plus WLED's v4 bootloader on classic ESP32 | GitHub SHA-256 (app) |
 | Tasmota | ota.tasmota.com release folder (`*.factory.bin`) | not published — fingerprinted in cache |
 | Meshtastic | meshtastic/firmware GitHub release zip → your board's `factory.bin` / `.uf2` | GitHub SHA-256 (zip) + CRC-32 |
-| ESP32 Marauder (incl. CYD builds) | justcallmekoko/ESP32Marauder release; Flashie adds a Minimal SPIFFS partition table | GitHub SHA-256 |
-| Bruce (incl. CYD builds) | pr3y/Bruce release, merged image at 0x0 | GitHub SHA-256 |
 | NerdMiner v2 (incl. CYD builds) | BitMaker-hub/NerdMiner_v2 `bin/<board>/0x…_*.bin` | git blob SHA-1 |
 | Grbl / Grbl-Mega | gnea/grbl and gnea/grbl-Mega release `.hex` | GitHub SHA-256 |
 | Klipper, Marlin | no ready-made binaries — Flashie explains how to build them, then you flash the result with “My own file” | — |

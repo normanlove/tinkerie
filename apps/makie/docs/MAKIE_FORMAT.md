@@ -117,4 +117,4 @@ These are realistic renders of the board (solder mask, copper, silkscreen) with 
 Example files: open `example.makie.json` alongside this spec.
 
 ---
-Format by nrmluvdev · Wirie 1.1.0
+Format by nrmluvdev · Wirie 0.8

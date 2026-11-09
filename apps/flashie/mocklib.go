@@ -81,16 +81,16 @@ func (m *mockLib) releases() map[string][]string {
 		"adafruit/circuitpython":       {},
 		"BitMaker-hub/NerdMiner_v2":    {},
 		"meshtastic/firmware":          {"firmware-esp32s3-2.7.15.567b8ea.zip", "firmware-esp32-2.7.15.567b8ea.zip", "firmware-rp2040-2.7.15.567b8ea.zip", "firmware-2.7.15.567b8ea.json"},
-		"justcallmekoko/ESP32Marauder": {"esp32_marauder_v1_14_1_20261101_cyd_2432S028.bin", "esp32_marauder_v1_14_1_20261101_cyd_2432S028_2usb.bin", "esp32_marauder_v1_14_1_20261101_cyd_3_5_inch.bin", "esp32_marauder_v1_14_1_20261101_esp32_lddb.bin", "esp32_marauder_v1_14_1_20261101_flipper.bin"},
-		"pr3y/Bruce":                   {"Bruce-CYD-2432S028.bin", "Bruce-CYD-2USB.bin", "Bruce-CYD-3248S035R.bin", "Bruce-CYD-3248S035C.bin", "Bruce-lilygo-t-deck.bin", "Bruce-m5stack-cardputer.bin"},
+		"tinkerie-test/app-only": {"app_only_demo_cyd_2432S028.bin"},
+		"tinkerie-test/merged": {"merged-demo-CYD-2432S028.bin"},
 		"gnea/grbl":                    {"grbl_v1.1h.20190825.hex"},
 	}
 }
 
 var mockTags = map[string]string{
 	"esphome/firmware": "2026.10.1", "wled/WLED": "v0.15.3", "arendst/Tasmota": "v15.1.0", "adafruit/circuitpython": "10.0.3",
-	"BitMaker-hub/NerdMiner_v2": "v1.8.3", "meshtastic/firmware": "v2.7.15.567b8ea", "justcallmekoko/ESP32Marauder": "v1.14.1",
-	"pr3y/Bruce": "1.11", "gnea/grbl": "v1.1h.20190825",
+	"BitMaker-hub/NerdMiner_v2": "v1.8.3", "meshtastic/firmware": "v2.7.15.567b8ea", "tinkerie-test/app-only": "v1.0.0",
+	"tinkerie-test/merged": "1.0", "gnea/grbl": "v1.1h.20190825",
 }
 
 // prepare builds every file the mock serves.
@@ -103,7 +103,7 @@ func (m *mockLib) prepare() {
 				b = mockZip(a)
 			case strings.HasSuffix(a, ".hex"):
 				b = makeHexFile(fakeImage(a, 30000)[1:], 0)
-			case strings.Contains(a, "marauder"):
+			case strings.Contains(a, "app_only"):
 				b = fakeImage(a, 1_400_000)
 			default:
 				b = fakeImage(a, 260_000)

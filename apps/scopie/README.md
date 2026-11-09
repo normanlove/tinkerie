@@ -7,7 +7,7 @@ for the Hantek 6022BE and now supports many common USB, bench and handheld scope
 button, menu and on-screen marker explains itself: hover over anything and a plain-English
 explanation appears in the help bar under the screen. Press **F1** for the beginner's guide.
 
-Version 3 is a complete rewrite in Go of the Python/Qt Scopie 2.0: one `Scopie.exe`, nothing to
+This version is a complete rewrite in Go of the old Python/Qt Scopie: one `Scopie.exe`, nothing to
 install, no Python, no DLLs, no runtime.
 
 ## Running it

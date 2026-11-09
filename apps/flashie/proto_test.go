@@ -299,7 +299,7 @@ func TestCYDDatabase(t *testing.T) {
 }
 
 func TestCYDMatch(t *testing.T) {
-	m := matchCYDFirmware("Marauder_v1.2_CYD_2432S028R.bin", []byte("xx esp32-2432s028r yy"))
+	m := matchCYDFirmware("MyApp_v1.2_CYD_2432S028R.bin", []byte("xx esp32-2432s028r yy"))
 	if len(m.Families) != 1 || m.Families[0] != "2432S028" || m.Hits[0].ID != "2432s028r" {
 		t.Fatalf("%+v", m)
 	}
