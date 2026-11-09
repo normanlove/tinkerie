@@ -61,6 +61,8 @@ h3 { font-size: 1.12rem; font-weight: 600; }
 p { margin: 0; }
 .wrap { max-width: 1160px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 .prose { max-width: 66ch; }
+.prose h2 { margin-top: 22px; }
+.prose ul { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; }
 .muted { color: var(--ink-2); }
 .label { font: 600 .74rem/1.2 var(--mono); text-transform: uppercase; letter-spacing: .12em; color: var(--ink-2); }
 kbd { font: 600 .8em var(--mono); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 6px; padding: .05em .4em; background: var(--sheet); }

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Code Signing Policy · Tinkerie</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="How Tinkerie&#x27;s Windows program is signed through SignPath, who approves releases, and Tinkerie&#x27;s privacy statement.">
+<meta property="og:title" content="Code Signing Policy · Tinkerie">
+<meta property="og:description" content="How Tinkerie&#x27;s Windows program is signed through SignPath, who approves releases, and Tinkerie&#x27;s privacy statement.">
+<link rel="icon" href="img/icons/tinkerie.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&family=Unbounded:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top"><div class="wrap">
+  <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
+  <nav class="nav" aria-label="Main">
+    <div class="apps-menu"><button type="button" aria-expanded="false" aria-haspopup="true">Apps <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><div class="menu"><a href="wirie.html"><img src="img/icons/wirie.png" alt=""><span><b>Wirie</b><small>Design circuit boards</small></span></a><a href="makie.html"><img src="img/icons/makie.png" alt=""><span><b>Makie</b><small>A Tinkercad-style 3D designer with threads</small></span></a><a href="tunie.html"><img src="img/icons/tunie.png" alt=""><span><b>Tunie</b><small>Print a test</small></span></a><a href="flashie.html"><img src="img/icons/flashie.svg" alt=""><span><b>Flashie</b><small>Flash ESP32</small></span></a><a href="scopie.html"><img src="img/icons/scopie.png" alt=""><span><b>Scopie</b><small>A friendly oscilloscope app for Hantek</small></span></a><a href="meterie.html"><img src="img/icons/meterie.png" alt=""><span><b>Meterie</b><small>Connect your multimeter to show huge readings</small></span></a><a href="tracie.html"><img src="img/icons/tracie.svg" alt=""><span><b>Tracie</b><small>A serial monitor with a live plotter</small></span></a><a class="menu-start" href="start.html">Getting started guide →</a></div></div>
+    <a class="hide-s" href="start.html">Getting started</a>
+    <a class="hide-s" href="https://github.com/normanlove/tinkerie">GitHub</a>
+    <a class="btn btn-go" href="index.html#download" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg><span class="lbl">Download</span></a>
+    <button class="theme" id="theme" type="button" aria-label="Switch theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></button>
+  </nav>
+</div></header>
+<main id="main">
+<div class="ruler" aria-hidden="true"></div>
+<section class="hero" style="padding-bottom:30px"><div class="wrap">
+  <span class="tape">Code signing policy</span>
+  <h1>Code signing policy</h1>
+  <p class="lead" style="max-width:56ch">How Tinkerie's Windows program is signed, who decides what gets signed, and what Tinkerie does (and doesn't do) with your data.</p>
+</div></section>
+<section class="band alt" style="padding-top:40px"><div class="wrap"><div class="stack" style="max-width:860px">
+  <div class="callout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-9.5v.5"/></svg><p>Free code signing provided by <a href="https://signpath.io">SignPath.io</a>, certificate by <a href="https://signpath.org">SignPath Foundation</a>.</p></div>
+  <p class="muted">Signing is being set up. Releases made before it's in place are not signed, and Windows shows an "unrecognised app" warning for them.</p>
+</div></div></section>
+<section class="band"><div class="wrap"><div class="stack prose">
+  <h2>What is signed</h2>
+  <p>The Windows program, <code>Tinkerie.exe</code>, attached to each <a href="https://github.com/normanlove/tinkerie/releases">GitHub release</a>, on its own and inside the Windows zip. It is built from this project's source code by GitHub Actions, on GitHub's own servers, using the public <a href="https://github.com/normanlove/tinkerie/blob/main/.github/workflows/release.yml">release workflow</a>. Nothing built anywhere else is signed.</p>
+  <p>Signing proves the file came from this project's source code and hasn't been changed since. The Mac and Linux downloads are not part of this signing.</p>
+  <h2>Team roles</h2>
+  <div class="table-wrap"><table><thead><tr><th>Role</th><th>Who</th><th>What it means</th></tr></thead><tbody>
+    <tr><td>Committers and reviewers</td><td><a href="https://github.com/normanlove">nrmluvdev (normanlove)</a></td><td>Can change the source code. Every change from anyone else, such as a pull request, is reviewed by them before it's added.</td></tr>
+    <tr><td>Approvers</td><td><a href="https://github.com/normanlove">nrmluvdev (normanlove)</a></td><td>Approves each release by hand before it's signed.</td></tr>
+  </tbody></table></div>
+  <p>Everyone in these roles uses two-factor authentication on GitHub and SignPath.</p>
+  <h2>Privacy</h2>
+  <p><b>This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it.</b> Tinkerie has no analytics, no tracking, no accounts and no automatic update checks.</p>
+  <p>These are the only times it uses the network, each one because you asked:</p>
+  <ul><li><b>Flashie</b> downloads firmware, the Arduino board list and Raspberry Pi&#x27;s OS list from those projects&#x27; own servers (GitHub, Raspberry Pi, MicroPython, CircuitPython and the others shown in its library) when you open its library or choose something to download.</li><li><b>Tunie</b> talks to your own printer (OctoPrint or Moonraker) only at the address you type in.</li><li><b>Scopie</b> connects to a network oscilloscope only at the address you choose.</li><li><b>Everything else</b> Wirie, Makie, Meterie, Tracie and the launcher never use the internet. Each app&#x27;s page is served only to your own computer (localhost).</li></ul>
+  <p>Those sites have their own privacy policies. This website is hosted by GitHub Pages and loads its fonts from Google Fonts.</p>
+  <h2>Changes to your computer</h2>
+  <p>Tinkerie doesn't need installing: delete it to remove it. Two optional steps change your system, and both ask first: on Windows, Scopie's <i>Install USB driver</i> button runs Zadig to install a USB driver (you'll see the administrator prompt; Tracie's help explains the same step for logic analysers), and on Linux and Raspberry Pi, <code>install.sh</code> and <code>install-usb.sh</code> add a menu entry and USB permissions. Both scripts undo themselves with <code>--remove</code>. The Windows driver can be removed in Device Manager.</p>
+  <h2>Licence</h2>
+  <p>Tinkerie is free software under the GNU General Public License, version 3 or later. The source code is on <a href="https://github.com/normanlove/tinkerie">GitHub</a>.</p>
+</div></div></section>
+</main>
+<footer><div class="wrap">
+  <div class="stack">
+    <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
+    <p>Free maker tools, designed and created by <b>nrmluvdev</b>. Version 1.5.2-alpha: Tinkerie is in alpha.</p>
+    <p>Free software under the GNU GPL, version 3 or later. It comes with no warranty.</p>
+  </div>
+  <div><h4>The apps</h4><ul><li><a href="wirie.html">Wirie</a></li><li><a href="makie.html">Makie</a></li><li><a href="tunie.html">Tunie</a></li><li><a href="flashie.html">Flashie</a></li><li><a href="scopie.html">Scopie</a></li><li><a href="meterie.html">Meterie</a></li><li><a href="tracie.html">Tracie</a></li></ul></div>
+  <div><h4>Help and source</h4><ul>
+    <li><a href="start.html">Getting started</a></li>
+    <li><a href="index.html#faq">Questions</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie/releases">All downloads</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie">Source code on GitHub</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie/issues">Report a problem</a></li>
+    <li><a href="code-signing.html">Code signing policy</a></li>
+  </ul></div>
+</div></footer>
+<script src="site.js"></script>
+</div>
+</body>
+</html>

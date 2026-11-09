@@ -8,7 +8,7 @@ Design stripboard circuits, model 3D-printed parts, flash microcontrollers, writ
 
 ## Download
 
-**Website:** https://normanlove.github.io/tinkerie/ (screenshots and a guide for every app)
+**Website:** https://tinkerie.net/ (screenshots and a guide for every app)
 
 Get the newest version from the **[Releases page](https://github.com/normanlove/tinkerie/releases)** (alpha versions are marked "Pre-release"):
 
@@ -79,6 +79,17 @@ Mac builds come out as `dist/<name>/Tinkerie.app`, Linux and Pi builds as `dist/
 Meterie's HID-cable meters, Bluetooth meters and Camera mode are Windows-only for now. On a Mac, USB scopes and logic analysers need Apple's IOKit, which these pure-Go builds don't use.
 
 For other platforms and how the source is laid out, see [PORTING.md](PORTING.md).
+
+## Code signing policy
+
+Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org). Signing is being set up; releases made before then are unsigned.
+
+- **What is signed:** `Tinkerie.exe` on each [release](https://github.com/normanlove/tinkerie/releases), built from this repository by GitHub Actions on GitHub-hosted runners ([release workflow](.github/workflows/release.yml)). Nothing built elsewhere is signed.
+- **Committers and reviewers:** [nrmluvdev (normanlove)](https://github.com/normanlove). Changes from anyone else (pull requests) are reviewed before they're merged.
+- **Approvers:** [nrmluvdev (normanlove)](https://github.com/normanlove), who approves every signing request by hand.
+- **Privacy:** This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. Only Flashie downloads things (firmware and OS images, from the projects' own servers, when you choose them); Tunie and Scopie connect only to a printer or scope at the address you give. There's no tracking or telemetry.
+
+The full policy is on the website: <https://tinkerie.net/code-signing.html>. Setup notes for the maintainer are in [.signpath/README.md](.signpath/README.md).
 
 ## Licence
 

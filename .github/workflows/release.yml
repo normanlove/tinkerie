@@ -10,9 +10,11 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  actions: read # the SignPath step reads this run's artifact
 jobs:
   release:
     runs-on: ubuntu-latest
+    timeout-minutes: 330
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
@@ -37,6 +39,39 @@ jobs:
       - name: Build and package
         if: steps.v.outputs.new == 'yes'
         run: ./package.sh
+      # Signing (see .signpath/README.md). Skipped until SignPath is set up.
+      - name: Upload Tinkerie.exe for signing
+        id: unsigned
+        if: steps.v.outputs.new == 'yes' && vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: Tinkerie-exe-unsigned
+          path: dist/packages/Tinkerie.exe
+          if-no-files-found: error
+      - name: Sign Tinkerie.exe (waits for the maintainer to approve in SignPath)
+        if: steps.unsigned.outcome == 'success'
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: tinkerie
+          signing-policy-slug: release-signing
+          github-artifact-id: ${{ steps.unsigned.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 18000
+          output-artifact-directory: signed
+          parameters: |
+            version: ${{ toJSON(steps.v.outputs.version) }}
+      - name: Use the signed Tinkerie.exe
+        if: steps.unsigned.outcome == 'success'
+        run: |
+          v="${{ steps.v.outputs.version }}"
+          cp signed/Tinkerie.exe dist/packages/Tinkerie.exe
+          cd dist/packages
+          mkdir -p swap/Tinkerie-$v-windows
+          cp Tinkerie.exe swap/Tinkerie-$v-windows/
+          (cd swap && zip -q ../Tinkerie-$v-windows.zip Tinkerie-$v-windows/Tinkerie.exe)
+          rm -rf swap
       - name: Publish release
         if: steps.v.outputs.new == 'yes'
         run: |

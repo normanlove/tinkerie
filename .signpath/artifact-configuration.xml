@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SignPath artifact configuration for Tinkerie (paste it into the SignPath
+     project as its default artifact configuration).
+     The release workflow uploads Tinkerie.exe as a GitHub artifact, which is a
+     zip, so the root element is <zip-file>. The program's metadata must say
+     Tinkerie and the version being released (set by tools/mksyso). -->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <parameters>
+    <parameter name="version" />
+  </parameters>
+  <zip-file>
+    <pe-file path="Tinkerie.exe" product-name="Tinkerie" product-version="${version}">
+      <authenticode-sign />
+    </pe-file>
+  </zip-file>
+</artifact-configuration>

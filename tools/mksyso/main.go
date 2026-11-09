@@ -135,7 +135,7 @@ func versionInfo(ver string) []byte {
 		vstring("InternalName", "Tinkerie"),
 		vstring("LegalCopyright", "© nrmluvdev - free for hobbyists"),
 		vstring("OriginalFilename", "Tinkerie.exe"),
-		vstring("ProductName", "Tinkerie (nrmluvdev maker tool suite)"),
+		vstring("ProductName", "Tinkerie"), // must match the SignPath artifact configuration
 		vstring("ProductVersion", ver),
 	)
 	sfi := vnode("StringFileInfo", 1, nil, 0, strs)
