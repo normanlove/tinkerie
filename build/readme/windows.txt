@@ -12,11 +12,12 @@ Everything, in every app. Every app has teaching mode: point at anything to see 
 F2 turns it off.
 
 New in {VERSION}:
-- New version numbers: Tinkerie and every app are now numbered below 1.0 while
-  in alpha.
-- Flashie: ESP32 Marauder and Bruce were removed from the firmware library.
+- A tidy-up release: the version shown in the Windows file details (and in a
+  few examples and notes) now matches Tinkerie's pre-1.0 alpha numbering.
 
 Also in recent alpha builds:
+- Tinkerie and every app are numbered below 1.0 while in alpha (0.6.0).
+- Flashie: ESP32 Marauder and Bruce were removed from the firmware library.
 - Wirie's auto-router draws ground (GND) tracks too, and checks the ground fill
   really reaches each pin.
 - Every app opens maximised.
