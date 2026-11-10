@@ -380,6 +380,7 @@ ABOUT = '''<div class="ruler" aria-hidden="true"></div>
   <h2 id="ai">My view on AI</h2>
   <p>I believe AI is useful as a tool in the same way a saw is useful for cutting wood. It does the job it was designed for well, but it doesn't create things by itself. A saw doesn't decide what the table looks like.</p>
   <p>AI is a language model, so it should be used to translate the ideas in your head into tangible things, not to come up with the ideas themselves.</p>
+  <p>I don't agree with how AI is being implemented in much of the world today. It should be used to improve our environment, not at its cost.</p>
 
   <h2 id="made">How Tinkerie is made</h2>
   <p>Tinkerie is built mostly by AI, but the core ideas behind it are entirely mine: which tools should exist, what each one is for, what it should feel like to use, and who it's meant to help. The AI writes much of the code that turns those ideas into working software. I decide what gets built, test it, and choose what ships.</p>
