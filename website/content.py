@@ -3,7 +3,7 @@
 
 APPS = [
   dict(
-    id="wirie", needshort="No hardware needed", name="Wirie", ver="0.10.1-alpha", color="#ef8a3c", icon="wirie.png",
+    id="wirie", needshort="No hardware needed", name="Wirie", ver="0.11.0-alpha", color="#ef8a3c", icon="wirie.png",
     tagline="Design your own circuit boards, even if you've never made one before.",
     short="Design circuit boards and custom keyboards, plan stripboard builds, look up pinouts and work out battery life.",
     need="No hardware needed",
@@ -59,6 +59,9 @@ APPS = [
         "Turn the switch solder points per key for custom-height builds",
         "Pick any common controller (Pro Micro, Elite-C, RP2040 boards, Pico, Black Pill, nice!nano, XIAO) or a bare ATmega32U4, RP2040 or STM32 chip, and Keebie adds the USB-C, crystal, regulator, flash and buttons it needs",
         "Diodes, matrix, per-key RGB, stabilisers and mounting holes are placed for you; QMK/ZMK firmware files and a switch plate (SVG/DXF) come out too",
+        "Choose how the diodes are laid out (upright beside each switch, flat above or below it, or at 45° in the corner), on the back or on show at the front, with an optional capacitor beside each LED; the Parts view shows them all before you build",
+        "Drag and turn the controller to wherever suits your case, and lay its parts out packed, in neat rows or in one tidy line",
+        "New keyboard and Close keyboard buttons start afresh or put a keyboard away",
         "One click sends it to Makie for a printed case, or to Flashie to set the keymap and flash the firmware",
       ]),
       ("Calcie: electronics maths", "The calculators every maker keeps looking up.", [

@@ -390,3 +390,12 @@ body.page #hint, body.page #coords { visibility: hidden; }
 .kb-help { padding-left: 16px; color: var(--dim); line-height: 1.9; margin: 6px 0; }
 .modal.kbw { width: min(760px, 94vw); }
 @media (max-width: 1300px) { .kb { grid-template-columns: 270px 1fr 220px; } }
+/* Keebie: parts view, controller, empty state */
+.kb-fp .d { fill: #1d222b; stroke: #9aa6b8; stroke-width: .2; } .kb-fp .d.top { fill: #2a1f12; stroke: #f0a35a; }
+.kb-fp .pp { fill: #e7b56f; opacity: .85; } .kb-fp .st { fill: #cfd6e0; }
+.kb-fp .l { fill: rgba(255,255,255,.14); stroke: #f472b6; stroke-width: .25; } .kb-fp .c { fill: #8a6a3e; stroke: #d9b67a; stroke-width: .15; }
+.kb-ctrl { cursor: move; } .kb-ctrl:hover .kb-area { fill: rgba(63,224,208,.12); } .kb-ctrl.sel .kb-area { fill: rgba(63,224,208,.14); stroke-dasharray: none; }
+.kb-empty { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; color: var(--dim); pointer-events: none; }
+.kb-empty[hidden] { display: none; } .kb-empty b { color: var(--text); font-size: 18px; } .kb-empty p { max-width: 360px; margin: 0 0 6px; } .kb-empty .btn { pointer-events: auto; }
+.kb-head .kb-row { margin-top: 4px; } .kb-head .kb-row .btn { margin-bottom: 0; }
+.toast a { pointer-events: auto; color: var(--cy); font-weight: 600; }

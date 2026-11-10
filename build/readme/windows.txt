@@ -12,13 +12,16 @@ Everything, in every app. Every app has teaching mode: point at anything to see 
 F2 turns it off.
 
 New in {VERSION}:
-- Tracie is now Probie, with a new Explain tab: it explains captures in plain
-  words, decodes UART, I2C, SPI, LEDs, IR remotes and 1-Wire, and reads serial
-  logs for boots, crashes and GPS fixes. It keeps Tracie's settings.
-- "Explain in Probie" in Scopie and Meterie sends their captures there.
-- Codie is a code explainer again (its Signals mode moved to Probie).
+- Keebie: a Parts view shows every diode, LED and capacitor before you build
+  (they go on the back of the board); choose how the diodes are laid out
+  (beside, below, above or at 45 degrees, back or front) and add a capacitor
+  beside each LED.
+- Keebie: drag and turn the controller, and lay its parts out packed, in rows
+  or in one line.
+- Keebie: New keyboard and Close keyboard buttons.
 
 Also in recent alpha builds:
+- 0.11.0-alpha: Tracie became Probie, with an Explain tab; Codie is code only.
 - 0.10.0-alpha: Codie explained signals (now Probie's Explain tab).
 - 0.9.1-alpha: Keebie fixes (key spacing, widening keys, faster redraws).
 - 0.9.0-alpha: Flashie keyboard firmware, Makie keyboard cases, Keebie knobs
