@@ -23,7 +23,7 @@ import (
 )
 
 // Version is the suite version shown in the launcher.
-const Version = "0.12.1-alpha"
+const Version = "0.12.2-alpha"
 
 // App describes one tile in the launcher.
 type App struct {
@@ -38,7 +38,7 @@ type App struct {
 
 // Apps is the suite, in launcher order.
 var Apps = []App{
-	{"wirie", "Wirie", "Circuit board designer, with Keebie keyboards, Boardie, Calcie, Pinnie and Powerie", "0.11.1-alpha", "wirie.png", "", false},
+	{"wirie", "Wirie", "Circuit board designer, with Keebie keyboards, Boardie, Calcie, Pinnie and Powerie", "0.11.2-alpha", "wirie.png", "", false},
 	{"makie", "Makie", "3D-printing part designer. Builds cases for Wirie boards and keyboards", "0.11.0-alpha", "makie.png", "", false},
 	{"tunie", "Tunie", "3D printer tuning and calibration", "0.5.0-alpha", "tunie.png", "", false},
 	{"flashie", "Flashie", "Firmware flasher for ESP32, Pico, Arduino and STM32, keyboard firmware maker, and SD card / USB image writer", "0.8.0-alpha", "flashie.svg", "", false},

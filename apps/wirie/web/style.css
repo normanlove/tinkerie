@@ -399,3 +399,4 @@ body.page #hint, body.page #coords { visibility: hidden; }
 .kb-empty[hidden] { display: none; } .kb-empty b { color: var(--text); font-size: 18px; } .kb-empty p { max-width: 360px; margin: 0 0 6px; } .kb-empty .btn { pointer-events: auto; }
 .kb-head .kb-row { margin-top: 4px; } .kb-head .kb-row .btn { margin-bottom: 0; }
 .toast a { pointer-events: auto; color: var(--cy); font-weight: 600; }
+.kb-bank { fill: rgba(240,163,90,.05); stroke: rgba(240,163,90,.55); stroke-width: .3; stroke-dasharray: 1.2 .8; } .kb-bankt { fill: #f0a35a; font-weight: 700; font-family: var(--fontd); }
