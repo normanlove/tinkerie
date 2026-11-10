@@ -14,20 +14,21 @@ Starting Tinkerie
 What works on this system
 - Launcher, Wirie, Makie, Tunie and Flashie: everything.
 - Scopie: demo, network and bench scopes, and CSV files. USB scopes aren't available on Mac yet.
-- Tracie: the serial monitor. The USB logic analyser isn't available on Mac yet.
+- Probie: the serial monitor. The USB logic analyser isn't available on Mac yet.
 - Codie: everything.
 - Meterie: meters with a USB-serial cable, like the HoldPeak HP-90EPC. Meters with a HID USB
   cable, Bluetooth meters and Camera mode are Windows only for now.
 Every app has teaching mode: point at anything to see what it does. F2 turns it off.
 
 New in {VERSION}:
-- Codie has a new Signals mode: it explains captures from Scopie, Tracie and
-  Meterie in plain words, decodes UART, I2C, SPI, LEDs, IR remotes and 1-Wire,
-  and reads serial logs for boots, crashes and GPS fixes.
-- "Explain in Codie" buttons in Scopie, Tracie and Meterie send a capture
-  straight to Codie.
+- Tracie is now Probie, with a new Explain tab: it explains captures in plain
+  words, decodes UART, I2C, SPI, LEDs, IR remotes and 1-Wire, and reads serial
+  logs for boots, crashes and GPS fixes. It keeps Tracie's settings.
+- "Explain in Probie" in Scopie and Meterie sends their captures there.
+- Codie is a code explainer again (its Signals mode moved to Probie).
 
 Also in recent alpha builds:
+- 0.10.0-alpha: Codie explained signals (now Probie's Explain tab).
 - 0.9.1-alpha: Keebie fixes (key spacing, widening keys, faster redraws).
 - 0.9.0-alpha: Flashie keyboard firmware, Makie keyboard cases, Keebie knobs
   and screens, version numbers in every download's name.

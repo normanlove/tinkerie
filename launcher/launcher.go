@@ -23,7 +23,7 @@ import (
 )
 
 // Version is the suite version shown in the launcher.
-const Version = "0.10.0-alpha"
+const Version = "0.11.0-alpha"
 
 // App describes one tile in the launcher.
 type App struct {
@@ -39,20 +39,20 @@ type App struct {
 // Apps is the suite, in launcher order.
 var Apps = []App{
 	{"wirie", "Wirie", "Circuit board designer, with Keebie keyboards, Boardie, Calcie, Pinnie and Powerie", "0.10.1-alpha", "wirie.png", "", false},
-	{"makie", "Makie", "3D-printing part designer. Builds cases for Wirie boards and keyboards", "0.10.0-alpha", "makie.png", "", false},
+	{"makie", "Makie", "3D-printing part designer. Builds cases for Wirie boards and keyboards", "0.11.0-alpha", "makie.png", "", false},
 	{"tunie", "Tunie", "3D printer tuning and calibration", "0.5.0-alpha", "tunie.png", "", false},
 	{"flashie", "Flashie", "Firmware flasher for ESP32, Pico, Arduino and STM32, keyboard firmware maker, and SD card / USB image writer", "0.8.0-alpha", "flashie.svg", "", false},
 	{"scopie", "Scopie", "Oscilloscope: Hantek 6022, network scopes and more", "0.9.1-alpha", "scopie.png", "", false},
 	{"meterie", "Meterie", "PC multimeter: HoldPeak, UNI-T, OWON, Brymen, Fluke…", "0.6.1-alpha", "meterie.png", "", false},
-	{"tracie", "Tracie", "Serial monitor and logic analyser", "0.5.1-alpha", "tracie.svg", "", false},
-	{"codie", "Codie", "Code and signal explainer: what each line of code does and why, and what captures from Scopie, Tracie and Meterie show", "0.2.0-alpha", "codie.svg", "", false},
+	{"probie", "Probie", "Serial monitor and logic analyser that explains captures in plain words: its own, and Scopie's and Meterie's", "0.6.0-alpha", "probie.svg", "", false},
+	{"codie", "Codie", "Code explainer: what each line of code does and why", "0.3.0-alpha", "codie.svg", "", false},
 }
 
 // What each app can't do yet on this system (see PORTING.md).
 var limits = map[string]map[string]string{
 	"darwin": {
 		"scopie":  "USB scopes: not on Mac yet",
-		"tracie":  "Logic analyser: not on Mac yet",
+		"probie":  "Logic analyser: not on Mac yet",
 		"meterie": "USB-serial meters only on Mac",
 	},
 	"linux": {

@@ -34,7 +34,15 @@ func TestEveryLauncherAppRuns(t *testing.T) {
 			t.Errorf("launcher tile %q has no app", n)
 		}
 	}
-	if len(mains) != len(launcher.Names()) {
-		t.Errorf("%d apps but %d launcher tiles", len(mains), len(launcher.Names()))
+	// old names kept so earlier shortcuts still work
+	aliases := map[string]bool{"tracie": true}
+	n := 0
+	for k := range mains {
+		if !aliases[k] {
+			n++
+		}
+	}
+	if n != len(launcher.Names()) {
+		t.Errorf("%d apps but %d launcher tiles", n, len(launcher.Names()))
 	}
 }

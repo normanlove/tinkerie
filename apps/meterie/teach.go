@@ -136,7 +136,7 @@ var teachTips = map[string][2]string{
 	"w#connect":   {"Connect a meter", "Goes to the Meters page to connect your meter."},
 	"hdr#connect": {"Connect meter", "Goes to the Meters page to connect a meter by USB, Bluetooth or camera."},
 	"hdr#export":  {"Export", "Saves your readings as a CSV spreadsheet, a suite timeline that other Tinkerie apps can line up with, a picture of the graph, or a whole session. It also brings in captures from Scopie and other apps."},
-	"exp#codie":   {"Explain in Codie", "Saves these readings and opens them in Codie, which explains them in plain words: a battery charging or running down, a gadget that sleeps and wakes up, power and energy used, temperatures warming up or settling, and anything worth checking."},
+	"exp#probie":  {"Explain in Probie", "Saves these readings and opens them in Probie, which explains them in plain words: a battery charging or running down, a gadget that sleeps and wakes up, power and energy used, temperatures warming up or settling, and anything worth checking."},
 	"hdr#marker":  {"Marker", "Puts a labelled line on the graph at this moment, so you can find it later."},
 	"learn#":      {"Meter modes", "Pick a mode to learn what it measures, which jacks the probes go in, and how to measure safely."},
 	"wz#":         {"Guided test", "Opens this step-by-step test. Each one tells you what to connect and does the maths for you."},

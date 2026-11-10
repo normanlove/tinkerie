@@ -41,7 +41,7 @@
     }
     buildLessonList();
     showLesson(store.get("lesson") || lessons[0].id);
-    if (i.file && (i.file.code || i.file.kind === "signal")) loadFile(i.file);
+    if (i.file && i.file.code) loadFile(i.file);
     else { const saved = store.get("code"); if (saved) { ta.value = saved; langSel.value = store.get("lang") || ""; } }
     syncGutter(); analyse();
     const t = store.get("tab"); if (t && t !== "explain") tab(t);
@@ -56,9 +56,7 @@
   })();
 
   function loadFile(f) {
-    if (f && f.kind === "signal" && window.codieSig) { window.codieSig.openPath(f.path, f.name); return; }
     if (!f || !f.code) return;
-    if (window.codieSig) window.codieSig.mode("code");
     ta.value = f.code; fileName = f.name || ""; langSel.value = "";
     syncGutter(); analyse(); setCur(1);
   }
@@ -137,7 +135,6 @@
   $("#open").onclick = () => $("#file").click();
   $("#file").onchange = e => { const f = e.target.files[0]; if (f) readLocal(f); e.target.value = ""; };
   function readLocal(f) {
-    if (window.codieSig && window.codieSig.take(f)) return;
     if (f.size > 2 * 1024 * 1024) { alertBar("That file is over 2 MB: Codie is made for source files."); return; }
     const r = new FileReader();
     r.onload = () => loadFile({ name: f.name, code: String(r.result) });

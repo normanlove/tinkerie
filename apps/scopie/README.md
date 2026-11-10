@@ -1,6 +1,6 @@
 # Scopie — a beginner-friendly program for many oscilloscopes
 
-**Created by nrmluvdev** · part of the free nrmluvdev maker suite (Wirie · Scopie · Makie · Flashie · Tunie · Tracie)
+**Created by nrmluvdev** · part of the free nrmluvdev maker suite (Wirie · Scopie · Makie · Flashie · Tunie · Probie · Meterie · Codie)
 
 Scopie turns your PC into the screen and controls of an oscilloscope. It started as a front end
 for the Hantek 6022BE and now supports many common USB, bench and handheld scopes — and every
@@ -99,6 +99,6 @@ their source in `third_party/`.
 
 Made with care by **nrmluvdev**.
 
-## Explain in Codie
+## Explain in Probie
 
-- **Explain in Codie** (toolbar, or File menu): saves the waveform and opens it in Codie, which explains each channel in plain words.
+- **Explain in Probie** (toolbar, or File menu): saves the waveform and opens it in Probie's Explain tab, which explains each channel in plain words.

@@ -33,10 +33,10 @@ Double-click `Tinkerie.exe` to open the launcher and pick an app. Each app opens
 | **Makie** | 3D-printing part designer. Builds cases for Wirie boards, including keyboard cases with a switch plate | 0.10.0-alpha |
 | **Tunie** | 3D printer tuning and calibration. Shares fit clearances with Makie | 0.5.0-alpha |
 | **Flashie** | Firmware flasher for microcontroller boards (ESP32, Pico, Arduino, STM32), plus a "Write image" tab that puts Raspberry Pi OS (with your Wi-Fi, user and SSH set up), Linux, or a Windows 10/11 installer onto an SD card or USB drive, and a Keyboard tab that makes and flashes firmware for Keebie keyboards | 0.8.0-alpha |
-| **Scopie** | Oscilloscope program (Hantek 6022BE/BL and others, plus network scopes and demo) | 0.9.1-alpha |
-| **Meterie** | PC multimeter: HoldPeak HP-90EPC, UNI-T, OWON, Brymen, Fluke and more | 0.6.1-alpha |
-| **Tracie** | Serial monitor and logic analyser | 0.5.1-alpha |
-| **Codie** | Code explainer: paste code and see what each line does and why, in 20+ languages (including Windows Go and the BASIC of the C64, ZX Spectrum and BBC Micro), with a game-development section and a Game school, plus a Signals mode that explains captures from Scopie, Tracie and Meterie | 0.2.0-alpha |
+| **Scopie** | Oscilloscope program (Hantek 6022BE/BL and others, plus network scopes and demo) | 0.9.2-alpha |
+| **Meterie** | PC multimeter: HoldPeak HP-90EPC, UNI-T, OWON, Brymen, Fluke and more | 0.6.2-alpha |
+| **Probie** | Serial monitor and logic analyser, with an Explain tab that explains captures in plain words (its own, and Scopie's and Meterie's). Probie was called Tracie before 0.11 | 0.6.0-alpha |
+| **Codie** | Code explainer: paste code and see what each line does and why, in 20+ languages (including Windows Go and the BASIC of the C64, ZX Spectrum and BBC Micro), with a game-development section and a Game school | 0.3.0-alpha |
 
 Every app's own guide is its `README.md` in `apps\<name>\`.
 
@@ -74,7 +74,7 @@ Mac builds come out as `dist/<name>/Tinkerie.app`, Linux and Pi builds as `dist/
 |---|---|---|---|
 | Launcher, Wirie, Makie, Tunie, Flashie, Codie | everything | everything | everything |
 | Scopie | everything | everything (USB scopes: run `install-usb.sh` once) | no USB scopes yet |
-| Tracie | everything | everything (logic analyser: run `install-usb.sh` once) | serial monitor; no logic analyser yet |
+| Probie | everything | everything (logic analyser: run `install-usb.sh` once) | serial monitor; no logic analyser yet |
 | Meterie | everything | USB-serial meters (like the HoldPeak HP-90EPC) | USB-serial meters |
 
 Meterie's HID-cable meters, Bluetooth meters and Camera mode are Windows-only for now. On a Mac, USB scopes and logic analysers need Apple's IOKit, which these pure-Go builds don't use.

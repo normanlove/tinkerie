@@ -158,6 +158,6 @@ Meterie by **nrmluvdev**. Protocol knowledge thanks to the sigrok project's mult
 the OWON / UNI-T / Aneng reverse-engineering community (DeanCording, ljakob, mwuertinger,
 ludwich66 and others) and Fluke's remote interface specification.
 
-## Explain in Codie
+## Explain in Probie
 
-- **Explain in Codie** (Export): saves the readings as a suite timeline and opens them in Codie, which explains batteries, current patterns, power and energy in plain words.
+- **Explain in Probie** (Export): saves the readings as a suite timeline and opens them on Probie's Explain tab, which explains batteries, current patterns, power and energy in plain words.

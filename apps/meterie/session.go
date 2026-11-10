@@ -546,15 +546,15 @@ func (a *App) drawExportModal() {
 			a.reportExport(a.writeTimeline(p, t0, t1), p)
 		}
 	}
-	if item("exp#codie", icBulb, "Explain in Codie", "Codie explains the readings in plain words: batteries, sleep and wake current, power and energy, temperature") {
+	if item("exp#probie", icBulb, "Explain in Probie", "Probie explains the readings in plain words: batteries, sleep and wake current, power and energy, temperature") {
 		p := filepath.Join(a.dataDir(), "meterie-"+stamp+".nst.csv")
 		_ = os.MkdirAll(a.dataDir(), 0o755)
 		if err := a.writeTimeline(p, t0, t1); err != nil {
 			a.ui.Toast("Export failed: "+err.Error(), 3)
-		} else if err := suite.OpenWith("codie", p); err != nil {
-			a.ui.Toast("Couldn't open Codie: "+err.Error(), 3)
+		} else if err := suite.OpenWith("probie", p); err != nil {
+			a.ui.Toast("Couldn't open Probie: "+err.Error(), 3)
 		} else {
-			a.ui.Toast("Opening the readings in Codie…", 1)
+			a.ui.Toast("Opening the readings in Probie…", 1)
 			a.modal = ""
 		}
 	}

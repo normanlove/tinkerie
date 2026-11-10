@@ -1068,11 +1068,11 @@ async function connectDemo(kind) {
   toast(kind === "bench" ? "Demo mode: 4-channel bench scope" : "Demo mode: simulated USB scope");
 }
 
-async function explainCodie() {
+async function explainProbie() {
   try {
-    const r = await api("explain-codie", {});
-    toast(`Opening the waveform in Codie…\n${r.path}`);
-  } catch (e) { message("Explain in Codie", e.message); }
+    const r = await api("explain-probie", {});
+    toast(`Opening the waveform in Probie…\n${r.path}`);
+  } catch (e) { message("Explain in Probie", e.message); }
 }
 
 async function exportCSV() {
@@ -1332,7 +1332,7 @@ async function licences() {
 // ================================================================ menus, toolbar, keys
 
 const ACTIONS = {
-  openCSV: () => $("fileCSV").click(), exportCSV, explainCodie, screenshot, saveSetup, loadSetup: () => $("fileSetup").click(),
+  openCSV: () => $("fileCSV").click(), exportCSV, explainProbie, screenshot, saveSetup, loadSetup: () => $("fileSetup").click(),
   openExports: () => api("open-folder", {}), connect: () => openConnect(), demoStream: () => connectDemo("stream"),
   demoBench: () => connectDemo("bench"), disconnect: () => api("disconnect", {}), drivers: driverChooser,
   pico: () => api("driver", { kind: "pico" }), guide, supported, logs: () => api("open-folder", { which: "data" }), licences, about,
@@ -1359,7 +1359,7 @@ $("btnClear").onclick = () => api("clear", {});
 $("btnConnect").onclick = () => openConnect();
 $("btnShot").onclick = screenshot;
 $("btnCSV").onclick = exportCSV;
-$("btnCodie").onclick = explainCodie;
+$("btnProbie").onclick = explainProbie;
 $("btnOpen").onclick = () => $("fileCSV").click();
 $("btnMeas").onclick = measPopover;
 

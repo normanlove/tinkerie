@@ -198,7 +198,7 @@ def build_index():
   <div class="head"><div><span class="label">Made for beginners</span><h2>You don't need to know it all already</h2></div></div>
   <div class="pillars">
     <div class="pillar"><div class="ic">{svg("teach")}</div><h3>Every button explains itself</h3><p>Teaching mode is on in every app. Point at anything and a card says what it does, in plain language. Press <kbd>F2</kbd> when you don't need it any more.</p></div>
-    <div class="pillar"><div class="ic">{svg("demo")}</div><h3>Try it without hardware</h3><p>Scopie, Meterie, Tracie and Flashie have demo modes with pretend scopes, meters and boards, so you can learn before you buy anything.</p></div>
+    <div class="pillar"><div class="ic">{svg("demo")}</div><h3>Try it without hardware</h3><p>Scopie, Meterie, Probie and Flashie have demo modes with pretend scopes, meters and boards, so you can learn before you buy anything.</p></div>
     <div class="pillar"><div class="ic">{svg("box")}</div><h3>Nothing to set up</h3><p>One program, no installer, no Python, no extra drivers for most things. Download it, open it, and pick an app.</p></div>
   </div>
 </div></section>
@@ -209,7 +209,7 @@ def build_index():
     <div><span class="step">DESIGN</span><h3>Draw the circuit</h3><p><a href="wirie.html">Wirie</a> lays out the board, or plans it on stripboard.</p></div>
     <div><span class="step">MAKE</span><h3>Print a case</h3><p><a href="makie.html">Makie</a> builds a case around your Wirie board. <a href="tunie.html">Tunie</a> gets your printer dialled in.</p></div>
     <div><span class="step">PROGRAM</span><h3>Flash the firmware</h3><p><a href="flashie.html">Flashie</a> puts firmware on the board, or builds a program from blocks.</p></div>
-    <div><span class="step">TEST</span><h3>See what it's doing</h3><p><a href="tracie.html">Tracie</a>, <a href="scopie.html">Scopie</a> and <a href="meterie.html">Meterie</a> show its messages, signals and voltages.</p></div>
+    <div><span class="step">TEST</span><h3>See what it's doing</h3><p><a href="probie.html">Probie</a>, <a href="scopie.html">Scopie</a> and <a href="meterie.html">Meterie</a> show its messages, signals and voltages.</p></div>
   </div>
 </div></section>
 
@@ -292,7 +292,7 @@ def build_start():
   <div class="head"><div><span class="label">Handy to know</span><h2>Tips</h2></div></div>
   <div class="features">
     <div class="feature"><h3>Start an app directly</h3><p>Make a desktop shortcut to <code>Tinkerie.exe --app makie</code>, or rename a copy of Tinkerie.exe to <code>Makie.exe</code>. On Linux and Mac, a link called <code>makie</code> does the same.</p></div>
-    <div class="feature"><h3>Run several at once</h3><p>Each app opens in its own window and keeps running after you close the launcher, so you can have Flashie and Tracie open side by side.</p></div>
+    <div class="feature"><h3>Run several at once</h3><p>Each app opens in its own window and keeps running after you close the launcher, so you can have Flashie and Probie open side by side.</p></div>
     <div class="feature"><h3>Your work is saved</h3><p>Wirie and Makie save as you go and pick up where you left off next time.</p></div>
   </div>
 </div></section>"""
@@ -361,9 +361,9 @@ def build_app(i, a):
     page(f"{a['id']}.html", f"{a['name']} · Tinkerie", f"{a['name']}: {a['short']} Part of Tinkerie, free maker tools by nrmluvdev.", a["id"], body, app=a)
 
 
-PRIVACY = [('Flashie', "downloads firmware, the Arduino board list and Raspberry Pi's OS list from those projects' own servers (GitHub, Raspberry Pi, MicroPython, CircuitPython and the others shown in its library) when you open its library or choose something to download."), ('Tunie', 'talks to your own printer (OctoPrint or Moonraker) only at the address you type in.'), ('Scopie', 'connects to a network oscilloscope only at the address you choose.'), ('Everything else', "Wirie, Makie, Meterie, Tracie, Codie and the launcher never use the internet. Each app's page is served only to your own computer (localhost).")]
+PRIVACY = [('Flashie', "downloads firmware, the Arduino board list and Raspberry Pi's OS list from those projects' own servers (GitHub, Raspberry Pi, MicroPython, CircuitPython and the others shown in its library) when you open its library or choose something to download."), ('Tunie', 'talks to your own printer (OctoPrint or Moonraker) only at the address you type in.'), ('Scopie', 'connects to a network oscilloscope only at the address you choose.'), ('Everything else', "Wirie, Makie, Meterie, Probie, Codie and the launcher never use the internet. Each app's page is served only to your own computer (localhost).")]
 
-POLICY = '<div class="ruler" aria-hidden="true"></div>\n<section class="hero" style="padding-bottom:30px"><div class="wrap">\n  <span class="tape">Code signing policy</span>\n  <h1>Code signing policy</h1>\n  <p class="lead" style="max-width:56ch">How Tinkerie\'s Windows program is signed, who decides what gets signed, and what Tinkerie does (and doesn\'t do) with your data.</p>\n</div></section>\n<section class="band alt" style="padding-top:40px"><div class="wrap"><div class="stack" style="max-width:860px">\n  <div class="callout">{info}<p>Free code signing provided by <a href="https://signpath.io">SignPath.io</a>, certificate by <a href="https://signpath.org">SignPath Foundation</a>.</p></div>\n  <p class="muted">Signing is being set up. Releases made before it\'s in place are not signed, and Windows shows an "unrecognised app" warning for them.</p>\n</div></div></section>\n<section class="band"><div class="wrap"><div class="stack prose">\n  <h2 id="what-is-signed">What is signed</h2>\n  <p>The Windows program, <code>Tinkerie.exe</code> (released as <code>Tinkerie-&lt;version&gt;-windows.exe</code>), attached to each <a href="{repo}/releases">GitHub release</a>, on its own and inside the Windows zip. It is built from this project\'s source code by GitHub Actions, on GitHub\'s own servers, using the public <a href="{repo}/blob/main/.github/workflows/release.yml">release workflow</a>. Nothing built anywhere else is signed.</p>\n  <p>Signing proves the file came from this project\'s source code and hasn\'t been changed since. The Mac and Linux downloads are not part of this signing.</p>\n  <h2 id="team">Team roles</h2>\n  <div class="table-wrap"><table><thead><tr><th>Role</th><th>Who</th><th>What it means</th></tr></thead><tbody>\n    <tr><td>Committers and reviewers</td><td><a href="https://github.com/normanlove">nrmluvdev (normanlove)</a></td><td>Can change the source code. Every change from anyone else, such as a pull request, is reviewed by them before it\'s added.</td></tr>\n    <tr><td>Approvers</td><td><a href="https://github.com/normanlove">nrmluvdev (normanlove)</a></td><td>Approves each release by hand before it\'s signed.</td></tr>\n  </tbody></table></div>\n  <p>Everyone in these roles uses two-factor authentication on GitHub and SignPath.</p>\n  <h2 id="privacy">Privacy</h2>\n  <p><b>This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it.</b> Tinkerie has no analytics, no tracking, no accounts and no automatic update checks.</p>\n  <p>These are the only times it uses the network, each one because you asked:</p>\n  <ul>{priv}</ul>\n  <p>Those sites have their own privacy policies. This website is hosted by GitHub Pages and loads its fonts from Google Fonts.</p>\n  <h2>Changes to your computer</h2>\n  <p>Tinkerie doesn\'t need installing: delete it to remove it. Two optional steps change your system, and both ask first: on Windows, Scopie\'s <i>Install USB driver</i> button runs Zadig to install a USB driver (you\'ll see the administrator prompt; Tracie\'s help explains the same step for logic analysers), and on Linux and Raspberry Pi, <code>install.sh</code> and <code>install-usb.sh</code> add a menu entry and USB permissions. Both scripts undo themselves with <code>--remove</code>. The Windows driver can be removed in Device Manager.</p>\n  <h2>Licence</h2>\n  <p>Tinkerie is free software under the GNU General Public License, version 3 or later. The source code is on <a href="{repo}">GitHub</a>.</p>\n</div></div></section>'
+POLICY = '<div class="ruler" aria-hidden="true"></div>\n<section class="hero" style="padding-bottom:30px"><div class="wrap">\n  <span class="tape">Code signing policy</span>\n  <h1>Code signing policy</h1>\n  <p class="lead" style="max-width:56ch">How Tinkerie\'s Windows program is signed, who decides what gets signed, and what Tinkerie does (and doesn\'t do) with your data.</p>\n</div></section>\n<section class="band alt" style="padding-top:40px"><div class="wrap"><div class="stack" style="max-width:860px">\n  <div class="callout">{info}<p>Free code signing provided by <a href="https://signpath.io">SignPath.io</a>, certificate by <a href="https://signpath.org">SignPath Foundation</a>.</p></div>\n  <p class="muted">Signing is being set up. Releases made before it\'s in place are not signed, and Windows shows an "unrecognised app" warning for them.</p>\n</div></div></section>\n<section class="band"><div class="wrap"><div class="stack prose">\n  <h2 id="what-is-signed">What is signed</h2>\n  <p>The Windows program, <code>Tinkerie.exe</code> (released as <code>Tinkerie-&lt;version&gt;-windows.exe</code>), attached to each <a href="{repo}/releases">GitHub release</a>, on its own and inside the Windows zip. It is built from this project\'s source code by GitHub Actions, on GitHub\'s own servers, using the public <a href="{repo}/blob/main/.github/workflows/release.yml">release workflow</a>. Nothing built anywhere else is signed.</p>\n  <p>Signing proves the file came from this project\'s source code and hasn\'t been changed since. The Mac and Linux downloads are not part of this signing.</p>\n  <h2 id="team">Team roles</h2>\n  <div class="table-wrap"><table><thead><tr><th>Role</th><th>Who</th><th>What it means</th></tr></thead><tbody>\n    <tr><td>Committers and reviewers</td><td><a href="https://github.com/normanlove">nrmluvdev (normanlove)</a></td><td>Can change the source code. Every change from anyone else, such as a pull request, is reviewed by them before it\'s added.</td></tr>\n    <tr><td>Approvers</td><td><a href="https://github.com/normanlove">nrmluvdev (normanlove)</a></td><td>Approves each release by hand before it\'s signed.</td></tr>\n  </tbody></table></div>\n  <p>Everyone in these roles uses two-factor authentication on GitHub and SignPath.</p>\n  <h2 id="privacy">Privacy</h2>\n  <p><b>This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it.</b> Tinkerie has no analytics, no tracking, no accounts and no automatic update checks.</p>\n  <p>These are the only times it uses the network, each one because you asked:</p>\n  <ul>{priv}</ul>\n  <p>Those sites have their own privacy policies. This website is hosted by GitHub Pages and loads its fonts from Google Fonts.</p>\n  <h2>Changes to your computer</h2>\n  <p>Tinkerie doesn\'t need installing: delete it to remove it. Two optional steps change your system, and both ask first: on Windows, Scopie\'s <i>Install USB driver</i> button runs Zadig to install a USB driver (you\'ll see the administrator prompt; Probie\'s help explains the same step for logic analysers), and on Linux and Raspberry Pi, <code>install.sh</code> and <code>install-usb.sh</code> add a menu entry and USB permissions. Both scripts undo themselves with <code>--remove</code>. The Windows driver can be removed in Device Manager.</p>\n  <h2>Licence</h2>\n  <p>Tinkerie is free software under the GNU General Public License, version 3 or later. The source code is on <a href="{repo}">GitHub</a>.</p>\n</div></div></section>'
 
 
 ABOUT = '''<div class="ruler" aria-hidden="true"></div>
@@ -403,6 +403,18 @@ def build_policy():
     page("code-signing.html", "Code Signing Policy · Tinkerie", "How Tinkerie's Windows program is signed through SignPath, who approves releases, and Tinkerie's privacy statement.", "policy", body)
 
 
+# Old page names that should keep working.
+REDIRECTS = {"tracie.html": ("probie.html", "Tracie is now Probie")}
+
+
+def build_redirects():
+    for old, (new, title) in REDIRECTS.items():
+        with open(os.path.join(OUT, old), "w", encoding="utf-8") as f:
+            f.write(f'<!doctype html>\n<html lang="en-GB">\n<head>\n<meta charset="utf-8">\n<title>{title}</title>\n'
+                    f'<meta http-equiv="refresh" content="0; url={new}">\n<link rel="canonical" href="{new}">\n</head>\n'
+                    f'<body><p>{title}. <a href="{new}">Go to the new page</a>.</p></body>\n</html>\n')
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     shutil.copy(os.path.join(HERE, "site.css"), OUT)
@@ -414,6 +426,7 @@ def main():
     build_about()
     for i, a in enumerate(APPS):
         build_app(i, a)
+    build_redirects()
     print("built", len(APPS) + 3, "pages into", OUT, "for version", VERSION)
 
 

@@ -43,7 +43,7 @@ Each app runs in its own process (`Tinkerie --app NAME`), so apps never share gl
 | **Tunie** | Everything; serial opens `/dev/tty*` directly | none |
 | **Scopie** | Everything on Linux and Pi (`usb_linux.go` uses `shared/usb`); on Mac, demo, network/SCPI scopes and CSV files | USB scopes on Mac (needs IOKit) |
 | **Flashie** | Everything: serial boards, Pico drives (`platform_unix.go`) and image writing (`disks_*.go`) | none |
-| **Tracie** | Serial monitor everywhere; logic analyser on Linux and Pi (`usb_linux.go`) | Logic analyser on Mac (`usb_darwin.go` explains) |
+| **Probie** | Serial monitor everywhere; logic analyser on Linux and Pi (`usb_linux.go`) | Logic analyser on Mac (`usb_darwin.go` explains) |
 | **Meterie** | Its window (`web_front.go`, see below) and USB-serial meters (`platform_unix.go`) | HID cables (CH9325, CP2110, BU-86X: Linux could use hidraw), Bluetooth LE (Linux: BlueZ over D-Bus), webcam (Linux: V4L2) |
 
 ### Meterie's window on Linux and macOS
@@ -63,7 +63,7 @@ Each app serves its window from its own local port (127.0.0.1 only). They must n
 | Makie | 47811 | asks the copy already running to open a window, else any free port |
 | Wirie | 47820 | the same |
 | Tunie | 47821 | the same |
-| Tracie | 47822 | the same |
+| Probie | 47822 | the same |
 | Codie | 47824 | the same as Makie |
 | Meterie | 47823 (suite link, for other apps to read the meter) | any free port, written to `%APPDATA%\nrmluvdev\suite\meterie.json` |
 | Scopie | 47831 | the same as Makie |
@@ -90,7 +90,7 @@ Like Raspberry Pi Imager: pick an OS from Raspberry Pi's official catalogue (`os
 
 ## Teaching mode
 
-Wirie, Makie, Tunie, Flashie, Tracie and Codie are web pages. Each loads `teach-tips.js` (its explanations) and `teach.js` (the card, shared by all). Edit `shared/teach.js`, then copy it into `apps/{wirie,makie,tunie,tracie,codie}/web/` and `apps/flashie/`. Scopie keeps its own help bar (`apps/scopie/web/tips.js`). Meterie draws its own window, so its version is `apps/meterie/teach.go`, and `TestTeachingCoverage` lists any control without an explanation.
+Wirie, Makie, Tunie, Flashie, Probie and Codie are web pages. Each loads `teach-tips.js` (its explanations) and `teach.js` (the card, shared by all). Edit `shared/teach.js`, then copy it into `apps/{wirie,makie,tunie,probie,codie}/web/` and `apps/flashie/`. Scopie keeps its own help bar (`apps/scopie/web/tips.js`). Meterie draws its own window, so its version is `apps/meterie/teach.go`, and `TestTeachingCoverage` lists any control without an explanation.
 
 ## Notes
 

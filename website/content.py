@@ -199,7 +199,7 @@ APPS = [
     ],
     table=None,
     callouts=[],
-    pairs=[("makie", "Uses your measured clearances so printed parts fit."), ("tracie", "Watch your printer's serial output.")],
+    pairs=[("makie", "Uses your measured clearances so printed parts fit."), ("probie", "Watch your printer's serial output.")],
   ),
   dict(
     id="flashie", needshort="Board or SD card", name="Flashie", ver="0.8.0-alpha", color="#7b5cf5", icon="flashie.svg",
@@ -274,10 +274,10 @@ APPS = [
       ("STM32", "Blue Pill (F103), Black Pill (F401/F411)", ".bin or .hex"),
     ]),
     callouts=[("warn", "Writing an image erases the whole drive. Flashie asks you to confirm the drive and shows its name and size, so check it's the right one.")],
-    pairs=[("tracie", "See what your freshly flashed board prints."), ("wirie", "Design the board you're flashing."), ("makie", "Print a case for it.")],
+    pairs=[("probie", "See what your freshly flashed board prints."), ("wirie", "Design the board you're flashing."), ("makie", "Print a case for it.")],
   ),
   dict(
-    id="scopie", needshort="Scope, or demo mode", name="Scopie", ver="0.9.1-alpha", color="#e8b416", icon="scopie.png",
+    id="scopie", needshort="Scope, or demo mode", name="Scopie", ver="0.9.2-alpha", color="#e8b416", icon="scopie.png",
     tagline="Turn your PC into the screen of an oscilloscope.",
     short="A friendly oscilloscope app for Hantek, Rigol, Siglent, OWON, PicoScope and more.",
     need="A USB or bench oscilloscope, or try Demo mode",
@@ -326,10 +326,10 @@ APPS = [
     ]),
     callouts=[("warn", "On USB and bench scopes the probe's ground clip is connected to your computer's ground. Never connect it to mains, or anything plugged into mains, without proper isolation."),
               ("info", "USB scopes work on Windows, Linux and Raspberry Pi. On a Mac, Scopie works with network bench scopes, CSV files and Demo mode.")],
-    pairs=[("tracie", "Decode the digital signals you see."), ("meterie", "Log slow changes with your multimeter.")],
+    pairs=[("probie", "Decode the digital signals you see."), ("meterie", "Log slow changes with your multimeter.")],
   ),
   dict(
-    id="meterie", needshort="Meter, or demo mode", name="Meterie", ver="0.6.1-alpha", color="#1fb4cc", icon="meterie.png",
+    id="meterie", needshort="Meter, or demo mode", name="Meterie", ver="0.6.2-alpha", color="#1fb4cc", icon="meterie.png",
     tagline="A big, friendly multimeter display, with graphs and logging.",
     short="Connect your multimeter to show huge readings, graph them, log them and run guided tests.",
     need="A multimeter with a PC link, or try the demo",
@@ -390,23 +390,27 @@ APPS = [
     pairs=[("wirie", "Calcie can use your meter's live reading."), ("scopie", "For fast signals a meter can't follow.")],
   ),
   dict(
-    id="tracie", needshort="Board, or demo mode", name="Tracie", ver="0.5.1-alpha", color="#25b39f", icon="tracie.svg",
-    tagline="See what your board is saying, and the signals on its wires.",
-    short="A serial monitor with a live plotter, plus a logic analyser that decodes UART, I²C and SPI.",
+    id="probie", needshort="Board, or demo mode", name="Probie", ver="0.6.0-alpha", color="#25b39f", icon="probie.svg",
+    tagline="See what your board is saying and the signals on its wires, then have them explained in plain words.",
+    short="A serial monitor with a live plotter, a logic analyser that decodes UART, I²C and SPI, and an Explain tab that tells you what a capture means. Probie was called Tracie.",
     need="A board on USB, or a cheap logic analyser (demo included)",
     plain=("In plain words",
-           "When your Arduino or ESP32 prints messages, Tracie shows them, and turns any numbers into live graphs automatically. "
-           "With a cheap 8-channel logic analyser it also records the digital signals on your wires and decodes them into readable bytes."),
-    chips=["Serial monitor", "Live plotter", "UART, I²C, SPI decoders", "8-channel logic analyser", "Shared timeline"],
+           "When your Arduino or ESP32 prints messages, Probie shows them, and turns any numbers into live graphs automatically. "
+           "With a cheap 8-channel logic analyser it also records the digital signals on your wires and decodes them into readable bytes. "
+           "Then the Explain tab tells you what it all means, the way Codie explains code: which chip is talking, what it said, and what looks wrong. "
+           "It explains Scopie waveforms and Meterie readings too."),
+    chips=["Serial monitor", "Live plotter", "UART, I²C, SPI decoders", "8-channel logic analyser", "Shared timeline", "Explains captures in plain words", "Explains Scopie and Meterie captures"],
     firsts=[
       ("Try the DEMO board", "Pick DEMO in the port list and press Connect. No hardware needed."),
       ("Watch the plotter", "Lines like temp:21.5,hum:40 are graphed by themselves."),
       ("Send a command", "Type at the bottom, or use the quick buttons like LED on."),
       ("Try Logic", "The Logic tab has a demo signal generator with UART, I²C, SPI and PWM."),
+      ("Explain it", "Press Export, then Explain this capture, or pick one of the Examples on the Explain tab."),
     ],
     shots=[
-      ("tracie-serial", "Serial: the demo board's messages, plotted live."),
-      ("tracie-logic", "Logic: eight channels captured and decoded."),
+      ("probie-serial", "Serial: the demo board's messages, plotted live."),
+      ("probie-logic", "Logic: eight channels captured and decoded."),
+      ("probie-explain", "Explain: a capture in plain words, with UART text, an I2C display, an SPI flash chip and a fading PWM."),
     ],
     features=[
       ("Serial monitor", "Better than the Arduino one.", [
@@ -431,21 +435,29 @@ APPS = [
         "Serial lines, plotted values and logic channels on one zoomable timeline",
         "Logic captures show the serial messages alongside",
       ]),
+      ("Explain", "Captures explained like code.", [
+        "Explain this capture (Logic) and Explain log (Serial) open them here; Explain in Probie in Scopie and Meterie sends theirs",
+        "Logic: clocks, PWM, servo angles, UART text, I2C (naming the chip at each address), SPI flash commands, NeoPixel colours, IR remote buttons and 1-Wire temperatures",
+        "Scope channels: DC rails, ripple, sine, triangle and sawtooth waves, notes, edges and logic levels",
+        "Meter logs: batteries charging and running down, sleep and wake current, battery life, power and energy",
+        "Serial logs: boots and reset reasons, crashes, brownouts, Wi-Fi and GPS fixes",
+        "Warnings for clipping, slow edges, too few samples and 5 V on 3.3 V boards; save it all as a report",
+      ]),
     ],
     table=None,
-    callouts=[("info", "Logic analysers need a one-time setup: a USB driver on Windows (Zadig) and the free fx2lafw firmware, which Tracie finds automatically if PulseView is installed. On Linux and Raspberry Pi, run install-usb.sh once instead.")],
+    callouts=[("info", "Logic analysers need a one-time setup: a USB driver on Windows (Zadig) and the free fx2lafw firmware, which Probie finds automatically if PulseView is installed. On Linux and Raspberry Pi, run install-usb.sh once instead.")],
     pairs=[("flashie", "Flash a board, then watch it here."), ("scopie", "For analogue signals, not just digital ones.")],
   ),
   dict(
-    id="codie", needshort="Nothing: just code or a capture", name="Codie", ver="0.2.0-alpha", color="#22c39a", icon="codie.svg",
-    tagline="Paste in code, or open a capture. Find out what every line, or every signal, does, and why.",
-    short="A code explainer for 20+ languages, with a Game school, and a Signals mode that explains captures from Scopie, Tracie and Meterie.",
+    id="codie", needshort="Nothing: just code", name="Codie", ver="0.3.0-alpha", color="#22c39a", icon="codie.svg",
+    tagline="Paste in code. Find out what every line does, and why.",
+    short="A code explainer for 20+ languages, with a game-development section and a Game school.",
     need="Nothing but some code (examples included)",
     plain=("In plain words",
            "Found some code online, in a book or in a game you're modding, and not sure what it does? Paste it into Codie. "
            "It explains every line in plain English: what it does and why it's there. It also spots game code, explains how that "
            "engine's game loop works, and teaches the ideas every game uses."),
-    chips=["Line-by-line explanations", "20+ languages", "Signals from Scopie, Tracie and Meterie", "UART, I2C and SPI decoding", "Game logic", "Game school", "C64, ZX Spectrum and BBC BASIC"],
+    chips=["Line-by-line explanations", "20+ languages", "Windows Go", "Game logic", "Game school", "C64, ZX Spectrum and BBC BASIC"],
     firsts=[
       ("Pick an example", "The Examples menu has everyday programs, Windows Go, game engines and 1980s BASIC."),
       ("Click a line", "Click any line of code (or any card) to see its explanation side by side."),
@@ -456,17 +468,8 @@ APPS = [
       ("codie-explain", "Explain: every line of a Unity script, with what it does and why."),
       ("codie-game", "Game logic: how Unity runs one frame, and where this script fits in."),
       ("codie-school", "Game school: collision detection, with examples from JavaScript to the Commodore 64."),
-      ("codie-signals", "Signals: a Tracie capture explained, with UART text, an I2C display, an SPI flash chip and a fading PWM."),
     ],
     features=[
-      ("Signals", "Captures explained like code.", [
-        "Explain in Codie in Scopie, Tracie and Meterie sends a capture straight here",
-        "Scope channels: DC rails, ripple, sine, triangle and sawtooth waves, notes, edges and logic levels",
-        "Logic: clocks, PWM, servo angles, UART text, I2C (naming the chip at each address), SPI flash commands, NeoPixel colours, IR remote buttons and 1-Wire temperatures",
-        "Meter logs: batteries charging and running down, sleep and wake current, battery life, power and energy",
-        "Serial logs: boots and reset reasons, crashes, brownouts, Wi-Fi and GPS fixes",
-        "Warnings for clipping, slow edges, too few samples and 5 V on 3.3 V boards",
-      ]),
       ("Line by line", "What, and why.", [
         "Each line gets what it does and why it's there, in plain English",
         "Uses the names in your code: updatePlayer() 'probably updates the player'",
@@ -503,7 +506,7 @@ APPS = [
     ],
     table=None,
     callouts=[("info", "Codie reads code; it doesn't run it. Everything happens on your computer, so your code is never uploaded anywhere.")],
-    pairs=[("flashie", "Flashie's Create tab builds firmware code and explains it as it goes."), ("tracie", "Run your code on a board and watch what it prints.")],
+    pairs=[("flashie", "Flashie's Create tab builds firmware code and explains it as it goes."), ("probie", "Run your code on a board and watch what it prints.")],
   ),
 ]
 
@@ -515,7 +518,7 @@ FAQ = [
   ("Do I need to install anything?", ["No. Tinkerie is one program. On Windows you just double-click Tinkerie.exe. On Linux and Raspberry Pi, ./install.sh adds it to your menu if you'd like it there."]),
   ("Windows says it's an unrecognised app. Is that OK?", ["Windows warns about any program that isn't signed with a paid certificate. Click More info, then Run anyway. The full source code is on GitHub if you'd like to check it."]),
   ("My Mac won't open it.", ["The first time, macOS blocks apps from outside the App Store. Open it once, then go to System Settings › Privacy & Security and click Open Anyway."]),
-  ("I don't have any hardware yet. Can I still try it?", ["Yes. Wirie, Makie and Calcie need no hardware at all, and Scopie, Meterie, Tracie and Flashie all have demo modes with pretend devices."]),
+  ("I don't have any hardware yet. Can I still try it?", ["Yes. Wirie, Makie and Calcie need no hardware at all, and Scopie, Meterie, Probie and Flashie all have demo modes with pretend devices."]),
   ("How do I learn what a button does?", ["Point at it. Every app has teaching mode, which explains each button, setting and panel in plain language. Press F2 to turn the explanations off or back on."]),
   ("Does it need the internet?", ["Only for downloads: Flashie's firmware library and OS images. Everything else works offline."]),
   ("I found a bug, or my board / scope / meter doesn't work.", ["Please open an issue on GitHub and say which app, which computer, and what happened."]),

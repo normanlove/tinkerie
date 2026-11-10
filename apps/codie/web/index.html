@@ -12,39 +12,27 @@
 <header class="top">
   <div class="brand">
     <img src="icon.svg" alt="" width="34" height="34">
-    <div><b>Codie</b><small>Code and signal explainer</small></div>
-  </div>
-  <div class="modes" role="tablist" aria-label="What to explain" data-help="Mode">
-    <button data-mode="code" aria-selected="true" title="Explain code">Code</button>
-    <button data-mode="signals" title="Explain signals from Scopie, Tracie and Meterie">Signals</button>
+    <div><b>Codie</b><small>Code explainer</small></div>
   </div>
   <div class="tools">
-    <label class="field code-only" data-help="Language">
+    <label class="field" data-help="Language">
       <span>Language</span>
       <select id="lang" title="Language"><option value="">Auto-detect</option></select>
     </label>
-    <label class="field code-only" data-help="Examples">
+    <label class="field" data-help="Examples">
       <span>Examples</span>
       <select id="examples" title="Examples"><option value="">Pick an example…</option></select>
     </label>
-    <label class="field sig-only" data-help="Signal examples">
-      <span>Examples</span>
-      <select id="sigExamples" title="Signal examples"><option value="">Pick an example…</option></select>
-    </label>
-    <label class="field sig-only" data-help="From the suite">
-      <span>From the suite</span>
-      <select id="sigRecent" title="Captures saved by Scopie, Tracie and Meterie"><option value="">Recent captures…</option></select>
-    </label>
     <button id="open" class="btn" title="Open a code file">Open file…</button>
     <input id="file" type="file" hidden>
-    <button id="explain" class="btn primary code-only" title="Explain (Ctrl+Enter)">Explain</button>
-    <button id="clear" class="btn ghost code-only" title="Clear the code">Clear</button>
+    <button id="explain" class="btn primary" title="Explain (Ctrl+Enter)">Explain</button>
+    <button id="clear" class="btn ghost" title="Clear the code">Clear</button>
     <button id="save" class="btn ghost" title="Save the report">Save report</button>
     <button id="teachBtn" class="btn ghost icon" title="Teaching tips (F2)">?</button>
   </div>
 </header>
 
-<main class="split" id="codeMain">
+<main class="split">
   <section class="pane code-pane" aria-label="Your code">
     <div class="pane-h">
       <h2>Your code</h2>
@@ -93,49 +81,14 @@
   </section>
 </main>
 
-<main class="split sig-split" id="sigMain" hidden>
-  <section class="pane sig-pane" aria-label="Your capture">
-    <div class="pane-h">
-      <h2>Your capture</h2>
-      <span id="sigSource" class="badge" title="Where the capture came from"></span>
-      <span class="sig-zoom" data-help="Zoom">
-        <button class="btn ghost icon" id="sigZoomOut" title="Zoom out">−</button>
-        <button class="btn ghost icon" id="sigZoomIn" title="Zoom in">+</button>
-        <button class="btn ghost" id="sigZoomAll" title="Show everything">All</button>
-      </span>
-    </div>
-    <div class="sig-plot" id="sigPlot" data-help="Capture view">
-      <canvas id="sigCanvas"></canvas>
-      <div class="sig-tip" id="sigTip" hidden></div>
-      <div class="empty sig-empty" id="sigEmpty"><b>Explain a signal</b>Open a capture, or drop one here: a <i>Scopie</i> waveform (.csv), a <i>Tracie</i> logic capture (.vcd) or serial log (.csv), or a <i>Meterie</i> timeline (.nst.csv).<br>In those apps, <i>Explain in Codie</i> sends a capture straight here.<br>Or try one of the <i>Examples</i> above.</div>
-    </div>
-    <div class="foot" id="sigStats"></div>
-  </section>
-  <section class="pane report-pane" aria-label="Explanation of the signals">
-    <nav class="tabs" role="tablist" id="sigTabs">
-      <button role="tab" data-stab="explain" aria-selected="true" title="Signal explanations">Explain</button>
-      <button role="tab" data-stab="decoded" title="Decoded data">Decoded <i id="nDecoded"></i></button>
-      <button role="tab" data-stab="concepts" title="Signal concepts">Concepts <i id="nSigConcepts"></i></button>
-      <button role="tab" data-stab="warnings" title="Signal warnings">Warnings <i id="nSigWarnings"></i></button>
-    </nav>
-    <div class="views">
-      <div class="view" id="s-explain"><div id="sigSummary" class="summary"></div><div id="sigCards" class="lines"></div></div>
-      <div class="view" id="s-decoded" hidden><div id="sigDecoded"></div></div>
-      <div class="view" id="s-concepts" hidden><div id="sigConcepts" class="cards"></div></div>
-      <div class="view" id="s-warnings" hidden><div id="sigWarnings"></div></div>
-    </div>
-  </section>
-</main>
-
 <footer class="bar">
   <span id="ver">Codie</span>
-  <span>Everything is explained on this computer: your code and captures never leave it.</span>
+  <span>Everything is explained on this computer: your code never leaves it.</span>
   <span>Part of Tinkerie · made by nrmluvdev</span>
 </footer>
 
 <script src="teach-tips.js"></script>
 <script src="teach.js"></script>
 <script src="app.js"></script>
-<script src="sig.js"></script>
 </body>
 </html>

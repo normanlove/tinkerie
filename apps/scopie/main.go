@@ -41,7 +41,7 @@ var docFS embed.FS
 
 const (
 	appName     = "Scopie"
-	appVersion  = "0.9.1-alpha"
+	appVersion  = "0.9.2-alpha"
 	appAuthor   = "nrmluvdev"
 	defaultPort = 47831
 )
@@ -548,8 +548,8 @@ func (a *App) routes() http.Handler {
 		writeJSON(w, map[string]any{"path": p, "samples": n})
 	})
 
-	// Explain in Codie: save the waveform, then open it in Codie's Signals mode
-	mux.HandleFunc("/api/explain-codie", func(w http.ResponseWriter, r *http.Request) {
+	// Explain in Probie: save the waveform, then open it in Probie's Explain tab
+	mux.HandleFunc("/api/explain-probie", func(w http.ResponseWriter, r *http.Request) {
 		b, _, err := a.view.ExportCSV()
 		if err != nil {
 			fail(w, err)
@@ -560,7 +560,7 @@ func (a *App) routes() http.Handler {
 			fail(w, err)
 			return
 		}
-		if err := suite.OpenWith("codie", p); err != nil {
+		if err := suite.OpenWith("probie", p); err != nil {
 			fail(w, err)
 			return
 		}

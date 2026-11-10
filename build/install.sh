@@ -17,7 +17,7 @@ cat > "$file" <<EOF
 [Desktop Entry]
 Type=Application
 Name=Tinkerie
-Comment=Free maker tools by nrmluvdev: Wirie, Makie, Tunie, Flashie, Scopie, Meterie, Tracie, Codie
+Comment=Free maker tools by nrmluvdev: Wirie, Makie, Tunie, Flashie, Scopie, Meterie, Probie, Codie
 Exec="$here/tinkerie"
 Icon=$here/tinkerie.png
 Terminal=false

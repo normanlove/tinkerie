@@ -1,5 +1,5 @@
 #!/bin/sh
-# Lets you use USB scopes (Scopie) and logic analysers (Tracie) on Linux and
+# Lets you use USB scopes (Scopie) and logic analysers (Probie) on Linux and
 # Raspberry Pi OS without root. Run once: ./install-usb.sh  (asks for your password)
 # then unplug and replug the device. To remove: ./install-usb.sh --remove
 set -e

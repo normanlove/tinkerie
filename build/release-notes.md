@@ -1,6 +1,6 @@
 > ⚠️ **Tinkerie is in alpha.** Everything works, but it's still being tested on real hardware, so expect rough edges and changes. Please [report](https://github.com/normanlove/tinkerie/issues) anything that doesn't work.
 
-Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie, Tracie and Codie in one program.
+Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie, Probie and Codie in one program.
 
 ### Which file?
 - **Windows 10/11:** `Tinkerie-{VERSION}-windows.exe` (just run it), or `Tinkerie-{VERSION}-windows.zip` if your connection blocks .exe downloads (it also has the source)
@@ -11,10 +11,13 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 Each package has a *READ ME FIRST.txt*.
 
 ### New in {VERSION}
-- **Codie explains signals (new Signals mode).** Captures from Scopie, Tracie and Meterie are explained the way Codie explains code: what each channel is (a 3.3 V rail, a 440 Hz tone, PWM, a servo signal, a Li-ion battery running down…), the protocols it carries decoded (UART text, I2C with the chip at each address, SPI flash commands, NeoPixel colours, infrared remote buttons, 1-Wire temperatures), serial logs read for boots, crashes, brownouts and GPS fixes, and warnings for things like clipping, slow edges or 5 V on 3.3 V boards. Click a card to see where it happens on the capture.
-- **Explain in Codie** in Scopie (toolbar and File menu), Tracie (Export, and the serial log) and Meterie (Export) sends a capture straight to Codie.
+- **Tracie is now Probie, and it explains what it captures.** A new **Explain** tab tells you what a capture means in plain words, the way Codie explains code: what each channel is, the protocols it carries decoded (UART text, I2C with the chip at each address, SPI flash commands, NeoPixel colours, infrared remote buttons, 1-Wire temperatures), serial logs read for boots, crashes, brownouts and GPS fixes, and warnings for things like clipping, slow edges or 5 V on 3.3 V boards. Use *Export → Explain this capture* on the Logic tab, or *Explain log* under Recording.
+- **Explain in Probie** in Scopie and Meterie sends their captures to Probie's Explain tab.
+- **Codie is a code explainer again**: its Signals mode moved to Probie.
+- Nothing is lost: Probie keeps Tracie's settings, still lists captures saved in Documents\Tracie, and the old Tracie shortcut still opens it.
 
 ### Also in recent alpha builds
+- **0.10.0-alpha:** Codie explained captures from Scopie, Tracie and Meterie (that's now Probie's Explain tab).
 - **0.9.1-alpha:** Keebie fixes: key spacing, widening keys, much faster redraws.
 - **0.9.0-alpha:** Flashie's Keyboard tab makes and flashes firmware for Keebie keyboards; Makie makes keyboard cases with a printed switch plate; Keebie knobs and OLED screens; version numbers in every download's name.
 - **0.8.0-alpha, new in Wirie: Keebie, custom keyboard PCBs.** Lay out the keys, pick switches and any common controller (or a bare chip with all its circuitry), and Keebie builds the PCB, QMK/ZMK files and a switch plate.

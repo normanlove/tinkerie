@@ -1,6 +1,8 @@
-# Codie 0.2.0-alpha — code and signal explainer
+# Codie 0.3.0-alpha — code explainer
 
 Part of **Tinkerie**, the free maker tools by **nrmluvdev**.
+
+*Looking for signal explanations? Codie's Signals mode (0.2.0) moved to **Probie**'s Explain tab in Tinkerie 0.11.*
 
 Paste code (or open a file) and Codie explains it line by line: **what** each part does and **why** it's there, in plain English. It's like the explanations in Flashie's Create tab, but for code you already have, in the languages people actually meet.
 
@@ -29,36 +31,10 @@ Codie works out the language and its flavour (Unity, Unreal, Arduino, Windows Go
 
 **Save report** writes the whole explanation as a Markdown file. **F2** (or the **?** button) turns teaching mode on and off.
 
-## Signals mode
-
-Codie also explains **captures** from the rest of Tinkerie, the same way it explains code: a card for the capture, each channel and each protocol or event, saying what it is, why it matters and the numbers behind it.
-
-| From | File | How to send it |
-|---|---|---|
-| Scopie | waveform `.csv` (time + volts) | **Explain in Codie** (toolbar or File menu) |
-| Tracie | logic capture `.vcd` | Export → **Explain in Codie** |
-| Tracie | serial log `.csv` | Switch on Log to CSV, then **Explain in Codie** |
-| Meterie | suite timeline `.nst.csv` | Export → **Explain in Codie** |
-
-Plain CSV files (a time column and number columns) and VCD files from other tools work too. **From the suite** lists recent captures in `Documents\Scopie`, `Documents\Tracie` and `Documents\Meterie`.
-
-What Codie recognises:
-- **Scope channels:** steady DC levels (with what they probably are: 3.3 V rail, USB 5 V, a Li-ion cell…), ripple and its likely source, sine, triangle and sawtooth waves (with the musical note in the audio range, and mains at 50/60 Hz), one-off changes with their RC time constant, and signals switching between two levels, which are then treated as logic (below) with their logic family, rise time and overshoot.
-- **Logic channels:** clocks and square waves, PWM (with a changing duty cycle), servo signals (with the angle), UART serial (baud rate found automatically, decoded to text), I2C (address, read/write, ACK/NACK, data, with the common chip at each address), SPI (clock, chip select, MOSI and MISO, flash commands and JEDEC IDs), WS2812/NeoPixel LED colours, NEC infrared remote codes and 1-Wire (DS18B20 temperatures). Channel names such as SCL, SDA, SCK, MOSI, CS and TX are used when they're there.
-- **Meter readings:** trends, batteries charging and discharging (Li-ion, AA, lead-acid, USB), sleep/wake current patterns with battery-life estimates, power and energy when a voltage and a current are logged together, temperature, sudden changes and over-range readings.
-- **Serial logs:** ESP32/ESP8266 boot and reset reasons, crashes and Backtraces, brownouts, watchdog resets, Python tracebacks, MicroPython, Wi-Fi, NMEA GPS fixes, AT commands, JSON and error messages, plus the numbers in each line as readings over time.
-- **Warnings:** too few samples per cycle, clipping, slow edges, overshoot, 5 V signals that can harm 3.3 V boards, weak HIGH levels, ripple, framing errors, I2C devices that didn't answer, brownouts and crashes.
-
-The capture view draws every channel; click a card to see where it happens, click the capture to find the card that explains it, scroll to zoom and drag to move. **Decoded** lists every decoded byte; **Save report** writes it all as Markdown. Captures up to 96 MB.
-
 ## Opening files
 
 - Open file…, or drag a file onto the code box.
 - `Tinkerie --app codie path/to/file.py` opens a file directly; if Codie is already open, the file goes to that window.
-
-## How it works (signals)
-
-`signals.go` reads the file formats, `sig_analyse.go` measures analog and meter channels and writes the explanations, `sig_decode.go` turns channels into edges and decodes the protocols, `sig_text.go` holds the glossary and the serial-log rules, and `sig_demo.go` builds the example captures in code (they're also the tests).
 
 ## How it works
 

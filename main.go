@@ -19,8 +19,8 @@ import (
 	"tinkerie/apps/flashie"
 	"tinkerie/apps/makie"
 	"tinkerie/apps/meterie"
+	"tinkerie/apps/probie"
 	"tinkerie/apps/scopie"
-	"tinkerie/apps/tracie"
 	"tinkerie/apps/tunie"
 	"tinkerie/apps/wirie"
 	"tinkerie/launcher"
@@ -32,7 +32,8 @@ var mains = map[string]func(){
 	"makie":   makie.Main,
 	"flashie": flashie.Main,
 	"tunie":   tunie.Main,
-	"tracie":  tracie.Main,
+	"probie":  probie.Main,
+	"tracie":  probie.Main, // Probie was called Tracie before 0.11
 	"meterie": meterie.Main,
 	"codie":   codie.Main,
 }
