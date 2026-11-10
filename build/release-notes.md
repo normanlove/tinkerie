@@ -11,12 +11,14 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 Each package has a *READ ME FIRST.txt*.
 
 ### New in {VERSION}
-- **Downloads now carry their version number**, including the Windows program: `Tinkerie-{VERSION}-windows.exe`.
-- **Flashie makes keyboard firmware (new Keyboard tab).** Send a keyboard from Wirie's Keebie tab, choose what every key does (letters, shortcuts, media keys, text, up to 4 layers), what each knob does when turned and pressed, and what the screen and lights show. Flashie writes the firmware, compiles it with arduino-cli and flashes it to ATmega32U4 (Pro Micro), RP2040 and STM32 keyboards.
-- **Makie makes keyboard cases.** Press Case in Makie in Keebie: Makie builds an open-top case that follows your keyboard's outline, a printed switch plate with a cut-out for every switch, knob and stabiliser, and feet for a typing angle.
-- **Keebie:** keys can now be rotary knobs (EC11), and a small OLED screen can be added. The wave option was removed (it didn't handle spacebars well).
+Keebie fixes:
+- **Key spacing no longer wipes out the layout.** The field now shows the real spacing (19.05 mm for MX) and only accepts 15–25 mm; before, one click on its arrow set 1 mm and squashed every key into a dot.
+- **Changing a key's width pushes the keys beside it along** instead of overlapping them, on staggered and column-staggered layouts.
+- **Much faster redraws**, especially on angled layouts like the Alice (about 2.4 s down to 0.2 s per change). Rounded outlines now use far fewer points.
+- Very large X or Y values no longer make the board disappear; building with no keys explains what to do.
 
 ### Also in recent alpha builds
+- **0.9.0-alpha:** Flashie's Keyboard tab makes and flashes firmware for Keebie keyboards; Makie makes keyboard cases with a printed switch plate; Keebie knobs and OLED screens; version numbers in every download's name.
 - **0.8.0-alpha, new in Wirie: Keebie, custom keyboard PCBs.** Lay out the keys, pick switches and any common controller (or a bare chip with all its circuitry), and Keebie builds the PCB, QMK/ZMK files and a switch plate.
 - **0.7.0-alpha, new app: Codie, the code explainer**, in 20+ languages, with a Game logic tab and a Game school.
 - 0.6.1-alpha: the version in the Windows file details now matches the alpha numbering.

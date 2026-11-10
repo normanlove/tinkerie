@@ -12,15 +12,14 @@ Everything, in every app. Every app has teaching mode: point at anything to see 
 F2 turns it off.
 
 New in {VERSION}:
-- Flashie's new Keyboard tab makes firmware for keyboards designed in Keebie:
-  choose what every key, knob, layer, screen and light does, and Flashie
-  compiles and flashes it (ATmega32U4, RP2040 and STM32 controllers).
-- Makie makes keyboard cases: an open-top case, a printed switch plate and
-  feet for a typing angle.
-- Keebie: rotary knobs and a small OLED screen. Wave rows were removed.
-- Every download now has the version number in its file name.
+- Keebie fixes: the Key spacing field can no longer squash the layout,
+  widening a key pushes its neighbours along, redraws are much faster
+  (especially angled layouts like the Alice), and huge X/Y values no longer
+  make the board disappear.
 
 Also in recent alpha builds:
+- 0.9.0-alpha: Flashie keyboard firmware, Makie keyboard cases, Keebie knobs
+  and screens, version numbers in every download's name.
 - 0.8.0-alpha: Keebie, custom keyboard PCB designer, in Wirie.
 - 0.7.0-alpha: new app Codie, the code explainer, with Game logic and Game school.
 - 0.6.1: the version in the Windows file details matches the alpha numbering.

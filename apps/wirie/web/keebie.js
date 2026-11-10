@@ -198,7 +198,17 @@ function kbOrd(G, b) { const M = G.matrix; return b.places.slice().sort((p, q) =
 // ---------------------------------------------------------------- controller block
 // Plans the controller area in local coordinates (0,0 = area top-left) by
 // recording the parts and nets the controller needs, then packing them.
+// the controller plan only depends on a few settings: remember it between redraws
+const KB_PLAN_CACHE = new Map();
 function kbPlanCtrl(K, half) {
+  const key = JSON.stringify([K.mcu, K.outline.margin, K.rgb, K.oled, K.split.mode, half || 0, kbKnobCount(K), kbPinPlan(K)]);
+  let plan = KB_PLAN_CACHE.get(key);
+  if (!plan) { plan = kbPlanCtrl0(K, half); if (KB_PLAN_CACHE.size > 30) KB_PLAN_CACHE.clear(); KB_PLAN_CACHE.set(key, plan); }
+  // hand back a copy (callers move the parts), keeping the nets pointing at the copied parts
+  const map = new Map(plan.parts.map(q => [q, Object.assign({}, q)]));
+  return Object.assign({}, plan, { parts: plan.parts.map(q => map.get(q)), nets: plan.nets.map(([n, pins]) => [n, pins.map(pin => Array.isArray(pin) && map.has(pin[0]) ? [map.get(pin[0]), ...pin.slice(1)] : pin)]) });
+}
+function kbPlanCtrl0(K, half) {
   const mcu = kbMcu(K), parts = [], nets = [], margin = K.outline.margin;
   const B = {
     add(fp, value, ref) { const p = { fp, value, ref: ref || null, x: 0, y: 0, rot: 0, side: "top", id: "p" + parts.length, fixed: false }; parts.push(p); return p; },
@@ -274,17 +284,20 @@ function kbFillet(pts, r) {
     const p = pts[i], a = pts[(i - 1 + n) % n], b = pts[(i + 1) % n];
     const la = Math.hypot(a[0] - p[0], a[1] - p[1]), lb = Math.hypot(b[0] - p[0], b[1] - p[1]);
     const d = Math.min(r, la * 0.45, lb * 0.45);
-    if (d < 0.05) { o.push(p); continue; }
+    const turn = Math.PI - Math.acos(Math.max(-1, Math.min(1, ((a[0] - p[0]) * (b[0] - p[0]) + (a[1] - p[1]) * (b[1] - p[1])) / (la * lb || 1))));
+    if (d < 0.05 || turn < 0.26) { o.push(p); continue; } // nearly straight: leave it
     const s = [p[0] + (a[0] - p[0]) / la * d, p[1] + (a[1] - p[1]) / la * d], e = [p[0] + (b[0] - p[0]) / lb * d, p[1] + (b[1] - p[1]) / lb * d];
-    for (let k = 0; k <= 5; k++) { const t = k / 5, u = 1 - t; o.push([u * u * s[0] + 2 * u * t * p[0] + t * t * e[0], u * u * s[1] + 2 * u * t * p[1] + t * t * e[1]]); }
+    const steps = Math.max(2, Math.min(6, Math.round(turn / 0.3)));
+    for (let k = 0; k <= steps; k++) { const t = k / steps, u = 1 - t; o.push([u * u * s[0] + 2 * u * t * p[0] + t * t * e[0], u * u * s[1] + 2 * u * t * p[1] + t * t * e[1]]); }
   }
   return o;
 }
 // trace the outside of a set of shapes (rotated key rectangles + the controller area)
 function kbHug(shapes, radius) {
-  const res = 0.5; let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
   for (const s of shapes) for (const [x, y] of s) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
   x0 -= 2; y0 -= 2; x1 += 2; y1 += 2;
+  const res = Math.max(0.5, Math.sqrt((x1 - x0) * (y1 - y0) / 3e6)); // keep the grid a sensible size for huge layouts
   const W = Math.ceil((x1 - x0) / res) + 1, H = Math.ceil((y1 - y0) / res) + 1, g = new Uint8Array(W * H);
   for (const s of shapes) {
     let a = 1e9, b = 1e9, c = -1e9, d = -1e9; for (const [x, y] of s) { a = Math.min(a, x); b = Math.min(b, y); c = Math.max(c, x); d = Math.max(d, y); }
@@ -315,7 +328,7 @@ function kbHug(shapes, radius) {
       while (!used.has(k) && guard++ < 1e6) { used.add(k); const [a, b] = k.split(",").map(Number); loop.push([x0 + a * res, y0 + b * res]); const nx = next.get(k); if (!nx) break; k = nx[0] + "," + nx[1]; }
       if (!best || Math.abs(polyArea(loop)) > Math.abs(polyArea(best))) best = loop;
     }
-    if (best) { let p = kbSimplify([...best, best[0]], 0.45).slice(0, -1); if (radius > 0.1) p = kbFillet(p, radius); polys.push(p); }
+    if (best) { let p = kbSimplify([...best, best[0]], 0.7).slice(0, -1); if (radius > 0.1) p = kbFillet(p, radius); polys.push(p); }
   }
   return polys;
 }
@@ -412,11 +425,25 @@ function kbHoles(K, G, b) {
   const A = b.area; let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
   for (const poly of b.polys) for (const [x, y] of poly) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
   const cands = [], r = 1.1 + 1.8;
-  for (let y = y0 + 3; y < y1 - 3; y += 1.27) for (let x = x0 + 3; x < x1 - 3; x += 1.27) {
-    if (!b.polys.some(pl => ptInPoly(x, y, pl) && ptPolyEdgeDist(x, y, pl) >= 3.2)) continue;
-    if (x > A.x - 3 && x < A.x + A.w + 3 && y > A.y - 6 && y < A.y + A.h + 3) continue;
-    let ok = true; for (const f of feats) { const dx = x - f[0], dy = y - f[1], lim = r + f[2]; if (dx * dx + dy * dy < lim * lim) { ok = false; break; } }
-    if (ok) cands.push([x, y]);
+  // features bucketed in a 10 mm grid, so each spot only checks its neighbours
+  const CELL = 10, grid = new Map(), cell = (x, y) => Math.floor(x / CELL) + "," + Math.floor(y / CELL);
+  for (const f of feats) { const reach = r + f[2]; for (let gx = Math.floor((f[0] - reach) / CELL); gx <= Math.floor((f[0] + reach) / CELL); gx++) for (let gy = Math.floor((f[1] - reach) / CELL); gy <= Math.floor((f[1] + reach) / CELL); gy++) { const k = gx + "," + gy; if (!grid.has(k)) grid.set(k, []); grid.get(k).push(f); } }
+  const pb = b.polys.map(pl => { let a0 = 1e9, b0 = 1e9, a1 = -1e9, b1 = -1e9; for (const [x, y] of pl) { a0 = Math.min(a0, x); b0 = Math.min(b0, y); a1 = Math.max(a1, x); b1 = Math.max(b1, y); } return [a0, b0, a1, b1]; });
+  const inBoard = (x, y) => b.polys.some((pl, i) => x > pb[i][0] + 3 && x < pb[i][2] - 3 && y > pb[i][1] + 3 && y < pb[i][3] - 3 && ptInPoly(x, y, pl) && !nearEdge(x, y, pl, 3.2));
+  function nearEdge(x, y, pl, lim) { // is (x, y) within lim of the outline? (exits early)
+    for (let i = 0, n = pl.length; i < n; i++) {
+      const [ax, ay] = pl[i], [bx, by] = pl[(i + 1) % n];
+      if (x < Math.min(ax, bx) - lim || x > Math.max(ax, bx) + lim || y < Math.min(ay, by) - lim || y > Math.max(ay, by) + lim) continue;
+      const dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy, t = l2 ? Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / l2)) : 0;
+      if (Math.hypot(x - ax - t * dx, y - ay - t * dy) < lim) return true;
+    }
+    return false;
+  }
+  for (let y = y0 + 3; y < y1 - 3; y += 1.6) for (let x = x0 + 3; x < x1 - 3; x += 1.6) {
+    if (A && x > A.x - 3 && x < A.x + A.w + 3 && y > A.y - 6 && y < A.y + A.h + 3) continue;
+    let ok = true; for (const f of grid.get(cell(x, y)) || []) { const dx = x - f[0], dy = y - f[1], lim = r + f[2]; if (dx * dx + dy * dy < lim * lim) { ok = false; break; } }
+    if (!ok || !inBoard(x, y)) continue;
+    cands.push([x, y]);
   }
   if (!cands.length) return [];
   const chosen = []; const corner = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
@@ -427,7 +454,9 @@ function kbHoles(K, G, b) {
 
 // ---------------------------------------------------------------- build the PCB
 function kbBuild(half) {
-  const K = KBS(), G = kbGeom(true), b = G.boards[half || 0];
+  const K = KBS();
+  if (!K.keys.length) { toast("Add some keys first: pick a layout, make a grid or type a number of keys.", "warn"); return; }
+  const G = kbGeom(true), b = G.boards[half || 0];
   if (!b) { toast("That half has no keys.", "warn"); return; }
   const mcu = G.mcu, sw = G.sw, M = G.matrix;
   const pins = kbFreePins(K);
@@ -703,7 +732,8 @@ function kbSide() {
     <section><h4>2 · Switches &amp; keycaps</h4>
       ${sel("kb_sw", "Switches", opt(KB_SWITCHES, K.sw), "Switch type")}
       <small class="kb-note">${esc(kbSwitch(K).note)}</small>
-      ${nm("kb_sp", "Key spacing (0 = standard for the switch)", K.spacing, "mm", "Key spacing")}
+      <label class="fld" data-help="Key spacing"><span>Key spacing (centre to centre)</span><div class="kb-inp"><input id="kb_sp" type="number" min="15" max="25" step="0.05" value="${K.spacing > 0 ? K.spacing : kbSwitch(K).pitch[0]}"><em>mm</em></div></label>
+      <small class="kb-note">Standard for ${esc(kbSwitch(K).name.split(",")[0])}: ${kbSwitch(K).pitch.join(" × ")} mm${K.spacing > 0 ? ` · <a href="#" id="kb_sp0">use standard</a>` : ""}</small>
       ${sel("kb_prof", "Keycap profile", opt(KB_PROFILES, K.profile, p => [p.id, `${p.name} · ${p.h}`]), "Keycap profile")}
       <small class="kb-note" id="kb_profnote"></small>
       ${sel("kb_fr", "Turn every switch footprint", [0, 90, 180, 270].map(a => `<option value="${a}" ${a === (K.fpRot || 0) ? "selected" : ""}>${a === 0 ? "0° · pins at the top (south-facing LED)" : a === 180 ? "180° · pins at the bottom (north-facing LED)" : a + "°"}</option>`).join(""), "Turn every switch footprint")}
@@ -748,7 +778,12 @@ function kbSide() {
   on("kb_kle_in", "onclick", kbImportDialog);
   on("kb_kle_out", "onclick", () => downloadFile((K.name || "keyboard") + "-kle.json", kbToKLE(), "application/json"));
   on("kb_sw", "onchange", () => { K.sw = val("kb_sw"); const fam = kbSwitch(K).fam; if ((KB_PROFILES.find(p => p.id === K.profile) || {}).fam !== fam) K.profile = (KB_PROFILES.find(p => p.fam === fam) || KB_PROFILES[0]).id; kbSide(); kbChanged("switch"); });
-  on("kb_sp", "onchange", () => { K.spacing = Math.max(0, numv("kb_sp") || 0); kbChanged("spacing"); });
+  on("kb_sp", "onchange", () => {
+    const std = kbSwitch(K).pitch[0], v = numv("kb_sp");
+    K.spacing = !(v > 0) || Math.abs(v - std) < 0.001 ? 0 : Math.max(15, Math.min(25, v));
+    kbSide(); kbChanged("spacing");
+  });
+  on("kb_sp0", "onclick", e => { e.preventDefault(); K.spacing = 0; kbSide(); kbChanged("spacing"); });
   on("kb_prof", "onchange", () => { K.profile = val("kb_prof"); kbSide(); kbChanged("profile"); });
   on("kb_fr", "onchange", () => { K.fpRot = +val("kb_fr"); kbChanged("footprint turn"); });
   on("kb_ol", "onchange", () => { const v = val("kb_ol"); if (v === "custom" && !K.outline.custom) { const G = kbGeom(); K.outline.custom = G.boards.map(b => b && b.polys[0] ? kbSimplify([...b.polys[0], b.polys[0][0]], 0.8).slice(0, -1).map(([x, y]) => [+x.toFixed(2), +y.toFixed(2)]) : null); } K.outline.mode = v; kbChanged("outline"); toast(v === "custom" ? "Drag the corner dots to shape the board. Double-click an edge to add a corner, right-click a corner to remove it." : "Outline updated"); });
@@ -829,20 +864,31 @@ function kbPropsPanel() {
   const ch = (id, f) => { const e = $("#" + id); if (e) e.onchange = () => { f(e.value); kbChanged("key"); }; };
   ch("kp_label", v => sel.forEach(k => k.label = v));
   ch("kp_kind", v => v && sel.forEach(k => { if (v === "knob") { k.kind = "knob"; k.w = 1; k.h = 1; k.shape = ""; if (!k.label) k.label = "Knob"; } else delete k.kind; }));
-  ch("kp_w", v => v && sel.forEach(k => k.w = +v));
+  ch("kp_w", v => v && kbResizeW(sel, +v));
   ch("kp_h", v => v && sel.forEach(k => k.h = +v));
-  ch("kp_shape", v => sel.forEach(k => { k.shape = v; if (v === "iso") { k.w = 1.25; k.h = 2; } if (v === "stepped") k.w = Math.max(k.w, 1.75); }));
+  ch("kp_shape", v => sel.forEach(k => { k.shape = v; if (v === "iso") { kbResizeW([k], 1.25); k.h = 2; } if (v === "stepped") kbResizeW([k], Math.max(k.w, 1.75)); }));
   ch("kp_r", v => v !== "" && sel.forEach(k => k.r = +v || 0));
   ch("kp_fr", v => v !== "" && sel.forEach(k => k.fr = +v));
   ch("kp_row", v => one.row = v === "" ? null : Math.max(0, v | 0));
   ch("kp_col", v => one.col = v === "" ? null : Math.max(0, v | 0));
-  ch("kp_x", v => one.x = +v || 0); ch("kp_y", v => one.y = +v || 0);
+  ch("kp_x", v => { if (v !== "" && isFinite(+v)) one.x = Math.max(-10, Math.min(60, +v)); }); ch("kp_y", v => { if (v !== "" && isFinite(+v)) one.y = Math.max(-10, Math.min(40, +v)); });
   ch("kp_stab", v => sel.forEach(k => k.stab = v));
   const d = $("#kp_dup"); if (d) d.onclick = kbDuplicate;
   const x = $("#kp_del"); if (x) x.onclick = kbDelete;
 }
 
 // ---- editing actions
+// change key widths, sliding the keys to their right along the row so nothing overlaps
+function kbResizeW(keys, w) {
+  const K = KBS(), G = kbGeom(), pos = G.matrix.pos, half = new Map(G.places.map(p => [p.k.id, p.half]));
+  const sameRow = (a, b) => Math.abs(a.y - b.y) < 0.01 || (pos.get(a.id) && pos.get(b.id) && pos.get(a.id)[0] === pos.get(b.id)[0] && Math.abs(a.y - b.y) < 0.75);
+  for (const k of [...keys].sort((a, b) => b.x - a.x)) {
+    const d = w - k.w; if (!d) continue;
+    const edge = k.x + k.w - 0.001;
+    if (!k.r) for (const o of K.keys) if (o !== k && !o.r && half.get(o.id) === half.get(k.id) && o.x >= edge && sameRow(o, k)) o.x = Math.round((o.x + d) * 1e4) / 1e4;
+    k.w = w;
+  }
+}
 function kbAddKey(w, h, shape, kind) {
   const K = KBS(); let y = K.keys.length ? Math.max(...K.keys.map(k => k.y + k.h)) + 0.25 : 0;
   const k = { id: kbId(), x: 0, y, w: shape === "iso" ? 1.25 : w, h: shape === "iso" ? 2 : h, r: 0, label: "", shape, fr: 0, row: null, col: null, stab: "auto" };

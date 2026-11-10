@@ -83,7 +83,7 @@ window.TEACH = {
     "Import KLE": ["Import from Keyboard Layout Editor", "Paste the raw data or JSON from keyboard-layout-editor.com to bring in a layout, including key sizes, rotations and ISO Enter."],
     "Export KLE": ["Export to Keyboard Layout Editor", "Copies this layout as KLE data so you can open it at keyboard-layout-editor.com."],
     "Switch type": ["Switch type", "Which switches the board takes: MX-style or Kailh Choc, soldered or with hot-swap sockets, or Alps. This sets the footprint, the key spacing and the plate cut-outs."],
-    "Key spacing": ["Key spacing", "The distance between key centres. 0 uses the standard for the switch (19.05mm for MX, 18mm for Choc). Choc boards often use 18 × 17mm."],
+    "Key spacing": ["Key spacing", "The distance between key centres, in millimetres (15–25). The standard is 19.05mm for MX and 18 × 17mm for Choc; press use standard to go back to it."],
     "Keycap profile": ["Keycap profile", "The shape and height of the keycaps you plan to use (Cherry, OEM, SA, DSA, XDA, MT3…). It shows the build height and is noted in the BOM."],
     "Turn every switch footprint": ["Turn the solder points", "Rotates every switch footprint on its key: 0° puts the pins at the top (for south-facing LEDs), 180° puts them at the bottom (north-facing). 90° and 270° are for custom-height or side-mounted builds."],
     "Board outline": ["Board outline", "Hug the keys follows the shape of the layout with rounded corners; Rectangle is a simple box; Custom lets you drag the corners yourself."],
