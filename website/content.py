@@ -277,7 +277,7 @@ APPS = [
     pairs=[("tracie", "See what your freshly flashed board prints."), ("wirie", "Design the board you're flashing."), ("makie", "Print a case for it.")],
   ),
   dict(
-    id="scopie", needshort="Scope, or demo mode", name="Scopie", ver="0.9.0-alpha", color="#e8b416", icon="scopie.png",
+    id="scopie", needshort="Scope, or demo mode", name="Scopie", ver="0.9.1-alpha", color="#e8b416", icon="scopie.png",
     tagline="Turn your PC into the screen of an oscilloscope.",
     short="A friendly oscilloscope app for Hantek, Rigol, Siglent, OWON, PicoScope and more.",
     need="A USB or bench oscilloscope, or try Demo mode",
@@ -329,7 +329,7 @@ APPS = [
     pairs=[("tracie", "Decode the digital signals you see."), ("meterie", "Log slow changes with your multimeter.")],
   ),
   dict(
-    id="meterie", needshort="Meter, or demo mode", name="Meterie", ver="0.6.0-alpha", color="#1fb4cc", icon="meterie.png",
+    id="meterie", needshort="Meter, or demo mode", name="Meterie", ver="0.6.1-alpha", color="#1fb4cc", icon="meterie.png",
     tagline="A big, friendly multimeter display, with graphs and logging.",
     short="Connect your multimeter to show huge readings, graph them, log them and run guided tests.",
     need="A multimeter with a PC link, or try the demo",
@@ -390,7 +390,7 @@ APPS = [
     pairs=[("wirie", "Calcie can use your meter's live reading."), ("scopie", "For fast signals a meter can't follow.")],
   ),
   dict(
-    id="tracie", needshort="Board, or demo mode", name="Tracie", ver="0.5.0-alpha", color="#25b39f", icon="tracie.svg",
+    id="tracie", needshort="Board, or demo mode", name="Tracie", ver="0.5.1-alpha", color="#25b39f", icon="tracie.svg",
     tagline="See what your board is saying, and the signals on its wires.",
     short="A serial monitor with a live plotter, plus a logic analyser that decodes UART, I²C and SPI.",
     need="A board on USB, or a cheap logic analyser (demo included)",
@@ -437,15 +437,15 @@ APPS = [
     pairs=[("flashie", "Flash a board, then watch it here."), ("scopie", "For analogue signals, not just digital ones.")],
   ),
   dict(
-    id="codie", needshort="Nothing: just code", name="Codie", ver="0.1.0-alpha", color="#22c39a", icon="codie.svg",
-    tagline="Paste in code. Find out what every line does, and why.",
-    short="A code explainer for 20+ languages, with a game-development section and a Game school.",
+    id="codie", needshort="Nothing: just code or a capture", name="Codie", ver="0.2.0-alpha", color="#22c39a", icon="codie.svg",
+    tagline="Paste in code, or open a capture. Find out what every line, or every signal, does, and why.",
+    short="A code explainer for 20+ languages, with a Game school, and a Signals mode that explains captures from Scopie, Tracie and Meterie.",
     need="Nothing but some code (examples included)",
     plain=("In plain words",
            "Found some code online, in a book or in a game you're modding, and not sure what it does? Paste it into Codie. "
            "It explains every line in plain English: what it does and why it's there. It also spots game code, explains how that "
            "engine's game loop works, and teaches the ideas every game uses."),
-    chips=["Line-by-line explanations", "20+ languages", "Windows Go", "Game logic", "Game school", "C64, ZX Spectrum and BBC BASIC"],
+    chips=["Line-by-line explanations", "20+ languages", "Signals from Scopie, Tracie and Meterie", "UART, I2C and SPI decoding", "Game logic", "Game school", "C64, ZX Spectrum and BBC BASIC"],
     firsts=[
       ("Pick an example", "The Examples menu has everyday programs, Windows Go, game engines and 1980s BASIC."),
       ("Click a line", "Click any line of code (or any card) to see its explanation side by side."),
@@ -456,8 +456,17 @@ APPS = [
       ("codie-explain", "Explain: every line of a Unity script, with what it does and why."),
       ("codie-game", "Game logic: how Unity runs one frame, and where this script fits in."),
       ("codie-school", "Game school: collision detection, with examples from JavaScript to the Commodore 64."),
+      ("codie-signals", "Signals: a Tracie capture explained, with UART text, an I2C display, an SPI flash chip and a fading PWM."),
     ],
     features=[
+      ("Signals", "Captures explained like code.", [
+        "Explain in Codie in Scopie, Tracie and Meterie sends a capture straight here",
+        "Scope channels: DC rails, ripple, sine, triangle and sawtooth waves, notes, edges and logic levels",
+        "Logic: clocks, PWM, servo angles, UART text, I2C (naming the chip at each address), SPI flash commands, NeoPixel colours, IR remote buttons and 1-Wire temperatures",
+        "Meter logs: batteries charging and running down, sleep and wake current, battery life, power and energy",
+        "Serial logs: boots and reset reasons, crashes, brownouts, Wi-Fi and GPS fixes",
+        "Warnings for clipping, slow edges, too few samples and 5 V on 3.3 V boards",
+      ]),
       ("Line by line", "What, and why.", [
         "Each line gets what it does and why it's there, in plain English",
         "Uses the names in your code: updatePlayer() 'probably updates the player'",

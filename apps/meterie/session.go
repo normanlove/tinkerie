@@ -17,6 +17,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"tinkerie/shared/suite"
 )
 
 type sessChannel struct {
@@ -507,7 +508,7 @@ var exportRanges = []string{"Everything", "Visible on graph", "Selection"}
 
 func (a *App) drawExportModal() {
 	u := a.ui
-	cr, closed := u.Modal("m#export", u.Px(620), u.Px(470), "Export & import")
+	cr, closed := u.Modal("m#export", u.Px(620), u.Px(536), "Export & import")
 	if closed {
 		a.modal = ""
 	}
@@ -543,6 +544,18 @@ func (a *App) drawExportModal() {
 	if item("exp#tl", icSync, "Suite timeline (.nst.csv)", "Shared nrmluv-timeline format — lines up with Scopie, Serialie and Logicie captures") {
 		if p, ok := platformSaveDialog("Export suite timeline", filepath.Join(a.dataDir(), "meterie-"+stamp+".nst.csv"), "Suite timeline (*.nst.csv)", "nst.csv"); ok {
 			a.reportExport(a.writeTimeline(p, t0, t1), p)
+		}
+	}
+	if item("exp#codie", icBulb, "Explain in Codie", "Codie explains the readings in plain words: batteries, sleep and wake current, power and energy, temperature") {
+		p := filepath.Join(a.dataDir(), "meterie-"+stamp+".nst.csv")
+		_ = os.MkdirAll(a.dataDir(), 0o755)
+		if err := a.writeTimeline(p, t0, t1); err != nil {
+			a.ui.Toast("Export failed: "+err.Error(), 3)
+		} else if err := suite.OpenWith("codie", p); err != nil {
+			a.ui.Toast("Couldn't open Codie: "+err.Error(), 3)
+		} else {
+			a.ui.Toast("Opening the readings in Codie…", 1)
+			a.modal = ""
 		}
 	}
 	if item("exp#png", icPhoto, "Graph image (PNG)", "1920×1080 picture of the current graph view, with legend and markers") {

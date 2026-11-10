@@ -11,13 +11,11 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 Each package has a *READ ME FIRST.txt*.
 
 ### New in {VERSION}
-Keebie fixes:
-- **Key spacing no longer wipes out the layout.** The field now shows the real spacing (19.05 mm for MX) and only accepts 15–25 mm; before, one click on its arrow set 1 mm and squashed every key into a dot.
-- **Changing a key's width pushes the keys beside it along** instead of overlapping them, on staggered and column-staggered layouts.
-- **Much faster redraws**, especially on angled layouts like the Alice (about 2.4 s down to 0.2 s per change). Rounded outlines now use far fewer points.
-- Very large X or Y values no longer make the board disappear; building with no keys explains what to do.
+- **Codie explains signals (new Signals mode).** Captures from Scopie, Tracie and Meterie are explained the way Codie explains code: what each channel is (a 3.3 V rail, a 440 Hz tone, PWM, a servo signal, a Li-ion battery running down…), the protocols it carries decoded (UART text, I2C with the chip at each address, SPI flash commands, NeoPixel colours, infrared remote buttons, 1-Wire temperatures), serial logs read for boots, crashes, brownouts and GPS fixes, and warnings for things like clipping, slow edges or 5 V on 3.3 V boards. Click a card to see where it happens on the capture.
+- **Explain in Codie** in Scopie (toolbar and File menu), Tracie (Export, and the serial log) and Meterie (Export) sends a capture straight to Codie.
 
 ### Also in recent alpha builds
+- **0.9.1-alpha:** Keebie fixes: key spacing, widening keys, much faster redraws.
 - **0.9.0-alpha:** Flashie's Keyboard tab makes and flashes firmware for Keebie keyboards; Makie makes keyboard cases with a printed switch plate; Keebie knobs and OLED screens; version numbers in every download's name.
 - **0.8.0-alpha, new in Wirie: Keebie, custom keyboard PCBs.** Lay out the keys, pick switches and any common controller (or a bare chip with all its circuitry), and Keebie builds the PCB, QMK/ZMK files and a switch plate.
 - **0.7.0-alpha, new app: Codie, the code explainer**, in 20+ languages, with a Game logic tab and a Game school.

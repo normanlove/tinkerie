@@ -98,3 +98,7 @@ Free software under the GNU General Public License, version 3 or later — see `
 their source in `third_party/`.
 
 Made with care by **nrmluvdev**.
+
+## Explain in Codie
+
+- **Explain in Codie** (toolbar, or File menu): saves the waveform and opens it in Codie, which explains each channel in plain words.

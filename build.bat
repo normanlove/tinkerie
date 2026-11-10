@@ -2,7 +2,7 @@
 rem Builds Tinkerie.exe: all seven apps and the launcher in one file, no DLLs.
 rem Needs Go 1.24+ from https://go.dev/dl/ (standard library only).
 rem To redraw the icon first:  go run ./tools/mkicon  then
-rem   go run ./tools/mksyso -ico build/tinkerie.ico -out rsrc_windows_amd64.syso -version 0.9.1-alpha
+rem   go run ./tools/mksyso -ico build/tinkerie.ico -out rsrc_windows_amd64.syso -version 0.10.0-alpha
 set GOOS=windows
 set GOARCH=amd64
 set CGO_ENABLED=0

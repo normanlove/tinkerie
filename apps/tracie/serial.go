@@ -15,6 +15,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"tinkerie/shared/suite"
 )
 
 // Port is a byte stream with modem-control lines (a COM port or the demo).
@@ -562,6 +563,24 @@ func (m *SerialManager) routes(mux *http.ServeMux) {
 		m.mu.Unlock()
 		m.publishState()
 		writeJSON(w, m.State())
+	})
+	// Explain in Codie: open the serial log (Log to CSV) in Codie's Signals mode
+	mux.HandleFunc("/api/serial/explain-codie", func(w http.ResponseWriter, r *http.Request) {
+		m.mu.Lock()
+		p := m.state.LogPath
+		if m.logW != nil {
+			m.logW.Flush()
+		}
+		m.mu.Unlock()
+		if p == "" {
+			writeErr(w, 400, "Switch on Log to CSV first: Codie explains the log file")
+			return
+		}
+		if err := suite.OpenWith("codie", p); err != nil {
+			writeErr(w, 500, err.Error())
+			return
+		}
+		writeJSON(w, map[string]any{"path": p})
 	})
 	mux.HandleFunc("/api/serial/log", func(w http.ResponseWriter, r *http.Request) {
 		var req struct {

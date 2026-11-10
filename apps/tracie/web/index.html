@@ -90,6 +90,7 @@
       <label class="sw big"><input type="checkbox" id="swLog"><i></i><span>Log to CSV</span></label>
       <div class="log-path mono" id="logPath">Saves to Documents\Tracie</div>
       <div class="row gap6">
+        <button class="btn ghost sm" id="btnLogCodie" title="Explain the log in Codie"><svg viewBox="0 0 24 24"><path d="M9 8l-4 4 4 4M15 8l4 4-4 4"/></svg>Explain in Codie</button>
         <button class="btn ghost sm" id="btnOpenLogs"><svg viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3z"/></svg>Open folder</button>
         <button class="btn ghost sm" id="btnSaveTxt"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Save .txt</button>
       </div>
@@ -275,6 +276,7 @@
 <div class="modal hidden" id="exportModal">
   <div class="modal-card small">
     <div class="modal-h"><span>Export capture</span><button class="icon-btn" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <button class="exp-opt" id="expCodie"><b>Explain in Codie</b><span>Codie explains every channel in plain words and decodes UART, I2C, SPI, LEDs and IR</span></button>
     <button class="exp-opt" id="expVcd"><b>Waveform (.vcd)</b><span>Opens in PulseView, GTKWave and most EDA tools</span></button>
     <button class="exp-opt" id="expDec"><b>Decoded data (.csv)</b><span>Every decoded byte with its timestamp</span></button>
     <button class="exp-opt" id="expPng"><b>Screenshot (.png)</b><span>The waveform exactly as shown</span></button>

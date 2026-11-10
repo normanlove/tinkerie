@@ -30,6 +30,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"tinkerie/shared/suite"
 )
 
 //go:embed web
@@ -40,7 +41,7 @@ var docFS embed.FS
 
 const (
 	appName     = "Scopie"
-	appVersion  = "0.9.0-alpha"
+	appVersion  = "0.9.1-alpha"
 	appAuthor   = "nrmluvdev"
 	defaultPort = 47831
 )
@@ -545,6 +546,25 @@ func (a *App) routes() http.Handler {
 			return
 		}
 		writeJSON(w, map[string]any{"path": p, "samples": n})
+	})
+
+	// Explain in Codie: save the waveform, then open it in Codie's Signals mode
+	mux.HandleFunc("/api/explain-codie", func(w http.ResponseWriter, r *http.Request) {
+		b, _, err := a.view.ExportCSV()
+		if err != nil {
+			fail(w, err)
+			return
+		}
+		p, err := saveExport("scope-"+time.Now().Format("20060102-150405")+".csv", b)
+		if err != nil {
+			fail(w, err)
+			return
+		}
+		if err := suite.OpenWith("codie", p); err != nil {
+			fail(w, err)
+			return
+		}
+		writeJSON(w, map[string]any{"path": p})
 	})
 
 	mux.HandleFunc("/api/save-file", func(w http.ResponseWriter, r *http.Request) {

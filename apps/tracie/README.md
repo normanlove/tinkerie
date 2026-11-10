@@ -66,3 +66,7 @@ It's pure Go with no cgo and no third-party modules. The UI is HTML/CSS/JS embed
 | `tools/` | scripts that regenerate the exe icon resource |
 
 fx2lafw firmware © the sigrok project (GPL). It is not bundled; Tracie loads it from your sigrok/PulseView install or from a file you provide.
+
+## Explain in Codie
+
+- **Explain in Codie**: Export → Explain in Codie sends a logic capture to Codie, and the button under Recording sends the serial log; Codie explains each channel and decodes UART, I2C, SPI, LEDs, IR and 1-Wire.

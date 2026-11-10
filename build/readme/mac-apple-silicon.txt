@@ -21,12 +21,14 @@ What works on this system
 Every app has teaching mode: point at anything to see what it does. F2 turns it off.
 
 New in {VERSION}:
-- Keebie fixes: the Key spacing field can no longer squash the layout,
-  widening a key pushes its neighbours along, redraws are much faster
-  (especially angled layouts like the Alice), and huge X/Y values no longer
-  make the board disappear.
+- Codie has a new Signals mode: it explains captures from Scopie, Tracie and
+  Meterie in plain words, decodes UART, I2C, SPI, LEDs, IR remotes and 1-Wire,
+  and reads serial logs for boots, crashes and GPS fixes.
+- "Explain in Codie" buttons in Scopie, Tracie and Meterie send a capture
+  straight to Codie.
 
 Also in recent alpha builds:
+- 0.9.1-alpha: Keebie fixes (key spacing, widening keys, faster redraws).
 - 0.9.0-alpha: Flashie keyboard firmware, Makie keyboard cases, Keebie knobs
   and screens, version numbers in every download's name.
 - 0.8.0-alpha: Keebie, custom keyboard PCB designer, in Wirie.

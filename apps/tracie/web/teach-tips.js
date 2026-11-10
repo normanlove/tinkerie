@@ -31,6 +31,8 @@ window.TEACH = {
     "Clear": ["Clear (Ctrl+L)", "Empties the console. It doesn't affect the board."],
     "Save .txt": ["Save as text", "Saves everything in the console to a .txt file."],
     "Log to CSV": ["Log to CSV", "Records every line into a CSV spreadsheet file in Documents\\Tracie, with the time it arrived and whether it was received or sent. Excel and LibreOffice open it."],
+    "Explain the log in Codie|#btnLogCodie": ["Explain in Codie", "Opens the serial log (switch on Log to CSV first) in Codie, which explains it in plain words: boot and reset messages, crashes, brownouts, Wi-Fi, GPS sentences, errors, and the numbers the board prints as readings over time."],
+    "#expCodie": ["Explain in Codie", "Saves this capture and opens it in Codie, which explains each channel in plain words and decodes UART serial, I2C (naming common chips by their address), SPI, WS2812 LEDs, infrared remotes and 1-Wire."],
     "Open folder": ["Open folder", "Opens the folder where Tracie saves logs."],
     "Type a command and press Enter|#sendInput": ["Send a command", "Type text to send to the board and press Enter. The ↑ and ↓ keys bring back earlier commands."],
     "Send": ["Send", "Sends what you typed to the board."],

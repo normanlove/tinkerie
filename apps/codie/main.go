@@ -25,6 +25,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -35,7 +36,7 @@ var webFS embed.FS
 
 const (
 	appName     = "Codie"
-	appVersion  = "0.1.0-alpha"
+	appVersion  = "0.2.0-alpha"
 	appAuthor   = "nrmluvdev"
 	defaultPort = 47824
 	maxFile     = 2 << 20
@@ -45,6 +46,8 @@ type openFile struct {
 	Name string `json:"name"`
 	Code string `json:"code"`
 	Seq  int64  `json:"seq"`
+	Kind string `json:"kind,omitempty"` // "signal" for a capture from Scopie, Tracie or Meterie
+	Path string `json:"path,omitempty"`
 }
 
 type server struct {
@@ -126,8 +129,14 @@ func readFile(p string) openFile {
 		return openFile{}
 	}
 	defer f.Close()
-	b, _ := io.ReadAll(io.LimitReader(f, maxFile))
-	return openFile{Name: filepath.Base(p), Code: string(b), Seq: time.Now().UnixNano()}
+	head := make([]byte, 4096)
+	n, _ := io.ReadFull(f, head)
+	if IsSignalFile(p, head[:n]) {
+		abs, _ := filepath.Abs(p)
+		return openFile{Name: filepath.Base(p), Kind: "signal", Path: abs, Seq: time.Now().UnixNano()}
+	}
+	b, _ := io.ReadAll(io.LimitReader(f, maxFile-int64(n)))
+	return openFile{Name: filepath.Base(p), Code: string(head[:n]) + string(b), Seq: time.Now().UnixNano()}
 }
 
 // handOver gives a file to a Codie that's already open; true if it took it.
@@ -212,7 +221,7 @@ func (s *server) routes() http.Handler {
 		f := s.file
 		s.mu.Unlock()
 		writeJSON(w, map[string]any{"app": appName, "version": appVersion, "author": appAuthor,
-			"langs": LangList(), "samples": Samples(), "file": f})
+			"langs": LangList(), "samples": Samples(), "file": f, "sigDemos": SigDemos})
 	})
 	mux.HandleFunc("/api/lessons", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, lessons)
@@ -228,11 +237,51 @@ func (s *server) routes() http.Handler {
 		}
 		writeJSON(w, Analyse(req.Code, req.Lang))
 	})
+	// Signals: captures from Scopie, Tracie and Meterie
+	mux.HandleFunc("/api/signals/open", func(w http.ResponseWriter, r *http.Request) {
+		p := r.URL.Query().Get("path")
+		if p == "" {
+			s.mu.Lock()
+			p = s.file.Path
+			s.mu.Unlock()
+		}
+		writeSignal(w, p)
+	})
+	mux.HandleFunc("/api/signals/analyse", func(w http.ResponseWriter, r *http.Request) {
+		b, err := io.ReadAll(io.LimitReader(r.Body, MaxSignal))
+		if err != nil {
+			http.Error(w, err.Error(), 400)
+			return
+		}
+		c, err := LoadCapture(r.URL.Query().Get("name"), b)
+		if err != nil {
+			writeJSON(w, map[string]string{"error": err.Error()})
+			return
+		}
+		writeJSON(w, AnalyseCapture(c))
+	})
+	mux.HandleFunc("/api/signals/demo", func(w http.ResponseWriter, r *http.Request) {
+		name := r.URL.Query().Get("name")
+		body, ok := demoCaptures()[name]
+		if !ok {
+			writeJSON(w, map[string]string{"error": "no such example"})
+			return
+		}
+		c, err := LoadCapture(name, []byte(body))
+		if err != nil {
+			writeJSON(w, map[string]string{"error": err.Error()})
+			return
+		}
+		writeJSON(w, AnalyseCapture(c))
+	})
+	mux.HandleFunc("/api/signals/recent", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, RecentCaptures())
+	})
 	mux.HandleFunc("/api/activate", func(w http.ResponseWriter, r *http.Request) {
 		var f openFile
 		_ = json.NewDecoder(io.LimitReader(r.Body, maxFile*2)).Decode(&f)
 		s.mu.Lock()
-		if f.Code != "" {
+		if f.Code != "" || f.Kind == "signal" {
 			f.Seq = time.Now().UnixNano()
 			s.file = f
 		}
@@ -291,4 +340,69 @@ func (s *server) routes() http.Handler {
 		}
 	})
 	return mux
+}
+
+func writeSignal(w http.ResponseWriter, p string) {
+	if p == "" {
+		writeJSON(w, map[string]string{"error": "no capture to open"})
+		return
+	}
+	st, err := os.Stat(p)
+	if err != nil {
+		writeJSON(w, map[string]string{"error": "Codie couldn't open " + filepath.Base(p) + ": " + err.Error()})
+		return
+	}
+	if st.Size() > MaxSignal {
+		writeJSON(w, map[string]string{"error": fmt.Sprintf("%s is %d MB: Codie reads captures up to %d MB. Export a shorter piece.", filepath.Base(p), st.Size()>>20, MaxSignal>>20)})
+		return
+	}
+	b, err := os.ReadFile(p)
+	if err != nil {
+		writeJSON(w, map[string]string{"error": err.Error()})
+		return
+	}
+	c, err := LoadCapture(p, b)
+	if err != nil {
+		writeJSON(w, map[string]string{"error": err.Error()})
+		return
+	}
+	writeJSON(w, AnalyseCapture(c))
+}
+
+// RecentCapture is a capture another app saved.
+type RecentCapture struct {
+	Path string `json:"path"`
+	Name string `json:"name"`
+	App  string `json:"app"`
+	Time int64  `json:"time"`
+	Size int64  `json:"size"`
+}
+
+// RecentCaptures lists the newest captures in the suite's export folders.
+func RecentCaptures() []RecentCapture {
+	home, _ := os.UserHomeDir()
+	dirs := map[string]string{"Scopie": "Scopie", "Tracie": "Tracie", "Meterie": "Meterie"}
+	var out []RecentCapture
+	for app, sub := range dirs {
+		for _, root := range []string{filepath.Join(home, "Documents"), filepath.Join(home, "OneDrive", "Documents")} {
+			d := filepath.Join(root, sub)
+			ents, _ := os.ReadDir(d)
+			for _, e := range ents {
+				low := strings.ToLower(e.Name())
+				if e.IsDir() || !(strings.HasSuffix(low, ".csv") || strings.HasSuffix(low, ".vcd")) {
+					continue
+				}
+				info, err := e.Info()
+				if err != nil {
+					continue
+				}
+				out = append(out, RecentCapture{Path: filepath.Join(d, e.Name()), Name: e.Name(), App: app, Time: info.ModTime().Unix(), Size: info.Size()})
+			}
+		}
+	}
+	sort.Slice(out, func(a, b int) bool { return out[a].Time > out[b].Time })
+	if len(out) > 40 {
+		out = out[:40]
+	}
+	return out
 }

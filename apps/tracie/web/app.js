@@ -1698,6 +1698,15 @@ $('#swFollow').addEventListener('change', e => {
   if (e.target.checked) { const span = Math.min(waveTL.v1 - waveTL.v0, 20) || 10; waveTL.v0 = 0; waveTL.v1 = span; }
 });
 $('#btnExport').addEventListener('click', () => { if (!G.cap) { toast('Capture something first', 'warn'); return; } showModal('#exportModal'); });
+$('#expCodie').addEventListener('click', async () => {
+  hideModals();
+  try { const r = await api(`/api/logic/explain-codie?names=${encodeURIComponent(cfg.logic.names.join(','))}`, {}); toast('Opening the capture in Codie…'); }
+  catch (e) { toast(esc(e.message), 'warn'); }
+});
+$('#btnLogCodie').addEventListener('click', async () => {
+  try { await api('/api/serial/explain-codie', {}); toast('Opening the serial log in Codie…'); }
+  catch (e) { toast(esc(e.message), 'warn'); }
+});
 $('#expVcd').addEventListener('click', () => {
   const a = document.createElement('a');
   a.href = `/api/logic/export.vcd?token=${TOKEN}&names=${encodeURIComponent(cfg.logic.names.join(','))}`;

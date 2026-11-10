@@ -23,7 +23,7 @@ import (
 )
 
 // Version is the suite version shown in the launcher.
-const Version = "0.9.1-alpha"
+const Version = "0.10.0-alpha"
 
 // App describes one tile in the launcher.
 type App struct {
@@ -42,10 +42,10 @@ var Apps = []App{
 	{"makie", "Makie", "3D-printing part designer. Builds cases for Wirie boards and keyboards", "0.10.0-alpha", "makie.png", "", false},
 	{"tunie", "Tunie", "3D printer tuning and calibration", "0.5.0-alpha", "tunie.png", "", false},
 	{"flashie", "Flashie", "Firmware flasher for ESP32, Pico, Arduino and STM32, keyboard firmware maker, and SD card / USB image writer", "0.8.0-alpha", "flashie.svg", "", false},
-	{"scopie", "Scopie", "Oscilloscope: Hantek 6022, network scopes and more", "0.9.0-alpha", "scopie.png", "", false},
-	{"meterie", "Meterie", "PC multimeter: HoldPeak, UNI-T, OWON, Brymen, Fluke…", "0.6.0-alpha", "meterie.png", "", false},
-	{"tracie", "Tracie", "Serial monitor and logic analyser", "0.5.0-alpha", "tracie.svg", "", false},
-	{"codie", "Codie", "Code explainer: paste code to see what each line does and why, with a game-development section", "0.1.0-alpha", "codie.svg", "", false},
+	{"scopie", "Scopie", "Oscilloscope: Hantek 6022, network scopes and more", "0.9.1-alpha", "scopie.png", "", false},
+	{"meterie", "Meterie", "PC multimeter: HoldPeak, UNI-T, OWON, Brymen, Fluke…", "0.6.1-alpha", "meterie.png", "", false},
+	{"tracie", "Tracie", "Serial monitor and logic analyser", "0.5.1-alpha", "tracie.svg", "", false},
+	{"codie", "Codie", "Code and signal explainer: what each line of code does and why, and what captures from Scopie, Tracie and Meterie show", "0.2.0-alpha", "codie.svg", "", false},
 }
 
 // What each app can't do yet on this system (see PORTING.md).

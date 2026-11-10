@@ -16,6 +16,8 @@ const TIPS = {
   clear: ["Clear display", "Wipes persistence and averaging history so they start building up again."],
   screenshot: ["Save screenshot",
     "Saves a picture (PNG) of the scope screen into Documents\\Scopie, for reports or sharing.\nShortcut: Ctrl+P."],
+  codie: ["Explain in Codie",
+    "Saves the waveform on screen and opens it in Codie, which explains it in plain words: what each channel is (a sine wave, PWM, a servo signal, a supply rail…), its frequency and levels, any serial data it carries, and anything worth checking, such as clipping or slow edges."],
   csv: ["Export data (CSV)",
     "Saves the samples currently on screen as a spreadsheet file (time and voltage columns) that Excel, LibreOffice or Python can open. Files go into Documents\\Scopie.\nShortcut: Ctrl+S."],
   guide: ["Beginner's guide", "A short introduction to using an oscilloscope. Shortcut: F1."],

@@ -16,6 +16,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"tinkerie/shared/suite"
 )
 
 // ---------------------------------------------------------------- capture
@@ -580,6 +581,27 @@ func (m *LogicManager) routes(mux *http.ServeMux) {
 			return
 		}
 		writeJSON(w, c.measure(int(qf(r, "ch")), qf(r, "s"), qf(r, "e")))
+	})
+	// Explain in Codie: save the capture as a VCD, then open it in Codie's Signals mode
+	mux.HandleFunc("/api/logic/explain-codie", func(w http.ResponseWriter, r *http.Request) {
+		c := m.current()
+		if c == nil {
+			writeErr(w, 404, "Capture something first")
+			return
+		}
+		p := filepath.Join(logsDir(), "tracie_"+time.Now().Format("20060102_150405")+".vcd")
+		f, err := os.Create(p)
+		if err != nil {
+			writeErr(w, 500, err.Error())
+			return
+		}
+		c.writeVCD(f, strings.Split(r.URL.Query().Get("names"), ","))
+		f.Close()
+		if err := suite.OpenWith("codie", p); err != nil {
+			writeErr(w, 500, err.Error())
+			return
+		}
+		writeJSON(w, map[string]any{"path": p})
 	})
 	mux.HandleFunc("/api/logic/export.vcd", func(w http.ResponseWriter, r *http.Request) {
 		c := m.current()
