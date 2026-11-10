@@ -82,6 +82,7 @@ def header(current):
   <nav class="nav" aria-label="Main">
     <div class="apps-menu"><button type="button" aria-expanded="false" aria-haspopup="true">Apps {svg("chev")}</button><div class="menu">{menu}<a class="menu-start" href="start.html">Getting started guide →</a></div></div>
     <a class="hide-s" href="start.html"{cur("start")}>Getting started</a>
+    <a class="hide-s" href="about.html"{cur("about")}>About Tinkerie</a>
     <a class="hide-s" href="{REPO}">GitHub</a>
     <a class="btn btn-go" href="index.html#download" aria-label="Download">{svg("download")}<span class="lbl">Download</span></a>
     <button class="theme" id="theme" type="button" aria-label="Switch theme">{svg("theme")}</button>
@@ -100,6 +101,7 @@ def footer():
   <div><h4>The apps</h4><ul>{links}</ul></div>
   <div><h4>Help and source</h4><ul>
     <li><a href="start.html">Getting started</a></li>
+    <li><a href="about.html">About Tinkerie</a></li>
     <li><a href="index.html#faq">Questions</a></li>
     <li><a href="{REPO}/releases">All downloads</a></li>
     <li><a href="{REPO}">Source code on GitHub</a></li>
@@ -364,6 +366,36 @@ PRIVACY = [('Flashie', "downloads firmware, the Arduino board list and Raspberry
 POLICY = '<div class="ruler" aria-hidden="true"></div>\n<section class="hero" style="padding-bottom:30px"><div class="wrap">\n  <span class="tape">Code signing policy</span>\n  <h1>Code signing policy</h1>\n  <p class="lead" style="max-width:56ch">How Tinkerie\'s Windows program is signed, who decides what gets signed, and what Tinkerie does (and doesn\'t do) with your data.</p>\n</div></section>\n<section class="band alt" style="padding-top:40px"><div class="wrap"><div class="stack" style="max-width:860px">\n  <div class="callout">{info}<p>Free code signing provided by <a href="https://signpath.io">SignPath.io</a>, certificate by <a href="https://signpath.org">SignPath Foundation</a>.</p></div>\n  <p class="muted">Signing is being set up. Releases made before it\'s in place are not signed, and Windows shows an "unrecognised app" warning for them.</p>\n</div></div></section>\n<section class="band"><div class="wrap"><div class="stack prose">\n  <h2 id="what-is-signed">What is signed</h2>\n  <p>The Windows program, <code>Tinkerie.exe</code> (released as <code>Tinkerie-&lt;version&gt;-windows.exe</code>), attached to each <a href="{repo}/releases">GitHub release</a>, on its own and inside the Windows zip. It is built from this project\'s source code by GitHub Actions, on GitHub\'s own servers, using the public <a href="{repo}/blob/main/.github/workflows/release.yml">release workflow</a>. Nothing built anywhere else is signed.</p>\n  <p>Signing proves the file came from this project\'s source code and hasn\'t been changed since. The Mac and Linux downloads are not part of this signing.</p>\n  <h2 id="team">Team roles</h2>\n  <div class="table-wrap"><table><thead><tr><th>Role</th><th>Who</th><th>What it means</th></tr></thead><tbody>\n    <tr><td>Committers and reviewers</td><td><a href="https://github.com/normanlove">nrmluvdev (normanlove)</a></td><td>Can change the source code. Every change from anyone else, such as a pull request, is reviewed by them before it\'s added.</td></tr>\n    <tr><td>Approvers</td><td><a href="https://github.com/normanlove">nrmluvdev (normanlove)</a></td><td>Approves each release by hand before it\'s signed.</td></tr>\n  </tbody></table></div>\n  <p>Everyone in these roles uses two-factor authentication on GitHub and SignPath.</p>\n  <h2 id="privacy">Privacy</h2>\n  <p><b>This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it.</b> Tinkerie has no analytics, no tracking, no accounts and no automatic update checks.</p>\n  <p>These are the only times it uses the network, each one because you asked:</p>\n  <ul>{priv}</ul>\n  <p>Those sites have their own privacy policies. This website is hosted by GitHub Pages and loads its fonts from Google Fonts.</p>\n  <h2>Changes to your computer</h2>\n  <p>Tinkerie doesn\'t need installing: delete it to remove it. Two optional steps change your system, and both ask first: on Windows, Scopie\'s <i>Install USB driver</i> button runs Zadig to install a USB driver (you\'ll see the administrator prompt; Tracie\'s help explains the same step for logic analysers), and on Linux and Raspberry Pi, <code>install.sh</code> and <code>install-usb.sh</code> add a menu entry and USB permissions. Both scripts undo themselves with <code>--remove</code>. The Windows driver can be removed in Device Manager.</p>\n  <h2>Licence</h2>\n  <p>Tinkerie is free software under the GNU General Public License, version 3 or later. The source code is on <a href="{repo}">GitHub</a>.</p>\n</div></div></section>'
 
 
+ABOUT = '''<div class="ruler" aria-hidden="true"></div>
+<section class="hero" style="padding-bottom:30px"><div class="wrap">
+  <span class="tape">About</span>
+  <h1>About Tinkerie</h1>
+  <p class="lead" style="max-width:60ch">A few words from nrmluvdev on where these tools came from, the part AI played in building them, and why they'll always be free.</p>
+</div></section>
+<section class="band alt" style="padding-top:40px"><div class="wrap"><div class="stack prose">
+  <h2 id="why">Why it exists</h2>
+  <p>Tinkerie is the set of tools I wish I'd had at every stage of my journey into engineering, microelectronics and making in general. Designing a circuit board, printing a case for it, flashing its firmware, measuring what it's doing, working out what a piece of code actually does: each step used to mean another program, another account, another manual.</p>
+  <p>So I've tried to make those tools exist, in one place, for everyone else who could benefit from them.</p>
+
+  <h2 id="ai">My view on AI</h2>
+  <p>I believe AI is useful as a tool in the same way a saw is useful for cutting wood. It does the job it was designed for well, but it doesn't create things by itself. A saw doesn't decide what the table looks like.</p>
+  <p>AI is a language model, so it should be used to translate the ideas in your head into tangible things, not to come up with the ideas themselves.</p>
+
+  <h2 id="made">How Tinkerie is made</h2>
+  <p>Tinkerie is built mostly by AI, but the core ideas behind it are entirely mine: which tools should exist, what each one is for, what it should feel like to use, and who it's meant to help. The AI writes much of the code that turns those ideas into working software. I decide what gets built, test it, and choose what ships.</p>
+  <p>All of the source code is public on <a href="{repo}">GitHub</a>, so anyone can see exactly how every tool works.</p>
+
+  <h2 id="free">Free, forever</h2>
+  <div class="callout">{info}<p><b>Every Tinkerie tool is, and always will be, completely free.</b> No paid tiers, no locked features, no accounts, no adverts.</p></div>
+  <p>I'll only ever ask for donations if the project grows to a point where it needs them to keep going, and even then, donating will never be required to use anything. Tinkerie is free software under the GNU General Public License, version 3 or later, so it stays free for everyone to use, study, share and improve.</p>
+  <p>&mdash; nrmluvdev</p>
+</div></div></section>'''
+
+
+def build_about():
+    page("about.html", "About Tinkerie", "Why Tinkerie exists, nrmluvdev's view on using AI as a tool to build it, and the promise that every tool stays free forever.", "about", ABOUT.format(info=svg("info"), repo=REPO))
+
+
 def build_policy():
     priv = "".join(f"<li><b>{e(a)}</b> {e(t)}</li>" for a, t in PRIVACY)
     body = POLICY.format(info=svg("info"), repo=REPO, priv=priv)
@@ -378,9 +410,10 @@ def main():
     build_index()
     build_start()
     build_policy()
+    build_about()
     for i, a in enumerate(APPS):
         build_app(i, a)
-    print("built", len(APPS) + 2, "pages into", OUT, "for version", VERSION)
+    print("built", len(APPS) + 3, "pages into", OUT, "for version", VERSION)
 
 
 if __name__ == "__main__":

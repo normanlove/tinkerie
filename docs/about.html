@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>About Tinkerie</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Why Tinkerie exists, nrmluvdev&#x27;s view on using AI as a tool to build it, and the promise that every tool stays free forever.">
+<meta property="og:title" content="About Tinkerie">
+<meta property="og:description" content="Why Tinkerie exists, nrmluvdev&#x27;s view on using AI as a tool to build it, and the promise that every tool stays free forever.">
+<link rel="icon" href="img/icons/tinkerie.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&family=Unbounded:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top"><div class="wrap">
+  <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
+  <nav class="nav" aria-label="Main">
+    <div class="apps-menu"><button type="button" aria-expanded="false" aria-haspopup="true">Apps <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><div class="menu"><a href="wirie.html"><img src="img/icons/wirie.png" alt=""><span><b>Wirie</b><small>Design circuit boards and custom keyboards</small></span></a><a href="makie.html"><img src="img/icons/makie.png" alt=""><span><b>Makie</b><small>A Tinkercad-style 3D designer with threads</small></span></a><a href="tunie.html"><img src="img/icons/tunie.png" alt=""><span><b>Tunie</b><small>Print a test</small></span></a><a href="flashie.html"><img src="img/icons/flashie.svg" alt=""><span><b>Flashie</b><small>Flash ESP32</small></span></a><a href="scopie.html"><img src="img/icons/scopie.png" alt=""><span><b>Scopie</b><small>A friendly oscilloscope app for Hantek</small></span></a><a href="meterie.html"><img src="img/icons/meterie.png" alt=""><span><b>Meterie</b><small>Connect your multimeter to show huge readings</small></span></a><a href="tracie.html"><img src="img/icons/tracie.svg" alt=""><span><b>Tracie</b><small>A serial monitor with a live plotter</small></span></a><a href="codie.html"><img src="img/icons/codie.svg" alt=""><span><b>Codie</b><small>A code explainer for 20+ languages</small></span></a><a class="menu-start" href="start.html">Getting started guide →</a></div></div>
+    <a class="hide-s" href="start.html">Getting started</a>
+    <a class="hide-s" href="about.html" aria-current="page">About Tinkerie</a>
+    <a class="hide-s" href="https://github.com/normanlove/tinkerie">GitHub</a>
+    <a class="btn btn-go" href="index.html#download" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg><span class="lbl">Download</span></a>
+    <button class="theme" id="theme" type="button" aria-label="Switch theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></button>
+  </nav>
+</div></header>
+<main id="main">
+<div class="ruler" aria-hidden="true"></div>
+<section class="hero" style="padding-bottom:30px"><div class="wrap">
+  <span class="tape">About</span>
+  <h1>About Tinkerie</h1>
+  <p class="lead" style="max-width:60ch">A few words from nrmluvdev on where these tools came from, the part AI played in building them, and why they'll always be free.</p>
+</div></section>
+<section class="band alt" style="padding-top:40px"><div class="wrap"><div class="stack prose">
+  <h2 id="why">Why it exists</h2>
+  <p>Tinkerie is the set of tools I wish I'd had at every stage of my journey into engineering, microelectronics and making in general. Designing a circuit board, printing a case for it, flashing its firmware, measuring what it's doing, working out what a piece of code actually does: each step used to mean another program, another account, another manual.</p>
+  <p>So I've tried to make those tools exist, in one place, for everyone else who could benefit from them.</p>
+
+  <h2 id="ai">My view on AI</h2>
+  <p>I believe AI is useful as a tool in the same way a saw is useful for cutting wood. It does the job it was designed for well, but it doesn't create things by itself. A saw doesn't decide what the table looks like.</p>
+  <p>AI is a language model, so it should be used to translate the ideas in your head into tangible things, not to come up with the ideas themselves.</p>
+
+  <h2 id="made">How Tinkerie is made</h2>
+  <p>Tinkerie is built mostly by AI, but the core ideas behind it are entirely mine: which tools should exist, what each one is for, what it should feel like to use, and who it's meant to help. The AI writes much of the code that turns those ideas into working software. I decide what gets built, test it, and choose what ships.</p>
+  <p>All of the source code is public on <a href="https://github.com/normanlove/tinkerie">GitHub</a>, so anyone can see exactly how every tool works.</p>
+
+  <h2 id="free">Free, forever</h2>
+  <div class="callout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-9.5v.5"/></svg><p><b>Every Tinkerie tool is, and always will be, completely free.</b> No paid tiers, no locked features, no accounts, no adverts.</p></div>
+  <p>I'll only ever ask for donations if the project grows to a point where it needs them to keep going, and even then, donating will never be required to use anything. Tinkerie is free software under the GNU General Public License, version 3 or later, so it stays free for everyone to use, study, share and improve.</p>
+  <p>&mdash; nrmluvdev</p>
+</div></div></section>
+</main>
+<footer><div class="wrap">
+  <div class="stack">
+    <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
+    <p>Free maker tools, designed and created by <b>nrmluvdev</b>. Version 0.9.1-alpha: Tinkerie is in alpha.</p>
+    <p>Free software under the GNU GPL, version 3 or later. It comes with no warranty.</p>
+  </div>
+  <div><h4>The apps</h4><ul><li><a href="wirie.html">Wirie</a></li><li><a href="makie.html">Makie</a></li><li><a href="tunie.html">Tunie</a></li><li><a href="flashie.html">Flashie</a></li><li><a href="scopie.html">Scopie</a></li><li><a href="meterie.html">Meterie</a></li><li><a href="tracie.html">Tracie</a></li><li><a href="codie.html">Codie</a></li></ul></div>
+  <div><h4>Help and source</h4><ul>
+    <li><a href="start.html">Getting started</a></li>
+    <li><a href="about.html">About Tinkerie</a></li>
+    <li><a href="index.html#faq">Questions</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie/releases">All downloads</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie">Source code on GitHub</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie/issues">Report a problem</a></li>
+    <li><a href="code-signing.html">Code signing policy</a></li>
+  </ul></div>
+</div></footer>
+<script src="site.js"></script>
+</div>
+</body>
+</html>
