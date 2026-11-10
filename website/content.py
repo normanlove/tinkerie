@@ -410,6 +410,66 @@ APPS = [
     callouts=[("info", "Logic analysers need a one-time setup: a USB driver on Windows (Zadig) and the free fx2lafw firmware, which Tracie finds automatically if PulseView is installed. On Linux and Raspberry Pi, run install-usb.sh once instead.")],
     pairs=[("flashie", "Flash a board, then watch it here."), ("scopie", "For analogue signals, not just digital ones.")],
   ),
+  dict(
+    id="codie", needshort="Nothing: just code", name="Codie", ver="0.1.0-alpha", color="#22c39a", icon="codie.svg",
+    tagline="Paste in code. Find out what every line does, and why.",
+    short="A code explainer for 20+ languages, with a game-development section and a Game school.",
+    need="Nothing but some code (examples included)",
+    plain=("In plain words",
+           "Found some code online, in a book or in a game you're modding, and not sure what it does? Paste it into Codie. "
+           "It explains every line in plain English: what it does and why it's there. It also spots game code, explains how that "
+           "engine's game loop works, and teaches the ideas every game uses."),
+    chips=["Line-by-line explanations", "20+ languages", "Windows Go", "Game logic", "Game school", "C64, ZX Spectrum and BBC BASIC"],
+    firsts=[
+      ("Pick an example", "The Examples menu has everyday programs, Windows Go, game engines and 1980s BASIC."),
+      ("Click a line", "Click any line of code (or any card) to see its explanation side by side."),
+      ("Open Game logic", "For game code, see how the engine runs one frame and where input, movement and collisions happen."),
+      ("Visit the Game school", "Short lessons with examples in many languages. Press Explain this example to read one line by line."),
+    ],
+    shots=[
+      ("codie-explain", "Explain: every line of a Unity script, with what it does and why."),
+      ("codie-game", "Game logic: how Unity runs one frame, and where this script fits in."),
+      ("codie-school", "Game school: collision detection, with examples from JavaScript to the Commodore 64."),
+    ],
+    features=[
+      ("Line by line", "What, and why.", [
+        "Each line gets what it does and why it's there, in plain English",
+        "Uses the names in your code: updatePlayer() 'probably updates the player'",
+        "Knows hundreds of well-known functions, from print to Time.deltaTime",
+        "Outline of functions, classes and loops, and a Concepts tab explaining the ideas used",
+        "Warnings for common slips: = instead of ==, ignored errors, slow calls every frame",
+        "Save the whole report as a text file",
+      ]),
+      ("Languages", "Everyday, scripting, game and retro.", [
+        "Python, JavaScript, TypeScript, C, C++, C#, Java, Go, Rust, Kotlin, Swift, PHP, Ruby, SQL, HTML and CSS",
+        "Bash, PowerShell and Windows batch files",
+        "Lua (LÖVE, PICO-8, Roblox Luau, Solar2D), GDScript (Godot) and GameMaker GML",
+        "BASIC: Commodore 64, ZX Spectrum, BBC Micro, Apple II, QBasic, QB64 and Visual Basic",
+        "Works out the language for you, or pick it yourself",
+      ]),
+      ("Windows Go", "Go that talks straight to Windows.", [
+        "//go:build windows files and their Linux/macOS partners",
+        "Loading DLLs with syscall.NewLazyDLL and finding functions with NewProc",
+        "What each common Windows function does (MessageBoxW, CreateFileW, GetAsyncKeyState…)",
+        "uintptr, unsafe.Pointer and UTF-16 text, and the mistakes to avoid",
+        "golang.org/x/sys/windows, the registry and services",
+      ]),
+      ("Game logic", "For game makers.", [
+        "Spots Unity, Unreal, Godot, LÖVE, PICO-8, Roblox, pygame, Phaser, raylib, SDL, MonoGame, GameMaker, Ebitengine, Bevy and SpriteKit",
+        "Shows how that engine runs one frame, in order, and which of its steps your code uses",
+        "Finds the game loop, delta time, input, movement, gravity, collisions, spawning, timers, randomness, score and states",
+        "Explains POKE and PEEK addresses on the Commodore 64, ZX Spectrum and Apple II",
+      ]),
+      ("Game school", "Twelve short lessons.", [
+        "The game loop, delta time, input, gravity and jumping, collisions, game states",
+        "Spawning, timers, randomness, score and saving, animation, and games on 8-bit machines",
+        "Each with working examples in several languages, ready to explain line by line",
+      ]),
+    ],
+    table=None,
+    callouts=[("info", "Codie reads code; it doesn't run it. Everything happens on your computer, so your code is never uploaded anywhere.")],
+    pairs=[("flashie", "Flashie's Create tab builds firmware code and explains it as it goes."), ("tracie", "Run your code on a board and watch what it prints.")],
+  ),
 ]
 
 APP = {a["id"]: a for a in APPS}

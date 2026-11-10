@@ -1,6 +1,6 @@
 > ⚠️ **Tinkerie is in alpha.** Everything works, but it's still being tested on real hardware, so expect rough edges and changes. Please [report](https://github.com/normanlove/tinkerie/issues) anything that doesn't work.
 
-Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie and Tracie in one program.
+Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie, Tracie and Codie in one program.
 
 ### Which file?
 - **Windows 10/11:** `Tinkerie.exe` (just run it), or `Tinkerie-{VERSION}-windows.zip` if your connection blocks .exe downloads (it also has the source)
@@ -11,9 +11,13 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 Each package has a *READ ME FIRST.txt*.
 
 ### New in {VERSION}
-- **Tidy-up release:** the version in the Windows file details (Properties › Details) and in a few examples and notes now matches the pre-1.0 alpha numbering. No changes to how the apps work.
+- **New app: Codie, the code explainer.** Paste code (or open a file) and Codie explains it line by line: what each part does and why it's there. It reads Python, JavaScript, TypeScript, C, C++, C#, Java, Go, Rust, Kotlin, Swift, PHP, Ruby, SQL, HTML, CSS, Bash, PowerShell, batch files, Lua, GDScript, GameMaker and BASIC, with an outline, the ideas the code uses and warnings about common mistakes.
+- **Windows Go:** Codie explains Go that calls Windows directly: build constraints, loading DLLs with syscall, finding Windows functions with NewProc, passing pointers with unsafe and golang.org/x/sys/windows.
+- **Game logic:** Codie recognises Unity, Unreal, Godot, LÖVE, PICO-8, Roblox, pygame, Phaser, raylib, SDL, MonoGame, GameMaker, Ebitengine, Bevy and SpriteKit, and the BASIC of the Commodore 64, ZX Spectrum, BBC Micro, Apple II and QBasic. It shows how each engine runs one frame and where the code handles input, movement, collisions, spawning, timers and score.
+- **Game school:** twelve short lessons (the game loop, delta time, input, gravity and jumping, collisions, game states, spawning, timers, randomness, score, animation and 8-bit machines), each with examples in several languages that Codie can explain.
 
 ### Also in recent alpha builds
+- 0.6.1-alpha: the version in the Windows file details now matches the alpha numbering.
 - **0.6.0-alpha, new version numbers:** while Tinkerie is in alpha, it and every app are numbered below 1.0. Apps: Makie and Scopie 0.9, Wirie 0.8, Flashie 0.7.1, Meterie 0.6, Tunie and Tracie 0.5.
 - **Flashie:** ESP32 Marauder and Bruce were removed from the firmware library.
 - Wirie's auto-router draws ground (GND) tracks too, and checks that the ground fill really reaches each pin.

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Codie — code explainer</title>
+<link rel="icon" href="icon.svg">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<!-- Codie · part of the free Tinkerie maker suite · created by nrmluvdev -->
+<header class="top">
+  <div class="brand">
+    <img src="icon.svg" alt="" width="34" height="34">
+    <div><b>Codie</b><small>Code explainer</small></div>
+  </div>
+  <div class="tools">
+    <label class="field" data-help="Language">
+      <span>Language</span>
+      <select id="lang" title="Language"><option value="">Auto-detect</option></select>
+    </label>
+    <label class="field" data-help="Examples">
+      <span>Examples</span>
+      <select id="examples" title="Examples"><option value="">Pick an example…</option></select>
+    </label>
+    <button id="open" class="btn" title="Open a code file">Open file…</button>
+    <input id="file" type="file" hidden>
+    <button id="explain" class="btn primary" title="Explain (Ctrl+Enter)">Explain</button>
+    <button id="clear" class="btn ghost" title="Clear the code">Clear</button>
+    <button id="save" class="btn ghost" title="Save the report">Save report</button>
+    <button id="teachBtn" class="btn ghost icon" title="Teaching tips (F2)">?</button>
+  </div>
+</header>
+
+<main class="split">
+  <section class="pane code-pane" aria-label="Your code">
+    <div class="pane-h">
+      <h2>Your code</h2>
+      <span id="detected" class="badge" title="Detected language"></span>
+      <label class="check" data-help="Live explain"><input type="checkbox" id="live" checked> Live explain</label>
+    </div>
+    <div class="editor" id="editor">
+      <div class="gutter" id="gutter" aria-hidden="true"></div>
+      <div class="area">
+        <div class="band" id="band"></div>
+        <div class="band hover" id="hband"></div>
+        <textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" aria-label="Code to explain" placeholder="Paste or type code here, open a file, or drop one on this box.&#10;&#10;Codie reads Python, JavaScript, TypeScript, C, C++, C#, Java, Go (including Windows Go), Rust, Kotlin, Swift, PHP, Ruby, SQL, HTML, CSS, Bash, PowerShell, batch files, Lua, GDScript, GameMaker and BASIC (C64, ZX Spectrum, BBC Micro, Apple II, QBasic, Visual Basic).&#10;&#10;Try the Examples menu above, or the Game school tab."></textarea>
+      </div>
+    </div>
+    <div class="foot" id="stats"></div>
+  </section>
+
+  <section class="pane report-pane" aria-label="Explanation">
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="explain" aria-selected="true" title="Explain">Explain</button>
+      <button role="tab" data-tab="outline" title="Outline">Outline <i id="nOutline"></i></button>
+      <button role="tab" data-tab="concepts" title="Concepts">Concepts <i id="nConcepts"></i></button>
+      <button role="tab" data-tab="game" title="Game logic">Game logic <i id="nGame"></i></button>
+      <button role="tab" data-tab="warnings" title="Warnings">Warnings <i id="nWarnings"></i></button>
+      <button role="tab" data-tab="school" title="Game school" class="school-tab">Game school</button>
+    </nav>
+    <div class="views">
+      <div class="view" id="v-explain">
+        <div class="explain-tools">
+          <label class="check" data-help="Show why"><input type="checkbox" id="showWhy" checked> Show why</label>
+          <label class="check" data-help="Show closing lines"><input type="checkbox" id="showClose" checked> Show closing lines</label>
+          <label class="check" data-help="Show notes"><input type="checkbox" id="showNotes" checked> Show notes</label>
+        </div>
+        <div id="summary" class="summary"></div>
+        <div id="lines" class="lines"></div>
+      </div>
+      <div class="view" id="v-outline" hidden><div id="outline"></div></div>
+      <div class="view" id="v-concepts" hidden><div id="concepts" class="cards"></div></div>
+      <div class="view" id="v-game" hidden><div id="game"></div></div>
+      <div class="view" id="v-warnings" hidden><div id="warnings"></div></div>
+      <div class="view school" id="v-school" hidden>
+        <aside id="lessonList" class="lesson-list" aria-label="Lessons"></aside>
+        <article id="lesson" class="lesson"></article>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="bar">
+  <span id="ver">Codie</span>
+  <span>Everything is explained on this computer: your code never leaves it.</span>
+  <span>Part of Tinkerie · made by nrmluvdev</span>
+</footer>
+
+<script src="teach-tips.js"></script>
+<script src="teach.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

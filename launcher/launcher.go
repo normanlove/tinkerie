@@ -23,7 +23,7 @@ import (
 )
 
 // Version is the suite version shown in the launcher.
-const Version = "0.6.1-alpha"
+const Version = "0.7.0-alpha"
 
 // App describes one tile in the launcher.
 type App struct {
@@ -45,6 +45,7 @@ var Apps = []App{
 	{"scopie", "Scopie", "Oscilloscope: Hantek 6022, network scopes and more", "0.9.0-alpha", "scopie.png", "", false},
 	{"meterie", "Meterie", "PC multimeter: HoldPeak, UNI-T, OWON, Brymen, Fluke…", "0.6.0-alpha", "meterie.png", "", false},
 	{"tracie", "Tracie", "Serial monitor and logic analyser", "0.5.0-alpha", "tracie.svg", "", false},
+	{"codie", "Codie", "Code explainer: paste code to see what each line does and why, with a game-development section", "0.1.0-alpha", "codie.svg", "", false},
 }
 
 // What each app can't do yet on this system (see PORTING.md).

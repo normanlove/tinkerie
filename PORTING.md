@@ -64,6 +64,7 @@ Each app serves its window from its own local port (127.0.0.1 only). They must n
 | Wirie | 47820 | the same |
 | Tunie | 47821 | the same |
 | Tracie | 47822 | the same |
+| Codie | 47824 | the same as Makie |
 | Meterie | 47823 (suite link, for other apps to read the meter) | any free port, written to `%APPDATA%\nrmluvdev\suite\meterie.json` |
 | Scopie | 47831 | the same as Makie |
 | Flashie, launcher | any free port | |
@@ -89,7 +90,7 @@ Like Raspberry Pi Imager: pick an OS from Raspberry Pi's official catalogue (`os
 
 ## Teaching mode
 
-Wirie, Makie, Tunie, Flashie and Tracie are web pages. Each loads `teach-tips.js` (its explanations) and `teach.js` (the card, shared by all). Edit `shared/teach.js`, then copy it into `apps/{wirie,makie,tunie,tracie}/web/` and `apps/flashie/`. Scopie keeps its own help bar (`apps/scopie/web/tips.js`). Meterie draws its own window, so its version is `apps/meterie/teach.go`, and `TestTeachingCoverage` lists any control without an explanation.
+Wirie, Makie, Tunie, Flashie, Tracie and Codie are web pages. Each loads `teach-tips.js` (its explanations) and `teach.js` (the card, shared by all). Edit `shared/teach.js`, then copy it into `apps/{wirie,makie,tunie,tracie,codie}/web/` and `apps/flashie/`. Scopie keeps its own help bar (`apps/scopie/web/tips.js`). Meterie draws its own window, so its version is `apps/meterie/teach.go`, and `TestTeachingCoverage` lists any control without an explanation.
 
 ## Notes
 

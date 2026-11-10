@@ -15,6 +15,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"tinkerie/apps/codie"
 	"tinkerie/apps/flashie"
 	"tinkerie/apps/makie"
 	"tinkerie/apps/meterie"
@@ -33,6 +34,7 @@ var mains = map[string]func(){
 	"tunie":   tunie.Main,
 	"tracie":  tracie.Main,
 	"meterie": meterie.Main,
+	"codie":   codie.Main,
 }
 
 func main() {

@@ -35,7 +35,7 @@ jobs:
           go-version: '1.24'
       - name: Test Flashie and shared code
         if: steps.v.outputs.new == 'yes'
-        run: go test ./apps/flashie/... ./shared/... .
+        run: go test ./apps/flashie/... ./apps/codie/... ./shared/... .
       - name: Build and package
         if: steps.v.outputs.new == 'yes'
         run: ./package.sh

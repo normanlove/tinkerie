@@ -36,6 +36,7 @@ Double-click `Tinkerie.exe` to open the launcher and pick an app. Each app opens
 | **Scopie** | Oscilloscope program (Hantek 6022BE/BL and others, plus network scopes and demo) | 0.9.0-alpha |
 | **Meterie** | PC multimeter: HoldPeak HP-90EPC, UNI-T, OWON, Brymen, Fluke and more | 0.6.0-alpha |
 | **Tracie** | Serial monitor and logic analyser | 0.5.0-alpha |
+| **Codie** | Code explainer: paste code and see what each line does and why, in 20+ languages (including Windows Go and the BASIC of the C64, ZX Spectrum and BBC Micro), with a game-development section and a Game school | 0.1.0-alpha |
 
 Every app's own guide is its `README.md` in `apps\<name>\`.
 
@@ -71,7 +72,7 @@ Mac builds come out as `dist/<name>/Tinkerie.app`, Linux and Pi builds as `dist/
 
 | | Windows | Linux, Raspberry Pi | Mac |
 |---|---|---|---|
-| Launcher, Wirie, Makie, Tunie, Flashie | everything | everything | everything |
+| Launcher, Wirie, Makie, Tunie, Flashie, Codie | everything | everything | everything |
 | Scopie | everything | everything (USB scopes: run `install-usb.sh` once) | no USB scopes yet |
 | Tracie | everything | everything (logic analyser: run `install-usb.sh` once) | serial monitor; no logic analyser yet |
 | Meterie | everything | USB-serial meters (like the HoldPeak HP-90EPC) | USB-serial meters |
