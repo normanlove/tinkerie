@@ -3,14 +3,14 @@
 
 APPS = [
   dict(
-    id="wirie", needshort="No hardware needed", name="Wirie", ver="0.8.0-alpha", color="#ef8a3c", icon="wirie.png",
+    id="wirie", needshort="No hardware needed", name="Wirie", ver="0.9.0-alpha", color="#ef8a3c", icon="wirie.png",
     tagline="Design your own circuit boards, even if you've never made one before.",
-    short="Design circuit boards, plan stripboard builds, look up pinouts and work out battery life.",
+    short="Design circuit boards and custom keyboards, plan stripboard builds, look up pinouts and work out battery life.",
     need="No hardware needed",
     plain=("In plain words",
            "You pick parts like a Raspberry Pi Pico, a sensor and a button, draw which pins connect, and Wirie lays out the copper tracks for you. "
            "Then you can send the board off to be made, etch it at home, or build it on cheap stripboard with Wirie's step-by-step plan."),
-    chips=["700+ parts", "Auto-router", "Stripboard planner", "26 interactive pinouts", "Ready for JLCPCB / PCBWay"],
+    chips=["700+ parts", "Auto-router", "Stripboard planner", "Custom keyboards", "26 interactive pinouts", "Ready for JLCPCB / PCBWay"],
     firsts=[
       ("Open the example", "On the welcome screen, click Example project: a Pico weather station with a screen, sensor, button and LED."),
       ("Look around", "Click a part to see its pins. Point at any button and teaching mode explains what it does."),
@@ -23,6 +23,8 @@ APPS = [
       ("wirie-pinnie", "Pinnie: hover a pin to see what it can do."),
       ("wirie-powerie", "Powerie: how long will it run on a battery?"),
       ("wirie-calcie", "Calcie: everyday electronics maths."),
+      ("wirie-keebie", "Keebie: a 65% wave keyboard with an Elite-C, ready to build."),
+      ("wirie-keebie-pcb", "Keebie built this Corne half on the PCB tab, then the auto-router wired every key."),
     ],
     features=[
       ("PCB: real circuit boards", "Design a two-layer board, then have it made.", [
@@ -48,6 +50,14 @@ APPS = [
         "Each part's awake and sleep current, plus a wake-up schedule",
         "Regulator losses and dropout, a runtime estimate, a breakdown chart and tips",
         "Imports the parts from your PCB",
+      ]),
+      ("Keebie: custom keyboard PCBs", "Design a mechanical keyboard, and Keebie builds the board.", [
+        "Start from a macropad, numpad, 40%, 60%, 65%, 75%, TKL, full size, Alice, Corne, Lily58 or Sweep, a grid, or a KLE layout",
+        "Every key size (1u to 7u, tall keys, ISO Enter) at any angle, MX or Choc switches (soldered or hot-swap) and Alps, and keycap profiles",
+        "Shape it: hug the keys or draw your own outline, wave rows, arcs, Alice-style angled splits or two halves joined by TRRS",
+        "Turn the switch solder points per key for custom-height builds",
+        "Pick any common controller (Pro Micro, Elite-C, RP2040 boards, Pico, Black Pill, nice!nano, XIAO) or a bare ATmega32U4, RP2040 or STM32 chip, and Keebie adds the USB-C, crystal, regulator, flash and buttons it needs",
+        "Diodes, matrix, per-key RGB, stabilisers and mounting holes are placed for you; QMK/ZMK firmware files and a switch plate (SVG/DXF) come out too",
       ]),
       ("Calcie: electronics maths", "The calculators every maker keeps looking up.", [
         "Ohm's law, resistor colour codes, E-series values, LED resistor",

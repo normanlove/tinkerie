@@ -11,12 +11,14 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 Each package has a *READ ME FIRST.txt*.
 
 ### New in {VERSION}
-- **New app: Codie, the code explainer.** Paste code (or open a file) and Codie explains it line by line: what each part does and why it's there. It reads Python, JavaScript, TypeScript, C, C++, C#, Java, Go, Rust, Kotlin, Swift, PHP, Ruby, SQL, HTML, CSS, Bash, PowerShell, batch files, Lua, GDScript, GameMaker and BASIC, with an outline, the ideas the code uses and warnings about common mistakes.
-- **Windows Go:** Codie explains Go that calls Windows directly: build constraints, loading DLLs with syscall, finding Windows functions with NewProc, passing pointers with unsafe and golang.org/x/sys/windows.
-- **Game logic:** Codie recognises Unity, Unreal, Godot, LÖVE, PICO-8, Roblox, pygame, Phaser, raylib, SDL, MonoGame, GameMaker, Ebitengine, Bevy and SpriteKit, and the BASIC of the Commodore 64, ZX Spectrum, BBC Micro, Apple II and QBasic. It shows how each engine runs one frame and where the code handles input, movement, collisions, spawning, timers and score.
-- **Game school:** twelve short lessons (the game loop, delta time, input, gravity and jumping, collisions, game states, spawning, timers, randomness, score, animation and 8-bit machines), each with examples in several languages that Codie can explain.
+- **New in Wirie: Keebie, custom keyboard PCBs.** Lay out your keys (presets from macropads to full size, grids, KLE import, every key size, ISO Enter, any angle), shape the board (hug the keys, rectangle or your own corners, wave rows, arcs, Alice-style angled splits or two halves with TRRS) and press Build: Keebie places the switches, diodes, matrix, stabilisers, per-key RGB LEDs and mounting holes on the PCB.
+- **Every common keyboard controller:** Pro Micro, Elite-C, RP2040 Pro Micro boards, Pico, RP2040-Zero, XIAO RP2040, Black Pill, nice!nano and XIAO nRF52840, or bare ATmega32U4, RP2040 and STM32 chips with all their support circuitry (USB-C, fuse, crystal, regulator, flash, reset and boot buttons) added for you.
+- **Switches and caps:** MX and Choc, soldered or hot-swap, and Alps; keycap profiles; switch footprints can be turned per key for custom-height builds.
+- **Firmware and plate:** Keebie writes QMK (or ZMK for wireless) files with your matrix pins, and the switch plate as SVG or DXF.
+- Wirie now supports custom board outlines, cut-outs and parts at any angle.
 
 ### Also in recent alpha builds
+- **0.7.0-alpha, new app: Codie, the code explainer.** Paste code (or open a file) and Codie explains it line by line, in 20+ languages including Windows Go and 8-bit BASIC, with a Game logic tab and a Game school.
 - 0.6.1-alpha: the version in the Windows file details now matches the alpha numbering.
 - **0.6.0-alpha, new version numbers:** while Tinkerie is in alpha, it and every app are numbered below 1.0. Apps: Makie and Scopie 0.9, Wirie 0.8, Flashie 0.7.1, Meterie 0.6, Tunie and Tracie 0.5.
 - **Flashie:** ESP32 Marauder and Bruce were removed from the firmware library.

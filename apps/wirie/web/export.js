@@ -32,7 +32,7 @@ function copperItemsOn(layer) {
   return out;
 }
 function emitItem(gb, it, grow) {
-  if (it.kind === "pad") { const p = it.ref; gb.flash(p.x, p.y, p.shape, p.w + 2 * grow, p.h + 2 * grow); }
+  if (it.kind === "pad") { const p = it.ref; if (p.ang) { if (p.shape === "rect") gb.region(padCorners(p, grow)); else { const s = padShape(p); gb.poly([[s.ax, s.ay], [s.bx, s.by]], Math.min(p.w, p.h) + 2 * grow); } } else gb.flash(p.x, p.y, p.shape, p.w + 2 * grow, p.h + 2 * grow); }
   else if (it.kind === "via") gb.flash(it.ref.x, it.ref.y, "circle", it.ref.d + 2 * grow);
   else { const s = it.shape; gb.poly([[s.ax, s.ay], [s.bx, s.by]], s.r * 2 + 2 * grow); }
 }
@@ -46,8 +46,9 @@ function gerberCopper(layer) {
   const A = analyze(); const items = copperItemsOn(layer);
   const pn = pourActive(layer);
   if (pn) {
-    gb.region(boardPolygon(S.board.edgeClear));
+    for (const bp of boardPolys(S.board.edgeClear)) gb.region(bp);
     gb.polarity(false);
+    for (const c of S.board.cutouts || []) gb.region(offsetPoly(c, -S.board.edgeClear));
     for (const it of items) if (it.cnet !== pn || it.kind === "pad") emitItem(gb, it, S.board.pourClear);
     for (const h of A.holes) gb.flash(h.x, h.y, "circle", h.d + 2 * S.board.pourClear);
     gb.polarity(true);
@@ -120,7 +121,7 @@ function gerberSilk(layer) {
 }
 function gerberOutline() {
   const gb = new Gerber("Profile,NP");
-  const p = boardPolygon(0); gb.poly([...p, p[0]], 0.1);
+  for (const p of [...boardPolys(0), ...(S.board.cutouts || [])]) gb.poly([...p, p[0]], 0.1);
   return gb.toString();
 }
 function excellon(plated) {
@@ -184,7 +185,7 @@ function svgLayer(layer, mirror, what = "copper") {
   const tf = mirror ? `translate(${W - pad},${pad}) scale(-1,1)` : `translate(${pad},${pad})`;
   const parts = [];
   const shapeSVG = (it, grow, fill) => {
-    if (it.kind === "pad") { const p = it.ref; const w = p.w + 2 * grow, h = p.h + 2 * grow; const rr = p.shape === "rect" ? 0 : Math.min(w, h) / 2; return `<rect x="${(p.x - w / 2).toFixed(3)}" y="${(p.y - h / 2).toFixed(3)}" width="${w.toFixed(3)}" height="${h.toFixed(3)}" rx="${rr.toFixed(3)}" fill="${fill}"/>`; }
+    if (it.kind === "pad") { const p = it.ref; const w = p.w + 2 * grow, h = p.h + 2 * grow; const rr = p.shape === "rect" ? 0 : Math.min(w, h) / 2; return `<rect${p.ang ? ` transform="rotate(${(p.ang * 180 / Math.PI).toFixed(3)} ${p.x.toFixed(3)} ${p.y.toFixed(3)})"` : ""} x="${(p.x - w / 2).toFixed(3)}" y="${(p.y - h / 2).toFixed(3)}" width="${w.toFixed(3)}" height="${h.toFixed(3)}" rx="${rr.toFixed(3)}" fill="${fill}"/>`; }
     if (it.kind === "via") return `<circle cx="${it.ref.x}" cy="${it.ref.y}" r="${it.ref.d / 2 + grow}" fill="${fill}"/>`;
     const s = it.shape; return `<line x1="${s.ax}" y1="${s.ay}" x2="${s.bx}" y2="${s.by}" stroke="${fill}" stroke-width="${2 * s.r + 2 * grow}" stroke-linecap="round"/>`;
   };
@@ -192,7 +193,7 @@ function svgLayer(layer, mirror, what = "copper") {
   if (what === "copper") {
     const items = copperItemsOn(layer); const pn = pourActive(layer);
     if (pn) {
-      parts.push(`<mask id="pm"><rect x="-10" y="-10" width="${W + 20}" height="${H + 20}" fill="black"/><polygon points="${poly(boardPolygon(B.edgeClear))}" fill="white"/>${items.filter(i => i.cnet !== pn || i.kind === "pad").map(i => shapeSVG(i, B.pourClear, "black")).join("")}${items.filter(i => i.kind === "pad" && i.cnet === pn).flatMap(i => thermalSpokes(i.ref)).map(s => `<line x1="${s[0]}" y1="${s[1]}" x2="${s[2]}" y2="${s[3]}" stroke="white" stroke-width="${SPOKE_W}"/>`).join("")}${A.holes.map(h => `<circle cx="${h.x}" cy="${h.y}" r="${h.d / 2 + B.pourClear}" fill="black"/>`).join("")}</mask>`);
+      parts.push(`<mask id="pm"><rect x="-10" y="-10" width="${W + 20}" height="${H + 20}" fill="black"/>${boardPolys(B.edgeClear).map(bp => `<polygon points="${poly(bp)}" fill="white"/>`).join("")}${(B.cutouts || []).map(c => `<polygon points="${poly(offsetPoly(c, -B.edgeClear))}" fill="black"/>`).join("")}${items.filter(i => i.cnet !== pn || i.kind === "pad").map(i => shapeSVG(i, B.pourClear, "black")).join("")}${items.filter(i => i.kind === "pad" && i.cnet === pn).flatMap(i => thermalSpokes(i.ref)).map(s => `<line x1="${s[0]}" y1="${s[1]}" x2="${s[2]}" y2="${s[3]}" stroke="white" stroke-width="${SPOKE_W}"/>`).join("")}${A.holes.map(h => `<circle cx="${h.x}" cy="${h.y}" r="${h.d / 2 + B.pourClear}" fill="black"/>`).join("")}</mask>`);
       parts.push(`<rect x="-10" y="-10" width="${W + 20}" height="${H + 20}" fill="#000" mask="url(#pm)"/>`);
     }
     for (const it of items) parts.push(shapeSVG(it, 0, "#000"));
@@ -202,7 +203,7 @@ function svgLayer(layer, mirror, what = "copper") {
   } else {
     for (const l of silkLines(layer)) parts.push(`<polyline points="${poly(l.pts)}" fill="none" stroke="#000" stroke-width="${l.w}" stroke-linecap="round" stroke-linejoin="round"/>`);
   }
-  parts.push(`<polygon points="${poly(boardPolygon(0))}" fill="none" stroke="#000" stroke-width="0.1"/>`);
+  for (const bp of [...boardPolys(0), ...(B.cutouts || [])]) parts.push(`<polygon points="${poly(bp)}" fill="none" stroke="#000" stroke-width="0.1"/>`);
   for (const h of A.holes) parts.push(`<circle cx="${h.x}" cy="${h.y}" r="${h.d / 2}" fill="none" stroke="#000" stroke-width="0.1"/>`);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}mm" height="${H}mm" viewBox="0 0 ${W} ${H}"><g transform="${tf}">${parts.join("")}</g></svg>`;
 }

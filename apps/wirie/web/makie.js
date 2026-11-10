@@ -148,6 +148,6 @@ function renderBoardPNG(flip, ppm) {
   try { drawPCB(c); } finally { Object.defineProperty(window, "devicePixelRatio", { value: d, configurable: true }); Object.assign(VIEW, keep); UI.sel = keepSel; UI.dirty = true; }
   // keep only the board (transparent outside the outline)
   const ctx = c.getContext("2d"); ctx.setTransform(ppm, 0, 0, ppm, 0, 0); ctx.globalCompositeOperation = "destination-in";
-  pathPoly(ctx, flip ? boardPolygon(0).map(([x, y]) => [B.w - x, y]) : boardPolygon(0)); ctx.fill();
+  ctx.beginPath(); for (const bp of boardPolys(0)) { (flip ? bp.map(([x, y]) => [B.w - x, y]) : bp).forEach((q, i) => (i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]))); ctx.closePath(); } ctx.fill();
   return c.toDataURL("image/png");
 }

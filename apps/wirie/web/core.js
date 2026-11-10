@@ -1,7 +1,7 @@
 // Wirie core: project model, geometry, nets & connectivity — by nrmluvdev
 "use strict";
 
-const APP = { name: "Wirie", version: "0.8.0-alpha", author: "nrmluvdev" };
+const APP = { name: "Wirie", version: "0.9.0-alpha", author: "nrmluvdev" };
 
 function newProject() {
   return {
@@ -35,7 +35,10 @@ function redo() { if (!UNDO.redo.length) return; UNDO.stack.push(UNDO.last); UND
 const snapTo = (v, g) => Math.round(v / g) * g;
 const dist = (ax, ay, bx, by) => Math.hypot(ax - bx, ay - by);
 function rotPt(x, y, rot) {
-  switch (((rot % 360) + 360) % 360) { case 90: return [-y, x]; case 180: return [-x, -y]; case 270: return [y, -x]; default: return [x, y]; }
+  const r = ((rot % 360) + 360) % 360;
+  switch (r) { case 0: return [x, y]; case 90: return [-y, x]; case 180: return [-x, -y]; case 270: return [y, -x]; }
+  const a = r * Math.PI / 180, c = Math.cos(a), s = Math.sin(a); // any angle (keyboards: splayed and wavy keys)
+  return [x * c - y * s, x * s + y * c];
 }
 function compXform(c, x, y) { const lx = c.side === "bottom" ? -x : x; const [rx, ry] = rotPt(lx, y, c.rot); return [c.x + rx, c.y + ry]; }
 function compFP(c) { return LIB_BY_ID[c.fp]; }
@@ -45,27 +48,30 @@ let CACHE = null;
 function invalidate() { CACHE = null; if (typeof stripInvalidate === "function") stripInvalidate(); if (typeof UI !== "undefined") UI.dirty = true; }
 function padsOf(c) {
   const fp = compFP(c); if (!fp) return [];
-  const sw = c.rot % 180 !== 0;
+  const rr = ((c.rot % 360) + 360) % 360, q = Math.round(rr / 90) * 90;
+  const odd = Math.abs(rr - q) > 1e-6; // not a multiple of 90°: pads keep their own angle
+  const sw = (odd ? q : rr) % 180 !== 0;
+  const ang = odd ? (c.side === "bottom" ? -1 : 1) * (rr - q) * Math.PI / 180 : 0;
   return fp.pads.map(p => {
     const [x, y] = compXform(c, p.x, p.y);
     const side = c.side || "top", other = side === "top" ? "bottom" : "top";
     return { key: c.id + ":" + p.n, comp: c, fpPad: p, n: p.n, name: p.name, func: p.func, x, y, w: sw ? p.h : p.w, h: sw ? p.w : p.h, shape: p.shape, drill: p.drill,
       slot: p.slot ? (sw ? [p.slot[1], p.slot[0]] : p.slot) : null,
-      layers: p.drill ? ["top", "bottom"] : [p.opp ? other : side] };
+      layers: p.drill ? ["top", "bottom"] : [p.opp ? other : side], ang };
   });
 }
 function holesOf(c) { const fp = compFP(c); if (!fp) return []; return fp.holes.map(h => { const [x, y] = compXform(c, h.x, h.y); return { x, y, d: h.d, comp: c }; }); }
 function compBox(c) {
   const fp = compFP(c); if (!fp) return { x0: c.x - 1, y0: c.y - 1, x1: c.x + 1, y1: c.y + 1 };
-  const b = fp.body; const pts = [[b.x - b.w / 2, b.y - b.h / 2], [b.x + b.w / 2, b.y + b.h / 2]];
-  for (const p of fp.pads) { pts.push([p.x - p.w / 2, p.y - p.h / 2], [p.x + p.w / 2, p.y + p.h / 2]); }
+  const b = fp.body; const pts = [[b.x - b.w / 2, b.y - b.h / 2], [b.x + b.w / 2, b.y + b.h / 2], [b.x - b.w / 2, b.y + b.h / 2], [b.x + b.w / 2, b.y - b.h / 2]];
+  for (const p of fp.pads) { pts.push([p.x - p.w / 2, p.y - p.h / 2], [p.x + p.w / 2, p.y + p.h / 2], [p.x - p.w / 2, p.y + p.h / 2], [p.x + p.w / 2, p.y - p.h / 2]); }
   let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
   for (const [x, y] of pts) { const [wx, wy] = compXform(c, x, y); x0 = Math.min(x0, wx); x1 = Math.max(x1, wx); y0 = Math.min(y0, wy); y1 = Math.max(y1, wy); }
   return { x0, y0, x1, y1 };
 }
 function bodyRect(c) {
-  const b = compFP(c).body; const [ax, ay] = compXform(c, b.x - b.w / 2, b.y - b.h / 2); const [bx, by] = compXform(c, b.x + b.w / 2, b.y + b.h / 2);
-  return { x0: Math.min(ax, bx), y0: Math.min(ay, by), x1: Math.max(ax, bx), y1: Math.max(ay, by) };
+  const b = compFP(c).body; const P = [[-1, -1], [1, 1], [-1, 1], [1, -1]].map(([sx, sy]) => compXform(c, b.x + sx * b.w / 2, b.y + sy * b.h / 2));
+  return { x0: Math.min(...P.map(p => p[0])), y0: Math.min(...P.map(p => p[1])), x1: Math.max(...P.map(p => p[0])), y1: Math.max(...P.map(p => p[1])) };
 }
 
 // segment / shape distances. Shapes: {t:'cap', ax,ay,bx,by,r} or {t:'rect', cx,cy,hw,hh}
@@ -93,18 +99,34 @@ function segRectDist(ax, ay, bx, by, r) {
   return m;
 }
 function shapeDist(A, B) {
+  if (A.t === "poly" || B.t === "poly") { // turned pads: distance from the polygon's edges
+    if (B.t === "poly" && A.t !== "poly") return shapeDist(B, A);
+    const P = A.pts, rect2poly = r => [[r.cx - r.hw, r.cy - r.hh], [r.cx + r.hw, r.cy - r.hh], [r.cx + r.hw, r.cy + r.hh], [r.cx - r.hw, r.cy + r.hh]];
+    if (B.t === "cap" && ptInPoly(B.ax, B.ay, P)) return -1;
+    const Q = B.t === "poly" ? B.pts : B.t === "rect" ? rect2poly(B) : null;
+    if (Q && (ptInPoly(Q[0][0], Q[0][1], P) || ptInPoly(P[0][0], P[0][1], Q))) return -1;
+    let m = 1e9;
+    for (let i = 0; i < P.length; i++) { const a = P[i], b = P[(i + 1) % P.length];
+      if (B.t === "cap") m = Math.min(m, segSegDist(a[0], a[1], b[0], b[1], B.ax, B.ay, B.bx, B.by) - B.r);
+      else for (let j = 0; j < Q.length; j++) { const c = Q[j], d = Q[(j + 1) % Q.length]; m = Math.min(m, segSegDist(a[0], a[1], b[0], b[1], c[0], c[1], d[0], d[1])); } }
+    return m <= 0 ? -1 : m;
+  }
   if (A.t === "cap" && B.t === "cap") return segSegDist(A.ax, A.ay, A.bx, A.by, B.ax, B.ay, B.bx, B.by) - A.r - B.r;
   if (A.t === "rect" && B.t === "rect") { const dx = Math.max(Math.abs(A.cx - B.cx) - A.hw - B.hw, 0), dy = Math.max(Math.abs(A.cy - B.cy) - A.hh - B.hh, 0); const d = Math.hypot(dx, dy); return d === 0 ? -1 : d; }
   if (A.t === "rect") return shapeDist(B, A);
   return segRectDist(A.ax, A.ay, A.bx, A.by, B) - A.r;
 }
+// corners of a pad turned by a non-90° angle
+function padCorners(p, grow = 0) { const w = p.w / 2 + grow, h = p.h / 2 + grow, c = Math.cos(p.ang), s = Math.sin(p.ang); return [[-w, -h], [w, -h], [w, h], [-w, h]].map(([x, y]) => [p.x + x * c - y * s, p.y + x * s + y * c]); }
 function padShape(p) {
+  if (p.ang && p.shape === "rect") return { t: "poly", pts: padCorners(p) }; // turned rectangle
+  if (p.ang) { const r = Math.min(p.w, p.h) / 2, L = (Math.max(p.w, p.h) - 2 * r) / 2, a = p.ang + (p.h > p.w ? Math.PI / 2 : 0); return { t: "cap", ax: p.x - L * Math.cos(a), ay: p.y - L * Math.sin(a), bx: p.x + L * Math.cos(a), by: p.y + L * Math.sin(a), r }; }
   if (p.shape === "rect") return { t: "rect", cx: p.x, cy: p.y, hw: p.w / 2, hh: p.h / 2 };
   const r = Math.min(p.w, p.h) / 2, ex = (p.w - 2 * r) / 2, ey = (p.h - 2 * r) / 2;
   return { t: "cap", ax: p.x - ex, ay: p.y - ey, bx: p.x + ex, by: p.y + ey, r };
 }
-function shapeBox(s) { return s.t === "rect" ? [s.cx - s.hw, s.cy - s.hh, s.cx + s.hw, s.cy + s.hh] : [Math.min(s.ax, s.bx) - s.r, Math.min(s.ay, s.by) - s.r, Math.max(s.ax, s.bx) + s.r, Math.max(s.ay, s.by) + s.r]; }
-function ptInShape(x, y, s, tol = 0) { return s.t === "rect" ? ptRectDist(x, y, s) <= tol : ptSegDist(x, y, s.ax, s.ay, s.bx, s.by) <= s.r + tol; }
+function shapeBox(s) { if (s.t === "poly") { const xs = s.pts.map(q => q[0]), ys = s.pts.map(q => q[1]); return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)]; } return s.t === "rect" ? [s.cx - s.hw, s.cy - s.hh, s.cx + s.hw, s.cy + s.hh] : [Math.min(s.ax, s.bx) - s.r, Math.min(s.ay, s.by) - s.r, Math.max(s.ax, s.bx) + s.r, Math.max(s.ay, s.by) + s.r]; }
+function ptInShape(x, y, s, tol = 0) { if (s.t === "poly") return ptInPoly(x, y, s.pts) || ptPolyEdgeDist(x, y, s.pts) <= tol; return s.t === "rect" ? ptRectDist(x, y, s) <= tol : ptSegDist(x, y, s.ax, s.ay, s.bx, s.by) <= s.r + tol; }
 
 // ---------------- nets ----------------
 class UF { constructor() { this.p = new Map(); } find(a) { let p = this.p.get(a); if (p === undefined) { this.p.set(a, a); return a; } if (p === a) return a; const r = this.find(p); this.p.set(a, r); return r; } union(a, b) { const ra = this.find(a), rb = this.find(b); if (ra !== rb) this.p.set(ra, rb); } }
@@ -144,7 +166,7 @@ function pourLink(layer, items, holes, isPour, cu) {
   p.setTransform(1, 0, 0, 1, 0, 0); p.clearRect(0, 0, W, H);
   p.setTransform(1 / res, 0, 0, 1 / res, 0, 0);
   const on = items.filter(it => it.layers.includes(layer));
-  p.fillStyle = "#fff"; pathPoly(p, boardPolygon(B.edgeClear)); p.fill();
+  p.fillStyle = "#fff"; pathBoard(p, B.edgeClear); p.fill();
   p.globalCompositeOperation = "destination-out"; p.fillStyle = "#000"; p.strokeStyle = "#000"; p.lineCap = "round";
   for (const it of on) if (!isPour(it) || it.kind === "pad") itemPath(p, it, B.pourClear);
   p.globalCompositeOperation = "source-over"; p.strokeStyle = "#fff"; p.lineWidth = SPOKE_W; p.lineCap = "butt";
@@ -212,6 +234,7 @@ function analyze() {
     let best = [9, null];
     for (const p of ps) { const pr = netPriority(p.name); if (pr[0] < best[0]) best = pr; }
     let name = best[1];
+    if (S.netLabels) for (const p of ps) { const lb = S.netLabels[p.key]; if (lb && (!name || netPriority(lb)[0] < 9)) { name = lb; break; } }
     if (!name) { const bus = ps.map(p => p.func).find(f => /^(SDA|SCL|MOSI|MISO|SCK)$/.test(f || "")); const nonBus = ps.some(p => p.func && !/^(SDA|SCL|MOSI|MISO|SCK|SIG|ADC|CS)$/.test(p.func)); if (bus && !nonBus) name = bus; }
     if (!name) { const lead = ps.slice().sort((a, b) => (compFP(b.comp).mcu ? 1 : 0) - (compFP(a.comp).mcu ? 1 : 0))[0]; name = (compFP(lead.comp).pinLabels ? lead.name : lead.comp.ref + "_" + lead.name); }
     nets.push({ root: r, name, pads: ps, idx: 0 });
@@ -306,17 +329,51 @@ function runDRC() {
   for (const s of A.shorts) out.push({ sev: "err", msg: `Short circuit between nets ${s.names}`, x: s.x, y: s.y });
   for (const r of A.rats) out.push({ sev: "warn", msg: `Not routed yet: ${r.net.name} (${r.a.comp.ref}.${r.a.name} → ${r.b.comp.ref}.${r.b.name})`, x: (r.a.x + r.b.x) / 2, y: (r.a.y + r.b.y) / 2 });
   // board edge
-  for (const it of A.items) { const bx = it.box; const e = B.edgeClear; if (!insideBoard(bx[0] + 0, bx[1], e) || !insideBoard(bx[2], bx[3], e) || !insideBoard(bx[0], bx[3], e) || !insideBoard(bx[2], bx[1], e)) out.push({ sev: it.kind === "pad" ? "err" : "warn", msg: `Copper too close to / outside the board edge: ${desc(it)}`, x: (bx[0] + bx[2]) / 2, y: (bx[1] + bx[3]) / 2 }); }
+  const custom = (B.polys && B.polys.length) || (B.cutouts && B.cutouts.length);
+  const edgeBad = (it, e) => { // custom outlines: test the copper's real shape, not its bounding box
+    const s = it.shape, nc = it.kind === "pad" && compFP(it.ref.comp).cutout; // reverse-mount LEDs sit in their cut-out on purpose
+    if (s.t === "poly") return s.pts.some(([x, y]) => !insideBoard(x, y, e, nc));
+    if (s.t === "rect") return [[-1, -1], [1, -1], [1, 1], [-1, 1]].some(([a, b]) => !insideBoard(s.cx + a * s.hw, s.cy + b * s.hh, e, nc));
+    const L = Math.hypot(s.bx - s.ax, s.by - s.ay), n = Math.max(1, Math.ceil(L / 0.4));
+    for (let i = 0; i <= n; i++) if (!insideBoard(s.ax + (s.bx - s.ax) * i / n, s.ay + (s.by - s.ay) * i / n, e + s.r - 0.02)) return true;
+    return false;
+  };
+  for (const it of A.items) { const bx = it.box; const e = B.edgeClear; if (custom ? edgeBad(it, e) : (!insideBoard(bx[0] + 0, bx[1], e) || !insideBoard(bx[2], bx[3], e) || !insideBoard(bx[0], bx[3], e) || !insideBoard(bx[2], bx[1], e))) out.push({ sev: it.kind === "pad" ? "err" : "warn", msg: `Copper too close to / outside the board edge: ${desc(it)}`, x: (bx[0] + bx[2]) / 2, y: (bx[1] + bx[3]) / 2 }); }
   for (const h of A.holes) for (const it of A.items) { if (Math.abs(it.box[0] - h.x) > 20) continue; const d = shapeDist(it.shape, { t: "cap", ax: h.x, ay: h.y, bx: h.x, by: h.y, r: h.d / 2 }); if (d < B.clear) out.push({ sev: "err", msg: `Copper too close to mounting hole: ${desc(it)}`, x: h.x, y: h.y }); }
   // overlapping parts (pads of different parts overlapping)
-  for (const c of S.comps) { const fp = compFP(c); if (!fp) out.push({ sev: "err", msg: `Unknown part ${c.ref}`, x: c.x, y: c.y }); else if (fp.verify) out.push({ sev: "info", msg: `${c.ref} (${fp.name}): check pin positions against your actual module before ordering`, x: c.x, y: c.y }); }
+  const ver = {};
+  for (const c of S.comps) { const fp = compFP(c); if (!fp) out.push({ sev: "err", msg: `Unknown part ${c.ref}`, x: c.x, y: c.y }); else if (fp.verify) (ver[fp.id] = ver[fp.id] || []).push(c); }
+  for (const cs of Object.values(ver)) { const c = cs[0], fp = compFP(c); out.push({ sev: "info", msg: `${cs.length > 3 ? cs.slice(0, 3).map(q => q.ref).join(", ") + ` and ${cs.length - 3} more` : cs.map(q => q.ref).join(", ")} (${fp.name}): check pin positions against your actual part before ordering`, x: c.x, y: c.y }); }
   for (const t of S.tracks) if (t.w < 0.15) out.push({ sev: "warn", msg: `Track thinner than 0.15mm may be hard to manufacture`, x: t.pts[0][0], y: t.pts[0][1] });
   const sev = { err: 0, warn: 1, info: 2 }; out.sort((a, b) => sev[a.sev] - sev[b.sev]);
   return out;
 }
 function desc(it) { if (it.kind === "pad") return `${it.ref.comp.ref} pin ${it.ref.name}`; if (it.kind === "via") return "via"; return `track${it.cnet ? " (" + it.cnet.name + ")" : ""}`; }
-function insideBoard(x, y, m = 0) {
+// Custom outlines (keyboards, split boards): S.board.polys is a list of
+// polygons in mm (y down, all coordinates >= 0); B.w/B.h are their bounds.
+function polyArea(pts) { let a = 0; for (let i = 0; i < pts.length; i++) { const p = pts[i], q = pts[(i + 1) % pts.length]; a += p[0] * q[1] - q[0] * p[1]; } return a / 2; }
+function ptInPoly(x, y, pts) { let inside = false; for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) { const [xi, yi] = pts[i], [xj, yj] = pts[j]; if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside; } return inside; }
+function ptPolyEdgeDist(x, y, pts) { let d = 1e9; for (let i = 0; i < pts.length; i++) { const p = pts[i], q = pts[(i + 1) % pts.length]; d = Math.min(d, ptSegDist(x, y, p[0], p[1], q[0], q[1])); } return d; }
+// move every edge inwards by d mm (negative = outwards)
+function offsetPoly(pts, d) {
+  if (!d) return pts.map(p => p.slice());
+  const s = polyArea(pts) > 0 ? 1 : -1, n = pts.length, N = [];
+  for (let i = 0; i < n; i++) { const a = pts[i], b = pts[(i + 1) % n]; const L = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1; N.push([-(b[1] - a[1]) / L * s, (b[0] - a[0]) / L * s]); }
+  return pts.map((p, i) => { const n1 = N[(i - 1 + n) % n], n2 = N[i]; const k = Math.min(3, 1 / Math.max(0.2, (1 + n1[0] * n2[0] + n1[1] * n2[1]) / 2)) / 2; return [p[0] + (n1[0] + n2[0]) * k * d, p[1] + (n1[1] + n2[1]) * k * d]; });
+}
+function boardPolys(inset = 0) { const B = S.board; return B.polys && B.polys.length ? B.polys.map(p => offsetPoly(p, inset)) : [boardPolygon(inset)]; }
+// board shape as a canvas path; cut-outs (e.g. for reverse-mount LEDs) are wound the other way so they stay empty
+function pathBoard(ctx, inset = 0) {
+  ctx.beginPath();
+  const add = pts => { pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))); ctx.closePath(); };
+  for (const pts of boardPolys(inset)) add(polyArea(pts) > 0 ? pts : pts.slice().reverse());
+  for (const c of S.board.cutouts || []) { const g = offsetPoly(c, -inset); add(polyArea(g) > 0 ? g.slice().reverse() : g); }
+}
+
+function insideBoard(x, y, m = 0, noCut = false) {
   const B = S.board;
+  if (!noCut && B.cutouts && B.cutouts.length && B.cutouts.some(c => ptInPoly(x, y, c) || ptPolyEdgeDist(x, y, c) < m)) return false;
+  if (B.polys && B.polys.length) return B.polys.some(pts => ptInPoly(x, y, pts) && ptPolyEdgeDist(x, y, pts) >= m - 1e-6);
   if (B.round) { const r = Math.min(B.w, B.h) / 2; return dist(x, y, B.w / 2, B.h / 2) <= r - m; }
   if (x < m - 1e-6 || y < m - 1e-6 || x > B.w - m + 1e-6 || y > B.h - m + 1e-6) return false;
   const r = B.r || 0;
@@ -328,6 +385,7 @@ function insideBoard(x, y, m = 0) {
 // polygon for the board outline (optionally inset), y-down, mm
 function boardPolygon(inset = 0) {
   const B = S.board, pts = [];
+  if (B.polys && B.polys.length) return offsetPoly(B.polys[0], inset);
   if (B.round) { const R = Math.min(B.w, B.h) / 2 - inset; for (let i = 0; i < 96; i++) { const a = i / 96 * Math.PI * 2; pts.push([B.w / 2 + R * Math.cos(a), B.h / 2 + R * Math.sin(a)]); } return pts; }
   const r = Math.max(0, (B.r || 0) - inset), x0 = inset, y0 = inset, x1 = B.w - inset, y1 = B.h - inset;
   if (r < 0.01) return [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];

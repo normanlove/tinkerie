@@ -29,7 +29,7 @@ Double-click `Tinkerie.exe` to open the launcher and pick an app. Each app opens
 
 | App | What it does | Version |
 |---|---|---|
-| **Wirie** | Beginner-friendly circuit board designer (Boardie stripboard, Calcie calculators, Pinnie, Powerie) | 0.8.0-alpha |
+| **Wirie** | Beginner-friendly circuit board designer (Keebie custom keyboards, Boardie stripboard, Calcie calculators, Pinnie, Powerie) | 0.9.0-alpha |
 | **Makie** | 3D-printing part designer. Builds cases for Wirie boards | 0.9.0-alpha |
 | **Tunie** | 3D printer tuning and calibration. Shares fit clearances with Makie | 0.5.0-alpha |
 | **Flashie** | Firmware flasher for microcontroller boards (ESP32, Pico, Arduino, STM32), plus a "Write image" tab that puts Raspberry Pi OS (with your Wi-Fi, user and SSH set up), Linux, or a Windows 10/11 installer onto an SD card or USB drive | 0.7.1-alpha |

@@ -14,6 +14,7 @@ function pathPoly(ctx, pts) { ctx.beginPath(); pts.forEach((p, i) => (i ? ctx.li
 function rrect(ctx, x, y, w, h, r) { r = Math.min(r, w / 2, h / 2); ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
 function padPath(ctx, p, grow = 0) {
   const w = p.w + 2 * grow, h = p.h + 2 * grow;
+  if (p.ang) { ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.ang); if (p.shape === "rect") { ctx.beginPath(); ctx.rect(-w / 2, -h / 2, w, h); } else rrect(ctx, -w / 2, -h / 2, w, h, Math.min(w, h) / 2); ctx.restore(); return; }
   if (p.shape === "rect") { ctx.beginPath(); ctx.rect(p.x - w / 2, p.y - h / 2, w, h); }
   else rrect(ctx, p.x - w / 2, p.y - h / 2, w, h, Math.min(w, h) / 2);
 }
@@ -32,7 +33,7 @@ function drawPour(ctx, layer, color, alpha, W, H, dpr) {
   const p = pourCanvas.getContext("2d");
   p.setTransform(1, 0, 0, 1, 0, 0); p.clearRect(0, 0, W, H);
   setWorld(p, dpr);
-  p.fillStyle = color; pathPoly(p, boardPolygon(S.board.edgeClear)); p.fill();
+  p.fillStyle = color; pathBoard(p, S.board.edgeClear); p.fill();
   p.globalCompositeOperation = "destination-out"; p.fillStyle = "#000"; p.strokeStyle = "#000"; p.lineCap = "round";
   for (const it of A.items) if (it.layers.includes(layer) && (it.cnet !== pn || it.kind === "pad")) itemPath(p, it, S.board.pourClear);
   p.globalCompositeOperation = "source-over"; p.strokeStyle = color; p.lineWidth = SPOKE_W; p.lineCap = "butt";
@@ -69,12 +70,11 @@ function drawPCB(cv) {
     for (let x = Math.floor(Math.min(ax, bx) / g) * g; x <= Math.max(ax, bx); x += g) for (let y = Math.floor(ay / g) * g; y <= by; y += g) ctx.fillRect(x - r / 2, y - r / 2, r, r);
   }
   // board
-  const outline = boardPolygon(0);
-  ctx.save();
+    ctx.save();
   ctx.shadowColor = "rgba(0,0,0,0.55)"; ctx.shadowBlur = 30 * dpr; ctx.shadowOffsetY = 8 * dpr;
-  ctx.fillStyle = real ? "#1d6b3c" : COL.board; pathPoly(ctx, outline); ctx.fill();
+  ctx.fillStyle = real ? "#1d6b3c" : COL.board; pathBoard(ctx, 0); ctx.fill();
   ctx.restore();
-  if (real) { const gr = ctx.createLinearGradient(0, 0, B.w, B.h); gr.addColorStop(0, "rgba(255,255,255,0.07)"); gr.addColorStop(1, "rgba(0,0,0,0.12)"); ctx.fillStyle = gr; pathPoly(ctx, outline); ctx.fill(); }
+  if (real) { const gr = ctx.createLinearGradient(0, 0, B.w, B.h); gr.addColorStop(0, "rgba(255,255,255,0.07)"); gr.addColorStop(1, "rgba(0,0,0,0.12)"); ctx.fillStyle = gr; pathBoard(ctx, 0); ctx.fill(); }
   ctx.lineCap = "round"; ctx.lineJoin = "round";
   const viewTop = !VIEW.flip;
   const layersOrder = viewTop ? ["bottom", "top"] : ["top", "bottom"];
@@ -132,7 +132,7 @@ function drawPCB(cv) {
     ctx.globalAlpha = 1;
   }
   // board edge
-  ctx.strokeStyle = real ? "rgba(0,0,0,0.5)" : COL.edge; ctx.lineWidth = real ? 0.25 : 1.5 * px; pathPoly(ctx, outline); ctx.stroke();
+  ctx.strokeStyle = real ? "rgba(0,0,0,0.5)" : COL.edge; ctx.lineWidth = real ? 0.25 : 1.5 * px; pathBoard(ctx, 0); ctx.stroke();
   // realistic parts
   if (real && VIEW.show.parts) for (const c of S.comps) if ((c.side || "top") === (viewTop ? "top" : "bottom")) drawPartBody(ctx, c, px);
   // design-mode bodies (very faint) + selection

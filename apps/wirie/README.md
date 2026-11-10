@@ -3,7 +3,7 @@
 **A free, beginner-friendly circuit board designer — created by nrmluvdev.**
 Part of the nrmluvdev maker tool suite.
 
-Wirie has three tabs:
+Wirie has these tabs:
 
 | Tab | What it does |
 |---|---|
@@ -11,6 +11,7 @@ Wirie has three tabs:
 | **Boardie** | Plan the same circuit on stripboard or perfboard: auto-place, auto track-cuts, auto wire links, printable build plan. |
 | **Pinnie** | Interactive pinouts for 26 boards & chips (Pico, ESP32/S3/C3, ESP8266, Arduino, Pi header, ATmega, ATtiny, Teensy, STM32…) — hover a pin to see PWM/ADC/I²C/SPI/UART/touch and gotchas, filter by function, place on your PCB. |
 | **Powerie** | Battery power budget planner: battery & regulator presets, each part's awake/sleep current, wake-up schedule, regulator losses and dropout, runtime estimate, breakdown chart and tips. Import parts from your PCB. Saved with the project. |
+| **Keebie** | Custom mechanical keyboard PCBs: lay out the keys (presets, grids, KLE import, any key size, ISO Enter, angles, splits, waves, arcs), pick a switch (MX/Choc, soldered or hot-swap, Alps) and a controller, and Keebie builds the whole board: switch footprints, diodes, the matrix, the controller and the support circuitry it needs, per-key RGB, stabilisers and mounting holes. Also writes QMK/ZMK firmware files and a switch plate (SVG/DXF). |
 | **Calcie** | Everyday electronics maths: Ohm's law, resistor colours, E-series, LED resistor, divider, 555, RC/LC, battery life, wire gauge, PCB trace width, series/parallel, capacitor codes. |
 
 ## Features
@@ -25,6 +26,14 @@ Wirie has three tabs:
 
 ## More parts
 Displays & LED matrices (OLED/TFT/e-paper/LCD/7-seg/WS2812 panels), a big surface-mount range (0201–2512, SOT/SOD, SOIC/SSOP/TSSOP/MSOP, QFN, LQFP, DPAK/D2PAK…), named chips, crystals & oscillators, FFC/FPC (incl. Raspberry Pi camera/display), PCIe card-edge fingers, ISP/SWD/JTAG ribbon headers, USB-C/USB-A/DC/RJ45/D-sub/HDMI connectors, keyboard switches, encoders, sensors, comms and motor modules, and a **Retro & Consoles** section (cartridge edges & slots, controller ports, Z80/6502/SID/SN76489/EPROM/SRAM/74xx and more). Parts marked **!** should be measured against your real part before ordering.
+
+## Keebie (custom keyboards)
+- **Layout:** start from a preset (macropad, numpad, 40% ortho, 60% ANSI/ISO, 65%, 75%, TKL, full size, Alice, Corne, Lily58, Sweep), a rows × columns grid, a number of keys, or a [KLE](https://www.keyboard-layout-editor.com) paste. Drag keys, add any size (1u–7u, tall keys, ISO Enter, stepped Caps), rotate them, and set the row/column by hand if you like.
+- **Shape:** an outline that hugs the keys, a rectangle or your own corners; wave rows (with tilt), an arc, an angled Alice-style split or two separate halves joined by TRRS.
+- **Switches and caps:** MX or Kailh Choc (soldered or hot-swap sockets), Alps; standard or custom key spacing; keycap profiles (Cherry, OEM, SA, DSA, XDA, MT3, KAT…). The switch footprint can be turned 0/90/180/270° globally or per key for custom-height and side-mounted builds.
+- **Controllers:** Pro Micro, Elite-C, RP2040 Pro Micro boards (KB2040, Sea-Picro, Elite-Pi…), Raspberry Pi Pico, RP2040-Zero, XIAO RP2040, WeAct Black Pill, nice!nano and XIAO nRF52840 (wireless, with battery and switch), or bare chips: ATmega32U4, RP2040, STM32F072, STM32F411. Bare chips get their USB-C port (fuse and CC resistors), crystal, regulator, decoupling, QSPI flash, and reset/boot buttons added automatically.
+- **Build the PCB** places everything on the PCB tab with named nets; Auto-route and Check work as usual. Firmware: QMK `keyboard.json` + `keymap.json`, or a ZMK overlay for wireless boards.
+- Limits: fine-pitch bare chips (RP2040, STM32) usually need a few tracks finished by hand after auto-routing; split boards are built one half at a time; stabiliser plate cut-outs are approximate; parts marked **!** (TRRS jack, bare chips) should be checked against the datasheet.
 
 ## Part Creator
 Library → My Parts → **Create a part** (or Ctrl+Shift+P). Build from a template (pin rows/modules, DIP/SOIC/SSOP/TSSOP/QFP/QFN chips, 2-pin parts) or place pads by hand, name every pin, set the body, and give it a height and case opening for Makie. Parts are saved to `Documents\Wirie\Parts\*.wpart.json`, can be exported/imported, and are embedded in any project that uses them.
@@ -52,7 +61,7 @@ Regenerate it after changing the logo with `go run tools/mkrsrc.go` (icons come 
 - `web/` — the whole editor, embedded into the binary:
   - `lib.js` parts library & board templates · `core.js` project model, nets, connectivity, DRC
   - `route.js` auto-router · `export.js` Gerber/drill/BOM/SVG · `render.js` canvas renderer
-  - `strip.js` Boardie · `calc.js` Calcie · `ui.js` the interface · `font.js` silkscreen stroke font
+  - `strip.js` Boardie · `calc.js` Calcie · `keebie*.js` Keebie (layout, controllers, footprints) · `ui.js` the interface · `font.js` silkscreen stroke font
 
 Environment switches for development: `WIRIE_NO_WINDOW=1` (don't open a window), `WIRIE_STAY=1` (don't auto-quit).
 

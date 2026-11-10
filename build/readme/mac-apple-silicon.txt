@@ -21,14 +21,13 @@ What works on this system
 Every app has teaching mode: point at anything to see what it does. F2 turns it off.
 
 New in {VERSION}:
-- New app: Codie, the code explainer. Paste code or open a file and it explains
-  each line: what it does and why. It reads 20+ languages, including Windows Go
-  and the BASIC of the Commodore 64, ZX Spectrum and BBC Micro.
-- Codie's Game logic tab explains how game engines (Unity, Godot, LÖVE, PICO-8,
-  Roblox, pygame, Unreal and more) run their game loop, and its Game school has
-  lessons with examples in many languages.
+- New in Wirie: Keebie, for designing custom keyboard PCBs. Lay out the keys
+  (any size, angle, split, wave or arc), pick a switch and a controller, and
+  Keebie builds the board, with the support circuitry the controller needs.
+  It also writes QMK/ZMK firmware files and a switch plate.
 
 Also in recent alpha builds:
+- 0.7.0-alpha: new app Codie, the code explainer, with Game logic and Game school.
 - 0.6.1: the version in the Windows file details matches the alpha numbering.
 - Tinkerie and every app are numbered below 1.0 while in alpha (0.6.0).
 - Flashie: ESP32 Marauder and Bruce were removed from the firmware library.

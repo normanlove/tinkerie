@@ -27,7 +27,7 @@ const IC = {
   link: '<path d="M4 18c0-8 16-8 16 0"/><circle cx="4" cy="18" r="2"/><circle cx="20" cy="18" r="2"/>', print: '<path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/>', place: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 4v16M15 4v16M4 9h16M4 15h16"/>',
   info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/>', chip: '<rect x="6" y="6" width="12" height="12" rx="1.5"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/>', search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
   board: '<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="7" cy="9" r="1"/><circle cx="17" cy="15" r="1"/><path d="M7 9h5l2 3h3v3"/>', strip: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18"/><path d="M10 7l2 4M14 7l-2 4" stroke-width="1.4"/>', calc: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h2M12 12h2M16 12h0M8 16h2M12 16h2M16 16v0"/>',
-  bolt: '<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+  bolt: '<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>', keyboard: '<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/>',
   star: '<path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.8 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/>', close: '<path d="M6 6l12 12M18 6L6 18"/>', folder: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
 };
 const ico = (n, cls = "") => `<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${IC[n]}</svg>`;
@@ -428,6 +428,7 @@ function startPlacing(fpId) {
 function onKey(e) {
   if (e.target.matches("input,textarea,select")) { if (e.key === "Escape") e.target.blur(); return; }
   if ($(".modal-wrap")) { if (e.key === "Escape") closeModal(); return; }
+  if (UI.mode === "keeb" && kbKey(e)) return;
   const k = e.key.toLowerCase(), ctrl = e.ctrlKey || e.metaKey;
   if (ctrl && k === "z") { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
   if (ctrl && k === "y") { e.preventDefault(); redo(); return; }
@@ -436,7 +437,7 @@ function onKey(e) {
   if (ctrl && k === "d") { e.preventDefault(); duplicateSel(); return; }
   if (ctrl && e.shiftKey && k === "p") { e.preventDefault(); openPartCreator(); return; }
   if (ctrl && k === "a" && UI.mode === "pcb") { e.preventDefault(); UI.sel = new Set(S.comps.map(c => c.id)); refreshPanels(); UI.dirty = true; return; }
-  if (["calc", "pinnie", "power"].includes(UI.mode)) return;
+  if (["calc", "pinnie", "power", "keeb"].includes(UI.mode)) return;
   if (e.key === " ") { UI.space = true; cv().style.cursor = "grab"; e.preventDefault(); return; }
   if (e.key === "Escape") { if (UI.track) { UI.track = null; } else if (UI.placing || SV.placing) { if (SV.placing) { removeComp(SV.placing.id); SV.placing = null; commit("cancel place"); } UI.placing = null; setTool(UI.tool); } else if (UI.wireFrom || SV.linkStart) { UI.wireFrom = null; SV.linkStart = null; } else { UI.sel.clear(); SV.sel = null; setTool("select"); refreshPanels(); } UI.dirty = true; return; }
   if (e.key === "Delete" || e.key === "Backspace") { if (UI.track) { if (UI.track.pts.length > 1) UI.track.pts.pop(); else UI.track = null; UI.dirty = true; } else deleteSel(); return; }
@@ -491,6 +492,7 @@ function lazyPreviews(root) { root.querySelectorAll(".libcat.open .libitem").for
 function refreshPanels() {
   if (UI.mode === "pcb") renderProps();
   if (UI.mode === "strip") renderStripPanel();
+  if (UI.mode === "keeb") kbPage();
   renderGuide(); renderStatus();
   $("#projname").value = S.name;
 }
@@ -556,8 +558,8 @@ function renderProps() {
 function renderBoardProps(P, A) {
   const B = S.board;
   P.innerHTML = `<div class="ph"><h3>${ico("board")}Board</h3><p class="dim">Nothing selected — these settings are for the whole board.</p></div>
-    <div class="grid2">${fieldHTML("b_w", "Width", B.w, "mm", "number")}${fieldHTML("b_h", "Height", B.h, "mm", "number")}</div>
-    <div class="grid2">${fieldHTML("b_r", "Corner radius", B.r, "mm", "number")}<label class="fld"><span>Shape</span><div class="inp"><select id="b_shape"><option value="rect" ${!B.round ? "selected" : ""}>Rectangle</option><option value="round" ${B.round ? "selected" : ""}>Round</option></select></div></label></div>
+    ${B.polys && B.polys.length ? `<div class="note">Custom outline${S.keeb ? " from Keebie" : ""}: ${B.w.toFixed(1)} × ${B.h.toFixed(1)} mm${B.cutouts && B.cutouts.length ? `, ${B.cutouts.length} cut-outs` : ""}.</div><div class="grid2">${S.keeb ? `<button class="btn" id="b_keeb">${ico("keyboard")}Edit in Keebie</button>` : ""}<button class="btn" id="b_rect">Use a rectangle</button></div>` : `<div class="grid2">${fieldHTML("b_w", "Width", B.w, "mm", "number")}${fieldHTML("b_h", "Height", B.h, "mm", "number")}</div>
+    <div class="grid2">${fieldHTML("b_r", "Corner radius", B.r, "mm", "number")}<label class="fld"><span>Shape</span><div class="inp"><select id="b_shape"><option value="rect" ${!B.round ? "selected" : ""}>Rectangle</option><option value="round" ${B.round ? "selected" : ""}>Round</option></select></div></label></div>`}
     <button class="btn wide" id="b_tpl">${ico("place")}Board templates (Pi HAT, Pico, ESP32…)</button>
     <h4>Copper</h4>
     <div class="grid2">${fieldHTML("b_tw", "Signal track", B.track, "mm", "number")}${fieldHTML("b_pw", "Power track", B.power, "mm", "number")}</div>
@@ -570,8 +572,13 @@ function renderBoardProps(P, A) {
     <div class="statbox"><div><b>${S.comps.length}</b><span>parts</span></div><div><b>${A.nets.length}</b><span>nets</span></div><div><b>${S.tracks.length}</b><span>tracks</span></div><div><b>${S.vias.length}</b><span>vias</span></div></div>`;
   const num = id => parseFloat($(id).value);
   const ch = (id, f) => $(id).onchange = () => { f(); commit("board"); refreshPanels(); };
-  ch("#b_w", () => { if (num("#b_w") >= 5) B.w = num("#b_w"); }); ch("#b_h", () => { if (num("#b_h") >= 5) B.h = num("#b_h"); }); ch("#b_r", () => { B.r = Math.max(0, num("#b_r") || 0); });
-  ch("#b_shape", () => { B.round = $("#b_shape").value === "round"; if (B.round) B.h = B.w = Math.max(B.w, B.h); });
+  if (B.polys && B.polys.length) {
+    if ($("#b_keeb")) $("#b_keeb").onclick = () => switchMode("keeb");
+    $("#b_rect").onclick = () => { delete B.polys; B.cutouts = []; commit("board rectangle"); refreshPanels(); };
+  } else {
+    ch("#b_w", () => { if (num("#b_w") >= 5) B.w = num("#b_w"); }); ch("#b_h", () => { if (num("#b_h") >= 5) B.h = num("#b_h"); }); ch("#b_r", () => { B.r = Math.max(0, num("#b_r") || 0); });
+    ch("#b_shape", () => { B.round = $("#b_shape").value === "round"; if (B.round) B.h = B.w = Math.max(B.w, B.h); });
+  }
   ch("#b_tw", () => { if (num("#b_tw") >= 0.1) B.track = num("#b_tw"); }); ch("#b_pw", () => { if (num("#b_pw") >= 0.1) B.power = num("#b_pw"); }); ch("#b_cl", () => { if (num("#b_cl") >= 0.1) B.clear = num("#b_cl"); });
   ch("#b_vd", () => { const [a, b] = $("#b_vd").value.split("/").map(parseFloat); if (a > 0.3) B.viaD = a; if (b > 0.15 && b < B.viaD) B.viaDrill = b; });
   ch("#b_pt", () => { B.pourTop = $("#b_pt").checked; }); ch("#b_pb", () => { B.pourBot = $("#b_pb").checked; }); ch("#b_pn", () => { B.pourNet = $("#b_pn").value; }); ch("#b_pr", () => { B.pourRoute = $("#b_pr").checked; });
@@ -753,7 +760,7 @@ function exportDialog() {
     <div class="checks">
       <div class="ck ${errs.length ? "bad" : "good"}">${errs.length ? ico("info") : ico("check")}<span>${errs.length ? `${errs.length} design problem${errs.length > 1 ? "s" : ""} — <a href="#" id="x_show">show me</a>` : "Design check passed"}</span></div>
       <div class="ck ${A.unrouted ? "warn" : "good"}">${A.unrouted ? ico("info") : ico("check")}<span>${A.unrouted ? `${A.unrouted} connections not routed yet` : "All connections routed"}</span></div>
-      <div class="ck ${ver.length ? "warn" : "good"}">${ver.length ? ico("info") : ico("check")}<span>${ver.length ? `Double-check pin positions of ${ver.map(c => c.ref).join(", ")}` : "All footprints are standard"}</span></div>
+      <div class="ck ${ver.length ? "warn" : "good"}">${ver.length ? ico("info") : ico("check")}<span>${ver.length ? `Double-check pin positions of ${ver.slice(0, 6).map(c => c.ref).join(", ")}${ver.length > 6 ? ` and ${ver.length - 6} more` : ""}` : "All footprints are standard"}</span></div>
     </div>
     <div class="exgrid">
       <button class="excard primary" id="x_zip">${ico("export", "big")}<b>Gerber ZIP for PCB makers</b><small>Upload to JLCPCB, PCBWay, OSH Park, Aisler… (2-layer, 1.6mm)</small></button>
@@ -865,10 +872,11 @@ function switchMode(m) {
   UI.mode = m; UI.placing = null; SV.placing = null; UI.track = null; UI.wireFrom = null;
   $$("#modes button").forEach(b => b.classList.toggle("on", b.dataset.m === m));
   document.body.dataset.mode = m;
-  document.body.classList.toggle("page", ["calc", "pinnie", "power"].includes(m));
+  document.body.classList.toggle("page", ["calc", "pinnie", "power", "keeb"].includes(m));
   if (m === "calc") { if (!$("#calc").dataset.built) { buildCalcie($("#calc")); $("#calc").dataset.built = 1; } }
   else if (m === "pinnie") { if (!$("#pinnie").dataset.built) { buildPinnie($("#pinnie")); $("#pinnie").dataset.built = 1; } }
   else if (m === "power") { buildPowerie($("#power")); }
+  else if (m === "keeb") { if (!$("#keeb").dataset.built) { buildKeebie($("#keeb")); $("#keeb").dataset.built = 1; } setTimeout(kbPage, 0); }
   else { buildTools(); resize(); if (m === "strip" && !SV.fitted) { SV.fitted = true; fitView(); } }
   refreshPanels(); UI.dirty = true;
 }
@@ -877,7 +885,7 @@ function switchMode(m) {
 function boot() {
   document.title = `Wirie — by ${APP.author}`;
   $("#brand").innerHTML = `${LOGO}<div><b>Wirie</b><small>by ${APP.author}</small></div>`;
-  $("#modes").innerHTML = `<button data-m="pcb" class="on">${ico("board")}PCB</button><button data-m="strip">${ico("strip")}Boardie</button><button data-m="calc">${ico("calc")}Calcie</button><button data-m="pinnie">${ico("chip")}Pinnie</button><button data-m="power">${ico("bolt")}Powerie</button>`;
+  $("#modes").innerHTML = `<button data-m="pcb" class="on">${ico("board")}PCB</button><button data-m="strip">${ico("strip")}Boardie</button><button data-m="calc">${ico("calc")}Calcie</button><button data-m="pinnie">${ico("chip")}Pinnie</button><button data-m="power">${ico("bolt")}Powerie</button><button data-m="keeb">${ico("keyboard")}Keebie</button>`;
   $$("#modes button").forEach(b => b.onclick = () => switchMode(b.dataset.m));
   $("#filebtns").innerHTML = `<button class="btn ghost icon" id="f_new" data-tip="New">${ico("new")}</button><button class="btn ghost icon" id="f_open" data-tip="Open (Ctrl+O)">${ico("open")}</button><button class="btn ghost icon" id="f_save" data-tip="Save (Ctrl+S)">${ico("save")}</button><button class="btn primary" id="f_export">${ico("export")}Export</button><button class="btn ghost icon" id="f_help" data-tip="Help (?)">${ico("help")}</button><button class="btn ghost icon" id="f_about" data-tip="About Wirie">${ico("info")}</button>`;
   $("#f_new").onclick = newDialog; $("#f_open").onclick = openDialog; $("#f_save").onclick = () => saveProject(); $("#f_export").onclick = exportDialog; $("#f_help").onclick = showHelp; $("#f_about").onclick = showAbout;

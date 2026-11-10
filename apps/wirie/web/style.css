@@ -51,7 +51,7 @@ kbd { display: inline-block; min-width: 22px; padding: 2px 7px; border-radius: 6
 #app { display: grid; grid-template-columns: 300px 1fr 330px; height: calc(100% - 56px - 30px); }
 body.page #app { grid-template-columns: 1fr; } body.page #left, body.page #right { display: none; }
 body.page #cv, body.page .floatbar, body.page .floattools, body.page #guide { display: none; }
-body:not([data-mode=calc]) #calc, body:not([data-mode=pinnie]) #pinnie, body:not([data-mode=power]) #power { display: none; }
+body:not([data-mode=calc]) #calc, body:not([data-mode=pinnie]) #pinnie, body:not([data-mode=power]) #power, body:not([data-mode=keeb]) #keeb { display: none; }
 body[data-mode=strip] #topbar2 { display: none; } body[data-mode=strip] #rtabs { display: none; }
 #left, #right { background: var(--panel); border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
 #right { border-right: 0; border-left: 1px solid var(--line); }
@@ -340,3 +340,53 @@ body[data-mode=strip] #topbar2 { display: none; } body[data-mode=strip] #rtabs {
 @media (max-width: 1250px) { .pw-layout { grid-template-columns: 1fr; } .pw-right { position: static; } }
 
 body.page #hint, body.page #coords { visibility: hidden; }
+
+/* ---------- Keebie: keyboard designer ---------- */
+#keeb.fullpage { padding: 0; overflow: hidden; }
+.kb { display: grid; grid-template-columns: 300px 1fr 250px; height: 100%; }
+.kb-side, .kb-props { overflow: auto; padding: 14px 14px 30px; background: var(--panel); border-right: 1px solid var(--line); }
+.kb-props { border-right: 0; border-left: 1px solid var(--line); }
+.kb-head h2 { margin: 0; display: flex; align-items: center; gap: 8px; font: 800 22px var(--fontd); background: linear-gradient(90deg, #7ff3e6, var(--cu2)); -webkit-background-clip: text; color: transparent; }
+.kb-head h2 svg { color: var(--cy); width: 24px; height: 24px; }
+.kb-head p { margin: 2px 0 6px; color: var(--dim); font-size: 12px; }
+.kb-side section, .kb-props { font-size: 12.5px; }
+.kb-side section { border-top: 1px solid var(--line); padding: 10px 0 4px; }
+.kb-side h4, .kb-props h4 { margin: 2px 0 9px; font-size: 11px; text-transform: uppercase; letter-spacing: .9px; color: var(--dim2); }
+.kb-side select, .kb-props select { width: 100%; background: #0d1219; border: 1px solid var(--line); border-radius: 9px; padding: 6px 8px; outline: none; }
+.kb-side select:focus, .kb-props select:focus { border-color: var(--cy2); }
+.kb-inp { display: flex; align-items: center; background: #0d1219; border: 1px solid var(--line); border-radius: 9px; padding: 0 8px; }
+.kb-inp:focus-within { border-color: var(--cy2); }
+.kb-inp input { flex: 1; min-width: 0; background: transparent; border: 0; outline: none; padding: 6px 0; }
+.kb-inp em { font-style: normal; color: var(--dim2); font-size: 11px; margin-left: 4px; }
+.kb-row { display: flex; gap: 8px; align-items: flex-end; } .kb-row > .fld { flex: 1; min-width: 0; } .kb-row > .btn { margin-bottom: 9px; flex: none; }
+.kb-row > .btn.sm { flex: 1; }
+.kb-check { display: flex; align-items: center; gap: 8px; margin: 2px 0 10px; color: #cbd5e3; cursor: pointer; } .kb-check input { accent-color: var(--cy); }
+.kb-note { display: block; color: var(--dim); font-size: 11.5px; margin: -4px 0 10px; line-height: 1.4; }
+.kb-warn { color: var(--warn); font-size: 12px; margin: 6px 0 0; }
+.kb-outs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+.kb-outs > div { background: #0d1219; border: 1px solid var(--line); border-radius: 10px; padding: 6px 9px; } .kb-outs span { display: block; font-size: 10.5px; color: var(--dim); font-weight: 600; } .kb-outs b { font: 700 14px var(--fontd); }
+.kb-outs > div.bad { border-color: rgba(255,77,109,.5); } .kb-outs > div.bad b { color: #ff8fa3; }
+.kb-bom { color: var(--dim); font-size: 12px; line-height: 1.55; } .kb-bom b { color: #cbd5e3; }
+.kb-main { display: flex; flex-direction: column; min-width: 0; background: radial-gradient(900px 500px at 50% -20%, rgba(63,224,208,.06), transparent), var(--bg2); }
+.kb-bar { display: flex; gap: 8px; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.kb-bar .seg button { padding: 5px 8px; font-size: 12px; }
+.kb-lbl { color: var(--dim2); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; align-self: center; padding: 0 6px; }
+.kb-stage { flex: 1; position: relative; min-height: 0; }
+#kbSvg { position: absolute; inset: 0; width: 100%; height: 100%; outline: none; user-select: none; touch-action: none; cursor: default; }
+.kb-hint { position: absolute; left: 12px; bottom: 10px; color: var(--dim2); font-size: 11.5px; pointer-events: none; }
+.kb-board { fill: rgba(29,107,60,.32); stroke: #4ade80; stroke-width: .5; stroke-linejoin: round; }
+.kb-area { fill: rgba(63,224,208,.06); stroke: rgba(63,224,208,.55); stroke-width: .35; stroke-dasharray: 1.5 1; }
+.kb-part { fill: rgba(255,255,255,.06); stroke: rgba(255,255,255,.25); stroke-width: .2; } .kb-part.big { fill: rgba(63,224,208,.12); stroke: rgba(63,224,208,.6); }
+.kb-areat { fill: #7ff3e6; text-anchor: middle; font-weight: 700; font-family: var(--fontd); }
+.kb-hole { fill: #0a0d13; stroke: #c7cfdb; stroke-width: .3; }
+.kb-vtx { fill: var(--cu2); stroke: #140b04; stroke-width: .3; cursor: move; }
+.kb-key { cursor: grab; } .kb-key:active { cursor: grabbing; }
+.kb-cap { stroke: rgba(0,0,0,.45); stroke-width: .3; filter: drop-shadow(0 .6px .8px rgba(0,0,0,.5)); }
+.kb-lab { text-anchor: middle; dominant-baseline: central; font-family: var(--font); font-weight: 600; pointer-events: none; } .kb-lab.mono { font-family: Consolas, monospace; }
+.kb-selr { fill: none; stroke: var(--cy); }
+.kb-fp .h { fill: rgba(10,13,19,.8); stroke: #8c98ab; stroke-width: .2; } .kb-fp .p { fill: #d99a4e; opacity: .9; } .kb-fp .p.s { fill: #e7b56f; } .kb-fp .d { fill: #222; stroke: #8c98ab; stroke-width: .2; } .kb-fp .l { fill: rgba(255,255,255,.12); stroke: #f472b6; stroke-width: .25; stroke-dasharray: .6 .4; }
+.kb-split { stroke: var(--cu); stroke-dasharray: 3 2; }
+.kb-box { fill: rgba(63,224,208,.08); stroke: var(--cy); }
+.kb-help { padding-left: 16px; color: var(--dim); line-height: 1.9; margin: 6px 0; }
+.modal.kbw { width: min(760px, 94vw); }
+@media (max-width: 1300px) { .kb { grid-template-columns: 270px 1fr 220px; } }
