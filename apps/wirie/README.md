@@ -11,7 +11,7 @@ Wirie has these tabs:
 | **Boardie** | Plan the same circuit on stripboard or perfboard: auto-place, auto track-cuts, auto wire links, printable build plan. |
 | **Pinnie** | Interactive pinouts for 26 boards & chips (Pico, ESP32/S3/C3, ESP8266, Arduino, Pi header, ATmega, ATtiny, Teensy, STM32…) — hover a pin to see PWM/ADC/I²C/SPI/UART/touch and gotchas, filter by function, place on your PCB. |
 | **Powerie** | Battery power budget planner: battery & regulator presets, each part's awake/sleep current, wake-up schedule, regulator losses and dropout, runtime estimate, breakdown chart and tips. Import parts from your PCB. Saved with the project. |
-| **Keebie** | Custom mechanical keyboard PCBs: lay out the keys (presets, grids, KLE import, any key size, ISO Enter, angles, splits, waves, arcs), pick a switch (MX/Choc, soldered or hot-swap, Alps) and a controller, and Keebie builds the whole board: switch footprints, diodes, the matrix, the controller and the support circuitry it needs, per-key RGB, stabilisers and mounting holes. Also writes QMK/ZMK firmware files and a switch plate (SVG/DXF). |
+| **Keebie** | Custom mechanical keyboard PCBs: lay out the keys (presets, grids, KLE import, any key size, ISO Enter, angles, splits, arcs, rotary knobs, a small OLED screen), pick a switch (MX/Choc, soldered or hot-swap, Alps) and a controller, and Keebie builds the whole board: switch footprints, diodes, the matrix, the controller and the support circuitry it needs, per-key RGB, stabilisers and mounting holes. Also writes QMK/ZMK firmware files and a switch plate (SVG/DXF), sends the board to Makie for a printed case and to Flashie for ready-made firmware. |
 | **Calcie** | Everyday electronics maths: Ohm's law, resistor colours, E-series, LED resistor, divider, 555, RC/LC, battery life, wire gauge, PCB trace width, series/parallel, capacitor codes. |
 
 ## Features
@@ -29,10 +29,13 @@ Displays & LED matrices (OLED/TFT/e-paper/LCD/7-seg/WS2812 panels), a big surfac
 
 ## Keebie (custom keyboards)
 - **Layout:** start from a preset (macropad, numpad, 40% ortho, 60% ANSI/ISO, 65%, 75%, TKL, full size, Alice, Corne, Lily58, Sweep), a rows × columns grid, a number of keys, or a [KLE](https://www.keyboard-layout-editor.com) paste. Drag keys, add any size (1u–7u, tall keys, ISO Enter, stepped Caps), rotate them, and set the row/column by hand if you like.
-- **Shape:** an outline that hugs the keys, a rectangle or your own corners; wave rows (with tilt), an arc, an angled Alice-style split or two separate halves joined by TRRS.
+- **Shape:** an outline that hugs the keys, a rectangle or your own corners; an arc, an angled Alice-style split or two separate halves joined by TRRS.
+- **Knobs and a screen:** any key can be a rotary knob (EC11 encoder with push switch; its press joins the matrix, its two turn pins get controller pins of their own). A 0.91" (128 × 32) or 0.96" (128 × 64) SSD1306 OLED can be added next to the controller, wired to its I2C pins.
 - **Switches and caps:** MX or Kailh Choc (soldered or hot-swap sockets), Alps; standard or custom key spacing; keycap profiles (Cherry, OEM, SA, DSA, XDA, MT3, KAT…). The switch footprint can be turned 0/90/180/270° globally or per key for custom-height and side-mounted builds.
 - **Controllers:** Pro Micro, Elite-C, RP2040 Pro Micro boards (KB2040, Sea-Picro, Elite-Pi…), Raspberry Pi Pico, RP2040-Zero, XIAO RP2040, WeAct Black Pill, nice!nano and XIAO nRF52840 (wireless, with battery and switch), or bare chips: ATmega32U4, RP2040, STM32F072, STM32F411. Bare chips get their USB-C port (fuse and CC resistors), crystal, regulator, decoupling, QSPI flash, and reset/boot buttons added automatically.
 - **Build the PCB** places everything on the PCB tab with named nets; Auto-route and Check work as usual. Firmware: QMK `keyboard.json` + `keymap.json`, or a ZMK overlay for wireless boards.
+- **Case in Makie** saves the board's case file (with the switch plate data) and opens it in Makie, which makes an open-top case, a printed switch plate and feet for a typing angle.
+- **Firmware in Flashie** saves a `.keebie.json` (matrix pins, knobs, screen, LEDs and layout) to `Documents\Wirie\Exports` and opens Flashie's Keyboard tab, where you set the keymap and Flashie compiles and flashes Arduino firmware (ATmega32U4, RP2040 and STM32 controllers).
 - Limits: fine-pitch bare chips (RP2040, STM32) usually need a few tracks finished by hand after auto-routing; split boards are built one half at a time; stabiliser plate cut-outs are approximate; parts marked **!** (TRRS jack, bare chips) should be checked against the datasheet.
 
 ## Part Creator

@@ -14,7 +14,7 @@ Get the newest version from the **[Releases page](https://github.com/normanlove/
 
 | Your computer | Download |
 |---|---|
-| Windows 10 or 11 (64-bit) | `Tinkerie.exe` on its own, or `Tinkerie-…-windows.zip` (with the source) |
+| Windows 10 or 11 (64-bit) | `Tinkerie-…-windows.exe` on its own, or `Tinkerie-…-windows.zip` (with the source) |
 | Mac with Apple silicon (M1 or newer) | `Tinkerie-…-mac-apple-silicon.zip` |
 | Mac with an Intel processor | `Tinkerie-…-mac-intel.zip` |
 | Linux PC (64-bit Intel/AMD) | `Tinkerie-…-linux-x86_64.tar.gz` |
@@ -29,10 +29,10 @@ Double-click `Tinkerie.exe` to open the launcher and pick an app. Each app opens
 
 | App | What it does | Version |
 |---|---|---|
-| **Wirie** | Beginner-friendly circuit board designer (Keebie custom keyboards, Boardie stripboard, Calcie calculators, Pinnie, Powerie) | 0.9.0-alpha |
-| **Makie** | 3D-printing part designer. Builds cases for Wirie boards | 0.9.0-alpha |
+| **Wirie** | Beginner-friendly circuit board designer (Keebie custom keyboards, Boardie stripboard, Calcie calculators, Pinnie, Powerie) | 0.10.0-alpha |
+| **Makie** | 3D-printing part designer. Builds cases for Wirie boards, including keyboard cases with a switch plate | 0.10.0-alpha |
 | **Tunie** | 3D printer tuning and calibration. Shares fit clearances with Makie | 0.5.0-alpha |
-| **Flashie** | Firmware flasher for microcontroller boards (ESP32, Pico, Arduino, STM32), plus a "Write image" tab that puts Raspberry Pi OS (with your Wi-Fi, user and SSH set up), Linux, or a Windows 10/11 installer onto an SD card or USB drive | 0.7.1-alpha |
+| **Flashie** | Firmware flasher for microcontroller boards (ESP32, Pico, Arduino, STM32), plus a "Write image" tab that puts Raspberry Pi OS (with your Wi-Fi, user and SSH set up), Linux, or a Windows 10/11 installer onto an SD card or USB drive, and a Keyboard tab that makes and flashes firmware for Keebie keyboards | 0.8.0-alpha |
 | **Scopie** | Oscilloscope program (Hantek 6022BE/BL and others, plus network scopes and demo) | 0.9.0-alpha |
 | **Meterie** | PC multimeter: HoldPeak HP-90EPC, UNI-T, OWON, Brymen, Fluke and more | 0.6.0-alpha |
 | **Tracie** | Serial monitor and logic analyser | 0.5.0-alpha |

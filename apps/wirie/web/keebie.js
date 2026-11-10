@@ -1,7 +1,7 @@
 // Keebie — custom keyboard PCB designer inside Wirie.
 // Lay out keys (any size, any angle), shape the board (fit, hug, custom,
-// wave, arc, split and splayed), pick a switch type and controller, and
-// Keebie builds the PCB: switches, diodes, stabilisers, per-key RGB, the
+// arc, split and splayed), pick a switch type and controller, add knobs and a
+// screen, and Keebie builds the PCB: switches, diodes, stabilisers, per-key RGB, the
 // controller and all its support circuitry, matrix wiring, outline and
 // mounting holes. Also exports a switch plate, QMK/ZMK files and KLE layouts.
 // Part of Wirie, in the Tinkerie maker suite — by nrmluvdev.
@@ -14,8 +14,8 @@ const kbId = () => "k" + (Date.now() % 1e6).toString(36) + (kbUid++).toString(36
 // ---------------------------------------------------------------- model
 function kbDefault() {
   return { v: 1, name: "My keyboard", keys: kbFromPreset("ansi60"), preset: "ansi60", sw: "mx_hs", profile: "cherry", spacing: 0, fpRot: 0,
-    outline: { mode: "hug", margin: 2, radius: 2, custom: null }, holes: 6, wave: { amp: 0, len: 12, tilt: true }, arc: 0,
-    split: { mode: "none", at: 7.5, gap: 30, angle: 0 }, mcu: "promicro", ctrlPos: "right", diode: "d_sod123", dir: "COL2ROW", rgb: false, half: 0 };
+    outline: { mode: "hug", margin: 2, radius: 2, custom: null }, holes: 6, arc: 0,
+    split: { mode: "none", at: 7.5, gap: 30, angle: 0 }, mcu: "promicro", ctrlPos: "right", diode: "d_sod123", dir: "COL2ROW", rgb: false, oled: "none", half: 0 };
 }
 function KBS() { if (!S.keeb) S.keeb = kbDefault(); return S.keeb; }
 
@@ -119,7 +119,7 @@ function kbSwitch(K) { return KB_SWITCHES.find(s => s.id === K.sw) || KB_SWITCHE
 function kbPitch(K) { const s = kbSwitch(K); return K.spacing > 0 ? [K.spacing, K.spacing * s.pitch[1] / s.pitch[0]] : s.pitch; }
 function kbMcu(K) { return KB_MCU[K.mcu] || KB_MCUS[0]; }
 
-// where every key ends up, in mm, after wave, arc and split
+// where every key ends up, in mm, after arc and split
 function kbPlace(K) {
   const [sx, sy] = kbPitch(K), out = [];
   if (!K.keys.length) return out;
@@ -129,7 +129,6 @@ function kbPlace(K) {
   for (const k of K.keys) {
     const bcx = k.x + k.w / 2, bcy = k.y + k.h / 2;
     let dy = 0, ang = k.r || 0;
-    if (K.wave.amp) { const ph = 2 * Math.PI * bcx / Math.max(2, K.wave.len); dy += K.wave.amp * Math.sin(ph); if (K.wave.tilt) ang += Math.atan(K.wave.amp * 2 * Math.PI / Math.max(2, K.wave.len) * Math.cos(ph) * sy / sx) * 180 / Math.PI; }
     if (K.arc) { const d = bcx - mid; dy -= d * d / (2 * K.arc); ang += Math.atan(-d / K.arc * sy / sx) * 180 / Math.PI; }
     let cx = bcx * sx, cy = (bcy + dy) * sy;
     const half = split && bcx >= sp.at ? 1 : 0;
@@ -175,10 +174,26 @@ function kbMatrix(K, places) {
   for (const p of places) { const m = out.get(p.k.id); const key = (K.split.mode === "two" ? p.half : 0) + ":" + m; if (seen[key]) dup.push(p.k); seen[key] = 1; }
   return { pos: out, rows: R, cols: C, dup };
 }
-function kbFreePins(K) {
+// pins the matrix may use, once the split link, LEDs, screen and knobs have theirs
+function kbBasePins(K) {
   const m = kbMcu(K), split = K.split.mode === "two" && !m.wireless;
   return m.pins.filter(p => !(split && p === m.serial) && !(K.rgb && p === m.led));
 }
+function kbKnobCount(K) {
+  const ks = K.keys.filter(k => k.kind === "knob"); if (K.split.mode !== "two") return ks.length;
+  const r = ks.filter(k => k.x + k.w / 2 >= K.split.at).length; return Math.max(r, ks.length - r);
+}
+function kbPinPlan(K) {
+  const m = kbMcu(K); let pins = kbBasePins(K);
+  const scr = K.oled && K.oled !== "none";
+  const i2c = scr ? (m.ard ? m.ard.i2c : m.id === "nicenano" ? ["D2", "D3"] : ["D4", "D5"]) : null;
+  if (i2c) pins = pins.filter(p => !i2c.includes(p));
+  const enc = []; for (let i = 0; i < kbKnobCount(K) && pins.length >= 2; i++) enc.push(pins.splice(pins.length - 2, 2));
+  return { pins, i2c, enc };
+}
+function kbFreePins(K) { return kbPinPlan(K).pins; }
+// keys in wiring order (snakes through the matrix rows; the LED chain follows it)
+function kbOrd(G, b) { const M = G.matrix; return b.places.slice().sort((p, q) => { const a = M.pos.get(p.k.id), c = M.pos.get(q.k.id); return a[0] - c[0] || (a[0] % 2 ? c[1] - a[1] : a[1] - c[1]); }); }
 
 // ---------------------------------------------------------------- controller block
 // Plans the controller area in local coordinates (0,0 = area top-left) by
@@ -205,12 +220,18 @@ function kbPlanCtrl(K, half) {
   }
   const split = K.split.mode === "two" && !mcu.wireless;
   if (split) { const t = B.add("kb_trrs", "TRRS", "J_TRRS"); t.fixed = "trrs"; B.net("GND", [t, "SLEEVE"], [U, /^stm32/.test(mcu.id) ? "VSS" : "GND"]); B.net("SERIAL", [t, "TIP"], [U, mcu.serial]); B.net(mcu.bare ? "5V" : "VCC_LINK", [t, "RING1"], ...(mcu.bare ? [] : [[U, mcu.logic]])); }
+  const scr = KB_SCREENS.find(x => x.id === K.oled);
+  if (scr && scr.w) {
+    const pp = kbPinPlan(K), o = B.add(scr.id, `OLED ${scr.w}x${scr.h}`, "DISP1");
+    B.net("SDA", [o, "SDA"], [U, pp.i2c[0]]); B.net("SCL", [o, "SCL"], [U, pp.i2c[1]]); B.net("GND", [o, "GND"]);
+    if (mcu.bare) B.net(vcc, [o, "VCC"]); else B.net("OLED_VCC", [o, "VCC"], [U, mcu.logic]);
+  }
   if (K.rgb) { const c = B.add("c_0805", "10uF"); B.net(mcu.bare ? "5V" : "LED_5V", [c, "1"], ...(mcu.bare ? [] : [[U, mcu.pwr]])); B.net("GND", [c, "2"]); }
   // ---- pack
   const fpBox = (p, rot) => { const c = { fp: p.fp, x: 0, y: 0, rot, side: "top" }; return compBox(c); };
   const placed = [];
   const W0 = mcu.bare ? 40 : Math.max(LIB_BY_ID[mcu.fp].body.w + 16, split ? 36 : 28);
-  const W = W0;
+  const W = Math.max(W0, scr && scr.w ? LIB_BY_ID[scr.id].body.w + 3 : 0);
   const put = (p, x, y, rot) => { p.x = x; p.y = y; p.rot = rot; const b = fpBox(p, rot); placed.push({ x0: b.x0 + x - 0.8, y0: b.y0 + y - 0.8, x1: b.x1 + x + 0.8, y1: b.y1 + y + 0.8 }); };
   const usb = parts.find(p => p.fixed === "usb"), trrs = parts.find(p => p.fixed === "trrs");
   if (usb) put(usb, W / 2, -margin + 2.6, 180);
@@ -369,19 +390,19 @@ function kbGeom(force) {
 
 // local features (pads, holes, diode, LED) around one key, for mounting-hole checks
 function kbKeyFeatures(K, G, p) {
-  const fp = LIB_BY_ID[G.sw.fp], f = [];
+  const knob = p.k.kind === "knob", fp = LIB_BY_ID[knob ? "ec11" : G.sw.fp], f = [];
   const rot = p.ang + (K.fpRot || 0) + (p.k.fr || 0);
   const T = (x, y) => { const [rx, ry] = rotPt(x, y, rot); return [p.cx + rx, p.cy + ry]; };
   for (const q of fp.pads) f.push([...T(q.x, q.y), Math.max(q.w, q.h) / 2 + 0.3]);
   for (const h of fp.holes) f.push([...T(h.x, h.y), h.d / 2]);
   f.push([...T(7.6, 3.8), 2.4], [...T(7.6, 1.0), 1.2], [...T(7.6, 6.6), 1.2]);
-  if (K.rgb) f.push([...T(0, 5.05), 3.2]);
+  if (K.rgb && !knob) f.push([...T(0, 5.05), 3.2]);
   const st = kbStab(K, G, p);
   if (st) { const s = stabSpacing(st.units); for (const [x, y, d] of [[-s / 2, -6.985, 3.05], [s / 2, -6.985, 3.05], [-s / 2, 8.255, 3.988], [s / 2, 8.255, 3.988]]) { const [rx, ry] = rotPt(x, y, st.rot); f.push([p.cx + rx, p.cy + ry, d / 2]); } }
   return f;
 }
 function kbStab(K, G, p) {
-  const k = p.k; if (k.stab === "none" || !G.sw.stabs) return null;
+  const k = p.k; if (k.stab === "none" || !G.sw.stabs || k.kind === "knob") return null;
   const units = Math.max(k.w, k.h); if (units < 2) return null;
   return { units, rot: p.ang + (k.h > k.w ? 90 : 0) };
 }
@@ -420,24 +441,29 @@ function kbBuild(half) {
   S.comps = []; S.conns = []; S.tracks = []; S.vias = []; S.texts = []; S.netLabels = {};
   Object.assign(S.board, { w: ex - ox, h: ey - oy, r: 0, round: false, polys: b.polys.map(pl => pl.map(([x, y]) => [X(x), Y(y)])), cutouts: [], grid: 0.5,
     track: mcu.bare ? 0.2 : 0.25, power: 0.5, clear: mcu.bare ? 0.15 : 0.2, pourBot: true, pourTop: false, pourNet: "GND", edgeClear: 0.4 });
-  S.name = keepName && keepName !== fresh.name ? keepName : (K.name || "Keyboard") + (K.split.mode === "two" ? (half ? " (right)" : " (left)") : "");
+  S.name = keepName && keepName !== fresh.name && !K.built ? keepName : (K.name || "Keyboard") + (K.split.mode === "two" ? (half ? " (right)" : " (left)") : "");
   const nets = {}; const pinKey = (c, name) => { const fp = compFP(c); const p = fp.pads.find(q => q.name === name) || fp.pads.find(q => q.n === name); return p ? c.id + ":" + p.n : null; };
   const net = (name, c, pin) => { const k = pinKey(c, pin); if (!k) { console.warn("no pin", c.fp, pin); return; } (nets[name] = nets[name] || []).push(k); };
   const pfx = "";
   // ---- keys
-  const ord = b.places.slice().sort((p, q) => { const a = M.pos.get(p.k.id), c = M.pos.get(q.k.id); return a[0] - c[0] || (a[0] % 2 ? c[1] - a[1] : a[1] - c[1]); });
-  let n = 0, stabN = 0; const leds = [];
+  const ord = kbOrd(G, b);
+  let n = 0, stabN = 0; const leds = [], knobs = [];
   for (const p of ord) {
     n++;
-    const rot = p.ang + (K.fpRot || 0) + (p.k.fr || 0);
+    const knob = p.k.kind === "knob";
+    const rot = knob ? p.ang : p.ang + (K.fpRot || 0) + (p.k.fr || 0);
     const T = (x, y) => { const [rx, ry] = rotPt(x, y, rot); return [X(p.cx + rx), Y(p.cy + ry)]; };
-    const s = addComp(sw.fp, X(p.cx), Y(p.cy), { ref: "SW" + n, value: (p.k.label || sw.fam.toUpperCase()) + (p.k.w !== 1 || p.k.h !== 1 ? ` ${Math.max(p.k.w, p.k.h)}u` : ""), rot });
+    const s = knob ? addComp("ec11", X(p.cx), Y(p.cy), { ref: "ENC" + (knobs.length + 1), value: "EC11 knob", rot })
+      : addComp(sw.fp, X(p.cx), Y(p.cy), { ref: "SW" + n, value: (p.k.label || sw.fam.toUpperCase()) + (p.k.w !== 1 || p.k.h !== 1 ? ` ${Math.max(p.k.w, p.k.h)}u` : ""), rot });
+    if (knob) knobs.push(s); else s.kbTurn = (K.fpRot || 0) + (p.k.fr || 0);
+    const P1 = knob ? "S1" : "1", P2 = knob ? "S2" : "2";
     const [dx, dy] = T(7.6, 3.8);
     const d = addComp(K.diode, dx, dy, { ref: "D" + n, value: K.diode === "d_do35" ? "1N4148" : "1N4148W", rot: rot + 90, side: "bottom" });
     const [r, c] = M.pos.get(p.k.id);
     const ROW = `${pfx}ROW${r}`, COL = `${pfx}COL${c}`;
-    if (K.dir === "COL2ROW") { net(COL, s, "1"); net(`K${n}`, s, "2"); net(`K${n}`, d, "A"); net(ROW, d, "K"); }
-    else { net(ROW, s, "1"); net(`K${n}`, s, "2"); net(`K${n}`, d, "A"); net(COL, d, "K"); }
+    if (K.dir === "COL2ROW") { net(COL, s, P1); net(`K${n}`, s, P2); net(`K${n}`, d, "A"); net(ROW, d, "K"); }
+    else { net(ROW, s, P1); net(`K${n}`, s, P2); net(`K${n}`, d, "A"); net(COL, d, "K"); }
+    if (knob) continue;
     const st = kbStab(K, G, p);
     if (st) { stabN++; const u = st.units >= 8 ? "8" : st.units >= 7 ? "7" : st.units >= 6.25 ? "6.25" : st.units >= 6 ? "6" : st.units >= 3 ? "3" : "2"; addComp("kb_stab_" + u.replace(".", "_"), X(p.cx), Y(p.cy), { ref: "ST" + stabN, rot: st.rot }); }
     if (K.rgb) {
@@ -460,6 +486,8 @@ function kbBuild(half) {
   for (let c = 0; c < C; c++) net(`${pfx}COL${c}`, U, pins[R + c]);
   // power names for modules: join the module's own pins to the friendly net names
   if (!mcu.bare) { net("GND", U, "GND"); }
+  const PP = kbPinPlan(K);
+  knobs.forEach((e, i) => { const pr = PP.enc[i]; if (!pr) return; net(`ENC${i + 1}_A`, e, "A"); net(`ENC${i + 1}_A`, U, pr[0]); net(`ENC${i + 1}_B`, e, "B"); net(`ENC${i + 1}_B`, U, pr[1]); net("GND", e, "C"); });
   if (K.rgb && leds.length) {
     const p5 = mcu.bare ? "5V" : "LED_5V";
     net("LED_DATA0", U, mcu.led);
@@ -478,7 +506,7 @@ function kbBuild(half) {
   K.built = { at: Date.now(), half: half || 0 };
   UI.sel = new Set(); invalidate(); commit("keebie build");
   switchMode("pcb"); fitView();
-  const msg = `Built <b>${n}</b> keys${K.rgb ? " with RGB" : ""} on a ${(ex - ox).toFixed(0)} × ${(ey - oy).toFixed(0)} mm board with the ${esc(mcu.name)}. Press <b>Auto-route</b> to draw the tracks.`;
+  const msg = `Built <b>${n - knobs.length}</b> keys${knobs.length ? ` and ${knobs.length} knob${knobs.length > 1 ? "s" : ""}` : ""}${K.rgb ? " with RGB" : ""} on a ${(ex - ox).toFixed(0)} × ${(ey - oy).toFixed(0)} mm board with the ${esc(mcu.name)}. Press <b>Auto-route</b> to draw the tracks.`;
   toast(`<span>${msg}</span>`);
 }
 
@@ -510,7 +538,7 @@ function kbPlateDXF() {
   L.push("0", "ENDSEC", "0", "EOF");
   return L.join("\n");
 }
-// layout positions in key units for firmware files (after wave/split), top-left at 0
+// layout positions in key units for firmware files (after arc/split), top-left at 0
 function kbFirmwareLayout(K, G) {
   const [sx, sy] = [G.sx, G.sy], ps = G.places;
   const minX = Math.min(...ps.map(p => p.cx / sx - p.w / 2)), minY = Math.min(...ps.map(p => p.cy / sy - p.h / 2));
@@ -527,6 +555,9 @@ function kbQMK() {
   kb.matrix_pins = { rows: pins.slice(0, M.rows).map(q.map), cols: pins.slice(M.rows, M.rows + M.cols).map(q.map) };
   kb.features = { bootmagic: true, extrakey: true, mousekey: true, nkro: true };
   if (K.split.mode === "two") kb.split = { enabled: true, serial: { pin: q.map(m.serial) } };
+  const PP = kbPinPlan(K);
+  if (PP.enc.length) { kb.features.encoder = true; kb.encoder = { rotary: PP.enc.map(([a, b]) => ({ pin_a: q.map(a), pin_b: q.map(b) })) }; }
+  if (PP.i2c) kb.features.oled = true;
   if (K.rgb) {
     kb.features.rgb_matrix = true; kb.ws2812 = { pin: q.map(m.led) };
     const xs = lay.map(l => l.o.x), ys = lay.map(l => l.o.y), mx = Math.max(...xs) || 1, my = Math.max(...ys) || 1;
@@ -581,6 +612,50 @@ ${gl(cols, c2r ? outF : inF)}
 `;
 }
 
+// ---------------------------------------------------------------- hand-off to Flashie and Makie
+// Everything Flashie needs to write Arduino firmware for this keyboard.
+function kbFlashieExport() {
+  const K = KBS(), G = kbGeom(), m = G.mcu, M = G.matrix, PP = kbPinPlan(K), a = m.ard;
+  const pin = pad => pad ? { pad, pin: a ? a.pin(pad) : null } : null;
+  const lay = kbFirmwareLayout(K, G);
+  const knobs = G.boards[0] ? kbOrd(G, G.boards[0]).filter(p => p.k.kind === "knob") : [];
+  const scr = KB_SCREENS.find(x => x.id === K.oled);
+  return {
+    format: "keebie-keyboard", version: 1,
+    generator: { app: APP.name, version: APP.version, author: APP.author, tool: "Keebie", exported: new Date().toISOString() },
+    name: K.name || "Keyboard", switch: kbSwitch(K).fam,
+    mcu: { id: m.id, name: m.name, core: a ? a.core : null, fqbn: a ? a.fqbn : null, flash: a ? a.flash : null, note: a && a.note || "", volt: m.volt, wireless: !!m.wireless, bare: !!m.bare },
+    split: K.split.mode, diode: K.dir,
+    rows: PP.pins.slice(0, M.rows).map(pin), cols: PP.pins.slice(M.rows, M.rows + M.cols).map(pin),
+    keys: lay.map(({ p, o }) => { const [row, col] = kbMatrixFor(K, G, p); return { id: p.k.id, label: p.k.label || "", x: o.x, y: o.y, w: p.w, h: p.h, r: o.r || 0, rx: o.rx, ry: o.ry, row, col, half: p.half, kind: p.k.kind || "key", qmk: kbKeycode(p.k.label, p.half === 1 || o.x > 9) }; }),
+    knobs: knobs.map((p, i) => PP.enc[i] && { key: p.k.id, a: pin(PP.enc[i][0]), b: pin(PP.enc[i][1]) }).filter(Boolean),
+    screen: scr && scr.w ? { type: scr.id, name: scr.name, w: scr.w, h: scr.h, sda: pin(PP.i2c[0]), scl: pin(PP.i2c[1]) } : null,
+    rgb: K.rgb ? { pin: pin(m.led), count: (G.boards[0] ? G.boards[0].places : G.places).filter(p => p.k.kind !== "knob").length } : null,
+  };
+}
+async function kbSaveExport(ext, content) {
+  const r = await api("/api/savefile", { name: KBS().name || "keyboard", ext, content });
+  return r.path;
+}
+async function kbOpenIn(app, path, what) {
+  try { await api("/api/openin", { app, path }); toast(`<span>Opening ${what} in <b>${app === "makie" ? "Makie" : "Flashie"}</b>…</span>`, "good"); }
+  catch (e) { toast(`<span>Saved to <b>${esc(path)}</b>. Open it in ${app === "makie" ? "Makie" : "Flashie"} (${esc(e.message)}).</span>`, "warn"); }
+}
+async function kbToMakie() {
+  const K = KBS();
+  if (!K.built || !S.comps.some(c => /^kb_|^mx_switch|^choc_switch|^ec11$/.test(c.fp))) { toast("Build the PCB first (Build the PCB), then Makie can make a case around it.", "warn"); return; }
+  try { const path = await kbSaveExport(".makie.json", JSON.stringify(makieExport({ textures: true }))); kbOpenIn("makie", path, "the case"); }
+  catch (e) { downloadFile((K.name || "keyboard") + ".makie.json", JSON.stringify(makieExport()), "application/json"); toast("Saved as a download: open it in Makie.", "warn"); }
+}
+async function kbToFlashie() {
+  const K = KBS(), m = kbMcu(K);
+  if (m.wireless) { toast(`The ${esc(m.name)} runs ZMK: use QMK / ZMK files instead.`, "warn"); return; }
+  if (K.split.mode === "two") toast("Flashie makes firmware for one-piece keyboards. For split halves, use QMK / ZMK files.", "warn");
+  const data = JSON.stringify(kbFlashieExport(), null, 1);
+  try { const path = await kbSaveExport(".keebie.json", data); kbOpenIn("flashie", path, "the keymap"); }
+  catch (e) { downloadFile((K.name || "keyboard") + ".keebie.json", data, "application/json"); toast("Saved as a download: open it in Flashie's Keyboard tab.", "warn"); }
+}
+
 // ---------------------------------------------------------------- the page
 function buildKeebie(el) {
   el.innerHTML = `
@@ -588,7 +663,7 @@ function buildKeebie(el) {
     <aside class="kb-side" id="kbSide"></aside>
     <div class="kb-main">
       <div class="kb-bar">
-        <div class="seg" id="kbAdd" data-help="Add key"><span class="kb-lbl">Add key</span>${KB_SIZES.map(([w, h]) => `<button data-w="${w}" data-h="${h}" title="Add a ${w}${h !== 1 ? "×" + h : ""}u key">${h !== 1 ? `${h}u↕` : w + "u"}</button>`).join("")}<button data-iso="1" title="Add an ISO enter key">ISO⏎</button></div>
+        <div class="seg" id="kbAdd" data-help="Add key"><span class="kb-lbl">Add key</span>${KB_SIZES.map(([w, h]) => `<button data-w="${w}" data-h="${h}" title="Add a ${w}${h !== 1 ? "×" + h : ""}u key">${h !== 1 ? `${h}u↕` : w + "u"}</button>`).join("")}<button data-iso="1" title="Add an ISO enter key">ISO⏎</button><button data-knob="1" title="Add a rotary knob (EC11 encoder)">Knob</button></div>
         <span class="grow"></span>
         <div class="seg" id="kbView" data-help="Key view"><button data-v="legend" class="on" title="Show the key labels">Labels</button><button data-v="matrix" title="Show each key's row and column in the matrix">Matrix</button><button data-v="fp" title="Show the switch solder points">Solder points</button></div>
         <button class="btn ghost icon" id="kbFit" data-tip="Fit to window">${ico("fit")}</button>
@@ -597,7 +672,7 @@ function buildKeebie(el) {
     </div>
     <aside class="kb-props" id="kbProps"></aside>
   </div>`;
-  $("#kbAdd").onclick = e => { const b = e.target.closest("button"); if (!b) return; kbAddKey(+b.dataset.w || 1.25, +b.dataset.h || 2, b.dataset.iso ? "iso" : ""); };
+  $("#kbAdd").onclick = e => { const b = e.target.closest("button"); if (!b) return; if (b.dataset.knob) return kbAddKey(1, 1, "", "knob"); kbAddKey(+b.dataset.w || 1.25, +b.dataset.h || 2, b.dataset.iso ? "iso" : ""); };
   $$("#kbView button").forEach(b => b.onclick = () => { KV.view = b.dataset.v; $$("#kbView button").forEach(x => x.classList.toggle("on", x === b)); kbDraw(); });
   $("#kbFit").onclick = () => { KV.zoom = 0; kbDraw(); };
   const svg = $("#kbSvg");
@@ -637,8 +712,6 @@ function kbSide() {
       ${sel("kb_ol", "Board outline", opt([{ id: "hug", name: "Hug the keys" }, { id: "rect", name: "Rectangle" }, { id: "custom", name: "Custom (drag the corners)" }], K.outline.mode), "Board outline")}
       <div class="kb-row">${nm("kb_mg", "Edge margin", K.outline.margin, "mm", "Edge margin")}${nm("kb_rad", "Rounding", K.outline.radius, "mm", "Rounding")}</div>
       ${nm("kb_holes", "Mounting holes (M2)", K.holes, "", "Mounting holes", 1)}
-      <div class="kb-row">${nm("kb_wa", "Wave height", K.wave.amp, "u", "Wave height", 0.05)}${nm("kb_wl", "Wave length", K.wave.len, "keys", "Wave length", 0.5)}</div>
-      <label class="kb-check" data-help="Tilt keys along the wave"><input type="checkbox" id="kb_wt" ${K.wave.tilt ? "checked" : ""}> Tilt keys along the wave</label>
       ${nm("kb_arc", "Arc (bend radius, 0 = flat)", K.arc, "u", "Arc", 1)}
     </section>
     <section><h4>4 · Split</h4>
@@ -655,13 +728,16 @@ function kbSide() {
       ${sel("kb_dio", "Diodes", opt([{ id: "d_sod123", name: "SOD-123 surface-mount (1N4148W)" }, { id: "d_do35", name: "Through-hole (1N4148)" }], K.diode), "Diodes")}
       ${sel("kb_dir", "Diode direction", opt([{ id: "COL2ROW", name: "COL2ROW (most common)" }, { id: "ROW2COL", name: "ROW2COL" }], K.dir), "Diode direction")}
       <label class="kb-check" data-help="Per-key RGB"><input type="checkbox" id="kb_rgb" ${K.rgb ? "checked" : ""}> Per-key RGB LEDs (SK6812 MINI-E)</label>
+      ${sel("kb_oled", "Screen", opt(KB_SCREENS, K.oled || "none"), "Screen")}
+      <small class="kb-note">Knobs: pick a key and set its <b>Type</b> to <i>Rotary knob</i>, or press <b>Knob</b> above the keyboard.</small>
     </section>
     <section class="kb-stats" id="kbStats"></section>
     <section><h4>6 · Make it</h4>
       ${K.split.mode === "two" ? sel("kb_half", "Half to build", opt([{ id: "0", name: "Left half" }, { id: "1", name: "Right half" }], String(K.half || 0)), "Half to build") : ""}
       <button class="btn primary wide" id="kb_build" data-help="Build the PCB">${ico("magic")}Build the PCB</button>
       <div class="kb-row" style="margin-top:8px"><button class="btn sm" id="kb_plate" data-help="Switch plate">Plate (SVG)</button><button class="btn sm" id="kb_dxf" data-help="Switch plate DXF">Plate (DXF)</button></div>
-      <button class="btn sm wide" id="kb_fw" data-help="Firmware files">Firmware files…</button>
+      <div class="kb-row"><button class="btn sm" id="kb_makie" data-help="Case in Makie">${ico("box")}Case in Makie</button><button class="btn sm" id="kb_flashie" data-help="Firmware in Flashie">${ico("chip")}Firmware in Flashie</button></div>
+      <button class="btn sm wide" id="kb_fw" data-help="Firmware files">QMK / ZMK files…</button>
     </section>`;
   const on = (id, ev, f) => { const e = $("#" + id); if (e) e[ev] = f; };
   const val = id => $("#" + id).value, numv = id => parseFloat($("#" + id).value);
@@ -679,9 +755,6 @@ function kbSide() {
   on("kb_mg", "onchange", () => { K.outline.margin = Math.max(0, Math.min(20, numv("kb_mg") || 0)); kbChanged("margin"); });
   on("kb_rad", "onchange", () => { K.outline.radius = Math.max(0, Math.min(30, numv("kb_rad") || 0)); kbChanged("rounding"); });
   on("kb_holes", "onchange", () => { K.holes = Math.max(0, Math.min(16, numv("kb_holes") | 0)); kbChanged("holes"); });
-  on("kb_wa", "onchange", () => { K.wave.amp = Math.max(-3, Math.min(3, numv("kb_wa") || 0)); kbChanged("wave"); });
-  on("kb_wl", "onchange", () => { K.wave.len = Math.max(2, Math.min(60, numv("kb_wl") || 12)); kbChanged("wave"); });
-  on("kb_wt", "onchange", () => { K.wave.tilt = $("#kb_wt").checked; kbChanged("wave"); });
   on("kb_arc", "onchange", () => { const v = numv("kb_arc") || 0; K.arc = Math.abs(v) < 3 ? 0 : Math.max(-400, Math.min(400, v)); kbChanged("arc"); });
   on("kb_split", "onchange", () => { K.split.mode = val("kb_split"); if (K.split.mode !== "none" && (K.split.at <= 0 || !K.keys.some(k => k.x + k.w / 2 >= K.split.at))) { const xs = K.keys.map(k => k.x + k.w / 2); K.split.at = +((Math.min(...xs) + Math.max(...xs)) / 2).toFixed(2); } if (K.split.mode === "angled" && !K.split.angle) K.split.angle = 10; if (K.split.mode === "two" && !K.split.gap) K.split.gap = 30; K.outline.custom = null; kbSide(); kbChanged("split"); });
   on("kb_sat", "onchange", () => { K.split.at = numv("kb_sat") || 0; kbChanged("split"); });
@@ -692,6 +765,9 @@ function kbSide() {
   on("kb_dio", "onchange", () => { K.diode = val("kb_dio"); kbChanged("diodes"); });
   on("kb_dir", "onchange", () => { K.dir = val("kb_dir"); kbChanged("diode direction"); });
   on("kb_rgb", "onchange", () => { K.rgb = $("#kb_rgb").checked; kbChanged("rgb"); });
+  on("kb_oled", "onchange", () => { K.oled = val("kb_oled"); kbChanged("screen"); });
+  on("kb_makie", "onclick", kbToMakie);
+  on("kb_flashie", "onclick", kbToFlashie);
   on("kb_half", "onchange", () => { K.half = +val("kb_half"); kbChanged("half"); });
   on("kb_build", "onclick", () => {
     const go = () => kbBuild(K.split.mode === "two" ? K.half || 0 : 0);
@@ -707,11 +783,13 @@ function kbSide() {
 }
 function kbStats() {
   const el = $("#kbStats"); if (!el) return;
-  const K = KBS(), G = kbGeom(), M = G.matrix, pins = kbFreePins(K), need = M.rows + M.cols;
-  const sizes = {}; for (const k of K.keys) { const s = k.shape === "iso" ? "ISO enter" : (k.h > k.w ? `${k.h}u vertical` : `${k.w}u`); sizes[s] = (sizes[s] || 0) + 1; }
+  const K = KBS(), G = kbGeom(), M = G.matrix, PP = kbPinPlan(K), base = kbBasePins(K), extra = PP.enc.length * 2 + (PP.i2c ? 2 : 0), pins = PP.pins, need = M.rows + M.cols;
+  const nKnob = kbKnobCount(K);
+  const sizes = {}; for (const k of K.keys.filter(q => q.kind !== "knob")) { const s = k.shape === "iso" ? "ISO enter" : (k.h > k.w ? `${k.h}u vertical` : `${k.w}u`); sizes[s] = (sizes[s] || 0) + 1; }
   const stabs = G.places.filter(p => kbStab(K, G, p)).length;
   const dims = G.boards.filter(Boolean).map(b => { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (const pl of b.polys) for (const [x, y] of pl) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); } return `${(x1 - x0).toFixed(0)} × ${(y1 - y0).toFixed(0)} mm`; });
   const warn = [];
+  if (PP.enc.length < nKnob) warn.push(`Not enough free pins for ${nKnob} knob${nKnob > 1 ? "s" : ""}: each knob needs 2 pins of its own.`);
   if (need > pins.length) warn.push(`The matrix needs ${need} pins but the ${G.mcu.name} has ${pins.length} free. Try: ${KB_MCUS.filter(m => m.pins.length - 2 >= need).map(m => m.name.split(" (")[0]).slice(0, 3).join(", ") || "a split layout"}.`);
   if (M.dup.length) warn.push(`${M.dup.length} key(s) share a matrix position with another key: check the row/column overrides.`);
   if (G.boards.some(b => b && !b.polys.length)) warn.push("Couldn't make an outline: try a bigger margin.");
@@ -719,8 +797,8 @@ function kbStats() {
   if (G.mcu.bare) warn.push(`Bare chips have fine-pitch pins: order the board with factory assembly (PCBA) for the chip. Auto-route does the keys; tracks right at the chip's ${LIB_BY_ID[G.mcu.fp].pads[1] && Math.abs(LIB_BY_ID[G.mcu.fp].pads[1].y - LIB_BY_ID[G.mcu.fp].pads[0].y).toFixed(1)}mm-pitch pins often need finishing by hand, so run Check before ordering.`);
   el.innerHTML = `<h4>Your keyboard</h4><div class="kb-outs">
     <div><span>Keys</span><b>${K.keys.length}</b></div><div><span>Matrix</span><b>${M.rows} × ${M.cols}</b></div>
-    <div class="${need > pins.length ? "bad" : ""}"><span>Pins used</span><b>${need} / ${pins.length}</b></div><div><span>Board${dims.length > 1 ? "s" : ""}</span><b>${dims.join(" + ") || "—"}</b></div></div>
-    <div class="kb-bom"><b>Keycaps:</b> ${Object.entries(sizes).sort((a, b) => b[1] - a[1]).map(([s, n]) => `${n}× ${s}`).join(", ")}${stabs ? `<br><b>Stabilisers:</b> ${stabs}` : ""}<br><b>Diodes:</b> ${K.keys.length}${K.rgb ? ` · <b>LEDs:</b> ${K.keys.length}` : ""}</div>
+    <div class="${need > pins.length || PP.enc.length < nKnob ? "bad" : ""}"><span>Pins used</span><b>${need + extra} / ${base.length}</b></div><div><span>Board${dims.length > 1 ? "s" : ""}</span><b>${dims.join(" + ") || "—"}</b></div></div>
+    <div class="kb-bom"><b>Keycaps:</b> ${Object.entries(sizes).sort((a, b) => b[1] - a[1]).map(([s, n]) => `${n}× ${s}`).join(", ")}${stabs ? `<br><b>Stabilisers:</b> ${stabs}` : ""}<br><b>Diodes:</b> ${K.keys.length}${K.rgb ? ` · <b>LEDs:</b> ${K.keys.length - K.keys.filter(k => k.kind === "knob").length}` : ""}${nKnob ? `<br><b>Knobs:</b> ${K.keys.filter(k => k.kind === "knob").length} × EC11 rotary encoder` : ""}${PP.i2c ? `<br><b>Screen:</b> ${esc(KB_SCREENS.find(x => x.id === K.oled).name)} on ${PP.i2c.join(" / ")}` : ""}</div>
     ${warn.map(w => `<p class="kb-warn">${esc(w)}</p>`).join("")}`;
 }
 
@@ -740,15 +818,17 @@ function kbPropsPanel() {
     <label class="fld" data-help="Key label"><span>Label</span><div class="kb-inp"><input id="kp_label" value="${esc(same("label"))}" spellcheck="false"></div></label>
     <div class="kb-row"><label class="fld" data-help="Key width"><span>Width</span><select id="kp_w">${!same("w") ? '<option value="">mixed</option>' : ""}${sizeOpts.map(s => `<option value="${s}" ${same("w") === s ? "selected" : ""}>${s}u</option>`).join("")}</select></label>
     <label class="fld" data-help="Key height"><span>Height</span><select id="kp_h">${!same("h") ? '<option value="">mixed</option>' : ""}${[1, 1.5, 2].map(s => `<option value="${s}" ${same("h") === s ? "selected" : ""}>${s}u</option>`).join("")}</select></label></div>
+    <label class="fld" data-help="Key type"><span>Type</span><select id="kp_kind">${!sel.every(k => (k.kind || "") === (one.kind || "")) ? '<option value="">mixed</option>' : ""}${[["key", "Key switch"], ["knob", "Rotary knob (EC11)"]].map(([v, t]) => `<option value="${v}" ${sel.every(k => (k.kind || "key") === v) ? "selected" : ""}>${t}</option>`).join("")}</select></label>
     <label class="fld" data-help="Key shape"><span>Shape</span><select id="kp_shape">${[["", "Normal"], ["iso", "ISO enter"], ["stepped", "Stepped (Caps Lock)"]].map(([v, t]) => `<option value="${v}" ${same("shape") === v ? "selected" : ""}>${t}</option>`).join("")}</select></label>
     <div class="kb-row"><label class="fld" data-help="Key angle"><span>Angle</span><div class="kb-inp"><input id="kp_r" type="number" step="1" value="${same("r") === "" ? "" : same("r")}"><em>°</em></div></label>
     <label class="fld" data-help="Switch footprint turn"><span>Solder points</span><select id="kp_fr">${!sel.every(k => (k.fr || 0) === (one.fr || 0)) ? '<option value="">mixed</option>' : ""}${[0, 90, 180, 270].map(a => `<option value="${a}" ${(one.fr || 0) === a && sel.every(k => (k.fr || 0) === a) ? "selected" : ""}>+${a}°</option>`).join("")}</select></label></div>
     ${sel.length === 1 ? `<div class="kb-row"><label class="fld" data-help="Matrix row"><span>Row ${one.row == null ? `(auto: ${mp ? mp[0] : "?"})` : ""}</span><div class="kb-inp"><input id="kp_row" type="number" min="0" value="${one.row ?? ""}" placeholder="auto"></div></label><label class="fld" data-help="Matrix column"><span>Column ${one.col == null ? `(auto: ${mp ? mp[1] : "?"})` : ""}</span><div class="kb-inp"><input id="kp_col" type="number" min="0" value="${one.col ?? ""}" placeholder="auto"></div></label></div>
       <div class="kb-row"><label class="fld"><span>X</span><div class="kb-inp"><input id="kp_x" type="number" step="0.25" value="${one.x}"><em>u</em></div></label><label class="fld"><span>Y</span><div class="kb-inp"><input id="kp_y" type="number" step="0.25" value="${one.y}"><em>u</em></div></label></div>` : ""}
-    ${G.sw.stabs ? `<label class="fld" data-help="Stabiliser"><span>Stabiliser</span><select id="kp_stab">${[["auto", "Automatic (2u and longer)"], ["none", "None"]].map(([v, t]) => `<option value="${v}" ${same("stab") === v ? "selected" : ""}>${t}</option>`).join("")}</select></label>` : ""}
+    ${G.sw.stabs && !sel.every(k => k.kind === "knob") ? `<label class="fld" data-help="Stabiliser"><span>Stabiliser</span><select id="kp_stab">${[["auto", "Automatic (2u and longer)"], ["none", "None"]].map(([v, t]) => `<option value="${v}" ${same("stab") === v ? "selected" : ""}>${t}</option>`).join("")}</select></label>` : ""}
     <div class="kb-row"><button class="btn sm" id="kp_dup" data-help="Duplicate keys">Duplicate</button><button class="btn sm danger" id="kp_del" data-help="Delete keys">Delete</button></div>`;
   const ch = (id, f) => { const e = $("#" + id); if (e) e.onchange = () => { f(e.value); kbChanged("key"); }; };
   ch("kp_label", v => sel.forEach(k => k.label = v));
+  ch("kp_kind", v => v && sel.forEach(k => { if (v === "knob") { k.kind = "knob"; k.w = 1; k.h = 1; k.shape = ""; if (!k.label) k.label = "Knob"; } else delete k.kind; }));
   ch("kp_w", v => v && sel.forEach(k => k.w = +v));
   ch("kp_h", v => v && sel.forEach(k => k.h = +v));
   ch("kp_shape", v => sel.forEach(k => { k.shape = v; if (v === "iso") { k.w = 1.25; k.h = 2; } if (v === "stepped") k.w = Math.max(k.w, 1.75); }));
@@ -763,9 +843,10 @@ function kbPropsPanel() {
 }
 
 // ---- editing actions
-function kbAddKey(w, h, shape) {
+function kbAddKey(w, h, shape, kind) {
   const K = KBS(); let y = K.keys.length ? Math.max(...K.keys.map(k => k.y + k.h)) + 0.25 : 0;
   const k = { id: kbId(), x: 0, y, w: shape === "iso" ? 1.25 : w, h: shape === "iso" ? 2 : h, r: 0, label: "", shape, fr: 0, row: null, col: null, stab: "auto" };
+  if (kind) { k.kind = kind; k.label = "Knob"; }
   K.keys.push(k); KV.sel = new Set([k.id]); kbChanged("add key");
 }
 function kbDuplicate() { const K = KBS(); const add = K.keys.filter(k => KV.sel.has(k.id)).map(k => ({ ...k, id: kbId(), y: k.y + 1.25, row: null, col: null })); K.keys.push(...add); KV.sel = new Set(add.map(k => k.id)); kbChanged("duplicate"); }
@@ -859,14 +940,17 @@ function kbDraw() {
     const k = p.k, sel = KV.sel.has(k.id), [c0, c1, tc] = kbCapColour(k, prof);
     const W = k.w * sx, H = k.h * sy, g = 0.6;
     let cap, top;
-    if (k.shape === "iso") { const ext = 0.25 * sx; cap = `<path d="M${-W / 2 - ext + g},${-H / 2 + g}H${W / 2 - g}V${H / 2 - g}H${-W / 2 + g}V0H${-W / 2 - ext + g}Z" fill="${c0}" class="kb-cap"/>`; top = `<path d="M${-W / 2 - ext + 2.4},${-H / 2 + 1.6}H${W / 2 - 2.4}V${H / 2 - 3.2}H${-W / 2 + 2.4}V${-1.6}H${-W / 2 - ext + 2.4}Z" fill="${c1}"/>`; }
+    if (k.kind === "knob") { const R = Math.min(W, H) / 2 - 1.2; cap = `<circle r="${R}" fill="#2b313c" stroke="#5c6678" stroke-width="0.6" class="kb-cap"/>`; top = `<circle r="${R * 0.72}" fill="#3b4352"/><line x1="0" y1="${-R * 0.72}" x2="0" y2="${-R * 0.25}" stroke="#ef8a3c" stroke-width="1" stroke-linecap="round"/>`; }
+    else if (k.shape === "iso") { const ext = 0.25 * sx; cap = `<path d="M${-W / 2 - ext + g},${-H / 2 + g}H${W / 2 - g}V${H / 2 - g}H${-W / 2 + g}V0H${-W / 2 - ext + g}Z" fill="${c0}" class="kb-cap"/>`; top = `<path d="M${-W / 2 - ext + 2.4},${-H / 2 + 1.6}H${W / 2 - 2.4}V${H / 2 - 3.2}H${-W / 2 + 2.4}V${-1.6}H${-W / 2 - ext + 2.4}Z" fill="${c1}"/>`; }
     else { cap = `<rect x="${-W / 2 + g}" y="${-H / 2 + g}" width="${W - 2 * g}" height="${H - 2 * g}" rx="1.6" fill="${c0}" class="kb-cap"/>`; top = `<rect x="${-W / 2 + 2.4}" y="${-H / 2 + 1.6}" width="${W - 4.8}" height="${H - 4.8}" rx="1.4" fill="${c1}"/>`; }
     if (k.shape === "stepped") top += `<rect x="${-W / 2 + 2.4}" y="${-H / 2 + 1.6}" width="${(k.w - 1.25) * sx - 2}" height="${H - 4.8}" rx="1" fill="${c0}" opacity=".6"/>`;
     let lab = "";
     if (KV.view === "matrix") { const m = G.matrix.pos.get(k.id); lab = `<text class="kb-lab mono" fill="${tc}" font-size="3.2">${m ? (K.split.mode === "two" && p.half ? m[0] + G.matrix.rows : m[0]) + "," + m[1] : "?"}</text>`; }
+    else if (KV.view === "legend" && k.kind === "knob") lab = "";
     else if (KV.view === "legend") lab = `<text class="kb-lab" fill="${tc}" font-size="${(k.label || "").length > 3 ? 2.6 : 3.4}">${esc(k.label || "")}</text>`;
     let fpart = "";
-    if (KV.view === "fp" && fp) {
+    if (KV.view === "fp" && k.kind === "knob") { const e = LIB_BY_ID.ec11; fpart = `<g class="kb-fp">${e.pads.map(q => `<circle cx="${q.x}" cy="${q.y}" r="${Math.max(q.w || q.d || 1.8, q.h || 0) / 2}" class="p"/>`).join("")}</g>`; }
+    else if (KV.view === "fp" && fp) {
       const fr = (K.fpRot || 0) + (k.fr || 0);
       fpart = `<g transform="rotate(${fr})" class="kb-fp">${fp.holes.map(h => `<circle cx="${h.x}" cy="${h.y}" r="${h.d / 2}" class="h"/>`).join("")}${fp.pads.map(q => q.drill ? `<circle cx="${q.x}" cy="${q.y}" r="${q.w / 2}" class="p"/>` : `<rect x="${q.x - q.w / 2}" y="${q.y - q.h / 2}" width="${q.w}" height="${q.h}" class="p s"/>`).join("")}<rect x="6.9" y="1.5" width="1.4" height="4.6" class="d"/>${K.rgb ? `<rect x="-1.7" y="3.65" width="3.4" height="2.8" class="l"/>` : ""}</g>`;
     }

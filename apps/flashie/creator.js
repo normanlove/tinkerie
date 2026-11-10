@@ -1529,7 +1529,7 @@ function buildLayout(){
   // view tabs in the header
   const tabs = document.createElement('div');
   tabs.className = 'viewtabs';
-  tabs.innerHTML = `<button data-v="flash" class="on">⚡ Flash</button><button data-v="create">🧩 Create</button><button data-v="image">💾 Write image</button>`;
+  tabs.innerHTML = `<button data-v="flash" class="on">⚡ Flash</button><button data-v="create">🧩 Create</button><button data-v="image">💾 Write image</button><button data-v="keyboard">⌨ Keyboard</button>`;
   document.querySelector('header .spacer').before(tabs);
   tabs.onclick = e => { const b = e.target.closest('button'); if(b) setView(b.dataset.v); };
 }
@@ -1541,7 +1541,8 @@ function setView(v){
   flashEls.forEach(s => { const el = document.querySelector(s); if(el) el.classList.toggle('creator-hide', v !== 'flash'); });
   $c('#creatorView').classList.toggle('hidden', v !== 'create');
   if(window.imgView) window.imgView(v === 'image');
-  document.querySelector('.app').classList.toggle('wide', v === 'create');
+  if(window.kbdView) window.kbdView(v === 'keyboard');
+  document.querySelector('.app').classList.toggle('wide', v === 'create' || v === 'keyboard');
   if(v === 'create') renderAll();
   try{ localStorage.setItem('flashie.view', v); }catch{}
 }
@@ -1688,7 +1689,8 @@ function teachBlockDef(b, na){
   teachMsg('Welcome to the Firmware Creator', 'Build a program by dragging blocks from the left and snapping them together under “when the board starts”. The real code appears on the right as you build — hover over any block or any line of code to see what it means. When you’re ready, press “Upload & run”.');
   cStatus('Ready.', '');
   if(C.textMode) setTimeout(() => setTextMode(true), 0);
-  try{ if(localStorage.getItem('flashie.view') === 'create') setView('create'); }catch{}
+  window.flashieSetView = setView;
+  try{ const v = localStorage.getItem('flashie.view'); if(v === 'create' || v === 'keyboard') setView(v); }catch{}
 })();
 
 // Exposed for tests.

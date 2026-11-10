@@ -57,6 +57,11 @@ function caseInfo(fp, c) {
   }
   if (info.kind === "component") info.kind = kindOf(id, fp);
   // generic data-driven overrides (used by the expanded library & user parts)
+  // keyboard switches: only the part below the plate counts (the rest pokes through it)
+  if (/^(kb_mx_hs|mx_switch|kb_alps)$/.test(id)) { info.kind = "switch"; info.h = 3.4; info.lid = []; }
+  if (/^(kb_choc_hs|choc_switch)$/.test(id)) { info.kind = "switch"; info.h = 1.0; info.lid = []; }
+  if (/^kb_stab_/.test(id)) { info.kind = "mechanical"; info.h = 0; info.lid = []; } // stabiliser housings come up through the plate
+  if (id === "ec11") { info.kind = "control"; info.h = 20; info.lid = []; }
   if (fp.case) Object.assign(info, fp.case);
   if (c && c.caseH) info.h = c.caseH;
   return info;
@@ -77,7 +82,8 @@ function makieExport(opts = {}) {
   const dirXf = (c, v) => { const lx = c.side === "bottom" ? -v[0] : v[0]; const [rx, ry] = rotPt(lx, v[1], c.rot); return [R(rx), R(-ry)]; };
   const outline = boardPolygon(0).map(([x, y]) => [R(x), Y(y)]).reverse(); // CCW in Y-up
   const holes = [];
-  for (const h of A.holes) holes.push({ x: R(h.x), y: Y(h.y), d: R(h.d), plated: false, ref: h.comp.ref });
+  const KBSW = /^(kb_mx_hs|kb_choc_hs|kb_alps|mx_switch|choc_switch|ec11)$/;
+  for (const h of A.holes) if (!KBSW.test(h.comp.fp) && !/^kb_stab_/.test(h.comp.fp)) holes.push({ x: R(h.x), y: Y(h.y), d: R(h.d), plated: false, ref: h.comp.ref });
   for (const p of A.pads) if (p.drill >= 2 && /^(MH|1)$/.test(p.name) && compFP(p.comp).cat === "Mechanical") holes.push({ x: R(p.x), y: Y(p.y), d: R(p.drill), plated: true, ref: p.comp.ref });
   const screw = d => (d <= 2.4 ? "M2" : d <= 2.9 ? "M2.5" : d <= 3.6 ? "M3" : d <= 4.6 ? "M4" : "M5");
   const parts = [], openings = [], lid = [];
@@ -128,11 +134,30 @@ function makieExport(opts = {}) {
     generator: { app: APP.name, version: APP.version, author: APP.author, exported: new Date().toISOString() },
     project: S.name, units: "mm",
     coordinates: "Origin at the board's bottom-left corner. +X right, +Y toward the back (up on screen), +Z up. Board bottom face is z=0, top face is z=thickness. Rotations are degrees counter-clockwise looking down on the top.",
-    board: { width: R(B.w), height: R(B.h), thickness: BOARD_THICKNESS, shape: B.round ? "round" : "rect", cornerRadius: R(B.round ? Math.min(B.w, B.h) / 2 : B.r || 0), outline },
+    board: { width: R(B.w), height: R(B.h), thickness: BOARD_THICKNESS, shape: B.round ? "round" : B.polys && B.polys.length ? "custom" : "rect", cornerRadius: R(B.round ? Math.min(B.w, B.h) / 2 : B.r || 0), outline },
     mountingHoles: holes.map(h => Object.assign(h, { screw: screw(h.d) })),
     parts, openings, lidFeatures: lid,
     envelope: { maxPartHeightTop: R(maxTop), maxPartHeightBottom: R(maxBot), suggestedStandoff: R(Math.max(3, maxBot + 2)), suggestedLidClearance: R(maxTop + 2), suggestedWall: 2.0, suggestedFit: 0.3 },
   };
+  // keyboards (Keebie): switch plate data so Makie can make a plate and an open-top case
+  const sws = S.comps.filter(c => KBSW.test(c.fp));
+  if (sws.some(c => c.fp !== "ec11")) {
+    const first = sws.find(c => c.fp !== "ec11").fp, fam = /choc/.test(first) ? "choc" : /alps/.test(first) ? "alps" : "mx";
+    const cutouts = [];
+    for (const c of sws) {
+      const [x, y] = xf(c, 0, 0), knob = c.fp === "ec11";
+      let w = fam === "choc" ? 13.8 : fam === "alps" ? 15.5 : 14, h = fam === "alps" ? 12.8 : w;
+      if (knob) { w = 15; h = 17.4; } // the encoder's pins stick out past its 12 × 13 mm body
+      cutouts.push({ ref: c.ref, kind: knob ? "knob" : "switch", x, y, w, h, rotation: R(rotOut(((c.rot - (c.kbTurn || 0)) % 360 + 360) % 360)) });
+    }
+    for (const c of S.comps.filter(c => /^kb_stab_/.test(c.fp))) {
+      const fp = compFP(c), s2 = Math.abs(fp.holes[0].x);
+      for (const sx of [-s2, s2]) { const [x, y] = xf(c, sx, 0.8); cutouts.push({ ref: c.ref, kind: "stabiliser", x, y, w: 6.75, h: 14, rotation: R(rotOut(c.rot)) }); }
+    }
+    const hs = sws.some(c => /_hs$/.test(c.fp));
+    out.keyboard = { switch: fam, plateTop: fam === "choc" ? 2.2 : 5.0, plateThickness: fam === "choc" ? 1.2 : 1.5, hotswap: hs, cutouts };
+    if (hs) out.envelope.maxPartHeightBottom = Math.max(out.envelope.maxPartHeightBottom, 2.0);
+  }
   if (opts.textures !== false) {
     out.textures = { pixelsPerMm: 8, top: renderBoardPNG(false, 8), bottom: renderBoardPNG(true, 8) };
   }

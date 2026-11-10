@@ -27,12 +27,12 @@ import (
 	"time"
 )
 
-const appVersion = "0.7.1-alpha"
+const appVersion = "0.8.0-alpha"
 
 //go:embed ui.html
 var uiHTML []byte
 
-//go:embed creator.js creator.css imager.js mpy/*.py teach.js teach-tips.js
+//go:embed creator.js creator.css imager.js keyboard.js mpy/*.py teach.js teach-tips.js
 var assets embed.FS
 
 var demoMode = os.Getenv("FLASHIE_DEMO") == "1"
@@ -302,10 +302,16 @@ func Main() {
 	if len(os.Args) >= 4 && os.Args[1] == "--img-helper" { // elevated image writer
 		os.Exit(runImgHelper(os.Args[2], os.Args[3]))
 	}
+	for i := 1; i+1 < len(os.Args); i++ { // --keyboard file.keebie.json (from Wirie's Keebie)
+		if os.Args[i] == "--keyboard" {
+			kbInitial = os.Args[i+1]
+		}
+	}
 	if demoMode {
 		startDemoLibrary()
 	}
 	mux := http.NewServeMux()
+	registerKeyboardAPI(mux)
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
 			http.NotFound(w, r)
@@ -321,7 +327,7 @@ func Main() {
 		w.Header().Set("Cache-Control", "no-store")
 		w.Write(b)
 	})
-	for _, f := range []string{"teach.js", "teach-tips.js"} { // teaching mode
+	for _, f := range []string{"teach.js", "teach-tips.js", "keyboard.js"} { // teaching mode, Keyboard tab
 		f := f
 		mux.HandleFunc("/"+f, func(w http.ResponseWriter, r *http.Request) {
 			b, _ := assets.ReadFile(f)

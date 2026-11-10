@@ -41,11 +41,11 @@ const range = (pre, a, b, skip = []) => { const o = []; for (let i = a; i <= b; 
 
 const KB_MCUS = [
   // ----- boards you solder on (easiest)
-  { id: "promicro", group: "Boards you solder on", name: "Pro Micro (ATmega32U4)", fp: "promicro", fw: "QMK · Vial", volt: 5, pins: PROMICRO_PINS, serial: "D3", led: "TX0", pwr: "VCC", logic: "VCC", reset: ["RST", "GND"],
+  { id: "promicro", group: "Boards you solder on", name: "Pro Micro (ATmega32U4)", fp: "promicro", fw: "QMK · Vial", volt: 5, pins: PROMICRO_PINS, serial: "RX1", led: "TX0", pwr: "VCC", logic: "VCC", reset: ["RST", "GND"],
     qmk: { board: "promicro", bootloader: "caterina", map: n => PROMICRO_AVR[n] }, desc: "The classic keyboard controller: cheap, 18 pins, QMK. Micro-USB on most; USB-C clones exist." },
-  { id: "elitec", group: "Boards you solder on", name: "Elite-C (ATmega32U4, USB-C)", fp: "promicro", fw: "QMK · Vial", volt: 5, pins: PROMICRO_PINS, serial: "D3", led: "TX0", pwr: "VCC", logic: "VCC", reset: ["RST", "GND"],
+  { id: "elitec", group: "Boards you solder on", name: "Elite-C (ATmega32U4, USB-C)", fp: "promicro", fw: "QMK · Vial", volt: 5, pins: PROMICRO_PINS, serial: "RX1", led: "TX0", pwr: "VCC", logic: "VCC", reset: ["RST", "GND"],
     qmk: { board: "elite_c", bootloader: "atmel-dfu", map: n => PROMICRO_AVR[n] }, desc: "A sturdier Pro Micro with USB-C and a DFU bootloader. Same footprint (its extra bottom pins aren't used here)." },
-  { id: "rp2040pm", group: "Boards you solder on", name: "RP2040 Pro Micro (KB2040, Sea-Picro, Elite-Pi…)", fp: "promicro", fw: "QMK · Vial · KMK", volt: 3.3, pins: PROMICRO_PINS, serial: "D3", led: "TX0", pwr: "RAW", logic: "RAW", reset: ["RST", "GND"],
+  { id: "rp2040pm", group: "Boards you solder on", name: "RP2040 Pro Micro (KB2040, Sea-Picro, Elite-Pi…)", fp: "promicro", fw: "QMK · Vial · KMK", volt: 3.3, pins: PROMICRO_PINS, serial: "RX1", led: "TX0", pwr: "RAW", logic: "RAW", reset: ["RST", "GND"],
     qmk: { board: "promicro", bootloader: "caterina", convert: "kb2040", map: n => PROMICRO_AVR[n] }, desc: "Pro Micro-shaped RP2040 boards: more memory, USB-C, cheap. Build QMK with CONVERT_TO=kb2040 (or your board's converter)." },
   { id: "nicenano", group: "Wireless (Bluetooth)", name: "nice!nano v2 (nRF52840)", fp: "promicro", fw: "ZMK (Bluetooth)", volt: 3.3, wireless: true, pins: PROMICRO_PINS, led: "TX0", pwr: "VCC", logic: "VCC", reset: ["RST", "GND"],
     zmk: { node: "&pro_micro", map: n => PROMICRO_ARDUINO[n] }, desc: "Wireless Pro Micro. Keebie adds a battery connector and on/off switch. Split halves talk over Bluetooth, so no TRRS cable." },
@@ -61,7 +61,7 @@ const KB_MCUS = [
     qmk: { board: "BLACKPILL_STM32_F411", processor: "STM32F411", bootloader: "stm32-dfu", map: n => n }, desc: "Fast ARM board with 27 usable pins and USB-C." },
   // ----- bare chips (Keebie adds USB-C and everything the chip needs)
   { id: "atmega32u4", group: "Bare chips (all circuitry added)", name: "ATmega32U4 chip", fp: "kb_atmega32u4", bare: true, fw: "QMK · Vial", volt: 5,
-    pins: ["PB0", "PB1", "PB2", "PB3", "PB4", "PB5", "PB6", "PB7", "PC6", "PC7", "PD1", "PD2", "PD4", "PD5", "PD6", "PD7", "PE6", "PF0", "PF1", "PF4", "PF5", "PF6", "PF7", "PD3", "PD0"], serial: "PD0", led: "PD3",
+    pins: ["PB0", "PB1", "PB2", "PB3", "PB4", "PB5", "PB6", "PB7", "PC6", "PC7", "PD1", "PD2", "PD4", "PD5", "PD6", "PD7", "PE6", "PF0", "PF1", "PF4", "PF5", "PF6", "PF7", "PD3", "PD0"], serial: "PD2", led: "PD3",
     qmk: { processor: "atmega32u4", bootloader: "atmel-dfu", map: n => n.slice(1) }, desc: "The Pro Micro's chip on your own board: USB-C, 16MHz crystal and 25 pins. Factory assembly recommended (0.8mm pin pitch)." },
   { id: "rp2040", group: "Bare chips (all circuitry added)", name: "RP2040 chip", fp: "kb_rp2040", bare: true, fw: "QMK · Vial · KMK", volt: 3.3,
     pins: range("GPIO", 2, 29), serial: "GPIO1", led: "GPIO0",
@@ -73,6 +73,37 @@ const KB_MCUS = [
     pins: [...range("PA", 0, 8), "PA10", "PA15", ...range("PB", 0, 10, [2]), ...range("PB", 12, 15), "PC13", "PC14", "PC15"], serial: "PA9", led: "PA7",
     qmk: { processor: "STM32F411", bootloader: "stm32-dfu", map: n => n.slice(1) }, desc: "The Black Pill's chip with a 25MHz crystal: fast, 30 pins. Factory assembly recommended." },
 ];
+
+// ---------------- Arduino firmware (Flashie's Keyboard tab) ----------------
+// core: which Arduino core compiles it; fqbn: the board to compile for;
+// flash: the Flashie board used to write it (null = Flashie can't write it);
+// pin(pad): the Arduino pin for a footprint pad; i2c: [SDA, SCL] pads for a screen.
+const LEONARDO_PIN = { PD2: 0, PD3: 1, PD1: 2, PD0: 3, PD4: 4, PC6: 5, PD7: 6, PE6: 7, PB4: 8, PB5: 9, PB6: 10, PB7: 11, PD6: 12, PC7: 13, PB3: 14, PB1: 15, PB2: 16, PB0: 17, PF7: 18, PF6: 19, PF5: 20, PF4: 21, PF1: 22, PF0: 23, PD5: 30 };
+const KB2040_GP = { D3: 0, D2: 1, D1: 2, D0: 3, D4: 4, C6: 5, D7: 6, E6: 7, B4: 8, B5: 9, B6: 10, B1: 18, B2: 19, B3: 20, F4: 26, F5: 27, F6: 28, F7: 29 };
+const gpNum = n => String(+String(n).replace(/^\D+/, ""));
+const DFU_NOTE = "This chip starts with a DFU bootloader, which Flashie can't write to yet. Flashie builds the .hex for you: write it with QMK Toolbox or dfu-programmer.";
+const KB_ARD = {
+  promicro: { core: "avr", fqbn: "arduino:avr:leonardo", flash: "pro-micro", pin: n => String(PROMICRO_ARDUINO[n]), i2c: ["D2", "D3"] },
+  elitec: { core: "avr", fqbn: "arduino:avr:leonardo", flash: null, note: DFU_NOTE, pin: n => String(PROMICRO_ARDUINO[n]), i2c: ["D2", "D3"] },
+  rp2040pm: { core: "rp2040", fqbn: "rp2040:rp2040:adafruit_kb2040", flash: "rp2040-generic", pin: n => String(KB2040_GP[PROMICRO_AVR[n]]), i2c: ["D2", "D3"], note: "Pins follow the Adafruit KB2040. Sea-Picro, Elite-Pi and other RP2040 Pro Micros wire some pins differently: check the pin list under Wiring." },
+  pico: { core: "rp2040", fqbn: "rp2040:rp2040:rpipico", flash: "pico", pin: gpNum, i2c: ["GP20", "GP21"] },
+  rp2040zero: { core: "rp2040", fqbn: "rp2040:rp2040:waveshare_rp2040_zero", flash: "rp2040-zero", pin: gpNum, i2c: ["GP14", "GP15"] },
+  xiaorp: { core: "rp2040", fqbn: "rp2040:rp2040:seeed_xiao_rp2040", flash: "xiao-rp2040", pin: n => gpNum(XIAO_RP[n]), i2c: ["D4", "D5"] },
+  blackpill: { core: "stm32", fqbn: "STMicroelectronics:stm32:GenF4:pnum=BLACKPILL_F411CE,usb=HID", flash: "blackpill-f411", pin: n => "P" + n, i2c: ["B7", "B6"], note: "Flashie writes STM32 boards through their serial bootloader: wire a USB-serial adapter to PA9/PA10 and hold BOOT0 while resetting." },
+  atmega32u4: { core: "avr", fqbn: "arduino:avr:leonardo", flash: null, note: DFU_NOTE, pin: n => String(LEONARDO_PIN[n]), i2c: ["PD1", "PD0"] },
+  rp2040: { core: "rp2040", fqbn: "rp2040:rp2040:generic", flash: "rp2040-generic", pin: gpNum, i2c: ["GPIO2", "GPIO3"], note: "Hold the BOOT button while plugging in the first time: the board shows up as a drive." },
+  stm32f072: { core: "stm32", fqbn: "STMicroelectronics:stm32:GenF0:pnum=GENERIC_F072CBTX,usb=HID", flash: "stm32-generic", pin: n => n, i2c: ["PB7", "PB6"], note: "Flashie writes STM32 chips through their serial bootloader (PA9/PA10, BOOT0 held while resetting)." },
+  stm32f411: { core: "stm32", fqbn: "STMicroelectronics:stm32:GenF4:pnum=BLACKPILL_F411CE,usb=HID", flash: "stm32-generic", pin: n => n, i2c: ["PB7", "PB6"], note: "Built like a Black Pill (same 25MHz crystal). Flashie writes it through the serial bootloader (PA9/PA10, BOOT0 held while resetting)." },
+};
+for (const m of KB_MCUS) if (KB_ARD[m.id]) m.ard = KB_ARD[m.id];
+
+// small screens Keebie can add (SSD1306 OLED modules on I2C)
+const KB_SCREENS = [
+  { id: "none", name: "No screen" },
+  { id: "oled091", name: "0.91\" OLED, 128 × 32 (I2C)", w: 128, h: 32 },
+  { id: "oled096", name: "0.96\" OLED, 128 × 64 (I2C)", w: 128, h: 64 },
+];
+
 const KB_MCU = Object.fromEntries(KB_MCUS.map(m => [m.id, m]));
 
 // Support circuitry for the bare chips. B gives: add(fp, value, ref?) → part,

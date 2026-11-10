@@ -35,6 +35,7 @@ Parts on the **bottom** side have negative z values (they hang below z = 0).
 | `lidFeatures` | array | holes needed in the **lid / top face** (screens, buttons, LEDs, knobs, sensors) |
 | `envelope` | object | overall heights + suggested case settings |
 | `textures` | object, optional | PNG pictures of the board for realistic rendering |
+| `keyboard` | object, optional | switch plate data for keyboards made with Keebie (below) |
 
 ### `board`
 ```json
@@ -106,6 +107,17 @@ Parts on the **bottom** side have negative z values (they hang below z = 0).
 ```
 These are realistic renders of the board (solder mask, copper, silkscreen) with a transparent background outside the outline. `top` is seen from above. `bottom` is seen from **below**, so it is mirrored left-to-right compared with the top. Image size is `width*ppm × height*ppm` pixels. Map them onto the board's top and bottom faces.
 
+### `keyboard` (optional)
+```json
+{ "switch": "mx", "plateTop": 5.0, "plateThickness": 1.5, "hotswap": true,
+  "cutouts": [ { "ref": "SW1", "kind": "switch", "x": 30.5, "y": 120.2, "w": 14, "h": 14, "rotation": 0 },
+               { "ref": "ST1", "kind": "stabiliser", "x": 18.6, "y": 40.0, "w": 6.75, "h": 14, "rotation": 0 } ] }
+```
+- Present only for keyboards built by Keebie. `switch` is `mx`, `choc` or `alps`.
+- `plateTop` is the top of the switch plate above the board's **top face** (MX 5.0 mm, Choc 2.2 mm); `plateThickness` is the usual plate for that switch.
+- `cutouts[]` are rectangles centred on `x, y`, turned `rotation` degrees counter-clockwise: one per switch (`switch`), per rotary encoder (`knob`) and per stabiliser housing (`stabiliser`).
+- `board.shape` is `"custom"` when the outline isn't a rectangle or circle.
+
 ## Building a basic case
 1. **Inner cavity:** the board outline offset outwards by `suggestedFit`.
 2. **Floor:** at `z = -(suggestedStandoff + floorThickness)`. Add a standoff at each mounting hole, from the floor up to `z = 0`, with a screw hole of the right size for `screw`.
@@ -117,4 +129,4 @@ These are realistic renders of the board (solder mask, copper, silkscreen) with 
 Example files: open `example.makie.json` alongside this spec.
 
 ---
-Format by nrmluvdev · Wirie 0.8
+Format by nrmluvdev · Wirie 0.10

@@ -54,6 +54,19 @@ A drag-and-drop block editor, Scratch-style, that writes a real program for the 
 
 Supported in the Creator: ESP32, S2, S3, C3, C6, ESP8266, RP2040/RP2350 (MicroPython), and AVR Arduinos (C++). STM32 isn't supported. CYD screen blocks work on the SPI CYDs (2.4", 2.8" in every version, 3.2", 3.5", 1.9"). The parallel-bus and RGB-panel CYDs (2.2", 4.0"–7") and the round GC9A01 aren't supported by the MicroPython driver.
 
+## Keyboard firmware (the **Keyboard** tab)
+
+Makes and flashes firmware for keyboards designed in Wirie's Keebie tab. In Keebie, press **Firmware in Flashie**: Keebie saves a `.keebie.json` (key layout, matrix pins, diode direction, knobs, screen and LEDs) to `Documents\Wirie\Exports` and opens this tab with it. The tab also lists every keyboard in that folder, or opens a file from anywhere.
+
+- **Keymap:** click a key and pick what it sends: letters, numbers, symbols, editing and navigation keys, modifiers, F1–F24, the numpad, media keys (volume, play, next, brightness, calculator…), a shortcut (any key with Ctrl, Shift, Alt or Win held), a piece of text to type, or a layer key (hold, toggle or go to). Up to 4 layers, each with a name; ▽ (transparent) falls through to the layer below.
+- **Knobs:** each knob has a press, a turn left and a turn right per layer (volume down/up by default), with pulses-per-click and a direction swap.
+- **Screen:** a title, the layer name, typing speed and a key-press count on the SSD1306 OLED, the right way up or turned over.
+- **Lights:** per-key RGB off, one colour, breathing or rainbow, with brightness.
+- **Wiring:** the Arduino pin for every row, column, knob, screen and LED line, taken from the design and editable.
+- **Make & flash:** Flashie writes an Arduino sketch, compiles it with arduino-cli (the core for the chip is downloaded once into Flashie's own folder: `arduino:avr` with NicoHood's HID-Project, Earle Philhower's `rp2040:rp2040`, or STM32duino's `STMicroelectronics:stm32`, plus Adafruit SSD1306/GFX/NeoPixel when needed) and flashes it: AVR109 for Pro Micros, UF2 for RP2040 boards (Flashie reboots a running keyboard into BOOTSEL itself), the serial bootloader for STM32. **Make only** and **Save file** give you the .hex, .uf2 or .bin; **Code** shows the sketch and saves it as an .ino.
+- Keymaps are kept per keyboard in Flashie's folder (`keymaps\<name>.keymap.json`).
+- Limits: split keyboards in two halves and wireless controllers (nice!nano, XIAO nRF52840) need QMK/ZMK (Keebie writes those files). The Elite-C and bare ATmega32U4 chips ship with a DFU bootloader Flashie can't write yet, so it builds the .hex for QMK Toolbox. STM32's Arduino core can't send media keys. Text keys type as on a US layout.
+
 ## Cheap Yellow Display (CYD) database
 
 Choose your CYD from the **Cheap Yellow Display** group in Board type. The model number is printed on the back of the board. Flashie then shows:
@@ -113,6 +126,7 @@ GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -H wi
 | `libflash.go` | Flashing a library build (multi-part ESP, UF2, AVR) |
 | `repl.go` | MicroPython raw-REPL: detect, upload files, run, live console session |
 | `arduino.go` / `exec_*.go` | arduino-cli download, private build folder, compile + upload for the Creator |
+| `keyboard.go` / `keyboard.js` | The Keyboard tab: keymap editor, Arduino sketch generator, arduino-cli builds for AVR/RP2040/STM32 and flashing |
 | `creator.js` / `creator.css` | The Firmware Creator: blocks, code generators, pin database, teaching text, run flow |
 | `mpy/flashie_cyd.py` / `mpy/flashie_oled.py` | Small MicroPython drivers copied to the board (CYD SPI screens + XPT2046/GT911/CST816 touch; SSD1306) |
 | `sim_mpy.go` | Simulated MicroPython board for tests and demo mode |

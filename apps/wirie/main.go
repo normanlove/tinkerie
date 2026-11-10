@@ -21,6 +21,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -238,7 +239,7 @@ func handleSaveFile(w http.ResponseWriter, r *http.Request) {
 		fail(w, 400, "bad request")
 		return
 	}
-	allowed := map[string]bool{".makie.json": true, ".svg": true, ".csv": true}
+	allowed := map[string]bool{".makie.json": true, ".keebie.json": true, ".svg": true, ".csv": true}
 	if !allowed[req.Ext] {
 		fail(w, 400, "file type not allowed")
 		return
@@ -313,6 +314,45 @@ func handleReveal(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, map[string]bool{"ok": true})
 }
 
+// handleOpenIn hands an export to another Tinkerie app: a case file to Makie,
+// or a Keebie keyboard to Flashie's Keyboard tab. Only files in Exports.
+func handleOpenIn(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		App  string `json:"app"`
+		Path string `json:"path"`
+	}
+	json.NewDecoder(io.LimitReader(r.Body, 1<<16)).Decode(&req)
+	p := filepath.Clean(req.Path)
+	rel, err := filepath.Rel(exportsDir(), p)
+	if err != nil || strings.HasPrefix(rel, "..") {
+		fail(w, 400, "only exported files can be opened")
+		return
+	}
+	var args []string
+	switch {
+	case req.App == "makie" && strings.HasSuffix(p, ".makie.json"):
+		args = []string{"--app", "makie", p}
+	case req.App == "flashie" && strings.HasSuffix(p, ".keebie.json"):
+		args = []string{"--app", "flashie", "--keyboard", p}
+	default:
+		fail(w, 400, "can't open that file there")
+		return
+	}
+	exe, err := os.Executable()
+	if err != nil {
+		fail(w, 500, err.Error())
+		return
+	}
+	cmd := exec.Command(exe, args...)
+	cmd.Dir = filepath.Dir(exe)
+	if err := cmd.Start(); err != nil {
+		fail(w, 500, "couldn't start "+req.App+": "+err.Error())
+		return
+	}
+	go cmd.Wait()
+	writeJSON(w, map[string]string{"path": p})
+}
+
 func Main() {
 	dataDir = filepath.Join(documentsDir(), appName)
 	os.MkdirAll(projectsDir(), 0o755)
@@ -372,6 +412,7 @@ func Main() {
 	mux.HandleFunc("/api/export", localOnly(handleExport))
 	mux.HandleFunc("/api/reveal", localOnly(handleReveal))
 	mux.HandleFunc("/api/savefile", localOnly(handleSaveFile))
+	mux.HandleFunc("/api/openin", localOnly(handleOpenIn))
 	mux.HandleFunc("/api/parts", localOnly(handleParts))
 
 	// watchdog: quit once the editor window has been gone for a while

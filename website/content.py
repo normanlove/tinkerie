@@ -3,7 +3,7 @@
 
 APPS = [
   dict(
-    id="wirie", needshort="No hardware needed", name="Wirie", ver="0.9.0-alpha", color="#ef8a3c", icon="wirie.png",
+    id="wirie", needshort="No hardware needed", name="Wirie", ver="0.10.0-alpha", color="#ef8a3c", icon="wirie.png",
     tagline="Design your own circuit boards, even if you've never made one before.",
     short="Design circuit boards and custom keyboards, plan stripboard builds, look up pinouts and work out battery life.",
     need="No hardware needed",
@@ -23,7 +23,7 @@ APPS = [
       ("wirie-pinnie", "Pinnie: hover a pin to see what it can do."),
       ("wirie-powerie", "Powerie: how long will it run on a battery?"),
       ("wirie-calcie", "Calcie: everyday electronics maths."),
-      ("wirie-keebie", "Keebie: a 65% wave keyboard with an Elite-C, ready to build."),
+      ("wirie-keebie", "Keebie: a macropad with a rotary knob, a screen and per-key RGB."),
       ("wirie-keebie-pcb", "Keebie built this Corne half on the PCB tab, then the auto-router wired every key."),
     ],
     features=[
@@ -54,10 +54,12 @@ APPS = [
       ("Keebie: custom keyboard PCBs", "Design a mechanical keyboard, and Keebie builds the board.", [
         "Start from a macropad, numpad, 40%, 60%, 65%, 75%, TKL, full size, Alice, Corne, Lily58 or Sweep, a grid, or a KLE layout",
         "Every key size (1u to 7u, tall keys, ISO Enter) at any angle, MX or Choc switches (soldered or hot-swap) and Alps, and keycap profiles",
-        "Shape it: hug the keys or draw your own outline, wave rows, arcs, Alice-style angled splits or two halves joined by TRRS",
+        "Shape it: hug the keys or draw your own outline, arcs, Alice-style angled splits or two halves joined by TRRS",
+        "Turn any key into a rotary knob, and add a small OLED screen",
         "Turn the switch solder points per key for custom-height builds",
         "Pick any common controller (Pro Micro, Elite-C, RP2040 boards, Pico, Black Pill, nice!nano, XIAO) or a bare ATmega32U4, RP2040 or STM32 chip, and Keebie adds the USB-C, crystal, regulator, flash and buttons it needs",
         "Diodes, matrix, per-key RGB, stabilisers and mounting holes are placed for you; QMK/ZMK firmware files and a switch plate (SVG/DXF) come out too",
+        "One click sends it to Makie for a printed case, or to Flashie to set the keymap and flash the firmware",
       ]),
       ("Calcie: electronics maths", "The calculators every maker keeps looking up.", [
         "Ohm's law, resistor colour codes, E-series values, LED resistor",
@@ -77,14 +79,14 @@ APPS = [
     pairs=[("makie", "Turns your board into a 3D-printable case."), ("flashie", "Puts the firmware on the board you built."), ("meterie", "Calcie can read a live value from your multimeter.")],
   ),
   dict(
-    id="makie", needshort="No hardware needed", name="Makie", ver="0.9.0-alpha", color="#2f7df6", icon="makie.png",
+    id="makie", needshort="No hardware needed", name="Makie", ver="0.10.0-alpha", color="#2f7df6", icon="makie.png",
     tagline="Design parts for your 3D printer by stacking simple shapes.",
     short="A Tinkercad-style 3D designer with threads, gears, boxes, cases and hundreds of ready parts.",
     need="No hardware needed",
     plain=("In plain words",
            "Drop shapes onto the build plate, turn some of them into holes, and group them: the holes are cut out. "
            "That's all it takes to make a bracket, a box or a replacement knob. When it looks right, export an STL or 3MF for your slicer."),
-    chips=["Threads that fit", "Gears and mechanisms", "Cases for 70 boards", "Motion and collision check", "Multi-colour 3MF"],
+    chips=["Threads that fit", "Gears and mechanisms", "Cases for 70 boards", "Keyboard cases", "Motion and collision check", "Multi-colour 3MF"],
     firsts=[
       ("Show me an example", "Click Show me an example on the welcome screen. Makie builds a hand-cranked 9:1 gearbox."),
       ("Press Play", "Open Motion and press Play to watch the gears turn. If parts would collide, Makie shows them in red."),
@@ -94,6 +96,7 @@ APPS = [
     shots=[
       ("makie-gearbox", "The example gearbox, built from Makie's gear parts."),
       ("makie-motion", "Motion mode: crank it and watch every gear move."),
+      ("makie-keyboard", "A keyboard case and switch plate, made from a Keebie board in one click."),
     ],
     features=[
       ("Shapes and holes", "The Tinkercad idea, with more to build from.", [
@@ -120,6 +123,12 @@ APPS = [
         "A gear ratio calculator that adds the gears already meshed",
         "Rotating and sliding joints, driven by gears, racks and lead screws",
         "Live collision detection: a moving part stops the moment it hits another, just like the real thing would jam",
+      ]),
+      ("Keyboard cases", "For keyboards designed in Wirie's Keebie tab.", [
+        "An open-top case that follows your keyboard's outline, stepped or curved",
+        "A printed switch plate with a cut-out for every switch, knob and stabiliser",
+        "Room for the controller and screen, holes over the PCB screws, a USB opening",
+        "Feet for a typing angle, and a clash check against every part",
       ]),
       ("Cases for your electronics", "Mounts and enclosures for 70 boards and modules.", [
         "Raspberry Pi, Pico, Arduino, ESP32, XIAO, screens, sensors, relays, motors…",
@@ -193,14 +202,14 @@ APPS = [
     pairs=[("makie", "Uses your measured clearances so printed parts fit."), ("tracie", "Watch your printer's serial output.")],
   ),
   dict(
-    id="flashie", needshort="Board or SD card", name="Flashie", ver="0.7.1-alpha", color="#7b5cf5", icon="flashie.svg",
+    id="flashie", needshort="Board or SD card", name="Flashie", ver="0.8.0-alpha", color="#7b5cf5", icon="flashie.svg",
     tagline="Put new firmware on your boards, and operating systems on SD cards.",
-    short="Flash ESP32, Pico, Arduino and STM32 boards, build programs from blocks, and write SD cards and USB installers.",
+    short="Flash ESP32, Pico, Arduino and STM32 boards, build programs from blocks, make keyboard firmware, and write SD cards and USB installers.",
     need="A microcontroller board, or an SD card / USB drive",
     plain=("In plain words",
            "Firmware is the program that runs on a little board like an ESP32 or Arduino. Flashie copies it onto the board over USB, checks every byte, and restarts the board. "
            "It can also put a whole operating system, like Raspberry Pi OS, onto an SD card, or turn a Windows ISO into a USB installer."),
-    chips=["ESP32 / ESP8266", "Raspberry Pi Pico", "Arduino", "STM32", "Block programming", "SD card and USB writer"],
+    chips=["ESP32 / ESP8266", "Raspberry Pi Pico", "Arduino", "STM32", "Block programming", "Keyboard firmware", "SD card and USB writer"],
     firsts=[
       ("Plug in your board", "Use a USB cable that carries data. Flashie lists it and guesses what it is."),
       ("Pick the firmware", "Choose from the firmware library (MicroPython, WLED, ESPHome, Tasmota, Meshtastic…) or your own file."),
@@ -210,6 +219,7 @@ APPS = [
     shots=[
       ("flashie-flash", "Flash in three steps: pick the board, pick the firmware, flash."),
       ("flashie-create", "Create: snap blocks together and Flashie writes the code."),
+      ("flashie-keyboard", "Keyboard: set every key, knob and layer of a Keebie keyboard, then make and flash the firmware."),
       ("flashie-image", "Write image: a Windows 11 ISO about to become a USB installer."),
       ("flashie-settings", "OS settings: set up Wi-Fi, a user and SSH before the first start."),
     ],
@@ -234,6 +244,12 @@ APPS = [
         "Pin pickers that warn about pins you shouldn't use",
         "MicroPython on ESP32 and Pico; Arduino C++ on Arduino boards",
         "Templates: Blink, Button + LED, Wi-Fi web server, temperature logger",
+      ]),
+      ("Keyboard: firmware for your own keyboard", "For keyboards designed in Wirie's Keebie tab.", [
+        "Click a key and pick what it sends: letters, shortcuts, media keys, text, or a layer key",
+        "Up to 4 layers; knobs get a press, a turn left and a turn right on each",
+        "Show the layer, typing speed or a title on the screen; rainbow or solid per-key RGB",
+        "Writes Arduino firmware, compiles it and flashes ATmega32U4 (Pro Micro), RP2040 and STM32 keyboards",
       ]),
       ("Write image: SD cards and USB drives", "Like Raspberry Pi Imager, and a bit like Rufus.", [
         "Raspberry Pi OS and more, from Raspberry Pi's official list",

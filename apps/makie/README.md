@@ -201,6 +201,18 @@ base, the lid (flipped) and the extras as STL, 3MF or zips, laid out flat
 and keeping their AMS filament slots. The file format is described in
 `docs/MAKIE_FORMAT.md` and the design in `docs/WIRIE.md`.
 
+**Keyboards:** boards made with Keebie (Wirie's keyboard designer) carry a
+`keyboard` block, and *Make a case* then builds a keyboard case instead: an
+open-top tray that follows the board outline, with standoffs for the PCB
+screws and openings for USB and TRRS, a printed switch plate (1.5 mm for MX,
+1.2 mm for Choc) with a cut-out for every switch, knob and stabiliser, room
+for the controller, screen and other tall parts, and holes over the PCB
+screws, plus two rear feet for a typing angle. Settings: plate or no plate,
+plate thickness, wall, floor, fit, standoff height, wall height above the
+plate, typing angle, corner radius and screws. Custom (non-rectangular)
+outlines are grown with a distance field so stepped and curved keyboards
+keep a clean wall.
+
 **Example:** *Show me an example* builds a working hand-cranked 9:1 gearbox —
 press Play in Motion to watch it turn.
 

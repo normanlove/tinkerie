@@ -528,7 +528,8 @@ function buildPanel(b) {
   panel.statusEl = h('div', { class: 'case-status' });
   p.append(panel.statusEl);
   panel.segEl = h('div', { class: 'seg small' });
-  p.append(h('div', { class: 'field' }, h('label', {}, 'Lid in the preview'), panel.segEl));
+  panel.lidLbl = h('label', {}, 'Lid in the preview');
+  p.append(h('div', { class: 'field' }, panel.lidLbl, panel.segEl));
   const f = ui.form(fieldsFrom(b.wirie?.caseParams), (vals) => { Object.assign(panel.opts, vals); rebuild(); });
   Object.assign(f.vals, panel.opts);
   f.redraw();
@@ -564,6 +565,8 @@ function renderPanel() {
   else if (cl && !cl.length) el.append(h('div', { class: 'clash-st ok' }, '✓ No clashes: the case clears every part on the board.'));
   else if (cl) el.append(h('div', { class: 'clash-st bad' }, h('b', {}, `⚠ ${cl.length} clash${cl.length > 1 ? 'es' : ''} (shown in red):`), h('ul', {}, ...cl.map((c) => h('li', {}, `${c.ref}${c.part ? ' (' + c.part + ')' : ''} touches “${c.with}”`)))));
   for (const w of info?.warnings || []) el.append(h('div', { class: 'note warn-note' }, '⚠ ' + w));
+  const kb = info?.lidStyle === 'Keyboard';
+  if (panel.lidLbl) panel.lidLbl.textContent = kb ? 'Switch plate in the preview' : 'Lid in the preview';
   panel.segEl.innerHTML = '';
   panel.segEl.append(...['Closed', 'Lifted', 'Hidden'].map((v) => h('button', { class: panel.lidView === v ? 'on' : '', onclick: () => { if (panel.lidView === v) return; panel.lidView = v; const bb = sc.node(panel.boardId); if (bb) regenerate(bb, panel.opts); } }, v)));
 }
@@ -571,8 +574,8 @@ function renderPanel() {
 // ---------------- export, laid out for printing ----------------
 function exportMenu(e, b) {
   ui.menu(e, [
-    { label: 'Base — STL', run: () => exportCase(b, 'stl', ['base']) },
-    { label: 'Lid — STL (flipped for printing)', run: () => exportCase(b, 'stl', ['lid']) },
+    { label: panel?.info?.lidStyle === 'Keyboard' ? 'Case — STL' : 'Base — STL', run: () => exportCase(b, 'stl', ['base']) },
+    { label: panel?.info?.lidStyle === 'Keyboard' ? 'Switch plate — STL' : 'Lid — STL (flipped for printing)', run: () => exportCase(b, 'stl', ['lid']) },
     { label: 'Extras — STL', run: () => exportCase(b, 'stl', ['extra']), disabled: !caseNodesOf(b.id).some((n) => n.wirieRole === 'extra') },
     '-',
     { label: 'Everything — 3MF, one plate (AMS colours)', run: () => exportCase(b, '3mfasm', ['base', 'lid', 'extra']) },

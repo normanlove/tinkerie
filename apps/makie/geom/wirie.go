@@ -33,6 +33,7 @@ type WirieCase struct {
 	LidFeatures []WirieFeature `json:"lidFeatures"`
 	Envelope    WirieEnvelope  `json:"envelope"`
 	Textures    *WirieTextures `json:"textures,omitempty"`
+	Keyboard    *WirieKeyboard `json:"keyboard,omitempty"`
 }
 
 type WirieGenerator struct {
@@ -515,6 +516,9 @@ func (c *WirieCase) outlineAt(g, r float64, segs int) Loop {
 	if math.Abs(g) < 1e-9 {
 		return c.loop()
 	}
+	if bd.Shape == "custom" {
+		return rasterOffset(c.loop(), g)
+	}
 	return offsetLoop(c.loop(), g)
 }
 
@@ -603,6 +607,9 @@ func (c *WirieCase) screwName(s string) string {
 
 // CaseParams lists the case settings, with defaults taken from the board.
 func CaseParams(c *WirieCase) []Param {
+	if c.isKeyboard() {
+		return kbCaseParams(c)
+	}
 	e := c.Envelope
 	screws := []string{"From board"}
 	for _, s := range []string{"M2", "M2.5", "M3", "M4", "M5"} {
@@ -1133,6 +1140,9 @@ func wallRot(n [2]float64) [3]float64 {
 // BuildCase makes the editable node trees of the case: the base group, the
 // lid group and loose extras. Everything is in the board frame.
 func (c *WirieCase) BuildCase(p Params) ([]*Node, CaseInfo) {
+	if c.isKeyboard() {
+		return c.buildKeyboardCase(p)
+	}
 	o := caseOpts(c, p)
 	d := c.dims(o)
 	var info CaseInfo
