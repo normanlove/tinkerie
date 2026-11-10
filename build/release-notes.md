@@ -11,6 +11,7 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 Each package has a *READ ME FIRST.txt*.
 
 ### New in {VERSION}
+- **Keebie: switch pins and LED facing.** Choose 5-pin holes (fit 5-pin and 3-pin MX switches) or 3-pin only for plate builds, and south- or north-facing LEDs.
 - **Keebie shows its diodes and LEDs.** They were always added, but on the back of the board where they were easy to miss. A new **Parts** view shows every diode, LED and capacitor on the keyboard before you build, and the build message says how many went on and links straight to the back of the board.
 - **Diode layouts:** upright beside each switch (right or left), flat below or above it, or at 45° in the corner, on the back or on show at the front. Every spot is checked against the switch's pads, holes and LED. Optional 100nF capacitor beside each LED.
 - **Move and turn the controller:** drag it, nudge it with the arrow keys, turn it with R or the 90° buttons; the board outline follows. Its support parts can be packed tightly, set out in neat rows, or put in one tidy line.

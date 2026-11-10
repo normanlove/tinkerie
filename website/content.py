@@ -3,7 +3,7 @@
 
 APPS = [
   dict(
-    id="wirie", needshort="No hardware needed", name="Wirie", ver="0.11.0-alpha", color="#ef8a3c", icon="wirie.png",
+    id="wirie", needshort="No hardware needed", name="Wirie", ver="0.11.1-alpha", color="#ef8a3c", icon="wirie.png",
     tagline="Design your own circuit boards, even if you've never made one before.",
     short="Design circuit boards and custom keyboards, plan stripboard builds, look up pinouts and work out battery life.",
     need="No hardware needed",
@@ -56,6 +56,7 @@ APPS = [
         "Every key size (1u to 7u, tall keys, ISO Enter) at any angle, MX or Choc switches (soldered or hot-swap) and Alps, and keycap profiles",
         "Shape it: hug the keys or draw your own outline, arcs, Alice-style angled splits or two halves joined by TRRS",
         "Turn any key into a rotary knob, and add a small OLED screen",
+        "5-pin or 3-pin MX switches (5-pin holes fit both; 3-pin only for plate builds), and north- or south-facing LEDs",
         "Turn the switch solder points per key for custom-height builds",
         "Pick any common controller (Pro Micro, Elite-C, RP2040 boards, Pico, Black Pill, nice!nano, XIAO) or a bare ATmega32U4, RP2040 or STM32 chip, and Keebie adds the USB-C, crystal, regulator, flash and buttons it needs",
         "Diodes, matrix, per-key RGB, stabilisers and mounting holes are placed for you; QMK/ZMK firmware files and a switch plate (SVG/DXF) come out too",

@@ -21,6 +21,7 @@ What works on this system
 Every app has teaching mode: point at anything to see what it does. F2 turns it off.
 
 New in {VERSION}:
+- Keebie: 5-pin or 3-pin MX switches, and south- or north-facing LEDs.
 - Keebie: a Parts view shows every diode, LED and capacitor before you build
   (they go on the back of the board); choose how the diodes are laid out
   (beside, below, above or at 45 degrees, back or front) and add a capacitor

@@ -49,3 +49,12 @@ namedQFP("kb_stm32f072", "STM32F072CBT6 (LQFP-48)", 48, 0.5, 8.6, 1.2, 0.3, STM3
 namedQFP("kb_stm32f411", "STM32F411CEU6 (UFQFPN-48)", 48, 0.5, 6.85, 0.8, 0.28, STM32_48(true), 7, 5.6, "The Black Pill's chip: fast, needs a 25MHz crystal", "stm32 stm32f411 f401 qfn48 arm usb keyboard qmk blackpill");
 addFP({ id: "kb_w25q128", name: "W25Q128JVS flash (SOIC-8 208mil)", cat: KB, prefix: "U", value: "W25Q128JVS", desc: "16MB QSPI flash for the RP2040", tags: "flash qspi w25q128 w25q16 winbond spi memory", verify: true,
   pads: soPads(8, 1.27, 7.0, 1.6, 0.6).map((p, i) => Object.assign(p, { name: ["CS", "DO", "IO2", "GND", "DI", "CLK", "IO3", "VCC"][i] })), body: { x: 0, y: 0, w: 5.3, h: 5.3, col: "#1a1a1a", notch: true }, silk: "none", pinLabels: true });
+
+// 3-pin versions of the MX footprints: no holes for the two plastic pegs of
+// 5-pin (PCB-mount) switches, for switches held by a plate. That frees room
+// for tracks between the keys. The usual footprints keep the peg holes, so
+// 5-pin and 3-pin switches both fit them.
+for (const [id, name] of [["kb_mx_hs", "Cherry MX switch, Kailh hot-swap socket, 3-pin"], ["mx_switch", "Cherry MX keyboard switch, 3-pin (plate mount)"]]) {
+  const b = LIB_BY_ID[id]; if (!b) continue;
+  addFP({ ...b, id: id + "_3p", name, desc: "For 3-pin (plate-mount) switches held by a switch plate: no holes for 5-pin pegs", pads: b.pads.map(p => ({ ...p })), holes: b.holes.filter(h => !(Math.abs(Math.abs(h.x) - 5.08) < 0.01 && Math.abs(h.y) < 0.01)).map(h => ({ ...h })), body: { ...b.body } });
+}

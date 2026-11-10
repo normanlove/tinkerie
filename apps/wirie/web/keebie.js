@@ -118,6 +118,8 @@ function kbToKLE() {
 // ---------------------------------------------------------------- geometry
 function kbSwitch(K) { return KB_SWITCHES.find(s => s.id === K.sw) || KB_SWITCHES[0]; }
 function kbPitch(K) { const s = kbSwitch(K); return K.spacing > 0 ? [K.spacing, K.spacing * s.pitch[1] / s.pitch[0]] : s.pitch; }
+// the switch footprint: 3-pin MX footprints drop the 5-pin peg holes
+function kbSwFp(K) { const s = kbSwitch(K); return K.pins === 3 && s.fam === "mx" && LIB_BY_ID[s.fp + "_3p"] ? s.fp + "_3p" : s.fp; }
 function kbMcu(K) { return KB_MCU[K.mcu] || KB_MCUS[0]; }
 
 // where every key ends up, in mm, after arc and split
@@ -373,7 +375,7 @@ function kbGeom(force) {
   }
   const [sx, sy] = kbPitch(K), sw = kbSwitch(K), m = K.outline.margin, places = kbPlace(K);
   const boards = K.split.mode === "two" ? [0, 1] : [0];
-  const G = { sx, sy, places, boards: [], matrix: kbMatrix(K, places), mcu: kbMcu(K), sw };
+  const G = { sx, sy, places, boards: [], matrix: kbMatrix(K, places), mcu: kbMcu(K), sw, swfp: kbSwFp(K) };
   for (const h of boards) {
     const ps = places.filter(p => K.split.mode !== "two" || p.half === h);
     if (!ps.length) { G.boards.push(null); continue; }
@@ -429,7 +431,7 @@ function kbGeom(force) {
 
 // local features (pads, holes, diode, LED) around one key, for mounting-hole checks
 function kbKeyFeatures(K, G, p) {
-  const knob = p.k.kind === "knob", fp = LIB_BY_ID[knob ? "ec11" : G.sw.fp], f = [];
+  const knob = p.k.kind === "knob", fp = LIB_BY_ID[knob ? "ec11" : G.swfp], f = [];
   const rot = p.ang + (K.fpRot || 0) + (p.k.fr || 0);
   const T = (x, y) => { const [rx, ry] = rotPt(x, y, rot); return [p.cx + rx, p.cy + ry]; };
   for (const q of fp.pads) f.push([...T(q.x, q.y), Math.max(q.w, q.h) / 2 + 0.3]);
@@ -461,7 +463,7 @@ const KB_DSTYLES = [
 ];
 const KB_PACKS = [{ id: "compact", name: "Packed tightly round the controller" }, { id: "rows", name: "Neat rows, grouped by part" }, { id: "line", name: "One tidy line, all upright" }];
 function kbSpotsFor(K, G, p) {
-  const knob = p.k.kind === "knob", swfp = LIB_BY_ID[knob ? "ec11" : G.sw.fp], [sx, sy] = [G.sx, G.sy];
+  const knob = p.k.kind === "knob", swfp = LIB_BY_ID[knob ? "ec11" : G.swfp], [sx, sy] = [G.sx, G.sy];
   const halfX = p.k.w * sx / 2 - 0.4, halfY = p.k.h * sy / 2 - 0.4;
   const obs = []; // [x0, y0, x1, y1] boxes and [cx, cy, r] circles, in the footprint frame
   for (const q of swfp.pads) obs.push({ b: [q.x - q.w / 2, q.y - q.h / 2, q.x + q.w / 2, q.y + q.h / 2] });
@@ -558,7 +560,7 @@ function kbBuild(half) {
     const rot = knob ? p.ang : p.ang + (K.fpRot || 0) + (p.k.fr || 0);
     const T = (x, y) => { const [rx, ry] = rotPt(x, y, rot); return [X(p.cx + rx), Y(p.cy + ry)]; };
     const s = knob ? addComp("ec11", X(p.cx), Y(p.cy), { ref: "ENC" + (knobs.length + 1), value: "EC11 knob", rot })
-      : addComp(sw.fp, X(p.cx), Y(p.cy), { ref: "SW" + n, value: (p.k.label || sw.fam.toUpperCase()) + (p.k.w !== 1 || p.k.h !== 1 ? ` ${Math.max(p.k.w, p.k.h)}u` : ""), rot });
+      : addComp(G.swfp, X(p.cx), Y(p.cy), { ref: "SW" + n, value: (p.k.label || sw.fam.toUpperCase()) + (p.k.w !== 1 || p.k.h !== 1 ? ` ${Math.max(p.k.w, p.k.h)}u` : ""), rot });
     if (knob) knobs.push(s); else s.kbTurn = (K.fpRot || 0) + (p.k.fr || 0);
     const P1 = knob ? "S1" : "1", P2 = knob ? "S2" : "2";
     const sp = kbSpotsFor(K, G, p);
@@ -850,6 +852,8 @@ function kbSide() {
       <small class="kb-note">Standard for ${esc(kbSwitch(K).name.split(",")[0])}: ${kbSwitch(K).pitch.join(" × ")} mm${K.spacing > 0 ? ` · <a href="#" id="kb_sp0">use standard</a>` : ""}</small>
       ${sel("kb_prof", "Keycap profile", opt(KB_PROFILES, K.profile, p => [p.id, `${p.name} · ${p.h}`]), "Keycap profile")}
       <small class="kb-note" id="kb_profnote"></small>
+      ${kbSwitch(K).fam === "mx" ? sel("kb_pins", "Switch pins", opt([{ id: "5", name: "5-pin holes: fits 5-pin and 3-pin switches" }, { id: "3", name: "3-pin only: switches held by a plate" }], String(K.pins === 3 ? 3 : 5)), "Switch pins") : ""}
+      ${sel("kb_led", "LED facing", opt([{ id: "0", name: "South (towards you): best with Cherry-profile caps" }, { id: "180", name: "North (away from you): the classic Cherry way" }, ...((K.fpRot || 0) % 180 ? [{ id: String(K.fpRot), name: `Sideways (footprint turned ${K.fpRot}°)` }] : [])], String(K.fpRot || 0)), "LED facing")}
       ${sel("kb_fr", "Turn every switch footprint", [0, 90, 180, 270].map(a => `<option value="${a}" ${a === (K.fpRot || 0) ? "selected" : ""}>${a === 0 ? "0° · pins at the top (south-facing LED)" : a === 180 ? "180° · pins at the bottom (north-facing LED)" : a + "°"}</option>`).join(""), "Turn every switch footprint")}
     </section>
     <section><h4>3 · Shape</h4>
@@ -904,7 +908,9 @@ function kbSide() {
   });
   on("kb_sp0", "onclick", e => { e.preventDefault(); K.spacing = 0; kbSide(); kbChanged("spacing"); });
   on("kb_prof", "onchange", () => { K.profile = val("kb_prof"); kbSide(); kbChanged("profile"); });
-  on("kb_fr", "onchange", () => { K.fpRot = +val("kb_fr"); kbChanged("footprint turn"); });
+  on("kb_fr", "onchange", () => { K.fpRot = +val("kb_fr"); kbSide(); kbChanged("footprint turn"); });
+  on("kb_led", "onchange", () => { K.fpRot = +val("kb_led"); kbSide(); kbShowParts(); kbChanged("LED facing"); });
+  on("kb_pins", "onchange", () => { K.pins = +val("kb_pins"); kbShowParts(); kbChanged("switch pins"); });
   on("kb_ol", "onchange", () => { const v = val("kb_ol"); if (v === "custom" && !K.outline.custom) { const G = kbGeom(); K.outline.custom = G.boards.map(b => b && b.polys[0] ? kbSimplify([...b.polys[0], b.polys[0][0]], 0.8).slice(0, -1).map(([x, y]) => [+x.toFixed(2), +y.toFixed(2)]) : null); } K.outline.mode = v; kbChanged("outline"); toast(v === "custom" ? "Drag the corner dots to shape the board. Double-click an edge to add a corner, right-click a corner to remove it." : "Outline updated"); });
   on("kb_mg", "onchange", () => { K.outline.margin = Math.max(0, Math.min(20, numv("kb_mg") || 0)); kbChanged("margin"); });
   on("kb_rad", "onchange", () => { K.outline.radius = Math.max(0, Math.min(30, numv("kb_rad") || 0)); kbChanged("rounding"); });
@@ -1147,7 +1153,7 @@ function kbDraw() {
     if (K.outline.mode === "custom" && K.outline.custom && K.outline.custom[b.half]) K.outline.custom[b.half].forEach(([x, y], i) => o.push(`<circle cx="${x}" cy="${y}" r="${Math.max(1, 6 * px)}" class="kb-vtx" data-vtx="${b.half}:${i}"/>`));
   }
   const prof = KB_PROFILES.find(p => p.id === K.profile);
-  const fp = LIB_BY_ID[G.sw.fp];
+  const fp = LIB_BY_ID[G.swfp];
   for (const p of G.places) {
     const k = p.k, sel = KV.sel.has(k.id), [c0, c1, tc] = kbCapColour(k, prof);
     const W = k.w * sx, H = k.h * sy, g = 0.6;
