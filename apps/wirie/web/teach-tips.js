@@ -61,7 +61,7 @@ window.TEACH = {
     "#p_rot": ["Rotate 90°", "Turns the selected parts a quarter turn (R). Tracks on their pins turn with them."],
     "#p_r15": ["Rotate 15°", "Turns the selected parts by 15° (Shift+R). Handy for angled parts, like LEDs around a circle."],
     "#c_fix": ["Fix problems automatically", "Wirie fixes what it can from the check: tracks that are too close, shorted or past the edge are redrawn with proper spacing, parts whose pins clash or sit off the board are moved to the nearest free spot, thin tracks are widened, and unrouted connections are routed. Anything it can't fix stays in the list. Ctrl+Z undoes the whole fix."],
-    "#c_auto": ["Auto-fix mode", "When this is on, Wirie fixes problems by itself every time the design check runs, so the list only shows things that need you. Turn it off if you'd rather fix things by hand."],
+    "#c_auto": ["Auto-fix mode", "When this is on, Wirie fixes problems by itself every time the design check runs, so the list only shows things that need you. It never tries twice on the same problems: anything it couldn't fix stays listed until you change the board. Turn it off if you'd rather fix things by hand."],
     "Check|Run check": ["Design check", "Checks the board before you order it: tracks too close together, shorts between different nets, connections that aren't routed yet, and parts too near the board edge."],
 
     // ------------------------------------------------------- getting started

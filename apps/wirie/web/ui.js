@@ -645,7 +645,8 @@ function renderCheck(P) {
   if ($("#c_fix")) $("#c_fix").onclick = () => runAutoFix();
   $("#c_auto").onchange = e => { UI.autoFix = e.target.checked; try { localStorage.setItem("wirie.autofix", UI.autoFix ? "1" : ""); } catch (_) {} if (UI.autoFix) runAutoFix(); };
   // auto-fix mode: fix whenever the check finds something new (not again on the result of its own fix)
-  if (UI.autoFix && !UI.fixing && UNDO.last !== UI.fixedAt && UI.drc.some(fixable)) setTimeout(() => runAutoFix(), 0);
+  // ...and never twice on the same problems: if a fix couldn't clear them, trying again would only loop
+  if (UI.autoFix && !UI.fixing && UNDO.last !== UI.fixedAt && UI.drc.some(fixable) && fixSignature(UI.drc) !== UI.fixTried) setTimeout(() => runAutoFix(), 0);
   P.querySelectorAll(".drc").forEach(b => b.onclick = () => { const d = UI.drc[+b.dataset.i]; focusAt(d.x, d.y); });
 }
 // problems the auto-fixer knows how to deal with
@@ -658,7 +659,7 @@ async function runAutoFix() {
   let r;
   try { r = await autoFix(t => { const el = $("#fx_msg"); if (el) el.textContent = t; }); }
   finally { closeModal(); UI.fixing = false; UI.fixStop = false; }
-  commit("auto-fix"); UI.fixedAt = UNDO.last;
+  commit("auto-fix"); UI.fixedAt = UNDO.last; UI.fixTried = fixSignature(r.left);
   UI.drc = r.left; UI.drcStale = false; UI.drcRan = true;
   const parts = [];
   if (r.moved.size) parts.push(`moved ${[...r.moved].slice(0, 6).join(", ")}${r.moved.size > 6 ? ` and ${r.moved.size - 6} more` : ""} to free spots`);

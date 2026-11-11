@@ -12,10 +12,11 @@ Everything, in every app. Every app has teaching mode: point at anything to see 
 F2 turns it off.
 
 New in {VERSION}:
-- Keebie never puts a standoff under a key: they go in gaps between keys or just
-  outside them, where the board grows a small ear to hold each one.
+- Wirie's auto-fix: no more looping in auto-fix mode, tracks that kept landing too
+  close now get fixed, and it's much faster.
 
 Also in recent alpha builds:
+- 0.21.0-alpha: Keebie never puts a standoff under a key.
 - 0.20.0-alpha: apps started from the launcher open in front of it.
 - 0.19.0-alpha: 21 colour themes and a choice of accent colour in every app.
 - 0.18.0-alpha: Look & accessibility in every app (Ctrl+,): text size,

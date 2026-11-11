@@ -1,7 +1,9 @@
 // Wirie auto-router: two-layer grid A* with rip-up & retry — by nrmluvdev
 "use strict";
 
-const ROUTER = { running: false, cancel: false, noPour: false };
+// slack: extra room (mm) the router keeps round everything. Auto-fix raises it
+// when a track it redrew still came out too close (a diagonal cutting a corner).
+const ROUTER = { running: false, cancel: false, noPour: false, slack: 0 };
 
 function isPowerNet(name) { return /^(GND|3V3|5V|VIN|VCC|RAW|VSYS|VBAT|VMOT|12V|VBUS)/i.test(name); }
 
@@ -10,7 +12,7 @@ function buildRouteGrid(g, routeW) {
   const W = Math.ceil(B.w / g) + 1, H = Math.ceil(B.h / g) + 1, N = W * H;
   const grid = [new Int32Array(N), new Int32Array(N)];
   const L = { top: 0, bottom: 1 };
-  const inf = B.clear + routeW / 2;
+  const inf = B.clear + routeW / 2 + (ROUTER.slack || 0);
   // board edge
   const edge = B.edgeClear + routeW / 2;
   for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) if (!insideBoard(i * g, j * g, edge)) { grid[0][j * W + i] = -1; grid[1][j * W + i] = -1; }

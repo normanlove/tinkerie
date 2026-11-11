@@ -3,7 +3,7 @@
 
 APPS = [
   dict(
-    id="wirie", needshort="No hardware needed", name="Wirie", ver="0.16.0-alpha", color="#ef8a3c", icon="wirie.png",
+    id="wirie", needshort="No hardware needed", name="Wirie", ver="0.16.1-alpha", color="#ef8a3c", icon="wirie.png",
     tagline="Design your own circuit boards, even if you've never made one before.",
     short="Design circuit boards and custom keyboards, plan stripboard builds, look up pinouts and work out battery life.",
     need="No hardware needed",

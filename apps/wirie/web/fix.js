@@ -64,15 +64,24 @@ function fixTracksOn(c) {
   return S.tracks.filter(t => t.pts.some(([x, y]) => pads.some(s => ptInShape(x, y, s, 0.01))));
 }
 
+// a short description of the problems auto-fix can work on, to tell whether a
+// pass (or a whole run) changed anything
+function fixSignature(drc) { return drc.filter(d => ["clear", "short", "rat", "edge", "hole", "thin"].includes(d.code)).map(d => d.code + ":" + d.msg).sort().join("|"); }
+
 async function autoFix(progress) {
   const B = S.board, did = { tracks: new Set(), moved: new Set(), widened: 0, routed: 0, stuck: new Set() };
   const say = m => progress && progress(m);
-  for (let pass = 0; pass < 4; pass++) {
+  let lastSig = null, lastUnrouted = -1;
+  try {
+  for (let pass = 0; pass < 5; pass++) {
     if (typeof UI !== "undefined" && UI.fixStop) break;
     say(pass ? `Checking again (round ${pass + 1})…` : "Looking at the problems…");
-    const A = analyze(), drc = runDRC();
-    const rip = new Set(), moves = [];
-    const ripIt = it => { if (it.kind === "seg" || it.kind === "via") { rip.add(it.ref); return true; } return false; };
+    const A = analyze(), drc = runDRC(), sig = fixSignature(drc);
+    if (!sig) break; // nothing left to fix
+    if (sig === lastSig && pass > 1) break; // the same problems as last time: more of the same won't help
+    lastSig = sig;
+    const rip = new Set(), moves = [], nets = new Set();
+    const ripIt = it => { if (it.kind === "seg" || it.kind === "via") { rip.add(it.ref); if (it.cnet) nets.add(it.cnet.name); return true; } return false; };
     const moveFor = (it, ax, ay) => { const c = it.ref.comp; if (!fixCanMove(c)) return false; moves.push([c, it.ref.x - ax, it.ref.y - ay]); return true; };
     // shorts: tracks and vias joining two nets come out; overlapping pins get pushed apart
     for (const it of A.items) if (it.short) ripIt(it);
@@ -86,8 +95,13 @@ async function autoFix(progress) {
     for (const d of drc) {
       if (d.code === "clear") {
         const { a, b } = d, at = a.kind !== "pad", bt = b.kind !== "pad";
-        if (at && bt) ripIt(a.ref.auto || !b.ref.auto ? a : b);
-        else if (at || bt) ripIt(at ? a : b);
+        if (at && bt) {
+          // two tracks: the first time redraw one; if that didn't help, redraw both, and
+          // as a last resort make a wide power track normal width so they fit
+          if (pass === 0) ripIt(a.ref.auto || !b.ref.auto ? a : b);
+          else if (pass < 3) { ripIt(a); ripIt(b); }
+          else { for (const t of [a.ref, b.ref]) if (t.w > B.track + 0.01) { t.w = B.track; did.widened++; } ripIt(a); ripIt(b); }
+        } else if (at || bt) ripIt(at ? a : b);
         else { const [m, o] = padsOf(a.ref.comp).length <= padsOf(b.ref.comp).length ? [a, b] : [b, a]; if (!moveFor(m, o.ref.x, o.ref.y) && !moveFor(o, m.ref.x, m.ref.y)) did.stuck.add(d.msg); }
       } else if (d.code === "edge") {
         if (!ripIt(d.it)) { const c = d.it.ref.comp; if (fixCanMove(c)) moves.push([c, B.w / 2 - c.x, B.h / 2 - c.y]); else did.stuck.add(d.msg); }
@@ -110,15 +124,24 @@ async function autoFix(progress) {
       for (const o of rip) did.tracks.add(o.id);
       S.tracks = S.tracks.filter(t => !rip.has(t)); S.vias = S.vias.filter(v => !rip.has(v)); invalidate();
     }
-    const before = analyze().unrouted;
+    const A2 = analyze(), before = A2.unrouted;
+    // nothing taken up or moved, and routing already failed to finish these: stop trying
+    if (!rip.size && !seen.size && before === lastUnrouted) break;
     if (before) {
       say(`Routing ${before} connection${before > 1 ? "s" : ""}…`);
-      await autoroute((p, f, nm) => say(`Routing ${nm}…`));
-      did.routed += before - analyze().unrouted;
+      // each round keeps a little more room round tracks, so a redrawn one doesn't land in the same spot
+      ROUTER.slack = Math.min(0.35, pass * 0.12);
+      const only = seen.size ? null : A2.nets.filter(n => n.islands > 1).map(n => n.name); // just the nets that need it
+      await autoroute((p, f, nm) => say(`Routing ${nm}…`), only && only.length ? only : undefined);
+      ROUTER.slack = 0;
+      const after = analyze().unrouted;
+      did.routed += Math.max(0, before - after); lastUnrouted = after;
     }
     if (!rip.size && !seen.size && !before) break; // nothing more this pass can do
     await new Promise(r => setTimeout(r, 0));
   }
+  } finally { ROUTER.slack = 0; }
   const left = runDRC();
+  for (const d of left) if (d.code === "rat") did.stuck.add(`${d.msg}: the router found no way through. Moving nearby parts apart or making the board a little bigger usually helps.`);
   return { ...did, left, leftErr: left.filter(d => d.sev === "err").length, leftWarn: left.filter(d => d.sev === "warn").length };
 }
