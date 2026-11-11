@@ -36,7 +36,8 @@ android {
         release {
             minifyEnabled false
             def ks = System.getenv("TINKERIE_KEYSTORE")
-            signingConfig (ks != null && new File(ks).exists()) ? signingConfigs.release : signingConfigs.debug
+            def signed = ks != null && new File(ks).exists()
+            signingConfig = signed ? signingConfigs.release : signingConfigs.debug
         }
     }
 
