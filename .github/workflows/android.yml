@@ -1,12 +1,12 @@
-# Tinkerie for Android. On every push: builds the APK and tries it on
-# emulators running old and new Android. When a new version has been
-# released (by release.yml), it adds the signed APK to that release.
+# Tinkerie for Android. Paused for now: it no longer runs on every push, only
+# when started by hand (Actions > Android > Run workflow). It builds the APK and
+# tries it on emulators running old and new Android; when a new version has been
+# released (by release.yml), it adds the signed APK to that release. To turn it
+# back on, add "push: branches: [main]" under "on:" again.
 # Signing needs two repository secrets: ANDROID_KEYSTORE_B64 (the keystore,
 # base64) and ANDROID_KEYSTORE_PASSWORD.
 name: Android
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 permissions:
   contents: write

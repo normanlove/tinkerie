@@ -111,4 +111,4 @@ Wirie, Makie, Tunie, Flashie, Probie and Codie are web pages. Each loads `teach-
 
 On the Go side, `droid.Active()` is true on Android. `shared/usb` lists and opens devices through the bridge (usbfs works the same on the handed-over descriptor), `shared/serialport` drives USB serial adapters over USB (`usbserial.go`: CDC-ACM, CH34x, CP210x, FTDI, PL2303) because apps can't open `/dev/tty*`, and Flashie writes UF2 boards and SD card readers over USB mass storage (`shared/usb/msc.go`). Compiling Arduino code isn't available: arduino-cli's compilers are built for desktop Linux.
 
-`.github/workflows/android.yml` tries each push on Android 5, 10 and 15 emulators (`android/smoke.sh`) and adds the signed APK to each release; signing needs the `ANDROID_KEYSTORE_B64` and `ANDROID_KEYSTORE_PASSWORD` repository secrets.
+`.github/workflows/android.yml` (paused: it only runs when started by hand from the Actions tab) tries a build on Android 5, 10 and 15 emulators (`android/smoke.sh`) and adds the signed APK to each release; signing needs the `ANDROID_KEYSTORE_B64` and `ANDROID_KEYSTORE_PASSWORD` repository secrets.
