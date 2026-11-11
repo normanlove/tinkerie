@@ -656,6 +656,15 @@ func (a *App) pageSettings(r Rect) {
 		}
 	}
 	y += u.Px(58)
+	u.T.Draw("Theme", in.X, y, u.FB(12), th.Sub)
+	y += u.Px(22)
+	ti := a.settings.Theme
+	if u.Segmented("set#theme", Rect{in.X, y, min(in.W, u.Px(520)), u.Px(32)}, themeNames, &ti) {
+		a.settings.Theme = ti
+		a.applyTheme()
+		a.saveSettings()
+	}
+	y += u.Px(50)
 	u.T.Draw("Interface size", in.X, y, u.FB(12), th.Sub)
 	y += u.Px(22)
 	scales := []string{"90%", "100%", "110%", "125%", "150%"}
@@ -688,6 +697,11 @@ func (a *App) pageSettings(r Rect) {
 		a.saveSettings()
 	}
 	y += u.Px(54)
+	if u.Toggle("set#motion", Rect{in.X, y, in.W, u.Px(30)}, &a.settings.ReduceMotion, "Reduce motion: no sliding or fading") {
+		a.applyTheme()
+		a.saveSettings()
+	}
+	y += u.Px(38)
 	if u.Toggle("set#welcome", Rect{in.X, y, in.W, u.Px(30)}, &a.settings.ShowWelcome, "Show the welcome tips on start") {
 		a.saveSettings()
 	}

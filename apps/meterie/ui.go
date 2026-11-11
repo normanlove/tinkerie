@@ -291,6 +291,10 @@ func (u *UI) Anim(id string, target, speed float64) float64 {
 	}
 	a.seen = true
 	a.target = target
+	if reduceMotion {
+		a.v = target
+		return a.v
+	}
 	k := 1 - math.Exp(-speed*u.dt)
 	a.v += (target - a.v) * k
 	if math.Abs(a.v-target) > 0.002 {

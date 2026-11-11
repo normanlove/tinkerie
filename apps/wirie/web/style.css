@@ -410,3 +410,7 @@ body.page #hint, body.page #coords { visibility: hidden; }
 .plist th { color: var(--dim); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; } .plist td.q { font-weight: 700; text-align: right; width: 3em; } .plist td.r { color: var(--dim); font-size: 11.5px; }
 .plist tr.grp td { color: var(--cy); font-weight: 700; padding-top: 12px; border-bottom: none; }
 .plist-wrap { max-height: 58vh; overflow: auto; margin: 10px 0; }
+
+/* ---- narrow screens and tablets (streamlined layout) ---- */
+@media (max-width: 1320px) { .modes button .ml { display: none; } .modes button { padding: 7px 11px; } #top { gap: 10px; } }
+@media (max-width: 1100px) { #app { grid-template-columns: 250px 1fr 290px; } }

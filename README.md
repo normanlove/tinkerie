@@ -32,20 +32,31 @@ Double-click `Tinkerie.exe` to open the launcher and pick an app. Each app opens
 
 | App | What it does | Version |
 |---|---|---|
-| **Wirie** | Beginner-friendly circuit board designer (Keebie custom keyboards, Boardie stripboard, Calcie calculators, Pinnie, Powerie) | 0.14.0-alpha |
-| **Makie** | 3D-printing part designer. Builds cases for Wirie boards, including keyboard cases with a switch plate | 0.10.0-alpha |
-| **Tunie** | 3D printer tuning and calibration. Shares fit clearances with Makie | 0.5.0-alpha |
-| **Flashie** | Firmware flasher for microcontroller boards (ESP32, Pico, Arduino, STM32), plus a "Write image" tab that puts Raspberry Pi OS (with your Wi-Fi, user and SSH set up), Linux, or a Windows 10/11 installer onto an SD card or USB drive, and a Keyboard tab that makes and flashes firmware for Keebie keyboards | 0.9.0-alpha |
-| **Scopie** | Oscilloscope program (Hantek 6022BE/BL and others, plus network scopes and demo) | 0.9.2-alpha |
-| **Meterie** | PC multimeter: HoldPeak HP-90EPC, UNI-T, OWON, Brymen, Fluke and more | 0.6.2-alpha |
-| **Probie** | Serial monitor and logic analyser, with an Explain tab that explains captures in plain words (its own, and Scopie's and Meterie's). Probie was called Tracie before 0.11 | 0.6.0-alpha |
-| **Codie** | Code explainer: paste code and see what each line does and why, in 20+ languages (including Windows Go and the BASIC of the C64, ZX Spectrum and BBC Micro), with a game-development section and a Game school | 0.3.0-alpha |
+| **Wirie** | Beginner-friendly circuit board designer (Keebie custom keyboards, Boardie stripboard, Calcie calculators, Pinnie, Powerie) | 0.15.0-alpha |
+| **Makie** | 3D-printing part designer. Builds cases for Wirie boards, including keyboard cases with a switch plate | 0.12.0-alpha |
+| **Tunie** | 3D printer tuning and calibration. Shares fit clearances with Makie | 0.6.0-alpha |
+| **Flashie** | Firmware flasher for microcontroller boards (ESP32, Pico, Arduino, STM32), plus a "Write image" tab that puts Raspberry Pi OS (with your Wi-Fi, user and SSH set up), Linux, or a Windows 10/11 installer onto an SD card or USB drive, and a Keyboard tab that makes and flashes firmware for Keebie keyboards | 0.10.0-alpha |
+| **Scopie** | Oscilloscope program (Hantek 6022BE/BL and others, plus network scopes and demo) | 0.11.0-alpha |
+| **Meterie** | PC multimeter: HoldPeak HP-90EPC, UNI-T, OWON, Brymen, Fluke and more | 0.8.0-alpha |
+| **Probie** | Serial monitor and logic analyser, with an Explain tab that explains captures in plain words (its own, and Scopie's and Meterie's). Probie was called Tracie before 0.11 | 0.8.0-alpha |
+| **Codie** | Code explainer: paste code and see what each line does and why, in 20+ languages (including Windows Go and the BASIC of the C64, ZX Spectrum and BBC Micro), with a game-development section and a Game school | 0.4.0-alpha |
 
 Every app's own guide is its `README.md` in `apps\<name>\`.
 
 ## Teaching mode
 
 Every app explains itself. Point at any button, setting or panel and a card shows what it does, in plain language. Press **F2** to turn the explanations off or back on. Each app remembers your choice, and Meterie also has the switch in Settings. Scopie has its own help bar under the scope screen, which is always on.
+
+## Look & accessibility
+
+Every app has a **Look** button (the half-filled circle, or **Ctrl+,**) with:
+
+- **Themes:** Dark, Light, High contrast and Colour-blind safe (greens become blue and reds orange, so nothing relies on telling red from green).
+- **Text and controls size** from 90% to 150%.
+- **Touch-friendly controls:** bigger buttons, and on drawing areas drag with a finger, press and hold for the right-click menu, pinch to zoom and use two fingers to pan. *Automatic* turns this on for touchscreens.
+- **Reduce motion**, an **extra-strong focus outline** for keyboard use, **easier-to-read text** and **underlined links**.
+
+Each app remembers its own choices. Buttons that are only an icon get a spoken name for screen readers. Meterie has the same themes and reduce motion on its Settings page, next to its interface size.
 
 ## Starting an app directly
 

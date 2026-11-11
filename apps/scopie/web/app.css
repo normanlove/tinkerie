@@ -303,3 +303,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px;
   .side { width: 318px; }
   .row > label.l { width: 78px; }
 }
+
+/* ---- narrow screens and tablets (streamlined layout) ---- */
+.topbar { height: auto; min-height: 58px; flex-wrap: wrap; row-gap: 6px; padding-top: 6px; padding-bottom: 6px; }
+.toolbar { flex-wrap: wrap; row-gap: 6px; }

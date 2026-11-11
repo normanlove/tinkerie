@@ -25,6 +25,7 @@ shared/appwindow/    opens an app's page as a browser app window on Linux and ma
 shared/xz, zstd/     .xz and .zst decoders for Flashie's image writer (zstd is Go's own internal/zstd, BSD licence)
 shared/fat, exfat/   FAT16/FAT32 reading, editing and formatting; exFAT formatting (Flashie)
 shared/udf/          lists the files in a UDF disc image (Windows installer ISOs)
+shared/look.js      Look & accessibility (themes, text size, touch gestures); each app keeps a copy
 shared/teach.js      teaching mode for the web-based apps (a copy is in each app's web folder)
 tools/mkicon         draws the Tinkerie icon (build/tinkerie.ico, launcher/web/tinkerie.png)
 tools/mksyso         Windows resource: icon, DPI-aware manifest, version info

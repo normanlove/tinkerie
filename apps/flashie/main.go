@@ -27,12 +27,12 @@ import (
 	"time"
 )
 
-const appVersion = "0.9.0-alpha"
+const appVersion = "0.10.0-alpha"
 
 //go:embed ui.html
 var uiHTML []byte
 
-//go:embed creator.js creator.css imager.js keyboard.js mpy/*.py teach.js teach-tips.js
+//go:embed creator.js creator.css imager.js keyboard.js mpy/*.py teach.js teach-tips.js look.js
 var assets embed.FS
 
 var demoMode = os.Getenv("FLASHIE_DEMO") == "1"
@@ -327,7 +327,7 @@ func Main() {
 		w.Header().Set("Cache-Control", "no-store")
 		w.Write(b)
 	})
-	for _, f := range []string{"teach.js", "teach-tips.js", "keyboard.js"} { // teaching mode, Keyboard tab
+	for _, f := range []string{"teach.js", "teach-tips.js", "keyboard.js", "look.js"} { // teaching mode, Keyboard tab
 		f := f
 		mux.HandleFunc("/"+f, func(w http.ResponseWriter, r *http.Request) {
 			b, _ := assets.ReadFile(f)

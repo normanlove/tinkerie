@@ -911,7 +911,7 @@ function buildKeebie(el) {
   $("#kbFit").onclick = () => { KV.zoom = 0; kbDraw(); };
   $("#kbEmptyNew").onclick = () => kbNewDialog(false);
   const svg = $("#kbSvg");
-  svg.addEventListener("pointerdown", kbDown); svg.addEventListener("pointermove", kbMove); svg.addEventListener("pointerup", kbUp);
+  svg.dataset.lookTouch = "pointer"; svg.addEventListener("pointerdown", kbDown); svg.addEventListener("pointermove", kbMove); svg.addEventListener("pointerup", kbUp);
   svg.addEventListener("wheel", e => { e.preventDefault(); const [x, y] = kbPt(e); const f = Math.pow(1.0015, e.deltaY); KV.zoom *= f; KV.vx = x - (x - KV.vx) * f; KV.vy = y - (y - KV.vy) * f; kbDraw(); }, { passive: false });
   svg.addEventListener("dblclick", kbDbl); svg.addEventListener("contextmenu", e => { e.preventDefault(); kbCtx(e); });
   new ResizeObserver(() => kbDraw()).observe($("#kbStage"));

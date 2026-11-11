@@ -53,6 +53,8 @@ type Settings struct {
 	ShowWelcome   bool    `json:"welcome"`
 	TeachOff      bool    `json:"teachOff"` // teaching mode is on unless switched off
 	UIScale       float64 `json:"uiScale"`
+	Theme         int     `json:"theme"`        // 0 dark, 1 light, 2 high contrast, 3 colour-blind safe
+	ReduceMotion  bool    `json:"reduceMotion"` // animations jump straight to the end
 }
 
 func defaultSettings() Settings {
@@ -123,7 +125,7 @@ func NewApp() *App {
 	if a.ui.Teach {
 		a.ui.teachIntro = 4
 	}
-	a.applyAccent()
+	a.applyTheme()
 	a.mp.init()
 	a.cam.init()
 	a.wiz.which = -1
@@ -134,6 +136,12 @@ func NewApp() *App {
 func (a *App) applyAccent() {
 	i := clampi(a.settings.Accent, 0, len(accentChoices)-1)
 	th.Accent, th.AccentHi = accentChoices[i].acc, accentChoices[i].hi
+	switch a.settings.Theme {
+	case 1: // darker accents, so they read on white
+		th.Accent, th.AccentHi = th.Accent.Darken(0.38), th.Accent.Darken(0.22)
+	case 2:
+		th.Accent, th.AccentHi = hexColor(0xFFD400), hexColor(0xFFE866)
+	}
 }
 
 func configDir() string {

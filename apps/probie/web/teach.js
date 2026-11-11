@@ -21,6 +21,8 @@
     .replace(/[…\.:]+$/, "").replace(/^[^\p{L}\p{N}]+/u, "").replace(/\s+/g, " ").trim().toLowerCase();
 
   const tips = new Map();
+  // tips every app shares (the Look & accessibility button comes from look.js)
+  tips.set(norm("Look & accessibility"), ["Look & accessibility", "Themes (Dark, Light, High contrast, Colour-blind safe), text and control size, touch-friendly controls, reduced motion, a stronger focus outline, easier-to-read text and underlined links. Saved for this app. Ctrl+, opens it too."]);
   for (const [k, v] of Object.entries(T.tips || {})) {
     for (const key of k.split("|")) tips.set(norm(key), Array.isArray(v) ? v : [key.trim(), v]);
   }
@@ -144,6 +146,8 @@
     hide();
     announce();
   }, true);
-  if (on) setTimeout(announce, 900);
+  // say it's on the first time only, so it doesn't greet you every time the app opens
+  let greeted = false; try { greeted = !!localStorage.getItem("tinkerie.teach.greeted"); localStorage.setItem("tinkerie.teach.greeted", "1"); } catch (e) {}
+  if (on && !greeted) setTimeout(announce, 900);
   window.tinkerieTeach = { show, hide, isOn: () => on };
 })();

@@ -339,3 +339,8 @@ body.light .clash-st.ok { color: #15803d; } body.light .clash-st.bad { color: #b
 .drop-veil > div { display: flex; flex-direction: column; gap: 6px; align-items: center; padding: 28px 40px; border: 2px dashed var(--accent); border-radius: 16px; background: var(--panel); font-size: 13px; color: var(--dim); }
 .drop-veil b { font-size: 18px; color: var(--text); }
 #stage:has(#case-panel:not(.hidden)) #printer-chip { display: none; }
+
+/* ---- narrow screens and tablets (streamlined layout) ---- */
+body { grid-template-rows: minmax(54px, auto) 1fr 28px; }
+#toolbar { flex-wrap: wrap; row-gap: 4px; padding-top: 4px; padding-bottom: 4px; } #tools { flex-wrap: wrap; row-gap: 2px; }
+@media (max-width: 1100px) { body { grid-template-columns: 210px 1fr 264px; } }
