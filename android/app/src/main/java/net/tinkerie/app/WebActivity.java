@@ -73,6 +73,7 @@ public abstract class WebActivity extends Activity {
     Button overlayButton;
     String pageUrl;
     boolean pageFailed;
+    int oldWebView; // the Chrome version inside an outdated Android System WebView
 
     ValueCallback<Uri[]> chooserCallback;
     PickCallback pickCallback;
@@ -175,9 +176,23 @@ public abstract class WebActivity extends Activity {
         overlay.setVisibility(View.GONE);
     }
 
-    void load(String url) {
+    void load(final String url) {
         pageUrl = url;
         pageFailed = false;
+        if (oldWebView > 0) {
+            // Tinkerie's pages need Chrome 80 or newer inside the WebView
+            final String pkg = Build.VERSION.SDK_INT >= 24 && Build.VERSION.SDK_INT <= 28 ? "com.android.chrome" : "com.google.android.webview";
+            showOverlay("This phone's web engine (Android System WebView " + oldWebView + ") is too old for Tinkerie's apps.\n\n"
+                    + "Update \"" + (pkg.equals("com.android.chrome") ? "Chrome" : "Android System WebView") + "\" from the Play Store, then open Tinkerie again.",
+                    "Update it", v -> {
+                        try {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + pkg)));
+                        } catch (Exception e) {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + pkg)));
+                        }
+                    });
+            return;
+        }
         web.loadUrl(url);
     }
 
@@ -191,15 +206,17 @@ public abstract class WebActivity extends Activity {
     // tablets lay them out 1100 px wide and let pinch-zoom do the rest.
     int layoutWidth() {
         Configuration c = getResources().getConfiguration();
-        return c.screenWidthDp < 900 ? 1100 : 0;
+        return wantsDesktopWidth() && c.screenWidthDp < 900 ? 1100 : 0;
+    }
+
+    boolean wantsDesktopWidth() {
+        return true;
     }
 
     // Older Android System WebView versions can't run the apps' pages.
     void checkWebViewVersion() {
         Matcher m = Pattern.compile("Chrome/(\\d+)").matcher(web.getSettings().getUserAgentString());
-        if (m.find() && Integer.parseInt(m.group(1)) < 80) {
-            Toast.makeText(this, "Please update \"Android System WebView\" (or Chrome) from the Play Store: Tinkerie needs a newer one.", Toast.LENGTH_LONG).show();
-        }
+        if (m.find() && Integer.parseInt(m.group(1)) < 80) oldWebView = Integer.parseInt(m.group(1));
     }
 
     @Override
@@ -275,7 +292,65 @@ public abstract class WebActivity extends Activity {
         return true;
     }
 
+    // Script that must run before the page's own: fallbacks for older Android
+    // System WebView versions (Android 5 and 6 can't update past Chrome 95 and
+    // 106) and the desktop-width layout for phones.
+    String headScript() {
+        return "<script>(function(){var W=" + layoutWidth() + ";"
+                + "if(W){var m=document.createElement('meta');m.name='viewport';m.content='width='+W;document.head?document.head.appendChild(m):document.write(m.outerHTML);"
+                + "new MutationObserver(function(){var all=document.querySelectorAll('meta[name=viewport]');for(var i=0;i<all.length;i++)if(all[i]!==m)all[i].content='width='+W;}).observe(document,{subtree:true,childList:true});}"
+                + "if(!window.structuredClone)window.structuredClone=function c(v){if(v===null||typeof v!=='object')return v;"
+                + "if(v instanceof Date)return new Date(v);if(ArrayBuffer.isView(v))return v.slice();if(v instanceof ArrayBuffer)return v.slice(0);"
+                + "if(v instanceof Map){var mm=new Map();v.forEach(function(x,k){mm.set(c(k),c(x))});return mm}"
+                + "if(v instanceof Set){var ss=new Set();v.forEach(function(x){ss.add(c(x))});return ss}"
+                + "if(Array.isArray(v))return v.map(c);var o={};for(var k in v)if(Object.prototype.hasOwnProperty.call(v,k))o[k]=c(v[k]);return o};"
+                + "if(!Array.prototype.findLast){Array.prototype.findLast=function(f,t){for(var i=this.length-1;i>=0;i--)if(f.call(t,this[i],i,this))return this[i]};"
+                + "Array.prototype.findLastIndex=function(f,t){for(var i=this.length-1;i>=0;i--)if(f.call(t,this[i],i,this))return i;return -1}}"
+                + "if(!Array.prototype.toSorted)Array.prototype.toSorted=function(f){return this.slice().sort(f)};"
+                + "if(window.CSS&&CSS.supports&&!CSS.supports('color','color-mix(in srgb, red 50%, blue)')){"
+                + "document.addEventListener('DOMContentLoaded',function(){var st=document.createElement('style');"
+                + "st.textContent='.tb.on,.row.sel,.row.drop-in,.band{background:rgba(45,212,191,.22)!important}.pf.on{background:#1f2a36!important}"
+                + ".chip rect{fill:#1a2230}.chip text{fill:#e8ecf3}.chip.nm rect{fill:#2b3a4a}.ps-tag{background:rgba(255,255,255,.06)}"
+                + ".cmd{border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08)}';document.head.appendChild(st)})}"
+                + "})();</script>";
+    }
+
+    // The app's own pages come through here so headScript runs first.
+    android.webkit.WebResourceResponse withHeadScript(WebResourceRequest req) {
+        Uri u = req.getUrl();
+        if (!req.isForMainFrame() || !"GET".equals(req.getMethod()) || !isLocal(u)) return null;
+        try {
+            HttpURLConnection c = (HttpURLConnection) new URL(u.toString()).openConnection();
+            for (java.util.Map.Entry<String, String> h : req.getRequestHeaders().entrySet()) c.setRequestProperty(h.getKey(), h.getValue());
+            c.setInstanceFollowRedirects(true);
+            String type = c.getContentType();
+            int code = c.getResponseCode();
+            if (type == null || !type.startsWith("text/html") || code != 200) {
+                c.disconnect();
+                return null; // let the WebView fetch it itself
+            }
+            java.io.ByteArrayOutputStream b = new java.io.ByteArrayOutputStream();
+            try (InputStream in = c.getInputStream()) {
+                copy(in, b);
+            }
+            String html = b.toString("UTF-8");
+            java.util.regex.Matcher m = Pattern.compile("<head[^>]*>", Pattern.CASE_INSENSITIVE).matcher(html);
+            html = m.find() ? html.substring(0, m.end()) + headScript() + html.substring(m.end()) : headScript() + html;
+            java.util.Map<String, String> headers = new java.util.HashMap<>();
+            headers.put("Cache-Control", "no-store");
+            return new android.webkit.WebResourceResponse("text/html", "UTF-8", 200, "OK", headers,
+                    new java.io.ByteArrayInputStream(html.getBytes("UTF-8")));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     class Client extends WebViewClient {
+        @Override
+        public android.webkit.WebResourceResponse shouldInterceptRequest(WebView v, WebResourceRequest req) {
+            return withHeadScript(req);
+        }
+
         @Override
         public boolean shouldOverrideUrlLoading(WebView v, String url) {
             return route(Uri.parse(url));
@@ -381,10 +456,6 @@ public abstract class WebActivity extends Activity {
     // build a file in JavaScript), and gives phones a desktop-width layout.
     void injectShim() {
         String js = "(function(){if(window.__tk)return;window.__tk=1;"
-                + "var W=" + layoutWidth() + ";"
-                + "function vp(){if(!W||!document.head)return;var m=document.querySelector('meta[name=viewport]');"
-                + "if(!m){m=document.createElement('meta');m.name='viewport';document.head.appendChild(m);}"
-                + "m.content='width='+W;}vp();document.addEventListener('DOMContentLoaded',vp);"
                 + "var rv=URL.revokeObjectURL;URL.revokeObjectURL=function(u){setTimeout(function(){rv.call(URL,u)},60000)};"
                 + "function save(h,n){fetch(h).then(function(r){return r.blob()}).then(function(b){var f=new FileReader();"
                 + "f.onload=function(){var s=f.result;TinkerieAndroid.saveFile(n||'download',b.type||'application/octet-stream',s.substring(s.indexOf(',')+1))};"

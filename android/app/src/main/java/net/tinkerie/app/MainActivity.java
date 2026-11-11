@@ -96,6 +96,11 @@ public class MainActivity extends WebActivity {
     }
 
     @Override
+    boolean wantsDesktopWidth() {
+        return false; // the launcher's tiles fit a phone as they are
+    }
+
+    @Override
     void leave() {
         moveTaskToBack(true);
     }
