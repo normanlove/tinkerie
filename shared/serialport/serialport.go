@@ -12,6 +12,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"tinkerie/shared/droid"
 )
 
 // Config describes how to set up a port. Zero values mean 8N1.
@@ -40,6 +41,7 @@ type Port struct {
 	f   *os.File
 	fd  int
 	cfg Config
+	u   *usbPort // a USB serial adapter driven over USB (Android)
 }
 
 // ErrUnsupported is returned on systems this package doesn't cover.
@@ -48,7 +50,7 @@ var ErrUnsupported = errors.New("serial ports aren't supported on this system")
 // Open opens and configures a port. name may be a full path or a bare name
 // like ttyUSB0.
 func Open(name string, cfg Config) (*Port, error) {
-	if !strings.HasPrefix(name, "/") {
+	if !strings.HasPrefix(name, "/") && !strings.HasPrefix(name, usbPrefix) {
 		name = "/dev/" + name
 	}
 	if cfg.DataBits == 0 {
@@ -60,12 +62,21 @@ func Open(name string, cfg Config) (*Port, error) {
 	if cfg.StopBits == 0 {
 		cfg.StopBits = 1
 	}
+	if strings.HasPrefix(name, "/"+usbPrefix) {
+		name = name[1:]
+	}
+	if strings.HasPrefix(name, usbPrefix) {
+		return openUSB(name, cfg)
+	}
 	return open(name, cfg)
 }
 
 // Read waits for data and returns what has arrived. It returns an error once
 // the port is closed or unplugged.
 func (p *Port) Read(b []byte) (int, error) {
+	if p.u != nil {
+		return p.u.read(b, 0)
+	}
 	if err := p.f.SetReadDeadline(time.Time{}); err != nil {
 		return 0, err
 	}
@@ -80,6 +91,9 @@ func (p *Port) Read(b []byte) (int, error) {
 // ReadTimeout reads whatever is available, waiting at most d for the first
 // byte. It returns (0, nil) on timeout.
 func (p *Port) ReadTimeout(b []byte, d time.Duration) (int, error) {
+	if p.u != nil {
+		return p.u.read(b, max(d, time.Millisecond))
+	}
 	if err := p.f.SetReadDeadline(time.Now().Add(d)); err != nil {
 		return 0, err
 	}
@@ -94,12 +108,24 @@ func (p *Port) ReadTimeout(b []byte, d time.Duration) (int, error) {
 }
 
 // Write sends b, waiting until the port has accepted all of it.
-func (p *Port) Write(b []byte) (int, error) { return p.f.Write(b) }
+func (p *Port) Write(b []byte) (int, error) {
+	if p.u != nil {
+		return p.u.write(b)
+	}
+	return p.f.Write(b)
+}
 
 // SetBaud changes the speed, keeping the other settings.
 func (p *Port) SetBaud(baud int) error {
 	c := p.cfg
 	c.Baud = baud
+	if p.u != nil {
+		if err := p.u.configure(c); err != nil {
+			return err
+		}
+		p.cfg = c
+		return nil
+	}
 	if err := configure(p.fd, c); err != nil {
 		return err
 	}
@@ -108,20 +134,45 @@ func (p *Port) SetBaud(baud int) error {
 }
 
 // SetDTR sets the DTR control line.
-func (p *Port) SetDTR(on bool) error { return setModemBit(p.fd, tiocmDTR, on) }
+func (p *Port) SetDTR(on bool) error {
+	if p.u != nil {
+		p.u.dtr = on
+		return p.u.lines()
+	}
+	return setModemBit(p.fd, tiocmDTR, on)
+}
 
 // SetRTS sets the RTS control line.
-func (p *Port) SetRTS(on bool) error { return setModemBit(p.fd, tiocmRTS, on) }
+func (p *Port) SetRTS(on bool) error {
+	if p.u != nil {
+		p.u.rts = on
+		return p.u.lines()
+	}
+	return setModemBit(p.fd, tiocmRTS, on)
+}
 
 // Purge throws away anything waiting to be read or sent.
-func (p *Port) Purge() error { return flush(p.fd) }
+func (p *Port) Purge() error {
+	if p.u != nil {
+		return p.u.purge()
+	}
+	return flush(p.fd)
+}
 
 // Close closes the port, waking any Read in progress.
-func (p *Port) Close() error { return p.f.Close() }
+func (p *Port) Close() error {
+	if p.u != nil {
+		return p.u.close()
+	}
+	return p.f.Close()
+}
 
 // List returns the serial ports on this computer, USB ports first.
 func List() []Info {
 	out := list()
+	if droid.Active() {
+		out = usbList() // Android: only USB adapters, driven over USB
+	}
 	sort.Slice(out, func(i, j int) bool {
 		if out[i].USB != out[j].USB {
 			return out[i].USB

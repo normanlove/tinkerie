@@ -3,6 +3,7 @@
 package launcher
 
 import (
+	"tinkerie/shared/droid"
 	"os/exec"
 	"path/filepath"
 	"runtime"
@@ -12,6 +13,10 @@ import (
 // openWindow shows the launcher in a Chromium "app" window if one is installed,
 // else in the default browser.
 func openWindow(url, dataDir string) {
+	if droid.Active() {
+		droid.OpenWindow(url, "Tinkerie")
+		return
+	}
 	args := []string{"--app=" + url, "--user-data-dir=" + filepath.Join(dataDir, "window"), "--window-size=980,640", "--no-first-run"}
 	if runtime.GOOS == "darwin" {
 		for _, app := range []string{"Google Chrome", "Microsoft Edge", "Brave Browser", "Chromium"} {

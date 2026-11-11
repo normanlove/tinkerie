@@ -1,0 +1,57 @@
+// Tinkerie for Android: a small Java shell around the same Go program the
+// desktop uses. CI builds the Go program for each ABI into
+// src/main/jniLibs/<abi>/libtinkerie.so (see .github/workflows/release.yml).
+plugins {
+    id 'com.android.application'
+}
+
+def tkVersion = System.getenv("TINKERIE_VERSION") ?: "0.0.0-dev"
+def tkCode = (System.getenv("TINKERIE_VERSION_CODE") ?: "1") as int
+
+android {
+    namespace 'net.tinkerie.app'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'net.tinkerie.app'
+        minSdk 21
+        targetSdk 35
+        versionCode tkCode
+        versionName tkVersion
+    }
+
+    signingConfigs {
+        release {
+            def ks = System.getenv("TINKERIE_KEYSTORE")
+            if (ks != null && new File(ks).exists()) {
+                storeFile file(ks)
+                storePassword System.getenv("TINKERIE_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("TINKERIE_KEY_ALIAS") ?: "tinkerie"
+                keyPassword System.getenv("TINKERIE_KEYSTORE_PASSWORD")
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            def ks = System.getenv("TINKERIE_KEYSTORE")
+            signingConfig (ks != null && new File(ks).exists()) ? signingConfigs.release : signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packagingOptions {
+        // The Go program is run as a process, so it must be a real file on disk.
+        jniLibs { useLegacyPackaging true }
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+}

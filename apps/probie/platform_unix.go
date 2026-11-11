@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"tinkerie/shared/droid"
 
 	"tinkerie/shared/appwindow"
 	"tinkerie/shared/serialport"
@@ -49,6 +50,10 @@ func openPort(name string, cfg PortConfig) (Port, error) {
 }
 
 func openFolder(dir string) {
+	if droid.Active() {
+		droid.ShowFolder(dir)
+		return
+	}
 	if runtime.GOOS == "darwin" {
 		_ = exec.Command("open", dir).Start()
 		return

@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"tinkerie/shared/droid"
 
 	"tinkerie/shared/appwindow"
 	"tinkerie/shared/serialport"
@@ -65,6 +66,9 @@ func uf2Mounts() []string {
 }
 
 func listUF2Drives() []uf2Drive {
+	if droid.Active() {
+		return androidUF2Drives()
+	}
 	var out []uf2Drive
 	seen := map[string]bool{}
 	for _, dir := range uf2Mounts() {

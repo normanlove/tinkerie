@@ -2,6 +2,7 @@ package makie
 
 import (
 	"tinkerie/shared/appwindow"
+	"tinkerie/shared/droid"
 
 	"log"
 	"os"
@@ -13,6 +14,10 @@ import (
 // openWindow opens the editor in a chromeless app window if a Chromium-based
 // browser is installed (Edge ships with every Windows 10/11), else the default browser.
 func openWindow(url string) {
+	if droid.Active() {
+		droid.OpenWindow(url, "Makie")
+		return
+	}
 	dataDir := ""
 	if d, err := os.UserConfigDir(); err == nil {
 		dataDir = filepath.Join(d, "Makie", "window")

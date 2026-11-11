@@ -8,6 +8,8 @@ package tunie
 
 import (
 	"tinkerie/shared/appwindow"
+	"tinkerie/shared/droid"
+	"tinkerie/shared/serialport"
 
 	"fmt"
 	"os"
@@ -26,6 +28,9 @@ func fatal(msg string) {
 }
 
 func openAppWindow(url, dataDir string) error {
+	if droid.Active() {
+		return droid.OpenWindow(url, "Tunie")
+	}
 	for _, b := range []string{"microsoft-edge", "google-chrome", "chromium", "chromium-browser"} {
 		if p, err := exec.LookPath(b); err == nil {
 			cmd := exec.Command(p, append(appwindow.Maximised(filepath.Join(dataDir, "window")), "--app="+url, "--user-data-dir="+filepath.Join(dataDir, "window"), "--no-first-run")...)
@@ -39,6 +44,9 @@ func openAppWindow(url, dataDir string) error {
 }
 
 func openURL(u string) error {
+	if droid.Active() {
+		return droid.Browse(u)
+	}
 	if runtime.GOOS == "darwin" {
 		return exec.Command("open", u).Start()
 	}
@@ -46,6 +54,9 @@ func openURL(u string) error {
 }
 
 func openFolder(p string) error {
+	if droid.Active() {
+		return droid.ShowFolder(p)
+	}
 	if st, err := os.Stat(p); err == nil && !st.IsDir() {
 		p = filepath.Dir(p)
 	}
@@ -60,6 +71,9 @@ type Drive struct {
 }
 
 func listDrives() []Drive {
+	if droid.Active() {
+		return nil // Android keeps drives to itself
+	}
 	var out []Drive
 	for _, base := range []string{"/media", "/run/media", "/Volumes"} {
 		ents, _ := os.ReadDir(base)
@@ -80,6 +94,13 @@ func listDrives() []Drive {
 }
 
 func listSerialPorts() []string {
+	if droid.Active() {
+		var out []string
+		for _, p := range serialport.List() {
+			out = append(out, p.Path)
+		}
+		return out
+	}
 	var out []string
 	// Linux, Raspberry Pi and macOS. On a Mac only the cu.* devices: opening a
 	// tty.* device waits for a carrier signal and can hang.
@@ -92,6 +113,9 @@ func listSerialPorts() []string {
 }
 
 func openSerial(name string, baud int) (serialPort, error) {
+	if droid.Active() {
+		return serialport.Open(name, serialport.Config{Baud: baud})
+	}
 	if !strings.HasPrefix(name, "/dev/") {
 		name = "/dev/" + name
 	}

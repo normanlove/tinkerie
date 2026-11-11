@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 	"syscall"
+	"tinkerie/shared/droid"
 )
 
 func readSys(p string) string {
@@ -124,6 +125,9 @@ func linuxMounts() []mountEnt {
 }
 
 func listDisksOS() ([]Disk, error) {
+	if droid.Active() {
+		return androidDisks()
+	}
 	ents, err := os.ReadDir("/sys/block")
 	if err != nil {
 		return nil, err
@@ -215,6 +219,9 @@ func unmountAll(d Disk) error {
 }
 
 func openDiskForWrite(d Disk) (rawDisk, error) {
+	if droid.Active() {
+		return androidOpenDisk(d)
+	}
 	if t, ok := testDiskFile(d); ok {
 		return t, nil
 	}
@@ -247,6 +254,10 @@ func openDiskForWrite(d Disk) (rawDisk, error) {
 }
 
 func finishDisk(d Disk, eject bool) {
+	if droid.Active() {
+		androidFinishDisk(d, eject)
+		return
+	}
 	if _, ok := testDiskFile(d); ok {
 		return
 	}
@@ -262,6 +273,9 @@ func finishDisk(d Disk, eject bool) {
 // canWriteDirect reports whether Flashie itself may open the drive (root, or
 // in the "disk" group) so no password prompt is needed.
 func canWriteDirect(d Disk) bool {
+	if droid.Active() {
+		return true
+	}
 	if _, ok := testDiskFile(d); ok {
 		return true
 	}
@@ -276,6 +290,9 @@ func canWriteDirect(d Disk) bool {
 // elevate starts the helper with administrator rights. done receives the
 // helper's exit error once it ends.
 func elevate(base, token string) (done chan error, err error) {
+	if droid.Active() {
+		return nil, errors.New("Android writes drives directly: no extra permission step")
+	}
 	exe, err := os.Executable()
 	if err != nil {
 		return nil, err

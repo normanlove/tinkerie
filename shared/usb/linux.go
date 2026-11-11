@@ -13,6 +13,7 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+	"tinkerie/shared/droid"
 	"unsafe"
 )
 
@@ -91,6 +92,9 @@ func ioctl(fd int, req, arg uintptr) error {
 
 // List returns the USB devices on this computer, from sysfs.
 func List() []Info {
+	if droid.Active() {
+		return bridgeList()
+	}
 	dirs, _ := filepath.Glob("/sys/bus/usb/devices/*")
 	var out []Info
 	for _, d := range dirs {
@@ -154,6 +158,7 @@ func hex16(s string) uint16 {
 type Device struct {
 	fd    int
 	iface int
+	extra []int
 	Info  Info
 	mu    sync.Mutex
 }
@@ -161,10 +166,19 @@ type Device struct {
 // Open opens a device (Info.Path) and claims an interface, detaching any
 // kernel driver that had it.
 func Open(path string, iface int) (*Device, error) {
-	fd, err := syscall.Open(path, syscall.O_RDWR|syscall.O_CLOEXEC, 0)
+	var fd int
+	var err error
+	if droid.Active() {
+		fd, err = bridgeOpen(path) // Android asks the person, then hands over the device
+	} else {
+		fd, err = syscall.Open(path, syscall.O_RDWR|syscall.O_CLOEXEC, 0)
+	}
 	if err != nil {
 		if err == syscall.EACCES || err == syscall.EPERM {
 			return nil, ErrNoPermission
+		}
+		if droid.Active() {
+			return nil, err
 		}
 		return nil, fmt.Errorf("couldn't open USB device %s: %v", path, err)
 	}
@@ -185,6 +199,24 @@ func Open(path string, iface int) (*Device, error) {
 		return nil, fmt.Errorf("couldn't claim the USB interface: %v", err)
 	}
 	return d, nil
+}
+
+// ClaimExtra claims another interface of an open device too (a USB serial
+// adapter's control interface, say), detaching any kernel driver from it.
+func (d *Device) ClaimExtra(iface int) error {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	if iface == d.iface {
+		return nil
+	}
+	dc := usbIoctl{Ifno: int32(iface), IoctlCode: int32(reqDisconnect)}
+	_ = ioctl(d.fd, reqIoctl, uintptr(unsafe.Pointer(&dc)))
+	n := uint32(iface)
+	if err := ioctl(d.fd, reqClaim, uintptr(unsafe.Pointer(&n))); err != nil {
+		return fmt.Errorf("couldn't claim USB interface %d: %v", iface, err)
+	}
+	d.extra = append(d.extra, iface)
+	return nil
 }
 
 // Interface returns the claimed interface's details.
@@ -381,10 +413,12 @@ func (d *Device) Close() {
 	if d.fd < 0 {
 		return
 	}
-	n := uint32(d.iface)
-	_ = ioctl(d.fd, reqRelease, uintptr(unsafe.Pointer(&n)))
-	c := usbIoctl{Ifno: int32(d.iface), IoctlCode: int32(reqConnect)}
-	_ = ioctl(d.fd, reqIoctl, uintptr(unsafe.Pointer(&c)))
+	for _, i := range append([]int{d.iface}, d.extra...) {
+		n := uint32(i)
+		_ = ioctl(d.fd, reqRelease, uintptr(unsafe.Pointer(&n)))
+		c := usbIoctl{Ifno: int32(i), IoctlCode: int32(reqConnect)}
+		_ = ioctl(d.fd, reqIoctl, uintptr(unsafe.Pointer(&c)))
+	}
 	syscall.Close(d.fd)
 	d.fd = -1
 }

@@ -16,6 +16,7 @@ import (
 	"runtime"
 	"strings"
 	"time"
+	"tinkerie/shared/droid"
 
 	"tinkerie/shared/serialport"
 )
@@ -89,6 +90,10 @@ func platformStopSound() {
 }
 
 func platformReveal(path string) {
+	if droid.Active() {
+		droid.ShowFolder(path)
+		return
+	}
 	if runtime.GOOS == "darwin" {
 		_ = exec.Command("open", "-R", path).Start()
 		return
@@ -112,6 +117,15 @@ func platformClipboardGet() string { return clip }
 var patRe = regexp.MustCompile(`\*\.[A-Za-z0-9.]+`)
 
 func platformSaveDialog(title, def, filter, ext string) (string, bool) {
+	if droid.Active() { // saves go to Files › Tinkerie › Meterie
+		if ext != "" && !strings.HasPrefix(ext, ".") {
+			ext = "." + ext
+		}
+		if ext != "" && !strings.HasSuffix(strings.ToLower(def), strings.ToLower(ext)) {
+			def += ext
+		}
+		return droid.SavePath("Meterie", def), true
+	}
 	dir := defaultDialogDir()
 	if strings.ContainsRune(def, '/') { // a full suggested path
 		dir, def = filepath.Dir(def), filepath.Base(def)
@@ -138,6 +152,10 @@ func platformSaveDialog(title, def, filter, ext string) (string, bool) {
 }
 
 func platformOpenDialog(title, filter, pattern string) (string, bool) {
+	if droid.Active() {
+		p, err := droid.PickFile(title, patRe.FindAllString(pattern+" "+filter, -1))
+		return p, err == nil
+	}
 	dir := defaultDialogDir()
 	if runtime.GOOS == "darwin" {
 		out, err := exec.Command("osascript", "-e",

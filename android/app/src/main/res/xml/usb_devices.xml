@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- USB devices Tinkerie works with: offered when plugged in. -->
+<resources>
+    <usb-device vendor-id="9025" />   <!-- Arduino 0x2341 -->
+    <usb-device vendor-id="10755" />  <!-- Arduino.org 0x2A03 -->
+    <usb-device vendor-id="6790" />   <!-- WCH CH340/CH9102 0x1A86 -->
+    <usb-device vendor-id="4292" />   <!-- Silicon Labs CP210x 0x10C4 -->
+    <usb-device vendor-id="1027" />   <!-- FTDI 0x0403 -->
+    <usb-device vendor-id="1659" />   <!-- Prolific PL2303 0x067B -->
+    <usb-device vendor-id="11914" />  <!-- Raspberry Pi RP2040/RP2350 0x2E8A -->
+    <usb-device vendor-id="12346" />  <!-- Espressif 0x303A -->
+    <usb-device vendor-id="1155" />   <!-- STMicroelectronics 0x0483 -->
+    <usb-device vendor-id="9114" />   <!-- Adafruit 0x239A -->
+    <usb-device vendor-id="7855" />   <!-- Seeed 0x2886 -->
+    <usb-device vendor-id="5824" />   <!-- Teensy / V-USB 0x16C0 -->
+    <usb-device vendor-id="1204" />   <!-- Hantek 6022 (Cypress FX2) 0x04B4 -->
+    <usb-device vendor-id="1205" />   <!-- Hantek 0x04B5 -->
+    <usb-device vendor-id="2338" />   <!-- Saleae-style FX2 analysers 0x0925 -->
+    <usb-device vendor-id="7504" />   <!-- sigrok fx2lafw 0x1D50 -->
+</resources>

@@ -58,6 +58,10 @@ var limits = map[string]map[string]string{
 	"linux": {
 		"meterie": "USB-serial meters only on Linux",
 	},
+	"android": {
+		"meterie": "USB-serial meters only on Android",
+		"flashie": "Compiling Arduino code needs a computer",
+	},
 }
 
 // forThisSystem returns the app list with notes for what doesn't work here.

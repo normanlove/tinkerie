@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"tinkerie/shared/droid"
 
 	"tinkerie/shared/usb"
 )
@@ -87,6 +88,18 @@ func shellExecute(verb, file, args, dir string) error {
 	return fmt.Errorf("not needed on Linux")
 }
 
-func openURL(u string) { _ = exec.Command("xdg-open", u).Start() }
+func openURL(u string) {
+	if droid.Active() {
+		droid.Browse(u)
+		return
+	}
+	_ = exec.Command("xdg-open", u).Start()
+}
 
-func openFolder(dir string) { openURL(dir) }
+func openFolder(dir string) {
+	if droid.Active() {
+		droid.ShowFolder(dir)
+		return
+	}
+	openURL(dir)
+}

@@ -1,0 +1,106 @@
+# Tinkerie for Android. On every push: builds the APK and tries it on
+# emulators running old and new Android. When a new version has been
+# released (by release.yml), it adds the signed APK to that release.
+# Signing needs two repository secrets: ANDROID_KEYSTORE_B64 (the keystore,
+# base64) and ANDROID_KEYSTORE_PASSWORD.
+name: Android
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  emulator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { api: 21, arch: x86, abi: x86, target: default }            # Android 5.0
+          - { api: 29, arch: x86_64, abi: x86_64, target: default }      # Android 10: apps may only run programs shipped in the APK
+          - { api: 35, arch: x86_64, abi: x86_64, target: google_apis }  # Android 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version: '1.24' }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.11.1' }
+      - name: Build the debug APK
+        run: ./android/build.sh debug ${{ matrix.abi }}
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Try it on Android ${{ matrix.api }}
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api }}
+          arch: ${{ matrix.arch }}
+          target: ${{ matrix.target }}
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: ./android/smoke.sh dist/packages/*-android-debug.apk smoke-${{ matrix.api }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-${{ matrix.api }}
+          path: smoke-${{ matrix.api }}
+
+  release:
+    needs: emulator
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Is there a release without the Android app?
+        id: v
+        env:
+          KS: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+        run: |
+          v=$(sed -n 's/^VERSION=//p' build.sh)
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          if [ -z "$KS" ]; then
+            echo "::warning::No Android signing key yet: add the ANDROID_KEYSTORE_B64 and ANDROID_KEYSTORE_PASSWORD secrets"
+            echo "go=no" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          # release.yml may still be building the desktop downloads: wait for the release
+          for i in $(seq 1 90); do
+            if gh release view "v$v" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then break; fi
+            sleep 60
+          done
+          if ! gh release view "v$v" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "No release v$v"; echo "go=no" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          if gh release view "v$v" --repo "$GITHUB_REPOSITORY" --json assets -q '.assets[].name' | grep -q "Tinkerie-$v-android.apk"; then
+            echo "Already has the APK"; echo "go=no" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          echo "go=yes" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-go@v5
+        if: steps.v.outputs.go == 'yes'
+        with: { go-version: '1.24' }
+      - uses: actions/setup-java@v4
+        if: steps.v.outputs.go == 'yes'
+        with: { distribution: temurin, java-version: '17' }
+      - uses: gradle/actions/setup-gradle@v4
+        if: steps.v.outputs.go == 'yes'
+        with: { gradle-version: '8.11.1' }
+      - name: Build and add the signed APK to the release
+        if: steps.v.outputs.go == 'yes'
+        env:
+          KS: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          TINKERIE_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          echo "$KS" | base64 -d > "$RUNNER_TEMP/tinkerie.jks"
+          export TINKERIE_KEYSTORE="$RUNNER_TEMP/tinkerie.jks"
+          ./android/build.sh release
+          v="${{ steps.v.outputs.version }}"
+          "$ANDROID_HOME"/build-tools/*/apksigner verify --print-certs "dist/packages/Tinkerie-$v-android.apk" | head -3
+          gh release upload "v$v" "dist/packages/Tinkerie-$v-android.apk" --repo "$GITHUB_REPOSITORY"

@@ -20,6 +20,7 @@ import (
 	"runtime"
 	"strings"
 	"time"
+	"tinkerie/shared/droid"
 )
 
 // arduinoCLIURL is Arduino's "latest release" download for this system
@@ -150,6 +151,9 @@ func extractCLI(data []byte, isZip bool) ([]byte, error) {
 
 // runCLI runs arduino-cli with Flashie's private folders, streaming output.
 func runCLI(exe string, r *reporter, args ...string) error {
+	if droid.Active() {
+		return droid.ErrNeedsComputer("Compiling Arduino code")
+	}
 	home := arduinoHome()
 	cmd := exec.Command(exe, args...)
 	cmd.Env = append(os.Environ(),

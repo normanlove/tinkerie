@@ -118,8 +118,11 @@ func keyboardBuild(core, fqbn, code string, libs []string, r *reporter) ([]byte,
 
 func kbReporter() *reporter {
 	return &reporter{
-		Log:    func(s string) { emitConsole(s+"\n", "info") },
-		Status: func(s string) { events.send(map[string]any{"type": "kbstatus", "text": s}); emitConsole("» "+s+"\n", "info") },
+		Log: func(s string) { emitConsole(s+"\n", "info") },
+		Status: func(s string) {
+			events.send(map[string]any{"type": "kbstatus", "text": s})
+			emitConsole("» "+s+"\n", "info")
+		},
 		Progress: func() func(int, int) {
 			var last time.Time
 			return func(d, t int) {

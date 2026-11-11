@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tinkerie's apps run on this phone and are reached at 127.0.0.1 over plain
+     HTTP; network scopes and printers on the local network do the same. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

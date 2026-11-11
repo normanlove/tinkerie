@@ -6,9 +6,13 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
+	"tinkerie/shared/droid"
 )
 
 func pickImageFile() (string, error) {
+	if droid.Active() {
+		return droid.PickFile("Choose an image to write", []string{".img", ".iso", ".raw", ".wic", ".xz", ".gz", ".bz2", ".zip", ".zst"})
+	}
 	var cmd *exec.Cmd
 	if runtime.GOOS == "darwin" {
 		cmd = exec.Command("osascript", "-e", `POSIX path of (choose file with prompt "Choose an image to write")`)

@@ -76,14 +76,14 @@ func (m *mockLib) releases() map[string][]string {
 	return map[string][]string{
 		"esphome/firmware": {"esphome-web-esp32-2026.10.1.factory.bin", "esphome-web-esp32s3-2026.10.1.factory.bin",
 			"esphome-web-esp32c3-2026.10.1.factory.bin", "esphome-web-esp8266-2026.10.1.factory.bin", "esphome-web-esp32-2026.10.1.ota.bin"},
-		"wled/WLED":                    {"WLED_0.15.3_ESP32.bin", "WLED_0.15.3_ESP8266.bin", "WLED_0.15.3_ESP32-S3_8MB.bin"},
-		"arendst/Tasmota":              {},
-		"adafruit/circuitpython":       {},
-		"BitMaker-hub/NerdMiner_v2":    {},
-		"meshtastic/firmware":          {"firmware-esp32s3-2.7.15.567b8ea.zip", "firmware-esp32-2.7.15.567b8ea.zip", "firmware-rp2040-2.7.15.567b8ea.zip", "firmware-2.7.15.567b8ea.json"},
-		"tinkerie-test/app-only": {"app_only_demo_cyd_2432S028.bin"},
-		"tinkerie-test/merged": {"merged-demo-CYD-2432S028.bin"},
-		"gnea/grbl":                    {"grbl_v1.1h.20190825.hex"},
+		"wled/WLED":                 {"WLED_0.15.3_ESP32.bin", "WLED_0.15.3_ESP8266.bin", "WLED_0.15.3_ESP32-S3_8MB.bin"},
+		"arendst/Tasmota":           {},
+		"adafruit/circuitpython":    {},
+		"BitMaker-hub/NerdMiner_v2": {},
+		"meshtastic/firmware":       {"firmware-esp32s3-2.7.15.567b8ea.zip", "firmware-esp32-2.7.15.567b8ea.zip", "firmware-rp2040-2.7.15.567b8ea.zip", "firmware-2.7.15.567b8ea.json"},
+		"tinkerie-test/app-only":    {"app_only_demo_cyd_2432S028.bin"},
+		"tinkerie-test/merged":      {"merged-demo-CYD-2432S028.bin"},
+		"gnea/grbl":                 {"grbl_v1.1h.20190825.hex"},
 	}
 }
 

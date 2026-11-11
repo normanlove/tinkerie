@@ -11,11 +11,15 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"tinkerie/shared/droid"
 )
 
 // Open shows url in its own, maximised window. profile is a folder for the
 // window's browser profile (so the app keeps its own settings).
 func Open(url, profile string) error {
+	if droid.Active() {
+		return droid.OpenWindow(url, "")
+	}
 	args := append([]string{"--app=" + url, "--user-data-dir=" + profile,
 		"--no-first-run", "--no-default-browser-check"}, Maximised(profile)...)
 	if runtime.GOOS == "darwin" {

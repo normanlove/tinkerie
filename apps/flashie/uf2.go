@@ -123,6 +123,9 @@ func prepareUF2(name string, data []byte, d uf2Drive, r *reporter) ([]byte, erro
 }
 
 func copyUF2(d uf2Drive, data []byte, r *reporter) error {
+	if strings.HasPrefix(d.Root, usbDrivePrefix) {
+		return copyUF2USB(d, data, r)
+	}
 	dst := filepath.Join(d.Root, "FLASHIE.UF2")
 	f, err := os.OpenFile(dst, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
 	if err != nil {

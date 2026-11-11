@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="tk_bg">#0E1218</color>
+    <color name="tk_accent">#2DD4BF</color>
+    <style name="Theme.Tinkerie" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/tk_bg</item>
+        <item name="android:colorPrimary">@color/tk_bg</item>
+        <item name="android:colorPrimaryDark">@color/tk_bg</item>
+        <item name="android:colorAccent">@color/tk_accent</item>
+        <item name="android:statusBarColor">@color/tk_bg</item>
+        <item name="android:navigationBarColor">@color/tk_bg</item>
+    </style>
+</resources>

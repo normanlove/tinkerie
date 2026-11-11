@@ -4,6 +4,7 @@ package wirie
 
 import (
 	"tinkerie/shared/appwindow"
+	"tinkerie/shared/droid"
 
 	"os"
 	"os/exec"
@@ -14,6 +15,10 @@ import (
 // Porting notes: macOS uses `open`, Linux uses xdg-open. Chrome/Chromium app
 // mode is tried first so the editor gets its own window.
 func openWindow(url string) {
+	if droid.Active() {
+		droid.OpenWindow(url, "Wirie")
+		return
+	}
 	profile := filepath.Join(os.TempDir(), "wirie-window")
 	if runtime.GOOS == "darwin" {
 		for _, app := range []string{"Google Chrome", "Microsoft Edge", "Brave Browser"} {
@@ -35,6 +40,10 @@ func openWindow(url string) {
 }
 
 func revealInFolder(p string) {
+	if droid.Active() {
+		droid.ShowFolder(p)
+		return
+	}
 	if st, err := os.Stat(p); err == nil && !st.IsDir() {
 		p = filepath.Dir(p)
 	}
