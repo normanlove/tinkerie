@@ -1,0 +1,5 @@
+    intent={dat=http://127.0.0.1:47820/ flg=0x10080000 cmp=net.tinkerie.app/.AppActivity}
+    intent={dat=http://127.0.0.1:47824/ flg=0x10080000 cmp=net.tinkerie.app/.AppActivity}
+    intent={flg=0x10000000 cmp=net.tinkerie.app/.MainActivity}
+    intent={act=android.intent.action.MAIN cat=[android.intent.category.HOME] flg=0x10000100 cmp=com.android.launcher3/.Launcher}
+    intent={act=android.intent.action.MAIN cat=[android.intent.category.HOME] flg=0x10800100 cmp=com.android.settings/.FallbackHome}

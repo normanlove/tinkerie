@@ -1,0 +1,69 @@
+files/home:
+total 40
+drwx------ 5 u0_a116 u0_a116 4096 2026-11-11 21:05 .
+drwxrwx--x 3 u0_a116 u0_a116 4096 2026-11-11 21:05 ..
+drwx------ 4 u0_a116 u0_a116 4096 2026-11-11 21:06 .config
+drwx------ 3 u0_a116 u0_a116 4096 2026-11-11 21:06 Documents
+drwx------ 2 u0_a116 u0_a116 4096 2026-11-11 21:06 logs
+
+files/home/.config:
+total 32
+drwx------ 4 u0_a116 u0_a116 4096 2026-11-11 21:06 .
+drwx------ 5 u0_a116 u0_a116 4096 2026-11-11 21:05 ..
+drwx------ 2 u0_a116 u0_a116 4096 2026-11-11 21:05 Tinkerie
+drwx------ 3 u0_a116 u0_a116 4096 2026-11-11 21:06 nrmluvdev
+
+files/home/.config/Tinkerie:
+total 16
+drwx------ 2 u0_a116 u0_a116 4096 2026-11-11 21:05 .
+drwx------ 4 u0_a116 u0_a116 4096 2026-11-11 21:06 ..
+
+files/home/.config/nrmluvdev:
+total 24
+drwx------ 3 u0_a116 u0_a116 4096 2026-11-11 21:06 .
+drwx------ 4 u0_a116 u0_a116 4096 2026-11-11 21:06 ..
+drwx------ 2 u0_a116 u0_a116 4096 2026-11-11 21:06 Codie
+
+files/home/.config/nrmluvdev/Codie:
+total 24
+drwx------ 2 u0_a116 u0_a116 4096 2026-11-11 21:06 .
+drwx------ 3 u0_a116 u0_a116 4096 2026-11-11 21:06 ..
+-rw------- 1 u0_a116 u0_a116   75 2026-11-11 21:06 codie.log
+
+files/home/Documents:
+total 24
+drwx------ 3 u0_a116 u0_a116 4096 2026-11-11 21:06 .
+drwx------ 5 u0_a116 u0_a116 4096 2026-11-11 21:05 ..
+drwx------ 5 u0_a116 u0_a116 4096 2026-11-11 21:06 Wirie
+
+files/home/Documents/Wirie:
+total 48
+drwx------ 5 u0_a116 u0_a116 4096 2026-11-11 21:06 .
+drwx------ 3 u0_a116 u0_a116 4096 2026-11-11 21:06 ..
+drwx------ 2 u0_a116 u0_a116 4096 2026-11-11 21:06 Exports
+drwx------ 2 u0_a116 u0_a116 4096 2026-11-11 21:06 Parts
+drwx------ 2 u0_a116 u0_a116 4096 2026-11-11 21:06 Projects
+-rw------- 1 u0_a116 u0_a116  116 2026-11-11 21:06 wirie.log
+
+files/home/Documents/Wirie/Exports:
+total 16
+drwx------ 2 u0_a116 u0_a116 4096 2026-11-11 21:06 .
+drwx------ 5 u0_a116 u0_a116 4096 2026-11-11 21:06 ..
+
+files/home/Documents/Wirie/Parts:
+total 16
+drwx------ 2 u0_a116 u0_a116 4096 2026-11-11 21:06 .
+drwx------ 5 u0_a116 u0_a116 4096 2026-11-11 21:06 ..
+
+files/home/Documents/Wirie/Projects:
+total 16
+drwx------ 2 u0_a116 u0_a116 4096 2026-11-11 21:06 .
+drwx------ 5 u0_a116 u0_a116 4096 2026-11-11 21:06 ..
+
+files/home/logs:
+total 40
+drwx------ 2 u0_a116 u0_a116 4096 2026-11-11 21:06 .
+drwx------ 5 u0_a116 u0_a116 4096 2026-11-11 21:05 ..
+-rw------- 1 u0_a116 u0_a116   75 2026-11-11 21:06 codie.log
+-rw------- 1 u0_a116 u0_a116  155 2026-11-11 21:06 launcher.log
+-rw------- 1 u0_a116 u0_a116   41 2026-11-11 21:06 wirie.log
