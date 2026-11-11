@@ -53,6 +53,8 @@ window.TEACH = {
     "Parts": ["Parts list", "Every part in your design. Drag a part onto another to group them, or drag it out of a group to ungroup it."],
     "Snap|Change snap grid": ["Snap", "Parts move and resize in steps of this size, so they line up neatly. Hold Alt while dragging to move freely."],
     "Show me an example": ["Example", "Opens a small finished design so you can see how it was made."],
+    "Feet": ["Feet", "What the case stands on. Rubber feet in indents: shallow round pockets underneath, sized for common stick-on rubber feet, so they go in the right place and don't slide. Printed feet: little round feet printed with the case. No feet: a flat bottom. Keyboards keep their taller printed feet at the back for the typing angle (with an indent under each when you choose rubber feet)."],
+    "Foot size": ["Foot size", "The size of the feet, matching common stick-on rubber feet: 8 × 2 mm, 10 × 3 mm, 12.7 × 3.5 mm (½ inch), 6.4 × 1.9 mm or 20 × 5 mm. Printed feet use the same size."],
     "Open a Wirie board": ["Open a Wirie board", "Opens a board exported from Wirie (Export → Case data for Makie) so you can design a case or mount for it."],
     "Start with an empty bed": ["Empty bed", "Starts a new design with nothing on the bed."],
   },

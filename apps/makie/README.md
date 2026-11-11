@@ -189,7 +189,10 @@ lid or wall opening.
 *Make a case for this board* opens a live preview with settings taken from
 the board: wall, floor, fit gap, standoff height, lid clearance, corner
 radius, lid style (screw-down, snap-fit or slide-in), screw size, self-tapping
-or heat-set inserts, vent slots, and text or a logo on the lid. It builds a
+or heat-set inserts, vent slots, text or a logo on the lid, and feet: indents
+for stick-on rubber feet (8 × 2, 10 × 3, 12.7 × 3.5, 6.4 × 1.9 or 20 × 5 mm),
+printed feet, or none. Keyboard cases keep taller printed feet at the back for
+the typing angle, with a rubber-foot indent under each when you pick rubber feet. It builds a
 base tray that follows the board outline, standoffs at every mounting hole,
 chamfered wall openings for every connector at the right height, lid holes
 for buttons, LEDs, screens, knobs and sensors, sound and vent grilles, and

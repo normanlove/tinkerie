@@ -615,7 +615,7 @@ func CaseParams(c *WirieCase) []Param {
 	for _, s := range []string{"M2", "M2.5", "M3", "M4", "M5"} {
 		screws = append(screws, s)
 	}
-	return []Param{
+	return append([]Param{
 		sel("lid", "Lid style", "Screw-down", lidStyles...).help("Screw-down: one long screw per mounting hole holds the board and the lid. Snap-fit: the lid clicks on. Slide-in: the lid slides along grooves from the right-hand end."),
 		num("wall", "Wall thickness", round3(math.Max(e.SuggestedWall, 1.6)), 1.2, 10, 0.2, "mm"),
 		num("floor", "Floor thickness", 2, 1.2, 10, 0.2, "mm"),
@@ -636,8 +636,11 @@ func CaseParams(c *WirieCase) []Param {
 		sel("font", "Font", "Sans Bold", FontNames()...),
 		num("textSize", "Text size", 6, 2, 40, 0.5, "mm"),
 		sel("logo", "Logo on the lid", "None", "None", "Lightning bolt", "Heart", "Star"),
-	}
+	}, feetParams(boardFeetDefault)...)
 }
+
+// board cases had a flat bottom before feet were a choice, so that stays the default
+const boardFeetDefault = "No feet"
 
 // derived heights of the case, in the board frame
 type caseDims struct {
@@ -1467,9 +1470,19 @@ func (c *WirieCase) BuildCase(p Params) ([]*Node, CaseInfo) {
 		}
 	}
 
+	// feet under the case
+	var avoid []P2
+	for _, h := range c.Holes {
+		avoid = append(avoid, P2{h.X, h.Y})
+	}
+	lift := addFeet(base, d.outer, d.zFloorBot, o.Floor, p, avoid, "", boardFeetDefault, &info)
+	if p.S("feet", boardFeetDefault) != "Printed feet" {
+		lift = 0
+	}
+
 	ow := c.Board.Width + 2*(o.Fit+o.Wall)
 	oh := c.Board.Height + 2*(o.Fit+o.Wall)
-	info.Outer = [3]float64{round3(ow), round3(oh), round3(d.zLidTop - d.zFloorBot)}
+	info.Outer = [3]float64{round3(ow), round3(oh), round3(d.zLidTop - d.zFloorBot + lift)}
 	if d.lid == "Slide-in" {
 		info.Outer[2] = round3(d.zWallTop - d.zFloorBot)
 	}

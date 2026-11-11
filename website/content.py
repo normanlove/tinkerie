@@ -3,7 +3,7 @@
 
 APPS = [
   dict(
-    id="wirie", needshort="No hardware needed", name="Wirie", ver="0.16.1-alpha", color="#ef8a3c", icon="wirie.png",
+    id="wirie", needshort="No hardware needed", name="Wirie", ver="0.16.2-alpha", color="#ef8a3c", icon="wirie.png",
     tagline="Design your own circuit boards, even if you've never made one before.",
     short="Design circuit boards and custom keyboards, plan stripboard builds, look up pinouts and work out battery life.",
     need="No hardware needed",
@@ -86,14 +86,14 @@ APPS = [
     pairs=[("makie", "Turns your board into a 3D-printable case."), ("flashie", "Puts the firmware on the board you built."), ("meterie", "Calcie can read a live value from your multimeter.")],
   ),
   dict(
-    id="makie", needshort="No hardware needed", name="Makie", ver="0.12.2-alpha", color="#2f7df6", icon="makie.png",
+    id="makie", needshort="No hardware needed", name="Makie", ver="0.13.0-alpha", color="#2f7df6", icon="makie.png",
     tagline="Design parts for your 3D printer by stacking simple shapes.",
     short="A Tinkercad-style 3D designer with threads, gears, boxes, cases and hundreds of ready parts.",
     need="No hardware needed",
     plain=("In plain words",
            "Drop shapes onto the build plate, turn some of them into holes, and group them: the holes are cut out. "
            "That's all it takes to make a bracket, a box or a replacement knob. When it looks right, export an STL or 3MF for your slicer."),
-    chips=["Threads that fit", "Gears and mechanisms", "Cases for 70 boards", "Keyboard cases", "Motion and collision check", "Multi-colour 3MF"],
+    chips=["Threads that fit", "Gears and mechanisms", "Cases for 70 boards", "Keyboard cases", "Rubber-foot indents", "Motion and collision check", "Multi-colour 3MF"],
     firsts=[
       ("Show me an example", "Click Show me an example on the welcome screen. Makie builds a hand-cranked 9:1 gearbox."),
       ("Press Play", "Open Motion and press Play to watch the gears turn. If parts would collide, Makie shows them in red."),

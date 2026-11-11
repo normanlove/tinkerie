@@ -27,9 +27,13 @@ function buildRouteGrid(g, routeW) {
       else if (cur === 0) gr[k] = val; else if (cur !== val) gr[k] = -1;
     } }
   };
-  for (const h of A.holes) mark({ t: "cap", ax: h.x, ay: h.y, bx: h.x, by: h.y, r: h.d / 2 }, inf, ["top", "bottom"], -1, false);
+  // Round holes and the rings round mounting holes get an extra half grid step:
+  // the router only checks grid points, and a diagonal between two of them can
+  // shave past a curve (tracks kept landing too close to standoffs).
+  const roundExtra = g * 0.5;
+  for (const h of A.holes) mark({ t: "cap", ax: h.x, ay: h.y, bx: h.x, by: h.y, r: h.d / 2 }, inf + roundExtra, ["top", "bottom"], -1, false);
   const netVal = it => (it.cnet ? it.cnet.idx + 1 : -1);
-  for (const it of A.items) mark(it.shape, inf, it.layers, netVal(it), false);
+  for (const it of A.items) mark(it.shape, it.cnet ? inf : inf + roundExtra, it.layers, netVal(it), false);
   for (const it of A.items) if (it.cnet) mark(it.shape, 0, it.layers, netVal(it), true);
   return { grid, W, H, g, inf, mark };
 }

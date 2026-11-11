@@ -22,10 +22,11 @@ What works on this system
 Every app has teaching mode: point at anything to see what it does. F2 turns it off.
 
 New in {VERSION}:
-- Wirie's auto-fix: no more looping in auto-fix mode, tracks that kept landing too
-  close now get fixed, and it's much faster.
+- Makie case feet: indents for stick-on rubber feet, printed feet, or none.
+- Wirie's router keeps tracks clear of mounting holes.
 
 Also in recent alpha builds:
+- 0.22.0-alpha: Wirie's auto-fix: no looping, fixes close tracks, much faster.
 - 0.21.0-alpha: Keebie never puts a standoff under a key.
 - 0.20.0-alpha: apps started from the launcher open in front of it.
 - 0.19.0-alpha: 21 colour themes and a choice of accent colour in every app.

@@ -43,7 +43,7 @@ func (kb *WirieKeyboard) plateT() float64 {
 func kbCaseParams(c *WirieCase) []Param {
 	e, kb := c.Envelope, c.Keyboard
 	screws := []string{"From board", "M2", "M2.5", "M3", "M4", "M5"}
-	return []Param{
+	return append([]Param{
 		sel("plate", "Switch plate", "Printed plate", "Printed plate", "No plate").help("The plate holds the switches straight and takes the typing force. Print it flat. Choose No plate for a PCB-mount build (switches soldered or pushed into the PCB only)."),
 		num("plateT", "Plate thickness", round3(kb.plateT()), 1, 5, 0.1, "mm").help("MX switch clips are made for 1.5 mm; Choc plates are 1.2 mm. A thicker plate is stiffer but the switches may not clip in.").show("plate=Printed plate"),
 		num("wall", "Wall thickness", 2.4, 1.2, 10, 0.2, "mm"),
@@ -51,12 +51,15 @@ func kbCaseParams(c *WirieCase) []Param {
 		num("fit", "Fit gap around the board", 0.5, 0, 3, 0.05, "mm"),
 		num("standoff", "Standoff height", round3(math.Max(3, e.MaxPartHeightBottom+1)), 1, 40, 0.5, "mm").help("Space between the case floor and the bottom of the PCB. Hot-swap sockets and diodes hang under the board."),
 		num("rim", "Wall above the plate", 0, 0, 12, 0.5, "mm").help("0 makes the walls flush with the plate. Higher walls hide the switch sides (a 'high profile' case)."),
-		num("tilt", "Typing angle", 6, 0, 12, 0.5, "°").help("Feet under the back tilt the keyboard towards you. 0 lays it flat."),
+		num("tilt", "Typing angle", 6, 0, 12, 0.5, "°").help("Feet under the back tilt the keyboard towards you. 0 lays it flat.").show("feet!=No feet"),
 		num("radius", "Corner radius (-1 = follow the board)", -1, -1, 50, 0.5, "mm"),
 		sel("screw", "Screw size", "From board", screws...),
 		sel("fixing", "Screws go into", "Self-tapping screw", caseFixings...),
-	}
+	}, feetParams(kbFeetDefault)...)
 }
+
+// keyboards sit on rubber feet by default (in indents, so they stay put)
+const kbFeetDefault = "Rubber feet in indents"
 
 // heights of a keyboard case, in the board frame
 type kbZs struct{ floorBot, floorTop, plateBot, plateTop, wallTop float64 }
@@ -518,9 +521,26 @@ func (c *WirieCase) buildKeyboardCase(p Params) ([]*Node, CaseInfo) {
 	// typing angle: two feet under the back
 	outer, _ := c.kbOuter(o)
 	x0, y0, x1, y1 := loopBox(outer)
-	if tilt := clampF(p.F("tilt", 6), 0, 15); tilt > 0.2 {
+	var avoid []P2
+	for _, h := range c.Holes {
+		avoid = append(avoid, P2{h.X, h.Y})
+	}
+	tilt := clampF(p.F("tilt", 6), 0, 15)
+	if p.S("feet", kbFeetDefault) == "No feet" {
+		if tilt > 0.2 {
+			info.Lines = append(info.Lines, "No feet, so the keyboard lies flat (the typing angle needs feet at the back).")
+		}
+		tilt = 0
+	}
+	// the front feet (or, lying flat, all of them); the back ones raise it to the typing angle
+	which := ""
+	if tilt > 0.2 {
+		which = "front"
+	}
+	lift := addFeet(base, outer, z.floorBot, o.Floor, p, avoid, which, kbFeetDefault, &info)
+	if tilt > 0.2 {
 		depth := y1 - y0
-		fh := round3(math.Max(1, depth*math.Tan(tilt*math.Pi/180)))
+		fh := round3(math.Max(1, depth*math.Tan(tilt*math.Pi/180)) + lift)
 		var feet []P2
 		for _, fx := range []float64{x0 + 12, x1 - 12} {
 			q := P2{fx, y1 - 8}
@@ -531,8 +551,9 @@ func (c *WirieCase) buildKeyboardCase(p Params) ([]*Node, CaseInfo) {
 		}
 		for i, q := range feet {
 			base.Children = append(base.Children, newNode(fmt.Sprintf("Rear foot %d", i+1), "cylinder", Params{"d": 12.0, "h": fh + 0.5}, f3(q.X, q.Y, z.floorBot-fh), zero, false, ""))
+			rubberIndentUnder(base, q, z.floorBot-fh, p, fmt.Sprintf("Rubber foot indent (rear %d)", i+1), kbFeetDefault)
 		}
-		info.Lines = append(info.Lines, fmt.Sprintf("Typing angle about %.1f°: two %.1f mm feet under the back. Stick rubber pads under the front corners.", tilt, fh))
+		info.Lines = append(info.Lines, fmt.Sprintf("Typing angle about %.1f°: two %.1f mm feet under the back.", tilt, fh))
 	}
 
 	info.Outer = [3]float64{round3(x1 - x0), round3(y1 - y0), round3(z.wallTop - z.floorBot)}
@@ -620,7 +641,7 @@ func rasterShape(l Loop, cuts []Loop, g float64) (Loop, []Loop) {
 		g += r
 	}
 	// signed distance (in cells): + outside, - inside
-	dOut := edt(inside, W, H, true)  // distance from outside cells to the nearest inside cell
+	dOut := edt(inside, W, H, true) // distance from outside cells to the nearest inside cell
 	dIn := edt(inside, W, H, false) // distance from inside cells to the nearest outside cell
 	f := make([]float64, W*H)
 	gc := g / res

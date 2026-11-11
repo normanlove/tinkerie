@@ -10,13 +10,14 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 
 Each package has a *READ ME FIRST.txt*.
 
-<!-- release notes for 0.22.0-alpha: package.sh checks this line, so update the notes with every version -->
+<!-- release notes for 0.23.0-alpha: package.sh checks this line, so update the notes with every version -->
 ### New in {VERSION}
-- **Auto-fix mode no longer loops:** it never runs twice on the same problems. Anything it can't fix stays in the list (with what to try) until you change the board, and then it has another go.
-- **Tracks that stayed too close now get fixed:** when a redrawn track lands too close again (usually a diagonal cutting a corner), each round leaves a little more room round tracks, redraws both tracks of a clashing pair, and as a last resort makes a wide power track normal width.
-- **Auto-fix is much faster:** it only re-routes the connections that need it, and stops as soon as another round wouldn't help.
+- **Makie case feet:** choose rubber feet in indents (shallow pockets sized for common stick-on feet: 8 × 2, 10 × 3, 12.7 × 3.5, 6.4 × 1.9 or 20 × 5 mm), printed feet, or no feet. Feet go near each corner (and in the middle on long cases), clear of the edges and screw holes. Keyboard cases keep their taller back feet for the typing angle, with a rubber-foot indent under each; with no feet the keyboard lies flat.
+- **Wirie's router keeps clear of mounting holes:** tracks no longer get placed too close to standoffs and other round holes (the router left too little room round curves).
+- **Android builds are paused** on GitHub for now; the desktop downloads are unchanged.
 
 ### Also in recent alpha builds
+- **0.22.0-alpha:** Auto-fix mode no longer loops: it never runs twice on the same problems. Anything it can't fix stays in the list (with what to try) until you change the board, and then it has another go. Tracks that stayed too close now get fixed: when a redrawn track lands too close again (usually a diagonal cutting a corner), each round leaves a little more room round tracks, redraws both tracks of a clashing pair, and as a last resort makes a wide power track normal width. Auto-fix is much faster: it only re-routes the connections that need it, and stops as soon as another round wouldn't help.
 - **0.21.0-alpha:** Keebie standoffs never block a key: a standoff (and its screw head) is never placed under a keycap. Keebie uses gaps between keys, or spots just outside them, and the board outline grows a small ear to hold each one. Clicking under a key to place one by hand is refused, with a note why; clicking just beside the keys adds one there. If fewer standoffs fit than you asked for, Keebie says so.
 - **0.20.0-alpha:** Apps open in front of the launcher: on Windows, every app's window now comes to the front when you start it from the launcher, instead of opening behind it (Windows normally stops background programs from doing that). Meterie's own window does the same. Linux and Raspberry Pi OS: the new window is brought forward too when wmctrl or xdotool is installed (X11 desktops); on a Mac it already was.
 - **0.19.0-alpha:** 21 colour themes in every app: ten dark (Dark, Midnight, Ocean, Forest, Plum, Ember, Mocha, Slate, Graphite, True black), seven light (Light, Paper, Sepia, Sky, Mint, Rose, Lavender), and High contrast and Colour-blind safe, each in dark and light. Accent colour: keep the app's own, or pick one of eleven (blue, cyan, teal, green, lime, amber, orange, red, pink, purple, indigo) to replace its main colour; warning and status colours stay put. Meterie has all 21 themes on its Settings page. Text on bright buttons stays readable in the light and high-contrast themes.
