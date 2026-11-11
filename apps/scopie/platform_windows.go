@@ -121,7 +121,9 @@ func openAppWindow(url, dataDir string) error {
 			"--disable-renderer-backgrounding",
 			"--disable-background-timer-throttling",
 		)...)
+		raise := appwindow.WatchNewWindow() // so the window opens in front of the launcher
 		if err := cmd.Start(); err == nil {
+			raise()
 			go cmd.Wait()
 			return nil
 		}

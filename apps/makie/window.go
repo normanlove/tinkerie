@@ -28,7 +28,9 @@ func openWindow(url string) {
 	}
 	for _, b := range browserCandidates() {
 		if p, err := exec.LookPath(b); err == nil {
+			raise := appwindow.WatchNewWindow() // so the window opens in front of the launcher
 			if err := exec.Command(p, appArgs...).Start(); err == nil {
+				raise()
 				log.Println("opened app window with", p)
 				return
 			}

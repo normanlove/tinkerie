@@ -39,7 +39,9 @@ func openWindow(url, dataDir string) {
 			"--no-first-run", "--no-default-browser-check",
 			"--disable-features=Translate,msEdgeSidebarV2,msHubApps",
 			"--disable-background-timer-throttling")...)
+		raise := appwindow.WatchNewWindow() // so the window opens in front of the launcher
 		if err := cmd.Start(); err == nil {
+			raise()
 			return
 		}
 	}

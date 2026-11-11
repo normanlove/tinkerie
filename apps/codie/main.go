@@ -35,7 +35,7 @@ var webFS embed.FS
 
 const (
 	appName     = "Codie"
-	appVersion  = "0.4.1-alpha"
+	appVersion  = "0.4.2-alpha"
 	appAuthor   = "nrmluvdev"
 	defaultPort = 47824
 	maxFile     = 2 << 20

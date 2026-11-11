@@ -13,6 +13,7 @@ import (
 	"strings"
 	"syscall"
 	"time"
+	"tinkerie/shared/appwindow"
 	"unicode/utf16"
 	"unsafe"
 )
@@ -439,7 +440,8 @@ func runWindows() {
 	pSendMessageW.Call(hwnd, wmSetIcon, 1, big)
 	pSendMessageW.Call(hwnd, wmSetIcon, 0, small)
 	win.wantDraw = true
-	pShowWindow.Call(hwnd, 3) // SW_SHOWMAXIMIZED: every Tinkerie app opens maximised
+	pShowWindow.Call(hwnd, 3)       // SW_SHOWMAXIMIZED: every Tinkerie app opens maximised
+	appwindow.ForceForeground(hwnd) // in front of the launcher, which started us
 	renderFrame()
 	pUpdateWindow.Call(hwnd)
 	pSetTimer.Call(hwnd, 1, 15, 0)

@@ -46,7 +46,9 @@ func launchWindow(url string) error {
 			"--disable-sync",
 			"--disable-features=Translate,msEdgeSidebarV2,msHubApps",
 		)...)
+		raise := appwindow.WatchNewWindow() // so the window opens in front of the launcher
 		if err := cmd.Start(); err == nil {
+			raise()
 			return nil
 		}
 	}

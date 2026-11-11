@@ -32,7 +32,9 @@ func openWindow(url string) {
 		if _, err := os.Stat(c); err == nil {
 			cmd := exec.Command(c, append(appwindow.Maximised(profile), "--app="+url, "--user-data-dir="+profile, "--no-first-run", "--no-default-browser-check", "--disable-features=Translate")...)
 			cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+			raise := appwindow.WatchNewWindow() // so the window opens in front of the launcher
 			if cmd.Start() == nil {
+				raise()
 				return
 			}
 		}

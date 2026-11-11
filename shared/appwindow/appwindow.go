@@ -27,7 +27,7 @@ func Open(url, profile string) error {
 			if !exists("/Applications/"+app+".app") && !exists(filepath.Join(os.Getenv("HOME"), "Applications", app+".app")) {
 				continue
 			}
-			if exec.Command("open", append([]string{"-na", app, "--args"}, args...)...).Run() == nil {
+			if exec.Command("open", append([]string{"-na", app, "--args"}, args...)...).Run() == nil { // "open" brings it forward
 				return nil
 			}
 		}
@@ -36,7 +36,9 @@ func Open(url, profile string) error {
 	for _, b := range []string{"chromium", "chromium-browser", "google-chrome", "google-chrome-stable", "microsoft-edge", "brave-browser"} {
 		if p, err := exec.LookPath(b); err == nil {
 			cmd := exec.Command(p, args...)
+			raise := WatchNewWindow() // so the window opens in front of the launcher
 			if cmd.Start() == nil {
+				raise()
 				go cmd.Wait()
 				return nil
 			}

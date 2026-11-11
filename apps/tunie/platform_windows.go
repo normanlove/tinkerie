@@ -77,7 +77,9 @@ func openAppWindow(url, dataDir string) error {
 			"--no-default-browser-check",
 			"--disable-features=Translate,msEdgeSidebarV2,msHubApps",
 		)...)
+		raise := appwindow.WatchNewWindow() // so the window opens in front of the launcher
 		if err := cmd.Start(); err == nil {
+			raise()
 			go cmd.Wait()
 			return nil
 		}

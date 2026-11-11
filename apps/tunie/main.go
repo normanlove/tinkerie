@@ -32,7 +32,7 @@ var webFS embed.FS
 
 const (
 	appName     = "Tunie"
-	appVersion  = "0.6.1-alpha"
+	appVersion  = "0.6.2-alpha"
 	appAuthor   = "nrmluvdev"
 	defaultPort = 47821
 )
