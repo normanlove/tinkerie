@@ -14,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"tinkerie/shared/droid"
 
 	"tinkerie/apps/codie"
 	"tinkerie/apps/flashie"
@@ -50,6 +51,7 @@ func main() {
 		os.Exit(2)
 	}
 	// The app sees its own arguments only, as if it were a program of its own.
+	droid.SetApp(name)
 	os.Args = append([]string{os.Args[0]}, rest...)
 	run()
 }

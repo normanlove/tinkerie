@@ -41,6 +41,6 @@ adb shell dumpsys activity recents | grep -E "realActivity|intent=" | head -20 >
 adb shell run-as net.tinkerie.app ls -laR files/home > "$out/files.txt" 2>&1
 adb logcat -d > "$out/logcat.txt"
 if grep -q "FATAL EXCEPTION" "$out/logcat.txt"; then fail "the app crashed (see logcat.txt)"; fi
-grep -q "AppActivity" "$out/recents.txt" || echo "warning: no app window in Recents"
+grep -q "AppActivity" "$out/logcat.txt" || fail "the apps didn't open their own windows"
 dump
 echo "SMOKE OK"

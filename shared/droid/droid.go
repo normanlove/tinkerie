@@ -33,8 +33,17 @@ func init() {
 // Active reports whether this process was started by the Android app.
 func Active() bool { return os.Getenv("TINKERIE_BRIDGE") != "" }
 
+var appName string
+
+// SetApp records which app this process runs (main does this before it
+// trims "--app NAME" from the arguments).
+func SetApp(name string) { appName = name }
+
 // App is this process's app name ("launcher", "wirie", …).
 func App() string {
+	if appName != "" {
+		return appName
+	}
 	for i, a := range os.Args {
 		if a == "--app" && i+1 < len(os.Args) {
 			return os.Args[i+1]
