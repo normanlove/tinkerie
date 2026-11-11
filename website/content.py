@@ -86,7 +86,7 @@ APPS = [
     pairs=[("makie", "Turns your board into a 3D-printable case."), ("flashie", "Puts the firmware on the board you built."), ("meterie", "Calcie can read a live value from your multimeter.")],
   ),
   dict(
-    id="makie", needshort="No hardware needed", name="Makie", ver="0.13.0-alpha", color="#2f7df6", icon="makie.png",
+    id="makie", needshort="No hardware needed", name="Makie", ver="0.14.0-alpha", color="#2f7df6", icon="makie.png",
     tagline="Design parts for your 3D printer by stacking simple shapes.",
     short="A Tinkercad-style 3D designer with threads, gears, boxes, cases and hundreds of ready parts.",
     need="No hardware needed",

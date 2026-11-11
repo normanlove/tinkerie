@@ -194,7 +194,10 @@ for stick-on rubber feet (8 × 2, 10 × 3, 12.7 × 3.5, 6.4 × 1.9 or 20 × 5 mm
 printed feet, or none. Keyboard cases keep taller printed feet at the back for
 the typing angle, with a rubber-foot indent under each when you pick rubber feet. It builds a
 base tray that follows the board outline, standoffs at every mounting hole,
-chamfered wall openings for every connector at the right height, lid holes
+chamfered wall openings for every connector at the right height, room in
+the wall for anything that sticks out past the board edge (a module's USB end,
+a USB-C socket, a button or an antenna: a pocket open at the top so the board
+drops in, with a filler on the lid to close it), lid holes
 for buttons, LEDs, screens, knobs and sensors, sound and vent grilles, and
 floor holes for parts underneath. Extras: button extenders, light pipes and
 a display bezel. A clash check runs after every change and turns any part

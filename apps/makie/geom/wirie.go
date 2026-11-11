@@ -1289,6 +1289,9 @@ func (c *WirieCase) BuildCase(p Params) ([]*Node, CaseInfo) {
 		info.Lines = append(info.Lines, fmt.Sprintf("Heat-set inserts: %d × %s (hole Ø%.1f, %.1f mm deep).", len(c.Holes), d.screw, m.InsertD, m.InsertL))
 	}
 
+	// --- parts sticking out past the board edge ---
+	c.overhangPockets(base, lid, o, d.zWallTop, d.zTop, &info)
+
 	// --- wall openings ---
 	for _, op := range c.Openings {
 		n := op.Normal

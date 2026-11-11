@@ -517,6 +517,7 @@ func (c *WirieCase) buildKeyboardCase(p Params) ([]*Node, CaseInfo) {
 		pr := Params{"w": round3(w), "h": round3(h), "din": round3(o.Wall/2 + 0.8), "dout": round3(o.Wall/2 + 0.01), "cham": round3(math.Min(0.6, o.Wall/2-0.1)), "r": round3(math.Min(1, math.Min(w, h)/4)), "circle": op.Type == "audio-3.5mm"}
 		base.Children = append(base.Children, newNode(name, "wcase_cutout", pr, f3(cx, cy, zc), wallRot(n), true, ""))
 	}
+	c.overhangPockets(base, nil, o, z.wallTop, z.wallTop, &info) // parts sticking out past the board edge
 
 	// typing angle: two feet under the back
 	outer, _ := c.kbOuter(o)

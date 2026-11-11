@@ -10,9 +10,9 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 
 Each package has a *READ ME FIRST.txt*.
 
-<!-- release notes for 0.24.0-alpha: package.sh checks this line, so update the notes with every version -->
+<!-- release notes for 0.25.0-alpha: package.sh checks this line, so update the notes with every version -->
 ### New in {VERSION}
-- **Codie: What it does.** A new tab looks at the code as a whole and works out what kind of program it is (a microcontroller sketch, web server, web page, game, data-analysis script, file tool, command-line tool, chat bot, keyboard firmware and more), how it flows (where it starts, what it takes in, what it does, what it gives out), and the smaller jobs it does along the way. It shows the lines that led to each conclusion and says how sure it is. The summary on the Explain tab starts with it too, and saved reports include it.
+- **Makie cases make room for parts that stick out:** when a part hangs over the board edge (a microcontroller module's USB end, a USB-C socket, a button, an antenna), the generated case cuts a pocket in the wall for it, open at the top so the board still drops in, and the lid gets a filler that closes the slot above it. The case notes list each one and how far it sticks out. Works for board cases and keyboard cases.
 
 Licensed under GPL-3.0-or-later.
 
