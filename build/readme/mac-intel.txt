@@ -13,18 +13,21 @@ Starting Tinkerie
 
 What works on this system
 - Launcher, Wirie, Makie, Tunie and Flashie: everything.
-- Scopie: demo, network and bench scopes, and CSV files. USB scopes aren't available on Mac yet.
-- Probie: the serial monitor. The USB logic analyser isn't available on Mac yet.
+- Scopie: everything, including USB scopes. PicoScope needs Pico's free PicoSDK installed.
+- Probie: everything, including USB logic analysers.
 - Codie: everything.
-- Meterie: meters with a USB-serial cable, like the HoldPeak HP-90EPC. Meters with a HID USB
-  cable, Bluetooth meters and Camera mode are Windows only for now.
+- Meterie: every kind of meter: USB-serial and HID cables, Bluetooth and Camera mode.
+  The first time you use a Bluetooth meter, macOS asks whether Tinkerie may use Bluetooth.
 Every app has teaching mode: point at anything to see what it does. F2 turns it off.
 
 New in {VERSION}:
-- Tinkerie for Android (5.0 and newer), with USB boards, scopes and analysers
-  over USB OTG. Get Tinkerie-{VERSION}-android.apk from the releases page.
+- Mac and Linux catch up with Windows: Meterie's HID-cable meters, Bluetooth meters
+  and Camera mode on Mac, Linux and Pi; USB scopes, logic analysers and PicoScope
+  on Mac; Camera mode on Android. These are new, so please report what works.
 
 Also in recent alpha builds:
+- 0.13.0-alpha: Tinkerie for Android (5.0 and newer), with USB boards, scopes and
+  analysers over USB OTG.
 - 0.12.x-alpha: Keebie diode layouts, Parts view, movable controller.
 - 0.11.0-alpha: Tracie became Probie, with an Explain tab; Codie is code only.
 - 0.10.0-alpha: Codie explained signals (now Probie's Explain tab).

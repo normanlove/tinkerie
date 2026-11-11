@@ -14,18 +14,21 @@ dialout group:  sudo usermod -aG dialout $USER   then log out and back in.
 What works on this system
 - Launcher, Wirie, Makie, Tunie and Flashie: everything.
 - Scopie: everything, including USB scopes like the Hantek 6022BE. Run ./install-usb.sh once first
-  (it asks for your password), then unplug and replug the scope.
-- Probie: the serial monitor, and USB logic analysers after ./install-usb.sh.
+  (it asks for your password), then unplug and replug the scope. PicoScope isn't supported on Linux yet.
+- Probie: everything, including USB logic analysers after ./install-usb.sh.
 - Codie: everything.
-- Meterie: meters with a USB-serial cable, like the HoldPeak HP-90EPC. Meters with a HID USB
-  cable, Bluetooth meters and Camera mode are Windows only for now.
+- Meterie: every kind of meter: USB-serial and HID cables (after ./install-usb.sh),
+  Bluetooth (through BlueZ) and Camera mode (your webcam).
 Every app has teaching mode: point at anything to see what it does. F2 turns it off.
 
 New in {VERSION}:
-- Tinkerie for Android (5.0 and newer), with USB boards, scopes and analysers
-  over USB OTG. Get Tinkerie-{VERSION}-android.apk from the releases page.
+- Mac and Linux catch up with Windows: Meterie's HID-cable meters, Bluetooth meters
+  and Camera mode on Mac, Linux and Pi; USB scopes, logic analysers and PicoScope
+  on Mac; Camera mode on Android. These are new, so please report what works.
 
 Also in recent alpha builds:
+- 0.13.0-alpha: Tinkerie for Android (5.0 and newer), with USB boards, scopes and
+  analysers over USB OTG.
 - 0.12.x-alpha: Keebie diode layouts, Parts view, movable controller.
 - 0.11.0-alpha: Tracie became Probie, with an Explain tab; Codie is code only.
 - 0.10.0-alpha: Codie explained signals (now Probie's Explain tab).

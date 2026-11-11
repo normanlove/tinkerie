@@ -41,7 +41,7 @@ var docFS embed.FS
 
 const (
 	appName     = "Scopie"
-	appVersion  = "0.9.2-alpha"
+	appVersion  = "0.10.0-alpha"
 	appAuthor   = "nrmluvdev"
 	defaultPort = 47831
 )

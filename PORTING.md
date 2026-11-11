@@ -7,7 +7,7 @@ GOOS=linux  GOARCH=arm64 go build -o tinkerie .      e.g. a Raspberry Pi 5
 GOOS=darwin GOARCH=arm64 go build -o tinkerie .      Apple silicon Macs
 ```
 
-The launcher and most app logic already run everywhere. What's Windows-only is each app's hardware access (serial, USB, Bluetooth, camera) and, for Meterie, its window. Those parts are behind build tags, with stub files for other systems to fill in.
+The launcher and most app logic already run everywhere. Hardware access (serial, USB, HID, Bluetooth, camera) is behind build tags, one file per system. Everything is pure Go except the Mac build, which uses cgo for Apple's IOKit (USB and HID) and CoreBluetooth, so it must be built on a Mac (`./build.sh mac`; GitHub's macOS runner does it for releases). Without cgo the Mac build still compiles, with stubs for those parts.
 
 ## Layout
 
@@ -19,7 +19,8 @@ launcher/            the launcher (local web page in a Chromium "app" window)
   web/               the page and the app icons
 apps/<name>/         one package per app; Main() is the app's old main()
 shared/serialport/   serial ports on Linux, Raspberry Pi and macOS (pure Go, no cgo)
-shared/usb/          raw USB on Linux and Raspberry Pi through usbfs (pure Go, no libusb)
+shared/usb/          raw USB: usbfs on Linux and Pi (pure Go), IOKit on macOS (darwin.go, cgo)
+shared/dbus/         a small D-Bus client (Meterie's Bluetooth meters through BlueZ on Linux)
 shared/appwindow/    opens an app's page as a browser app window on Linux and macOS
 shared/xz, zstd/     .xz and .zst decoders for Flashie's image writer (zstd is Go's own internal/zstd, BSD licence)
 shared/fat, exfat/   FAT16/FAT32 reading, editing and formatting; exFAT formatting (Flashie)
@@ -41,10 +42,10 @@ Each app runs in its own process (`Tinkerie --app NAME`), so apps never share gl
 | **Wirie** | Everything (web UI, opens in Chromium or the default browser) | none |
 | **Makie** | Everything (web UI, geometry engine) | `assoc_windows.go`: "Open with" registration (optional) |
 | **Tunie** | Everything; serial opens `/dev/tty*` directly | none |
-| **Scopie** | Everything on Linux and Pi (`usb_linux.go` uses `shared/usb`); on Mac, demo, network/SCPI scopes and CSV files | USB scopes on Mac (needs IOKit) |
+| **Scopie** | Everything, USB scopes included (`usb_usbfs.go` uses `shared/usb`); PicoScope on Mac through Pico's libraries (`pico_darwin.go`) | PicoScope on Linux (needs cgo to call libps*.so) |
 | **Flashie** | Everything: serial boards, Pico drives (`platform_unix.go`) and image writing (`disks_*.go`) | none |
-| **Probie** | Serial monitor everywhere; logic analyser on Linux and Pi (`usb_linux.go`) | Logic analyser on Mac (`usb_darwin.go` explains) |
-| **Meterie** | Its window (`web_front.go`, see below) and USB-serial meters (`platform_unix.go`) | HID cables (CH9325, CP2110, BU-86X: Linux could use hidraw), Bluetooth LE (Linux: BlueZ over D-Bus), webcam (Linux: V4L2) |
+| **Probie** | Everything; the logic analyser through `usb_usbfs.go` | none |
+| **Meterie** | Everything: its window (`web_front.go`), serial meters (`platform_unix.go`), HID cables (`hid_ports.go` with `hid_linux.go` hidraw / `hid_darwin_iokit.go`), Bluetooth (`ble_linux.go` BlueZ / `ble_darwin.go` CoreBluetooth) and Camera mode (`camera_page.go`: the window's getUserMedia sends JPEG frames) | none |
 
 ### Meterie's window on Linux and macOS
 

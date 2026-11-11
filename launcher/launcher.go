@@ -24,7 +24,7 @@ import (
 )
 
 // Version is the suite version shown in the launcher.
-const Version = "0.13.0-alpha"
+const Version = "0.14.0-alpha"
 
 // App describes one tile in the launcher.
 type App struct {
@@ -43,24 +43,19 @@ var Apps = []App{
 	{"makie", "Makie", "3D-printing part designer. Builds cases for Wirie boards and keyboards", "0.11.0-alpha", "makie.png", "", false},
 	{"tunie", "Tunie", "3D printer tuning and calibration", "0.5.0-alpha", "tunie.png", "", false},
 	{"flashie", "Flashie", "Firmware flasher for ESP32, Pico, Arduino and STM32, keyboard firmware maker, and SD card / USB image writer", "0.8.0-alpha", "flashie.svg", "", false},
-	{"scopie", "Scopie", "Oscilloscope: Hantek 6022, network scopes and more", "0.9.1-alpha", "scopie.png", "", false},
-	{"meterie", "Meterie", "PC multimeter: HoldPeak, UNI-T, OWON, Brymen, Fluke…", "0.6.1-alpha", "meterie.png", "", false},
-	{"probie", "Probie", "Serial monitor and logic analyser that explains captures in plain words: its own, and Scopie's and Meterie's", "0.6.0-alpha", "probie.svg", "", false},
+	{"scopie", "Scopie", "Oscilloscope: Hantek 6022, network scopes and more", "0.10.0-alpha", "scopie.png", "", false},
+	{"meterie", "Meterie", "PC multimeter: HoldPeak, UNI-T, OWON, Brymen, Fluke…", "0.7.0-alpha", "meterie.png", "", false},
+	{"probie", "Probie", "Serial monitor and logic analyser that explains captures in plain words: its own, and Scopie's and Meterie's", "0.7.0-alpha", "probie.svg", "", false},
 	{"codie", "Codie", "Code explainer: what each line of code does and why", "0.3.0-alpha", "codie.svg", "", false},
 }
 
 // What each app can't do yet on this system (see PORTING.md).
 var limits = map[string]map[string]string{
-	"darwin": {
-		"scopie":  "USB scopes: not on Mac yet",
-		"probie":  "Logic analyser: not on Mac yet",
-		"meterie": "USB-serial meters only on Mac",
-	},
 	"linux": {
-		"meterie": "USB-serial meters only on Linux",
+		"scopie": "PicoScope: not on Linux yet",
 	},
 	"android": {
-		"meterie": "USB-serial meters only on Android",
+		"meterie": "USB-serial meters and Camera mode on Android",
 		"flashie": "Compiling Arduino code needs a computer",
 	},
 }
