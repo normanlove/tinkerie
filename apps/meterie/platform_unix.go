@@ -8,7 +8,6 @@ package meterie
 // (osascript on macOS, zenity or kdialog on Linux).
 
 import (
-	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -21,9 +20,6 @@ import (
 	"tinkerie/shared/serialport"
 )
 
-var (
-	errBLEOnly = errors.New("Bluetooth meters work on Windows only for now")
-)
 
 type unixSerial struct{ p *serialport.Port }
 
@@ -41,15 +37,6 @@ func platformOpenSerial(path string, cfg SerialCfg) (Port, error) {
 	}
 	return unixSerial{p}, nil
 }
-
-func platformOpenBLE(addr uint64, svc, chr string) (Port, error) { return nil, errBLEOnly }
-func platformBLEScan(on bool) error {
-	if on {
-		return errBLEOnly
-	}
-	return nil
-}
-func platformBLEResults() []PortInfo { return previewBLE }
 
 func platformListPorts() []PortInfo {
 	if previewPorts != nil { // the preview renderer's pretend ports

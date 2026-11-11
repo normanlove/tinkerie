@@ -13,6 +13,8 @@
 	<key>LSMinimumSystemVersion</key><string>11.0</string>
 	<!-- Tinkerie's windows are browser app windows, so it needs no Dock icon of its own. -->
 	<key>LSUIElement</key><true/>
+	<!-- macOS asks the person before an app may use Bluetooth (Meterie's Bluetooth meters). -->
+	<key>NSBluetoothAlwaysUsageDescription</key><string>Meterie reads Bluetooth multimeters.</string>
 	<key>NSHumanReadableCopyright</key><string>Designed and created by nrmluvdev</string>
 </dict>
 </plist>
