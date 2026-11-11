@@ -136,11 +136,13 @@ func NewApp() *App {
 func (a *App) applyAccent() {
 	i := clampi(a.settings.Accent, 0, len(accentChoices)-1)
 	th.Accent, th.AccentHi = accentChoices[i].acc, accentChoices[i].hi
-	switch a.settings.Theme {
-	case 1: // darker accents, so they read on white
-		th.Accent, th.AccentHi = th.Accent.Darken(0.38), th.Accent.Darken(0.22)
-	case 2:
+	switch {
+	case a.settings.Theme == 2:
 		th.Accent, th.AccentHi = hexColor(0xFFD400), hexColor(0xFFE866)
+	case a.settings.Theme >= 0 && a.settings.Theme < len(themes) && themes[a.settings.Theme].base == "contrastl":
+		th.Accent, th.AccentHi = hexColor(0x0033CC), hexColor(0x1F4FE0)
+	case themeIsLight(a.settings.Theme): // darker accents, so they read on white
+		th.Accent, th.AccentHi = th.Accent.Darken(0.38), th.Accent.Darken(0.22)
 	}
 }
 

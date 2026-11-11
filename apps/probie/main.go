@@ -34,7 +34,7 @@ var webFS embed.FS
 
 const (
 	appName     = "Probie"
-	appVersion  = "0.8.0-alpha"
+	appVersion  = "0.8.1-alpha"
 	appAuthor   = "nrmluvdev"
 	defaultPort = 47822 // Tinkerie ports: see PORTING.md
 )

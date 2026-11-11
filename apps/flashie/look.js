@@ -2,7 +2,9 @@
 // (each app has its own copy of this file; keep them identical to shared/look.js).
 // Created by nrmluvdev.
 //
-//   Themes: Dark (each app's own look), Light, High contrast and Colour-blind safe.
+//   Themes: Dark (each app's own look), nine more dark themes, seven light ones,
+//   high contrast (dark and light) and colour-blind safe (dark and light), plus a
+//   choice of accent colour that replaces the app's main colour.
 //     The app's own stylesheets are re-coloured on the fly: every colour in them
 //     is mapped by what it's used for (background, text, border), so new screens
 //     pick the theme up without extra work.
@@ -16,6 +18,8 @@
 // <html data-look-touch="mouse"> turns finger gestures on drawing areas into the
 // mouse events the app already understands ("pointer" when it handles touch itself;
 // an element can say data-look-touch="pointer" for itself too).
+// <html data-look-accent="--name"> names the custom property holding the app's main
+// colour, for the accent swap (otherwise --accent, --acc or --primary).
 // <html data-look-button="off"> leaves the button out (for an app that draws its
 // own settings, like Meterie); the touch gestures still work.
 // Settings are remembered per app. Ctrl+, opens the panel.
@@ -23,7 +27,7 @@
   "use strict";
   const H = document.documentElement;
   const KEY = "tinkerie.look";
-  const DEF = { theme: "dark", size: 100, touch: "auto", motion: "auto", focus: false, readable: false, underline: false };
+  const DEF = { theme: "dark", accent: "app", size: 100, touch: "auto", motion: "auto", focus: false, readable: false, underline: false };
   let L = Object.assign({}, DEF);
   try { Object.assign(L, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) {}
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(L)); } catch (e) {} };
@@ -79,39 +83,84 @@
     return "auto";
   }
 
+  // the themes. base: built on the app's dark look, or turned light; h/s: the tint
+  // given to backgrounds, borders and text (hue in degrees, saturation 0-1)
+  const THEMES = [
+    { id: "dark", name: "Dark", grp: "Dark", base: "dark", sw: ["#11151c", "#3cc8f0"] },
+    { id: "midnight", name: "Midnight", grp: "Dark", base: "dark", h: 225, s: 0.42, sw: ["#0d1330", "#6d8cff"] },
+    { id: "ocean", name: "Ocean", grp: "Dark", base: "dark", h: 198, s: 0.5, sw: ["#071c26", "#2fc4e8"] },
+    { id: "forest", name: "Forest", grp: "Dark", base: "dark", h: 145, s: 0.32, sw: ["#0b1d14", "#46d68c"] },
+    { id: "plum", name: "Plum", grp: "Dark", base: "dark", h: 285, s: 0.3, sw: ["#1a1023", "#c48cff"] },
+    { id: "ember", name: "Ember", grp: "Dark", base: "dark", h: 12, s: 0.32, sw: ["#211210", "#ff8a5c"] },
+    { id: "mocha", name: "Mocha", grp: "Dark", base: "dark", h: 30, s: 0.22, sw: ["#1d1712", "#e0a86a"] },
+    { id: "slate", name: "Slate", grp: "Dark", base: "dark", h: 210, s: 0.16, sw: ["#161b21", "#8fb3d9"] },
+    { id: "graphite", name: "Graphite", grp: "Dark", base: "dark", h: 0, s: 0, sw: ["#161616", "#bdbdbd"] },
+    { id: "black", name: "True black", grp: "Dark", base: "black", sw: ["#000000", "#3cc8f0"] },
+    { id: "light", name: "Light", grp: "Light", base: "light", sw: ["#f3f5f8", "#0a6f99"] },
+    { id: "paper", name: "Paper", grp: "Light", base: "light", h: 45, s: 0.12, sw: ["#f7f5ef", "#556070"] },
+    { id: "sepia", name: "Sepia", grp: "Light", base: "light", h: 36, s: 0.45, sw: ["#f4ead6", "#9a5b16"] },
+    { id: "sky", name: "Sky", grp: "Light", base: "light", h: 205, s: 0.55, sw: ["#e9f3fb", "#1d6fb8"] },
+    { id: "mint", name: "Mint", grp: "Light", base: "light", h: 155, s: 0.4, sw: ["#e8f6ef", "#16805a"] },
+    { id: "rose", name: "Rose", grp: "Light", base: "light", h: 340, s: 0.45, sw: ["#fbecf1", "#b0305f"] },
+    { id: "lavender", name: "Lavender", grp: "Light", base: "light", h: 265, s: 0.4, sw: ["#f1edfb", "#6a46c4"] },
+    { id: "contrast", name: "High contrast", grp: "Accessibility", base: "contrast", sw: ["#000000", "#ffd400"] },
+    { id: "contrastl", name: "High contrast light", grp: "Accessibility", base: "contrastl", sw: ["#ffffff", "#0033cc"] },
+    { id: "cvd", name: "Colour-blind safe", grp: "Accessibility", base: "dark", cvd: true, sw: ["#0072b2", "#e69f00"] },
+    { id: "cvdl", name: "Colour-blind safe light", grp: "Accessibility", base: "light", cvd: true, sw: ["#e8eef5", "#e69f00"] },
+  ];
+  // the app's main accent colour can be swapped for one of these
+  const ACCENTS = [["app", "The app's own", null], ["blue", "Blue", 215], ["cyan", "Cyan", 190], ["teal", "Teal", 168], ["green", "Green", 140], ["lime", "Lime", 88], ["amber", "Amber", 40], ["orange", "Orange", 24], ["red", "Red", 355], ["pink", "Pink", 330], ["purple", "Purple", 272], ["indigo", "Indigo", 240]];
+  let appAccentHue = null; // worked out from the app's stylesheets
+  const hueDist = (a, b) => { const d = Math.abs(a - b) % 360; return Math.min(d, 360 - d); };
+
   // map one colour for a theme
   function mapColor([r, g, b, a], role, theme) {
+    const T = THEMES.find(t => t.id === theme) || THEMES[0];
     let [h, s, l] = rgb2hsl(r, g, b);
-    const neutral = s < 0.28 || l < 0.1 || l > 0.94, deg = h * 360;
+    const neutral = s < 0.28 || l < 0.1 || l > 0.94;
     if (role === "auto") role = neutral ? (l < 0.4 ? "bg" : "text") : "accent";
-    if (theme === "light") {
+    const surface = neutral || (role === "bg" && l < 0.22 && T.base !== "dark");
+    // a different accent: colours close to the app's own accent take the new hue
+    const acc = ACCENTS.find(x => x[0] === L.accent);
+    if (!neutral && acc && acc[2] != null && appAccentHue != null && hueDist(h * 360, appAccentHue) < 32) { h = acc[2] / 360; s = Math.max(s, 0.55); }
+    if (T.base === "light") {
       if (role === "shadow") return fmt(r, g, b, a * 0.35);
       if (neutral && a < 0.6 && (l > 0.85 || l < 0.12)) { const v = 255 - (r + g + b) / 3; return fmt(v, v, v, a); } // see-through overlays flip
-      if (neutral || (role === "bg" && l < 0.22)) {
+      if (surface) {
         if (role === "bg") l = clamp(0.94 + (l - 0.04) * 0.45, 0.9, 1);
         else if (role === "line") l = clamp(0.95 - l * 0.5, 0.62, 0.9);
-        else l = clamp(1 - l * 1.03, 0.06, 0.58);
+        else l = l < 0.25 ? 0.98 : clamp(1 - l * 1.03, 0.06, 0.58); // dark text sat on a bright button: keep it readable on the darker one
         s = Math.min(s, 0.25);
       } else if (role !== "bg" || a > 0.5) l = Math.min(l, 0.44); // accents dark enough to read on white
-    } else if (theme === "contrast") {
+    } else if (T.base === "black") {
+      if (surface && role === "bg") { l = l < 0.16 ? l * 0.15 : l * 0.8; s = 0; }
+      else if (surface && role === "line") l = l * 0.85;
+    } else if (T.base === "contrast" || T.base === "contrastl") {
+      const dark = T.base === "contrast";
       if (role === "shadow") return fmt(0, 0, 0, 0);
-      if (neutral && a < 0.6) return fmt(r, g, b, Math.min(1, a * 2.2));
-      if (neutral || (role === "bg" && l < 0.22)) {
+      if (neutral && a < 0.6) return dark ? fmt(r, g, b, Math.min(1, a * 2.2)) : fmt(255 - r, 255 - g, 255 - b, Math.min(1, a * 2.2));
+      if (surface || (role === "bg" && l < 0.22)) {
         s = 0;
-        if (role === "bg") l = l < 0.2 ? 0 : l < 0.5 ? 0.1 : 1;
-        else if (role === "line") { l = 0.8; a = 1; }
-        else l = l > 0.3 ? 1 : 0.8;
-      } else { s = 1; l = clamp(l, 0.55, 0.68); }
-    } else if (theme === "cvd") {
-      // colour-blind safe (red/green): greens become blue, reds become orange (Okabe-Ito-like)
-      if (!neutral) {
-        if (deg >= 70 && deg < 175) { h = 205 / 360; s = Math.max(s, 0.6); }
-        else if (deg >= 330 || deg < 18) { h = 30 / 360; l = clamp(l, 0.45, 0.62); }
-      }
+        if (role === "bg") l = dark ? (l < 0.2 ? 0 : l < 0.5 ? 0.1 : 1) : (l < 0.2 ? 1 : l < 0.5 ? 0.9 : 0);
+        else if (role === "line") { l = dark ? 0.8 : 0.15; a = 1; }
+        else l = dark ? (l > 0.3 ? 1 : 0) : (l > 0.3 ? 0 : 1); // dark text was on a bright button
+      } else { s = 1; l = dark ? clamp(l, 0.55, 0.68) : clamp(l, 0.22, 0.34); }
+    }
+    // the theme's tint on backgrounds, borders and text
+    if (T.h != null && surface && role !== "shadow") {
+      h = T.h / 360; s = T.s * (role === "bg" ? 1 : role === "line" ? 0.75 : 0.3);
+      if (T.base === "dark" && role === "bg" && T.s > 0) l = Math.min(0.4, l * 1.2 + 0.015); // a touch lighter, so the tint shows
+    }
+    // colour-blind safe (red/green): greens become blue, reds become orange (Okabe-Ito-like)
+    if (T.cvd && !neutral) {
+      const deg = h * 360;
+      if (deg >= 70 && deg < 175) { h = 205 / 360; s = Math.max(s, 0.6); }
+      else if (deg >= 330 || deg < 18) { h = 30 / 360; l = clamp(l, T.base === "light" ? 0.38 : 0.45, 0.62); }
     }
     const [R, G, B] = hsl2rgb(h, s, l);
     return fmt(R, G, B, a);
   }
+  const isLight = () => { const T = THEMES.find(t => t.id === L.theme); return !!T && (T.base === "light" || T.base === "contrastl"); };
   const mapValue = (v, role, theme) => v.replace(COLOR_RE, t => { const c = parse(t); return c ? mapColor(c, role, theme) : t; });
 
   // every colour declaration in the app's stylesheets, with its original value
@@ -133,20 +182,39 @@
     }
   }
   function scan() { for (const sh of document.styleSheets) { try { if (sh.ownerNode && sh.ownerNode.id === "lkStyle") continue; scanRules(sh.cssRules); } catch (e) { /* another origin */ } } }
+  // the app's main accent: the most-used colourful hue among its accent-like custom properties
+  function findAccent() {
+    if (appAccentHue != null) return;
+    const hueOf = v => { for (const t of v.match(COLOR_RE) || []) { const c = parse(t); if (!c) continue; const [h, s, l] = rgb2hsl(c[0], c[1], c[2]); if (s >= 0.4 && l >= 0.25 && l <= 0.85) return Math.round(h * 360); } return null; };
+    // a custom property named for it says it best
+    for (const n of [H.dataset.lookAccent, "--accent", "--acc", "--primary", "--accent-color", "--brand-accent", "--cy", "--or"]) {
+      const d = decls.find(d => d.p === n); const h = d && hueOf(d.v); if (h != null) { appAccentHue = h; return; }
+    }
+    const votes = new Map();
+    for (const d of decls) {
+      const named = /^--(acc|accent|primary|brand|cy|main|hi|blue|or|orange)\b/.test(d.p) ? 3 : d.p.startsWith("--") ? 0 : 1;
+      if (!named) continue;
+      for (const t of d.v.match(COLOR_RE) || []) { const c = parse(t); if (!c) continue; const [h, s, l] = rgb2hsl(c[0], c[1], c[2]); if (s < 0.4 || l < 0.25 || l > 0.85) continue; const k = Math.round(h * 36) * 10; votes.set(k, (votes.get(k) || 0) + named); }
+    }
+    let best = null, n = 0; for (const [k, v] of votes) if (v > n) { n = v; best = k; }
+    appAccentHue = best;
+  }
   function applyTheme() {
-    scan();
-    for (const d of decls) d.st.setProperty(d.p, L.theme === "dark" ? d.v : mapValue(d.v, d.role, L.theme), d.pr);
-    H.style.colorScheme = L.theme === "light" ? "light" : "dark";
+    scan(); findAccent();
+    const plain = L.theme === "dark" && (L.accent || "app") === "app";
+    for (const d of decls) d.st.setProperty(d.p, plain ? d.v : mapValue(d.v, d.role, L.theme), d.pr);
+    H.style.colorScheme = isLight() ? "light" : "dark";
   }
 
   // ------------------------------------------------------------ the rest
   const css = `
   :root { --lk-bg: #151a23; --lk-fg: #e8edf5; --lk-dim: #9aa6b8; --lk-line: #2c3545; --lk-acc: #3cc8f0; --lk-acc-fg: #04131a; }
-  html[data-look-theme=light] { --lk-bg: #ffffff; --lk-fg: #12161d; --lk-dim: #586273; --lk-line: #d5dbe4; --lk-acc: #0a6f99; --lk-acc-fg: #fff; }
+  html.lk-light { --lk-bg: #ffffff; --lk-fg: #12161d; --lk-dim: #586273; --lk-line: #d5dbe4; --lk-acc: #0a6f99; --lk-acc-fg: #fff; }
   html[data-look-theme=contrast] { --lk-bg: #000; --lk-fg: #fff; --lk-dim: #fff; --lk-line: #fff; --lk-acc: #ffd400; --lk-acc-fg: #000; }
+  html[data-look-theme=contrastl] { --lk-bg: #fff; --lk-fg: #000; --lk-dim: #000; --lk-line: #000; --lk-acc: #0033cc; --lk-acc-fg: #fff; }
   :focus-visible { outline: 2px solid var(--lk-acc); outline-offset: 2px; }
-  html.lk-focus :focus-visible, html[data-look-theme=contrast] :focus-visible { outline: 3px solid #ffbf00 !important; outline-offset: 2px !important; box-shadow: 0 0 0 6px rgba(0,0,0,.85) !important; }
-  html[data-look-theme=contrast] button, html[data-look-theme=contrast] select, html[data-look-theme=contrast] input { border-width: 1.5px; }
+  html.lk-focus :focus-visible, html[data-look-theme^=contrast] :focus-visible { outline: 3px solid #ffbf00 !important; outline-offset: 2px !important; box-shadow: 0 0 0 6px rgba(0,0,0,.85) !important; }
+  html[data-look-theme^=contrast] button, html[data-look-theme^=contrast] select, html[data-look-theme^=contrast] input { border-width: 1.5px; }
   html.lk-readable body, html.lk-readable button, html.lk-readable input, html.lk-readable select, html.lk-readable textarea { font-family: Verdana, "DejaVu Sans", "Segoe UI", system-ui, sans-serif !important; letter-spacing: .02em; word-spacing: .06em; }
   html.lk-readable p, html.lk-readable li, html.lk-readable small { line-height: 1.6 !important; }
   html.lk-underline a { text-decoration: underline !important; }
@@ -162,7 +230,7 @@
   #lkBtn.lk-float { position: fixed; left: 10px; bottom: 34px; z-index: 99990; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
   #lkBtn svg { width: 16px; height: 16px; } #lkBtn:not(.lk-float) .lk-btnt { display: none; } #lkBtn:not(.lk-float) { padding: 6px; }
   #lkPanel { position: fixed; inset: 0; z-index: 2147483600; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.45); font: 14px/1.4 system-ui, "Segoe UI", sans-serif; }
-  #lkPanel .lk-card { background: var(--lk-bg); color: var(--lk-fg); border: 1px solid var(--lk-line); border-radius: 14px; width: min(460px, calc(100vw - 24px)); max-height: calc(100vh - 24px); overflow: auto; padding: 18px 18px 14px; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+  #lkPanel .lk-card { background: var(--lk-bg); color: var(--lk-fg); border: 1px solid var(--lk-line); border-radius: 14px; width: min(560px, calc(100vw - 24px)); max-height: calc(100vh - 24px); overflow: auto; padding: 18px 18px 14px; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
   #lkPanel h2 { margin: 0 0 2px; font-size: 18px; } #lkPanel .lk-sub { color: var(--lk-dim); margin: 0 0 12px; font-size: 13px; }
   #lkPanel h3 { margin: 14px 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--lk-dim); }
   #lkPanel .lk-seg { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -177,7 +245,7 @@
   (document.head || H).appendChild(style);
 
   function apply() {
-    H.dataset.lookTheme = L.theme;
+    H.dataset.lookTheme = L.theme; H.classList.toggle("lk-light", isLight());
     H.classList.toggle("lk-touch", L.touch === "on" || (L.touch === "auto" && coarse()));
     H.classList.toggle("lk-still", L.motion === "on" || (L.motion === "auto" && matchMedia("(prefers-reduced-motion: reduce)").matches));
     H.classList.toggle("lk-focus", !!L.focus);
@@ -191,14 +259,15 @@
 
   // ------------------------------------------------------------ the panel
   const ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></svg>`;
-  const THEMES = [["dark", "Dark", "#11151c"], ["light", "Light", "#f3f5f8"], ["contrast", "High contrast", "#000"], ["cvd", "Colour-blind safe", "linear-gradient(135deg,#0072b2 50%,#e69f00 50%)"]];
   const seg = (k, opts) => `<div class="lk-seg" role="group">${opts.map(([v, t, sw]) => `<button type="button" data-k="${k}" data-v="${v}" aria-pressed="${String(L[k]) === String(v)}">${sw ? `<span class="lk-th"><span class="lk-sw" style="background:${sw}"></span>${t}</span>` : t}</button>`).join("")}</div>`;
   const chk = (k, t, sub) => `<label class="lk-chk"><input type="checkbox" data-c="${k}" ${L[k] ? "checked" : ""}><span>${t}<small>${sub}</small></span></label>`;
   let panel = null, opener = null;
   function render() {
     panel.innerHTML = `<div class="lk-card" role="dialog" aria-modal="true" aria-labelledby="lkT">
       <h2 id="lkT">Look &amp; accessibility</h2><p class="lk-sub">Saved for this app. Ctrl+, opens this panel.</p>
-      <h3>Theme</h3>${seg("theme", THEMES)}
+      ${["Dark", "Light", "Accessibility"].map(g => `<h3>${g === "Accessibility" ? "Easier to see" : g + " themes"}</h3>${seg("theme", THEMES.filter(t => t.grp === g).map(t => [t.id, t.name, `linear-gradient(135deg,${t.sw[0]} 55%,${t.sw[1]} 55%)`]))}`).join("")}
+      <h3>Accent colour</h3>${seg("accent", ACCENTS.map(([id, n, hue]) => [id, n, hue == null ? "conic-gradient(#3cc8f0,#ff8a3c,#9b6cff,#3cc8f0)" : `hsl(${hue} 75% 52%)`]))}
+      <p class="lk-sub" style="margin:6px 0 0">Swaps the app's main colour (buttons, highlights) and keeps warning and status colours as they are.</p>
       <h3>Text and controls size</h3>${seg("size", [[90, "90%"], [100, "100%"], [115, "115%"], [130, "130%"], [150, "150%"]])}
       <h3>Touch-friendly controls</h3>${seg("touch", [["auto", "Automatic"], ["on", "On"], ["off", "Off"]])}
       <p class="lk-sub" style="margin:6px 0 0">Bigger buttons, and on drawing areas: drag with a finger, press and hold for the right-click menu, pinch to zoom, two fingers to pan.</p>
@@ -329,5 +398,5 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
   addEventListener("load", () => { if (L.theme !== "dark") applyTheme(); }); // stylesheets that arrived late
 
-  window.tinkerieLook = { get: () => Object.assign({}, L), open, onChange: f => listeners.push(f), mapColor: (c, role) => { const p = parse(c); return p && L.theme !== "dark" ? mapColor(p, role || "auto", L.theme) : c; } };
+  window.tinkerieLook = { get: () => Object.assign({}, L), isLight, open, accentHue: () => appAccentHue, onChange: f => listeners.push(f), mapColor: (c, role) => { const p = parse(c); return p && L.theme !== "dark" ? mapColor(p, role || "auto", L.theme) : c; } };
 })();

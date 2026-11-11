@@ -22,7 +22,7 @@
 
   const tips = new Map();
   // tips every app shares (the Look & accessibility button comes from look.js)
-  tips.set(norm("Look & accessibility"), ["Look & accessibility", "Themes (Dark, Light, High contrast, Colour-blind safe), text and control size, touch-friendly controls, reduced motion, a stronger focus outline, easier-to-read text and underlined links. Saved for this app. Ctrl+, opens it too."]);
+  tips.set(norm("Look & accessibility"), ["Look & accessibility", "21 colour themes (dark, light, high contrast and colour-blind safe) and a choice of accent colour, text and control size, touch-friendly controls, reduced motion, a stronger focus outline, easier-to-read text and underlined links. Saved for this app. Ctrl+, opens it too."]);
   for (const [k, v] of Object.entries(T.tips || {})) {
     for (const key of k.split("|")) tips.set(norm(key), Array.isArray(v) ? v : [key.trim(), v]);
   }

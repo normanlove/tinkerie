@@ -12,12 +12,12 @@ Everything, in every app. Every app has teaching mode: point at anything to see 
 F2 turns it off.
 
 New in {VERSION}:
-- Look & accessibility in every app (the Look button, or Ctrl+,): Dark, Light,
-  High contrast and Colour-blind safe themes, bigger text and controls,
-  touch-friendly controls (drag, hold for the menu, pinch to zoom), reduced
-  motion, a stronger focus outline and easier-to-read text.
+- 21 colour themes in every app (ten dark, seven light, high contrast and
+  colour-blind safe in dark and light), and a choice of accent colour.
 
 Also in recent alpha builds:
+- 0.18.0-alpha: Look & accessibility in every app (Ctrl+,): text size,
+  touch-friendly controls, reduced motion, focus outline, easier-to-read text.
 - 0.17.0-alpha: Keebie screens (OLEDs, LCD, nice!view, colour TFTs), and parts
   placed on their own.
 - 0.16.0-alpha: Keebie part spacing, diode patterns, through-hole parts, status

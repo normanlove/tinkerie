@@ -1,7 +1,7 @@
 // Wirie core: project model, geometry, nets & connectivity — by nrmluvdev
 "use strict";
 
-const APP = { name: "Wirie", version: "0.15.0-alpha", author: "nrmluvdev" };
+const APP = { name: "Wirie", version: "0.15.1-alpha", author: "nrmluvdev" };
 
 function newProject() {
   return {

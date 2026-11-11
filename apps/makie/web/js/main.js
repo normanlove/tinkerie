@@ -618,7 +618,7 @@ function settingsDialog() {
 }
 
 // the suite's Look & accessibility panel: its Light theme switches Makie's own light theme too
-if (window.tinkerieLook) tinkerieLook.onChange(l => { const want = l.theme === 'light' ? 'light' : 'dark'; if (S.settings && S.settings.theme !== want && (want === 'light' || S.settings.lookSet)) { S.settings.theme = want; S.settings.lookSet = want === 'light'; applyTheme(); } });
+if (window.tinkerieLook) tinkerieLook.onChange(l => { const want = tinkerieLook.isLight() ? 'light' : 'dark'; if (S.settings && S.settings.theme !== want && (want === 'light' || S.settings.lookSet)) { S.settings.theme = want; S.settings.lookSet = want === 'light'; applyTheme(); } });
 function applyTheme() { document.body.classList.toggle('dark', S.settings.theme !== 'light'); document.body.classList.toggle('light', S.settings.theme === 'light'); vp.requestRender(); }
 // ---------- printer / build plate ----------
 function findPrinterBySize(b) {

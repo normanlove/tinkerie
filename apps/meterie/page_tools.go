@@ -659,7 +659,7 @@ func (a *App) pageSettings(r Rect) {
 	u.T.Draw("Theme", in.X, y, u.FB(12), th.Sub)
 	y += u.Px(22)
 	ti := a.settings.Theme
-	if u.Segmented("set#theme", Rect{in.X, y, min(in.W, u.Px(520)), u.Px(32)}, themeNames, &ti) {
+	if u.Dropdown("set#theme", Rect{in.X, y, min(in.W, u.Px(320)), u.Px(32)}, themeNamesList(), &ti) {
 		a.settings.Theme = ti
 		a.applyTheme()
 		a.saveSettings()
