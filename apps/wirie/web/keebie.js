@@ -455,18 +455,24 @@ function kbGeom(force) {
       const key = L.group + ":" + h, lo = (K.sepOff || {})[key] || {};
       loose.push({ group: L.group, key, parts: L.parts, area: kbArea(x + (lo.x || 0), y + (lo.y || 0), L.W, L.H, lo.rot || 0) });
     }
-    let polys;
+    // standoffs: never under a keycap; ones beside the keys get a little ear of board
     const custom = K.outline.mode === "custom" && K.outline.custom && K.outline.custom[h];
+    const holes = Array.isArray(K.so) ? K.so.filter(q => q[0] === h).map(q => [q[1], q[2]])
+      : KV.drag ? (KV.geom?.boards?.[h]?.holes || []) : custom ? null : kbStandoffSpots(K, G, ps, area, loose, bank);
+    const ears = (holes || []).map(([x, y]) => kbCirclePoly(x, y, kbStandoff(K).od / 2 + 1.6));
+    let polys;
     if (custom) polys = [custom.map(p => p.slice())];
     else if (K.outline.mode === "rect") {
       let x0 = Math.min(bx0, area.bb[0]), x1 = Math.max(bx1, area.bb[2]), y0 = Math.min(by0, area.bb[1]), y1 = area.bb[3];
       for (const p of ps) for (const [, y] of kbCorners(p, sx, sy)) y1 = Math.max(y1, y);
       if (bank) { x0 = Math.min(x0, bank.x0); x1 = Math.max(x1, bank.x1); y0 = Math.min(y0, bank.y0); y1 = Math.max(y1, bank.y1); }
       for (const L of loose) { x0 = Math.min(x0, L.area.bb[0]); x1 = Math.max(x1, L.area.bb[2]); y0 = Math.min(y0, L.area.bb[1]); y1 = Math.max(y1, L.area.bb[3]); }
+      for (const e of ears) for (const [x, y] of e) { x0 = Math.min(x0, x + m); x1 = Math.max(x1, x - m); y0 = Math.min(y0, y + m); y1 = Math.max(y1, y - m); }
       polys = [kbRectPoly(x0 - m, y0 - m, x1 + m, y1 + m, K.outline.radius)];
     } else {
       const shapes = ps.map(p => p.k.shape === "iso" ? kbISOPoly(p, sx, sy, m) : kbCorners(p, sx, sy, m));
       shapes.push(areaPoly(m));
+      shapes.push(...ears);
       // each separate block, with a bridge to the nearest key or the controller so the board stays one piece
       for (const L of loose) {
         shapes.push(L.area.poly(m));
@@ -486,9 +492,10 @@ function kbGeom(force) {
       }
       polys = kbHug(shapes, K.outline.radius);
     }
-    G.boards.push({ half: h, places: ps, plan, area, loose, bank, polys, holes: [] });
+    G.boards.push({ half: h, places: ps, plan, area, loose, bank, polys, holes: holes || [] });
   }
-  for (const b of G.boards) if (b) b.holes = Array.isArray(K.so) ? K.so.filter(h => h[0] === b.half).map(h => [h[1], h[2]]) : KV.drag ? (KV.geom?.boards?.[b.half]?.holes || []) : kbHoles(K, G, b);
+  // a drawn outline can't grow ears: standoffs go inside it, still clear of the keys
+  for (const b of G.boards) if (b && !Array.isArray(K.so) && K.outline.mode === "custom" && K.outline.custom && K.outline.custom[b.half] && !KV.drag) b.holes = kbHoles(K, G, b);
   KV.geom = G; KV.geomKey = key;
   return G;
 }
@@ -608,6 +615,52 @@ function kbSpotsFor(K, G, p) {
   if (led && K.ledCap) for (const fp of ["c_disc_2.54", "c_0805"]) { for (const [x, y, rot] of [[4.6, 5.05, 90], [-4.6, 5.05, 90], [0, 7.6, 0], [0, 2.7, 0], [5.8, 5.05, 90], [-5.8, 5.05, 90]]) if (clear(shape(fp, x, y, rot))) { cap = { x, y, rot, fp }; break; } if (cap) break; }
   return { dio, led, cap };
 }
+// would a standoff (and its screw head) at x, y sit under a keycap? Keycaps are
+// about half a millimetre smaller than the key spacing on each side.
+function kbUnderKey(K, G, places, x, y, extra = 0) {
+  const r = kbStandoff(K).od / 2 + 0.3 + extra;
+  for (const p of places) {
+    const dx = x - p.cx, dy = y - p.cy, R0 = (Math.max(p.w * G.sx, p.h * G.sy) / 2) + r + 1;
+    if (dx * dx + dy * dy > R0 * R0) continue;
+    const [lx, ly] = rotPt(dx, dy, -p.ang);
+    const ext = p.k.shape === "iso" ? 0.25 * G.sx : 0; // ISO enter: the wider top half
+    const hw = p.w * G.sx / 2 - 0.45, hh = p.h * G.sy / 2 - 0.45, cx = ext / 2; // (ISO: its wider top, roughly)
+    if (Math.hypot(Math.max(0, Math.abs(lx + cx) - hw - cx), Math.max(0, Math.abs(ly) - hh)) < r) return true; // the round screw head against the keycap
+  }
+  return false;
+}
+function kbCirclePoly(x, y, r) { const o = []; for (let i = 0; i < 20; i++) { const a = i / 20 * Math.PI * 2; o.push([x + Math.cos(a) * r, y + Math.sin(a) * r]); } return o; }
+// Standoffs placed for you: never under a key. The best spots are gaps between
+// keys (no extra board needed); otherwise just outside the keys, where the
+// outline grows a small ear to hold them. Spread from the corners outwards.
+function kbStandoffSpots(K, G, ps, area, loose, bank) {
+  const n = K.holes | 0; if (!n || !ps.length) return [];
+  const so = kbStandoff(K), r = so.od / 2;
+  const feats = []; for (const p of ps) feats.push(...kbKeyFeatures(K, G, p));
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  for (const p of ps) for (const [x, y] of kbCorners(p, G.sx, G.sy)) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
+  const blocks = [area, ...(loose || []).map(L => L.area)].filter(Boolean);
+  const inBlock = (x, y, g) => blocks.some(A => x > A.bb[0] - g && x < A.bb[2] + g && y > A.bb[1] - g && y < A.bb[3] + g)
+    || (bank && x > bank.x0 - g && x < bank.x1 + g && y > bank.y0 - g && y < bank.y1 + g);
+  // how far a spot is from the nearest keycap (0 when under one)
+  const keyGap = (x, y) => { let d = 1e9; for (const p of ps) { const [lx, ly] = rotPt(x - p.cx, y - p.cy, -p.ang); const hw = p.w * G.sx / 2 - 0.45, hh = p.h * G.sy / 2 - 0.45; d = Math.min(d, Math.hypot(Math.max(0, Math.abs(lx) - hw), Math.max(0, Math.abs(ly) - hh))); } return d; };
+  const inner = [], outer = [];
+  for (let y = y0 - 6; y <= y1 + 6; y += 1.2) for (let x = x0 - 6; x <= x1 + 6; x += 1.2) {
+    if (inBlock(x, y, r + 2)) continue;
+    const g = keyGap(x, y); if (g < r + 0.3 || g > r + 2.2) continue; // clear of keycaps, but close to the keys
+    if (feats.some(f => Math.hypot(x - f[0], y - f[1]) < r + 0.8 + f[2])) continue;
+    // a gap between keys: keys on opposite sides of it
+    const around = [0, 90, 180, 270].filter(a => { const [dx, dy] = rotPt(0, -1, a); for (let t = 3; t < 14; t += 1.5) if (kbUnderKey(K, G, ps, x + dx * t, y + dy * t, -r)) return true; return false; }).length;
+    (around >= 3 ? inner : outer).push([x, y]);
+  }
+  const chosen = [], far = (p, lim) => chosen.every(q => Math.hypot(q[0] - p[0], q[1] - p[1]) > lim);
+  const pick = cands => { // corners first, then as spread out as they'll go
+    for (const c of [[x0, y0], [x1, y0], [x1, y1], [x0, y1]]) { if (chosen.length >= n) return; let best = null, bd = 1e9; for (const p of cands) { const d = Math.hypot(p[0] - c[0], p[1] - c[1]); if (d < bd && far(p, 25)) { bd = d; best = p; } } if (best) chosen.push(best); }
+    while (chosen.length < n) { let best = null, bd = 0; for (const p of cands) { const d = chosen.length ? Math.min(...chosen.map(q => Math.hypot(q[0] - p[0], q[1] - p[1]))) : 1e9; if (d > bd) { bd = d; best = p; } } if (!best || bd < 20) return; chosen.push(best); }
+  };
+  pick([...inner, ...outer]);
+  return chosen.map(([x, y]) => [+x.toFixed(2), +y.toFixed(2)]);
+}
 function kbHoles(K, G, b) {
   const n = K.holes | 0; if (!n || !b.polys.length) return [];
   const feats = []; for (const p of b.places) feats.push(...kbKeyFeatures(K, G, p));
@@ -632,6 +685,7 @@ function kbHoles(K, G, b) {
     if (b.bank && x > b.bank.x0 - 4 && x < b.bank.x1 + 4 && y > b.bank.y0 - 4 && y < b.bank.y1 + 4) continue;
     if ((b.loose || []).some(L => x > L.area.bb[0] - 4 && x < L.area.bb[2] + 4 && y > L.area.bb[1] - 4 && y < L.area.bb[3] + 4)) continue;
     if (A && (A.rot ? x > A.bb[0] - 6 && x < A.bb[2] + 6 && y > A.bb[1] - 6 && y < A.bb[3] + 6 : x > A.x - 3 && x < A.x + A.w + 3 && y > A.y - 6 && y < A.y + A.h + 3)) continue;
+    if (kbUnderKey(K, G, b.places, x, y)) continue;
     let ok = true; for (const f of grid.get(cell(x, y)) || []) { const dx = x - f[0], dy = y - f[1], lim = r + f[2]; if (dx * dx + dy * dy < lim * lim) { ok = false; break; } }
     if (!ok || !inBoard(x, y)) continue;
     cands.push([x, y]);
@@ -1110,6 +1164,7 @@ function kbStats() {
   const warn = [];
   if (PP.enc.length < nKnob) warn.push(`Not enough free pins for ${nKnob} knob${nKnob > 1 ? "s" : ""}: each knob needs 2 pins of its own.`);
   if (K.actLed && !PP.act) warn.push("No free pin left for the activity light.");
+  if (!Array.isArray(K.so) && K.holes > 0) { const got = Math.min(...G.boards.filter(Boolean).map(b => b.holes.length)); if (got < K.holes) warn.push(`Only ${got} of ${K.holes} standoffs fit without sitting under a key. Place more by hand in gaps beside the keys, or use a smaller standoff size.`); }
   const sd = KB_SCREENS.find(x => x.id === K.oled);
   if (sd && sd.bus === "spi" && !PP.spi) warn.push(`Not enough free pins for the ${sd.name.split(",")[0]}: it needs ${new Set(Object.values(sd.pins)).size} of its own.`);
   if (sd && sd.bus === "spi" && G.mcu.volt === 5) warn.push(`The ${sd.name.split(",")[0]} expects 3.3V signals; a 5V controller can damage it. An RP2040 controller (same footprint: RP2040 Pro Micro) is safer.`);
@@ -1284,8 +1339,9 @@ function kbSoClick(x, y) {
   const K = KBS(), G = kbGeom(), so = kbStandoff(K);
   const i = K.so.findIndex(h => Math.hypot(h[1] - x, h[2] - y) < so.od / 2 + 1);
   if (i >= 0) { K.so.splice(i, 1); kbChanged("remove standoff"); kbSide(); return; }
-  const b = G.boards.find(b => b && b.polys.some(pl => ptInPoly(x, y, pl)));
-  if (!b) { toast("Click inside the board outline to add a standoff.", "warn"); return; }
+  const b = G.boards.find(b => b && (b.polys.some(pl => ptInPoly(x, y, pl)) || b.places.some(p => Math.hypot(p.cx - x, p.cy - y) < Math.max(p.w * G.sx, p.h * G.sy) / 2 + 8)));
+  if (!b) { toast("Click on the board, or just beside the keys, to add a standoff.", "warn"); return; }
+  if (kbUnderKey(K, G, b.places, x, y)) { toast("That spot is under a key: a standoff and its screw there would stop the key going down. Pick a gap between keys, or just outside them.", "warn"); return; }
   const near = b.places.some(p => kbKeyFeatures(K, G, p).some(f => Math.hypot(f[0] - x, f[1] - y) < f[2] + so.od / 2 + 0.3));
   K.so.push([b.half, +x.toFixed(2), +y.toFixed(2)]); kbChanged("add standoff"); kbSide();
   if (near) toast("That standoff is very close to a switch's pins or a diode: check it fits, or click it to remove it.", "warn");

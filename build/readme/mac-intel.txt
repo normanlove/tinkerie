@@ -21,9 +21,11 @@ What works on this system
 Every app has teaching mode: point at anything to see what it does. F2 turns it off.
 
 New in {VERSION}:
-- Apps started from the launcher now open in front of it, not behind it.
+- Keebie never puts a standoff under a key: they go in gaps between keys or just
+  outside them, where the board grows a small ear to hold each one.
 
 Also in recent alpha builds:
+- 0.20.0-alpha: apps started from the launcher open in front of it.
 - 0.19.0-alpha: 21 colour themes and a choice of accent colour in every app.
 - 0.18.0-alpha: Look & accessibility in every app (Ctrl+,): text size,
   touch-friendly controls, reduced motion, focus outline, easier-to-read text.
