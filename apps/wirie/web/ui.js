@@ -3,7 +3,7 @@
 
 const UI = {
   mode: "pcb", tool: "select", layer: "top", sel: new Set(), hoverPad: null, hoverComp: null, hoverNet: null,
-  mouseW: [0, 0], mouseS: [0, 0], drag: null, wireFrom: null, track: null, placing: null, drc: [], drcShow: false, drcStale: true,
+  autoFix: (() => { try { return !!localStorage.getItem("wirie.autofix"); } catch (_) { return false; } })(), mouseW: [0, 0], mouseS: [0, 0], drag: null, wireFrom: null, track: null, placing: null, drc: [], drcShow: false, drcStale: true,
   focus: null, box: null, measure: null, dirty: true, space: false, exported: false, guideOpen: true, lastSaved: null,
 };
 const $ = s => document.querySelector(s);
@@ -98,7 +98,7 @@ function snapPt(wx, wy) { const g = S.board.grid; return [+snapTo(wx, g).toFixed
 
 // ---------- tools ----------
 const TOOLS_PCB = [
-  ["select", "Select & move", "V", "Click parts to select. Drag to move. R rotates, F flips to the back."],
+  ["select", "Select & move", "V", "Click parts to select. Drag to move. R rotates 90° (Shift+R 15°), or drag the round handle to any angle. F flips to the back."],
   ["wire", "Connect pins", "W", "Click a pin, then another pin, to say they should be connected. Yellow dashed lines show what still needs a track."],
   ["track", "Draw track", "T", "Click a pin to start a copper track, click to bend, click a pin to finish. V adds a via and swaps side. Esc cancels."],
   ["via", "Via", "I", "Click to drop a via (a plated hole that joins top and bottom copper)."],
@@ -183,6 +183,11 @@ function onDown(e) {
     if (!e.shiftKey) UI.placing = null;
     return;
   }
+  const rh = UI.tool === "select" && rotHandle();
+  if (rh && dist(wx, wy, rh.x, rh.y) < 10 / VIEW.zoom) {
+    const c = rh.c, pts = pinTrackPts([c]); pts.base = c.rot;
+    UI.drag = { rot: true, c, pts, rot0: c.rot, a0: Math.atan2(wy - c.y, wx - c.x), moved: false }; return;
+  }
   const hit = hitPCB(wx, wy);
   switch (UI.tool) {
     case "select": {
@@ -262,9 +267,19 @@ function onMove(e) {
     for (const tp of d.tpts) { tp.p[0] = +(tp.x + dx).toFixed(4); tp.p[1] = +(tp.y + dy).toFixed(4); }
     invalidate(); return;
   }
+  if (UI.drag && UI.drag.rot) {
+    const d = UI.drag, c = d.c;
+    let r = d.rot0 + (Math.atan2(wy - c.y, wx - c.x) - d.a0) * 180 / Math.PI * (VIEW.flip ? -1 : 1);
+    r = e.shiftKey ? Math.round(r) : Math.round(r / 15) * 15; // 15° steps; hold Shift for 1°
+    if (normRot(r) !== c.rot) d.moved = true;
+    turnComp(c, r, d.pts); UI.rotShow = { x: wx, y: wy, a: c.rot };
+    $("#coords").textContent = `${c.ref} at ${c.rot}°`; return;
+  }
   if (UI.drag && UI.drag.boxStart) { const [ax, ay] = UI.drag.boxStart; UI.box = { x0: Math.min(ax, wx), y0: Math.min(ay, wy), x1: Math.max(ax, wx), y1: Math.max(ay, wy) }; UI.dirty = true; return; }
   if (UI.measure && UI.measure.live) { UI.measure.b = UI.hoverPad ? [UI.hoverPad.x, UI.hoverPad.y] : [wx, wy]; }
   // hover
+  const rh = UI.tool === "select" && rotHandle();
+  cv().style.cursor = rh && dist(wx, wy, rh.x, rh.y) < 10 / VIEW.zoom ? "grab" : "";
   const hit = hitPCB(wx, wy); const A = analyze();
   const hp = hit && hit.kind === "pad" ? hit.obj : null;
   UI.hoverPad = hp; UI.hoverComp = hit ? (hit.kind === "comp" ? hit.obj.id : hp ? hp.comp.id : null) : null;
@@ -291,6 +306,7 @@ function onUp(e) {
   if (d.pan) { if (d.btn === 2 && !d.moved) onContext(e); return; }
   if (UI.mode === "strip") return stripUp(e);
   if (d.move) { if (d.moved) commit("move"); refreshPanels(); }
+  if (d.rot) { UI.rotShow = null; if (d.moved) commit("rotate"); refreshPanels(); }
   if (d.boxStart && UI.box) {
     const b = UI.box;
     for (const c of S.comps) { const r = compBox(c); if (r.x0 >= b.x0 && r.x1 <= b.x1 && r.y0 >= b.y0 && r.y1 <= b.y1) UI.sel.add(c.id); }
@@ -386,10 +402,32 @@ function stripUp() { const d = UI.drag; UI.drag = null; if (d && d.strip && d.mo
 function setLayer(l) { UI.layer = l; $$("#layerSw button").forEach(b => b.classList.toggle("on", b.dataset.l === l)); UI.dirty = true; }
 function rotateSel() {
   if (UI.mode === "strip") { if (SV.placing) { SV.placing.rot = (SV.placing.rot + 90) % 360; } else if (typeof SV.sel === "string" && S.strip.place[SV.sel]) { const p = S.strip.place[SV.sel]; const c = S.comps.find(q => q.id === SV.sel); const p1 = compFP(c).pads[0]; const [ax, ay] = rotPt(p1.x, p1.y, p.rot); p.rot = (p.rot + 90) % 360; [p.x, p.y] = snapStripPos(c.fp, p.x + ax - rotPt(p1.x, p1.y, p.rot)[0], p.y + ay - rotPt(p1.x, p1.y, p.rot)[1], p.rot); commit("strip rotate"); } UI.dirty = true; return; }
-  if (UI.placing) { UI.placing.rot = (UI.placing.rot + 90) % 360; UI.dirty = true; return; }
-  let n = 0; for (const c of S.comps) if (UI.sel.has(c.id)) { c.rot = (c.rot + 90) % 360; n++; }
-  for (const t of S.texts) if (UI.sel.has(t.id)) { t.rot = ((t.rot || 0) + 90) % 360; n++; }
+  const step = arguments[0] || 90;
+  if (UI.placing) { UI.placing.rot = normRot(UI.placing.rot + step); UI.dirty = true; return; }
+  let n = 0; for (const c of S.comps) if (UI.sel.has(c.id)) { turnComp(c, c.rot + step); n++; }
+  for (const t of S.texts) if (UI.sel.has(t.id)) { t.rot = normRot((t.rot || 0) + step); n++; }
   if (n) commit("rotate");
+}
+// any angle, kept between 0 and 360 and to a tenth of a degree
+function normRot(r) { r = Math.round((((r % 360) + 360) % 360) * 10) / 10; return r >= 360 ? 0 : r; }
+// track ends sitting on these parts' pins (they turn with the part)
+function pinTrackPts(comps) {
+  const shapes = comps.flatMap(padsOf).map(padShape), out = [];
+  for (const t of S.tracks) for (const p of t.pts) if (shapes.some(s => ptInShape(p[0], p[1], s, 0.01))) out.push({ p, x: p[0], y: p[1] });
+  return out;
+}
+// turn a part to an angle about its origin; tracks on its pins follow
+function turnComp(c, rot, pts) {
+  rot = normRot(rot); const d = rot - c.rot; if (!d && !pts) return;
+  pts = pts || pinTrackPts([c]); const base = pts.base ?? c.rot; pts.base = base;
+  for (const q of pts) { const [x, y] = rotPt(q.x - c.x, q.y - c.y, rot - base); q.p[0] = +(c.x + x).toFixed(4); q.p[1] = +(c.y + y).toFixed(4); }
+  c.rot = rot; invalidate();
+}
+// the round rotate handle above a single selected part
+function rotHandle() {
+  if (UI.mode !== "pcb" || UI.sel.size !== 1 || UI.placing) return null;
+  const c = S.comps.find(q => UI.sel.has(q.id)); if (!c || !compFP(c)) return null;
+  const b = compBox(c); return { c, x: (b.x0 + b.x1) / 2, y: b.y0 - 0.4 - 22 / VIEW.zoom, top: b.y0 - 0.4 };
 }
 function flipSel() {
   if (UI.placing) { UI.placing.side = UI.placing.side === "top" ? "bottom" : "top"; UI.dirty = true; return; }
@@ -443,7 +481,7 @@ function onKey(e) {
   if (e.key === "Delete" || e.key === "Backspace") { if (UI.track) { if (UI.track.pts.length > 1) UI.track.pts.pop(); else UI.track = null; UI.dirty = true; } else deleteSel(); return; }
   if (e.key === "Home") { fitView(); return; }
   if (e.key === "Enter" && UI.track) { finishTrack(); return; }
-  if (k === "r") return rotateSel();
+  if (k === "r") return rotateSel(e.shiftKey ? 15 : 90);
   if (k === "f" && UI.mode === "pcb") return flipSel();
   if (UI.mode === "pcb" && UI.track && k === "v") {
     const T = UI.track; T.pts.push(...trackPreview(T.pts[T.pts.length - 1], trackTarget()));
@@ -519,8 +557,8 @@ function renderProps() {
     P.innerHTML = `<div class="ph comp"><canvas id="p_prev" width="240" height="150"></canvas><h3>${esc(fp.name)}</h3><p class="dim">${esc(fp.desc || fp.cat)}</p>${fp.verify ? `<div class="callout warn">${ico("info")}Pin positions vary between makers — measure your module before ordering boards.</div>` : ""}</div>
       ${fp.user ? `<button class="btn wide" id="p_editpart">${ico("chip")}Edit this part's design</button>` : ""}
       <div class="grid2">${fieldHTML("p_ref", "Reference", c.ref)}${fieldHTML("p_val", "Value / label", c.value)}</div>
-      <div class="grid2">${fieldHTML("p_x", "X", c.x, "mm", "number")}${fieldHTML("p_y", "Y", c.y, "mm", "number")}</div>
-      <div class="btnrow"><button class="btn" id="p_rot">${ico("rotate")}Rotate</button><button class="btn" id="p_flip">${ico("flip")}${c.side === "bottom" ? "Move to top" : "Move to back"}</button><button class="btn danger icon" id="p_del" title="Delete">${ico("trash")}</button></div>
+      <div class="grid3">${fieldHTML("p_x", "X", c.x, "mm", "number")}${fieldHTML("p_y", "Y", c.y, "mm", "number")}${fieldHTML("p_ang", "Angle", c.rot, "°", "number")}</div>
+      <div class="btnrow"><button class="btn" id="p_rot" title="Rotate 90° (R)">${ico("rotate")}Rotate</button><button class="btn icon" id="p_r15" title="Rotate 15° (Shift+R)">15°</button><button class="btn" id="p_flip">${ico("flip")}${c.side === "bottom" ? "Move to top" : "Move to back"}</button><button class="btn danger icon" id="p_del" title="Delete">${ico("trash")}</button></div>
       ${fp.pinLabels ? `<button class="btn primary wide" id="p_smart">${ico("magic")}Smart connect…</button><label class="chk"><input type="checkbox" id="p_silk" ${c.silkPins ? "checked" : ""}><span>Print pin names on the board</span></label>` : ""}
       <label class="chk"><input type="checkbox" id="p_hide" ${c.hideRef ? "checked" : ""}><span>Hide reference text (${esc(c.ref)})</span></label>
       <h4>Case / 3D <em>for Makie</em></h4><div class="grid2">${fieldHTML("p_ch", "Part height", caseInfo(fp, c).h, "mm", "number")}${fieldHTML("p_rz", "Raised above board", caseInfo(fp, c).raise ?? 0, "mm", "number")}</div>
@@ -528,7 +566,8 @@ function renderProps() {
     drawFPPreview($("#p_prev"), fp);
     const upd = () => { c.ref = $("#p_ref").value.trim() || c.ref; c.value = $("#p_val").value; const x = parseFloat($("#p_x").value), y = parseFloat($("#p_y").value); if (isFinite(x)) c.x = x; if (isFinite(y)) c.y = y; commit("props"); };
     ["#p_ref", "#p_val", "#p_x", "#p_y"].forEach(s => $(s).onchange = upd);
-    $("#p_rot").onclick = rotateSel; $("#p_flip").onclick = flipSel; $("#p_del").onclick = deleteSel;
+    $("#p_rot").onclick = () => rotateSel(90); $("#p_r15").onclick = () => rotateSel(15);
+    $("#p_ang").onchange = () => { const v = parseFloat($("#p_ang").value); if (isFinite(v)) { turnComp(c, v); commit("angle"); refreshPanels(); } }; $("#p_flip").onclick = flipSel; $("#p_del").onclick = deleteSel;
     if ($("#p_editpart")) $("#p_editpart").onclick = () => openPartCreator(fp.id);
     if ($("#p_smart")) $("#p_smart").onclick = () => smartConnect(c);
     if ($("#p_silk")) $("#p_silk").onchange = e => { c.silkPins = e.target.checked; commit("silk"); };
@@ -597,10 +636,41 @@ function renderCheck(P) {
   const ok = !errs && !warns && S.comps.length;
   P.innerHTML = `<div class="ph"><h3>${ico("check")}Design check</h3><p class="dim">Wirie checks spacing, shorts, unrouted nets and the board edge.</p></div>
     <div class="verdict ${ok ? "good" : errs ? "bad" : "warn"}">${ok ? `${ico("check")}<div><b>Ready to manufacture</b><span>No problems found.</span></div>` : errs ? `${ico("info")}<div><b>${errs} problem${errs > 1 ? "s" : ""} to fix</b><span>${warns} warning${warns === 1 ? "" : "s"}</span></div>` : `${ico("info")}<div><b>${warns} warning${warns > 1 ? "s" : ""}</b><span>Nothing serious, but worth a look.</span></div>`}</div>
+    ${UI.drc.some(fixable) ? `<button class="btn primary wide" id="c_fix">${ico("magic")}Fix problems automatically</button>` : ""}
+    <label class="chk"><input type="checkbox" id="c_auto" ${UI.autoFix ? "checked" : ""}><span>Auto-fix mode: fix problems every time the check runs</span></label>
+    ${UI.fixReport ? `<div class="callout ${UI.fixReport.ok ? "good" : "warn"}">${ico(UI.fixReport.ok ? "check" : "info")}<div>${UI.fixReport.html}</div></div>` : ""}
     <label class="chk"><input type="checkbox" id="c_show" ${UI.drcShow ? "checked" : ""}><span>Circle problems on the board</span></label>
     <div class="drclist">${UI.drc.slice(0, 300).map((d, i) => `<button class="drc ${d.sev}" data-i="${i}"><i></i><span>${esc(d.msg)}</span></button>`).join("")}</div>`;
   $("#c_show").onchange = e => { UI.drcShow = e.target.checked; UI.dirty = true; };
+  if ($("#c_fix")) $("#c_fix").onclick = () => runAutoFix();
+  $("#c_auto").onchange = e => { UI.autoFix = e.target.checked; try { localStorage.setItem("wirie.autofix", UI.autoFix ? "1" : ""); } catch (_) {} if (UI.autoFix) runAutoFix(); };
+  // auto-fix mode: fix whenever the check finds something new (not again on the result of its own fix)
+  if (UI.autoFix && !UI.fixing && UNDO.last !== UI.fixedAt && UI.drc.some(fixable)) setTimeout(() => runAutoFix(), 0);
   P.querySelectorAll(".drc").forEach(b => b.onclick = () => { const d = UI.drc[+b.dataset.i]; focusAt(d.x, d.y); });
+}
+// problems the auto-fixer knows how to deal with
+const fixable = d => ["clear", "short", "rat", "edge", "hole", "thin"].includes(d.code);
+async function runAutoFix() {
+  if (UI.fixing || ROUTER.running || !UI.drc.some(fixable)) return;
+  UI.fixing = true;
+  const m = modal(`<div class="routing"><div class="spinner"></div><h2>Fixing your board…</h2><p class="dim" id="fx_msg">Looking at the problems…</p><button class="btn ghost" id="fx_stop">Stop</button></div>`, "small");
+  m.querySelector("#fx_stop").onclick = () => { ROUTER.cancel = true; UI.fixStop = true; };
+  let r;
+  try { r = await autoFix(t => { const el = $("#fx_msg"); if (el) el.textContent = t; }); }
+  finally { closeModal(); UI.fixing = false; UI.fixStop = false; }
+  commit("auto-fix"); UI.fixedAt = UNDO.last;
+  UI.drc = r.left; UI.drcStale = false; UI.drcRan = true;
+  const parts = [];
+  if (r.moved.size) parts.push(`moved ${[...r.moved].slice(0, 6).join(", ")}${r.moved.size > 6 ? ` and ${r.moved.size - 6} more` : ""} to free spots`);
+  if (r.tracks.size) parts.push(`redrew ${r.tracks.size} track${r.tracks.size > 1 ? "s" : ""}`);
+  if (r.routed) parts.push(`routed ${r.routed} connection${r.routed > 1 ? "s" : ""}`);
+  if (r.widened) parts.push(`widened ${r.widened} thin track${r.widened > 1 ? "s" : ""}`);
+  const done = parts.length ? "Wirie " + parts.join(", ") + "." : "Nothing could be fixed automatically.";
+  const rest = r.leftErr || r.leftWarn ? ` ${r.leftErr + r.leftWarn} left that need you (listed below).` : " No problems left.";
+  const stuck = [...r.stuck].slice(0, 3).map(t => `<br><span class="dim">${esc(t)}</span>`).join("");
+  UI.fixReport = { ok: !r.leftErr && !r.leftWarn, html: `<b>${parts.length ? "Auto-fix done" : "Auto-fix"}</b><br>${esc(done)}${esc(rest)}${stuck}<br><span class="dim">Not what you wanted? Press Ctrl+Z to undo the whole fix.</span>` };
+  toast(`${ico("magic")} ${esc(done)}${esc(rest)}`, UI.fixReport.ok ? "good" : "warn");
+  refreshPanels();
 }
 function focusAt(x, y) { const c = cv(); VIEW.zoom = Math.max(VIEW.zoom, 14); const [sx, sy] = [x * VIEW.zoom, y * VIEW.zoom]; VIEW.ox = c.clientWidth / 2 - (VIEW.flip ? (S.board.w - x) * VIEW.zoom : sx); VIEW.oy = c.clientHeight / 2 - sy; UI.focus = { x, y }; setTimeout(() => { UI.focus = null; UI.dirty = true; }, 1600); UI.dirty = true; }
 
@@ -824,7 +894,7 @@ function showHelp() {
       <div><h4>3 · Tracks</h4><p>Yellow dashed lines are connections without copper yet. Press <b>Auto-route</b>, or draw tracks yourself (T). Red = top, blue = bottom.</p></div>
       <div><h4>4 · Make it</h4><p>Run the <b>Check</b>, then <b>Export</b> a Gerber ZIP for a PCB factory — or plan it on stripboard in the <b>Boardie</b> tab.</p></div>
     </div>
-    <h4>Keyboard shortcuts</h4><div class="keys">${[["V", "Select"], ["W", "Connect pins"], ["T", "Track"], ["I", "Via"], ["X", "Text"], ["M", "Measure"], ["R", "Rotate"], ["F", "Flip to back"], ["L / Tab", "Swap copper side"], ["V (while routing)", "Via + swap side"], ["G", "Change grid"], ["Del", "Delete"], ["Ctrl+Z / Y", "Undo / redo"], ["Ctrl+D", "Duplicate"], ["Ctrl+S", "Save"], ["Space / right-drag", "Pan"], ["Wheel", "Zoom"], ["Home", "Fit"], ["Ctrl+Shift+P", "Create a part"]].map(k => `<div><kbd>${k[0]}</kbd><span>${k[1]}</span></div>`).join("")}</div>`, "wide");
+    <h4>Keyboard shortcuts</h4><div class="keys">${[["V", "Select"], ["W", "Connect pins"], ["T", "Track"], ["I", "Via"], ["X", "Text"], ["M", "Measure"], ["R", "Rotate 90°"], ["Shift+R", "Rotate 15°"], ["F", "Flip to back"], ["L / Tab", "Swap copper side"], ["V (while routing)", "Via + swap side"], ["G", "Change grid"], ["Del", "Delete"], ["Ctrl+Z / Y", "Undo / redo"], ["Ctrl+D", "Duplicate"], ["Ctrl+S", "Save"], ["Space / right-drag", "Pan"], ["Wheel", "Zoom"], ["Home", "Fit"], ["Ctrl+Shift+P", "Create a part"]].map(k => `<div><kbd>${k[0]}</kbd><span>${k[1]}</span></div>`).join("")}</div>`, "wide");
 }
 function showAbout() {
   modal(`<div class="about">${LOGO}<h1>Wirie</h1><p class="ver">Version ${APP.version}</p><p class="by">Created by <b>${APP.author}</b></p><p class="dim">A free, beginner-friendly circuit board designer — with Boardie (stripboard planner), Calcie (electronics calculators), Pinnie (interactive pinouts) and Powerie (battery planner) built in. Part of the ${APP.author} maker tool suite.</p>

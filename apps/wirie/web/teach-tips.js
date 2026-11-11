@@ -25,7 +25,7 @@ window.TEACH = {
     "Check pin positions against your real module": ["Check the pin positions", "The pin layout of this module varies between sellers. Compare it with the board you actually have before ordering your PCB."],
 
     // ------------------------------------------------------------ tools
-    "Select & move": ["Select & move (V)", "Click a part to select it, drag to move it. R rotates the selected part and F flips it to the back of the board."],
+    "Select & move": ["Select & move (V)", "Click a part to select it, drag to move it. R rotates the selected part 90° (Shift+R: 15°), the round handle above it turns it to any angle, and F flips it to the back of the board."],
     "Connect pins": ["Connect pins (W)", "Tell Wirie which pins should be joined: click one pin, then another. These connections (called nets) are what the auto-router turns into copper tracks."],
     "Draw track": ["Draw track (T)", "Draw a copper track by hand, click by click. Useful for important wires you want to place yourself before auto-routing the rest."],
     "Via": ["Via (I)", "A via is a small plated hole that carries a track from one side of the board to the other."],
@@ -44,6 +44,11 @@ window.TEACH = {
     "Flip": ["Flip view", "Looks at the back of the board, as if you turned it over in your hand."],
     "Auto-route": ["Auto-route", "Lets Wirie draw the copper tracks for every connection you've made, using both sides of the board and vias where needed. Power tracks are made wider automatically."],
     "Remove auto-routed tracks": ["Remove auto-routed tracks", "Deletes the tracks the auto-router drew, keeping any you drew by hand, so you can move parts and route again."],
+    "#p_ang": ["Angle", "Turns the part to any angle you type, in degrees (0 to 360, e.g. 45). You can also drag the round handle above a selected part to turn it by hand: it moves in 15° steps, or 1° steps while you hold Shift. Tracks on its pins turn with it."],
+    "#p_rot": ["Rotate 90°", "Turns the selected parts a quarter turn (R). Tracks on their pins turn with them."],
+    "#p_r15": ["Rotate 15°", "Turns the selected parts by 15° (Shift+R). Handy for angled parts, like LEDs around a circle."],
+    "#c_fix": ["Fix problems automatically", "Wirie fixes what it can from the check: tracks that are too close, shorted or past the edge are redrawn with proper spacing, parts whose pins clash or sit off the board are moved to the nearest free spot, thin tracks are widened, and unrouted connections are routed. Anything it can't fix stays in the list. Ctrl+Z undoes the whole fix."],
+    "#c_auto": ["Auto-fix mode", "When this is on, Wirie fixes problems by itself every time the design check runs, so the list only shows things that need you. Turn it off if you'd rather fix things by hand."],
     "Check|Run check": ["Design check", "Checks the board before you order it: tracks too close together, shorts between different nets, connections that aren't routed yet, and parts too near the board edge."],
 
     // ------------------------------------------------------- getting started

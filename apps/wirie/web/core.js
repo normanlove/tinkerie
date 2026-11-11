@@ -1,7 +1,7 @@
 // Wirie core: project model, geometry, nets & connectivity — by nrmluvdev
 "use strict";
 
-const APP = { name: "Wirie", version: "0.11.2-alpha", author: "nrmluvdev" };
+const APP = { name: "Wirie", version: "0.12.0-alpha", author: "nrmluvdev" };
 
 function newProject() {
   return {
@@ -323,11 +323,11 @@ function runDRC() {
   const A = analyze(), B = S.board, out = [];
   for (const [a, b, d] of A.pairs) {
     if (a.cnet && b.cnet && a.cnet === b.cnet) continue;
-    if (!a.cnet && !b.cnet && a.kind === "pad" && b.kind === "pad") { if (d < 0.1) out.push({ sev: "warn", msg: `Pads very close: ${a.ref.comp.ref}.${a.ref.name} / ${b.ref.comp.ref}.${b.ref.name}`, x: a.ref.x, y: a.ref.y }); continue; }
-    if (d < B.clear - 0.005) { const p = a.kind === "pad" ? a.ref : b.kind === "pad" ? b.ref : null; const x = p ? p.x : (a.shape.ax + a.shape.bx) / 2, y = p ? p.y : (a.shape.ay + a.shape.by) / 2; out.push({ sev: "err", msg: `Too close (${d.toFixed(2)}mm < ${B.clear}mm): ${desc(a)} ↔ ${desc(b)}`, x, y }); }
+    if (!a.cnet && !b.cnet && a.kind === "pad" && b.kind === "pad") { if (d < 0.1) out.push({ sev: "warn", code: "close", a, b, d, msg: `Pads very close: ${a.ref.comp.ref}.${a.ref.name} / ${b.ref.comp.ref}.${b.ref.name}`, x: a.ref.x, y: a.ref.y }); continue; }
+    if (d < B.clear - 0.005) { const p = a.kind === "pad" ? a.ref : b.kind === "pad" ? b.ref : null; const x = p ? p.x : (a.shape.ax + a.shape.bx) / 2, y = p ? p.y : (a.shape.ay + a.shape.by) / 2; out.push({ sev: "err", code: "clear", a, b, d, msg: `Too close (${d.toFixed(2)}mm < ${B.clear}mm): ${desc(a)} ↔ ${desc(b)}`, x, y }); }
   }
-  for (const s of A.shorts) out.push({ sev: "err", msg: `Short circuit between nets ${s.names}`, x: s.x, y: s.y });
-  for (const r of A.rats) out.push({ sev: "warn", msg: `Not routed yet: ${r.net.name} (${r.a.comp.ref}.${r.a.name} → ${r.b.comp.ref}.${r.b.name})`, x: (r.a.x + r.b.x) / 2, y: (r.a.y + r.b.y) / 2 });
+  for (const s of A.shorts) out.push({ sev: "err", code: "short", msg: `Short circuit between nets ${s.names}`, x: s.x, y: s.y });
+  for (const r of A.rats) out.push({ sev: "warn", code: "rat", msg: `Not routed yet: ${r.net.name} (${r.a.comp.ref}.${r.a.name} → ${r.b.comp.ref}.${r.b.name})`, x: (r.a.x + r.b.x) / 2, y: (r.a.y + r.b.y) / 2 });
   // board edge
   const custom = (B.polys && B.polys.length) || (B.cutouts && B.cutouts.length);
   const edgeBad = (it, e) => { // custom outlines: test the copper's real shape, not its bounding box
@@ -338,13 +338,13 @@ function runDRC() {
     for (let i = 0; i <= n; i++) if (!insideBoard(s.ax + (s.bx - s.ax) * i / n, s.ay + (s.by - s.ay) * i / n, e + s.r - 0.02)) return true;
     return false;
   };
-  for (const it of A.items) { const bx = it.box; const e = B.edgeClear; if (custom ? edgeBad(it, e) : (!insideBoard(bx[0] + 0, bx[1], e) || !insideBoard(bx[2], bx[3], e) || !insideBoard(bx[0], bx[3], e) || !insideBoard(bx[2], bx[1], e))) out.push({ sev: it.kind === "pad" ? "err" : "warn", msg: `Copper too close to / outside the board edge: ${desc(it)}`, x: (bx[0] + bx[2]) / 2, y: (bx[1] + bx[3]) / 2 }); }
-  for (const h of A.holes) for (const it of A.items) { if (Math.abs(it.box[0] - h.x) > 20) continue; const d = shapeDist(it.shape, { t: "cap", ax: h.x, ay: h.y, bx: h.x, by: h.y, r: h.d / 2 }); if (d < B.clear) out.push({ sev: "err", msg: `Copper too close to mounting hole: ${desc(it)}`, x: h.x, y: h.y }); }
+  for (const it of A.items) { const bx = it.box; const e = B.edgeClear; if (custom ? edgeBad(it, e) : (!insideBoard(bx[0] + 0, bx[1], e) || !insideBoard(bx[2], bx[3], e) || !insideBoard(bx[0], bx[3], e) || !insideBoard(bx[2], bx[1], e))) out.push({ sev: it.kind === "pad" ? "err" : "warn", code: "edge", it, msg: `Copper too close to / outside the board edge: ${desc(it)}`, x: (bx[0] + bx[2]) / 2, y: (bx[1] + bx[3]) / 2 }); }
+  for (const h of A.holes) for (const it of A.items) { if (Math.abs(it.box[0] - h.x) > 20) continue; const d = shapeDist(it.shape, { t: "cap", ax: h.x, ay: h.y, bx: h.x, by: h.y, r: h.d / 2 }); if (d < B.clear) out.push({ sev: "err", code: "hole", it, h, d, msg: `Copper too close to mounting hole: ${desc(it)}`, x: h.x, y: h.y }); }
   // overlapping parts (pads of different parts overlapping)
   const ver = {};
-  for (const c of S.comps) { const fp = compFP(c); if (!fp) out.push({ sev: "err", msg: `Unknown part ${c.ref}`, x: c.x, y: c.y }); else if (fp.verify) (ver[fp.id] = ver[fp.id] || []).push(c); }
-  for (const cs of Object.values(ver)) { const c = cs[0], fp = compFP(c); out.push({ sev: "info", msg: `${cs.length > 3 ? cs.slice(0, 3).map(q => q.ref).join(", ") + ` and ${cs.length - 3} more` : cs.map(q => q.ref).join(", ")} (${fp.name}): check pin positions against your actual part before ordering`, x: c.x, y: c.y }); }
-  for (const t of S.tracks) if (t.w < 0.15) out.push({ sev: "warn", msg: `Track thinner than 0.15mm may be hard to manufacture`, x: t.pts[0][0], y: t.pts[0][1] });
+  for (const c of S.comps) { const fp = compFP(c); if (!fp) out.push({ sev: "err", code: "unknown", msg: `Unknown part ${c.ref}`, x: c.x, y: c.y }); else if (fp.verify) (ver[fp.id] = ver[fp.id] || []).push(c); }
+  for (const cs of Object.values(ver)) { const c = cs[0], fp = compFP(c); out.push({ sev: "info", code: "verify", msg: `${cs.length > 3 ? cs.slice(0, 3).map(q => q.ref).join(", ") + ` and ${cs.length - 3} more` : cs.map(q => q.ref).join(", ")} (${fp.name}): check pin positions against your actual part before ordering`, x: c.x, y: c.y }); }
+  for (const t of S.tracks) if (t.w < 0.15) out.push({ sev: "warn", code: "thin", t, msg: `Track thinner than 0.15mm may be hard to manufacture`, x: t.pts[0][0], y: t.pts[0][1] });
   const sev = { err: 0, warn: 1, info: 2 }; out.sort((a, b) => sev[a.sev] - sev[b.sev]);
   return out;
 }

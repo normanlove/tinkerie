@@ -153,6 +153,14 @@ function drawPCB(cv) {
       }
       if (sel) { const b = compBox(c); ctx.strokeStyle = COL.sel; ctx.lineWidth = 1.5 * px; ctx.setLineDash([4 * px, 3 * px]); ctx.strokeRect(b.x0 - 0.4, b.y0 - 0.4, b.x1 - b.x0 + 0.8, b.y1 - b.y0 + 0.8); ctx.setLineDash([]); }
     }
+    const rh = typeof rotHandle === "function" && rotHandle();
+    if (rh) { // drag this round handle to turn the part by hand
+      ctx.strokeStyle = COL.sel; ctx.fillStyle = "#0e1a20"; ctx.lineWidth = 1.5 * px;
+      ctx.beginPath(); ctx.moveTo(rh.x, rh.top); ctx.lineTo(rh.x, rh.y + 6 * px); ctx.stroke();
+      ctx.beginPath(); ctx.arc(rh.x, rh.y, 6 * px, 0, 7); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.arc(rh.x, rh.y, 3 * px, -2.6, 1.6); ctx.stroke();
+      if (UI.rotShow) { ctx.save(); ctx.translate(UI.rotShow.x, UI.rotShow.y); if (VIEW.flip) ctx.scale(-1, 1); ctx.fillStyle = COL.sel; ctx.font = `600 ${12 * px}px Segoe UI, system-ui, sans-serif`; ctx.fillText(UI.rotShow.a + "°", 12 * px, -10 * px); ctx.restore(); }
+    }
     for (const t of S.tracks) if (UI.sel.has(t.id)) { ctx.strokeStyle = COL.sel; ctx.globalAlpha = 0.5; ctx.lineWidth = t.w + 6 * px; ctx.beginPath(); t.pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))); ctx.stroke(); ctx.globalAlpha = 1; }
     for (const v of S.vias) if (UI.sel.has(v.id)) { ctx.strokeStyle = COL.sel; ctx.lineWidth = 2 * px; ctx.beginPath(); ctx.arc(v.x, v.y, v.d / 2 + 0.3, 0, 7); ctx.stroke(); }
     for (const t of S.texts) if (UI.sel.has(t.id)) { const w = textStrokes(t.text, t.size).width; ctx.strokeStyle = COL.sel; ctx.lineWidth = 1.5 * px; ctx.setLineDash([4 * px, 3 * px]); ctx.save(); ctx.translate(t.x, t.y); ctx.rotate((t.rot || 0) * Math.PI / 180); ctx.strokeRect(-w / 2 - 0.5, -t.size / 2 - 0.5, w + 1, t.size + 1); ctx.restore(); ctx.setLineDash([]); }

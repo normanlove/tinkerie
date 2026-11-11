@@ -19,6 +19,8 @@ Wirie has these tabs:
 - Every module pin is labelled (GP4, SDA, 3V3…), and **Smart connect** wires a sensor to your microcontroller in one click (I²C, SPI, UART, power, GPIO).
 - Board templates: Raspberry Pi HAT & Zero pHAT (header and holes in the right place), Pico / Nano / ESP32 carriers, D1 Mini shield, round boards.
 - Two-layer A* **auto-router** with rip-up & retry, wider power tracks, vias.
+- Turn parts to **any angle**: type it in the Angle box, drag the round handle above a selected part (15° steps, Shift for 1°), or R / Shift+R for 90° / 15°.
+- **Auto-fix** in the Check tab: redraws tracks that are too close or shorted, moves parts that clash or sit off the board, widens thin tracks and routes what's left. *Auto-fix mode* does it every time the check runs. One Ctrl+Z undoes it.
 - Ground fill with thermal reliefs, design-rule check, realistic board preview, flip view.
 - Export: Gerber RS-274X X2 (copper, mask, silk, paste, outline), Excellon drills, BOM and pick-and-place CSV — zipped and ready for JLCPCB / PCBWay / OSH Park / Aisler.
 - 1:1 printouts for home etching, PNG board picture.
@@ -66,7 +68,7 @@ Regenerate it after changing the logo with `go run tools/mkrsrc.go` (icons come 
 - `launcher_windows.go` / `launcher_other.go` — opens the editor as a chromeless app window (Edge/Chrome `--app`), falling back to the default browser. This is the only platform-specific code.
 - `web/` — the whole editor, embedded into the binary:
   - `lib.js` parts library & board templates · `core.js` project model, nets, connectivity, DRC
-  - `route.js` auto-router · `export.js` Gerber/drill/BOM/SVG · `render.js` canvas renderer
+  - `route.js` auto-router · `fix.js` design-check auto-fix · `export.js` Gerber/drill/BOM/SVG · `render.js` canvas renderer
   - `strip.js` Boardie · `calc.js` Calcie · `keebie*.js` Keebie (layout, controllers, footprints) · `ui.js` the interface · `font.js` silkscreen stroke font
 
 Environment switches for development: `WIRIE_NO_WINDOW=1` (don't open a window), `WIRIE_STAY=1` (don't auto-quit).

@@ -3,7 +3,7 @@
 
 APPS = [
   dict(
-    id="wirie", needshort="No hardware needed", name="Wirie", ver="0.11.2-alpha", color="#ef8a3c", icon="wirie.png",
+    id="wirie", needshort="No hardware needed", name="Wirie", ver="0.12.0-alpha", color="#ef8a3c", icon="wirie.png",
     tagline="Design your own circuit boards, even if you've never made one before.",
     short="Design circuit boards and custom keyboards, plan stripboard builds, look up pinouts and work out battery life.",
     need="No hardware needed",
@@ -33,7 +33,8 @@ APPS = [
         "Smart connect wires a sensor to your microcontroller in one click (I²C, SPI, UART, power)",
         "Board templates: Raspberry Pi HAT and Zero pHAT, Pico, Nano and ESP32 carriers, round boards",
         "Two-layer auto-router with wider power tracks and vias. It routes ground too, so every connection is visible",
-        "Ground fill that's checked to really reach every ground pin, design-rule check, realistic board preview",
+        "Turn parts to any angle: type it in, or drag the round handle",
+        "Ground fill that's checked to really reach every ground pin, design-rule check with one-click auto-fix (or auto-fix mode), realistic board preview",
       ]),
       ("Boardie: stripboard and perfboard", "Build the same circuit without ordering a PCB.", [
         "Places the parts on stripboard or perfboard for you",

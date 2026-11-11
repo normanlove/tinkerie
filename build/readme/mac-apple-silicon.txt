@@ -21,11 +21,13 @@ What works on this system
 Every app has teaching mode: point at anything to see what it does. F2 turns it off.
 
 New in {VERSION}:
-- Mac and Linux catch up with Windows: Meterie's HID-cable meters, Bluetooth meters
-  and Camera mode on Mac, Linux and Pi; USB scopes, logic analysers and PicoScope
-  on Mac; Camera mode on Android. These are new, so please report what works.
+- Wirie: turn parts to any angle (type it, or drag the round handle above a part),
+  and auto-fix in the design check: one click, or a mode that fixes problems every
+  time the check runs.
 
 Also in recent alpha builds:
+- 0.14.0-alpha: Mac and Linux catch up with Windows: HID, Bluetooth and Camera
+  meters, Mac USB scopes, logic analysers and PicoScope.
 - 0.13.0-alpha: Tinkerie for Android (5.0 and newer), with USB boards, scopes and
   analysers over USB OTG.
 - 0.12.x-alpha: Keebie diode layouts, Parts view, movable controller.
