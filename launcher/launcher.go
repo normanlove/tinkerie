@@ -20,6 +20,7 @@ import (
 	"runtime"
 	"sync"
 	"time"
+	"tinkerie/shared/droid"
 )
 
 // Version is the suite version shown in the launcher.
@@ -157,6 +158,11 @@ func Run() {
 	log.Println("Tinkerie launcher at", url)
 	openWindow(url, dataDir())
 
+	// On Android the app decides when Tinkerie stops (its Quit button), and the
+	// launcher's window is often in the background while an app is in front.
+	if droid.Active() {
+		select {}
+	}
 	// Quit once the window has been gone for 3 s (a reload reconnects sooner),
 	// or after a minute if the window never opened.
 	began := time.Now()

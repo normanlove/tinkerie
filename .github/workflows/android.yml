@@ -45,11 +45,14 @@ jobs:
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: ./android/smoke.sh dist/packages/*-android-debug.apk smoke-${{ matrix.api }}
-      - uses: actions/upload-artifact@v4
+      - name: Keep the screenshots and logs on a branch
         if: always()
-        with:
-          name: smoke-${{ matrix.api }}
-          path: smoke-${{ matrix.api }}
+        run: |
+          [ -d smoke-${{ matrix.api }} ] || exit 0
+          cd smoke-${{ matrix.api }}
+          git init -q && git checkout -q -b results
+          git add -A && git -c user.name=nrmluvdev -c user.email=normanlove@users.noreply.github.com commit -qm "Android ${{ matrix.api }} smoke test: ${{ github.sha }}"
+          git push -fq "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" HEAD:refs/heads/ci/smoke-${{ matrix.api }}
 
   release:
     needs: emulator
