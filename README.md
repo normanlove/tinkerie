@@ -39,7 +39,7 @@ Double-click `Tinkerie.exe` to open the launcher and pick an app. Each app opens
 | **Scopie** | Oscilloscope program (Hantek 6022BE/BL and others, plus network scopes and demo) | 0.11.2-alpha |
 | **Meterie** | PC multimeter: HoldPeak HP-90EPC, UNI-T, OWON, Brymen, Fluke and more | 0.8.2-alpha |
 | **Probie** | Serial monitor and logic analyser, with an Explain tab that explains captures in plain words (its own, and Scopie's and Meterie's). Probie was called Tracie before 0.11 | 0.8.2-alpha |
-| **Codie** | Code explainer: paste code and see what each line does and why, in 20+ languages (including Windows Go and the BASIC of the C64, ZX Spectrum and BBC Micro), with a game-development section and a Game school | 0.4.2-alpha |
+| **Codie** | Code explainer: paste code and see what each line does and why, in 20+ languages (including Windows Go and the BASIC of the C64, ZX Spectrum and BBC Micro), with a game-development section and a Game school | 0.5.0-alpha |
 
 Every app's own guide is its `README.md` in `apps\<name>\`.
 

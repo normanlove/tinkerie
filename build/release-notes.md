@@ -10,11 +10,9 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 
 Each package has a *READ ME FIRST.txt*.
 
-<!-- release notes for 0.23.0-alpha: package.sh checks this line, so update the notes with every version -->
+<!-- release notes for 0.24.0-alpha: package.sh checks this line, so update the notes with every version -->
 ### New in {VERSION}
-- **Makie case feet:** choose rubber feet in indents (shallow pockets sized for common stick-on feet: 8 × 2, 10 × 3, 12.7 × 3.5, 6.4 × 1.9 or 20 × 5 mm), printed feet, or no feet. Feet go near each corner (and in the middle on long cases), clear of the edges and screw holes. Keyboard cases keep their taller back feet for the typing angle, with a rubber-foot indent under each; with no feet the keyboard lies flat.
-- **Wirie's router keeps clear of mounting holes:** tracks no longer get placed too close to standoffs and other round holes (the router left too little room round curves).
-- **Android builds are paused** on GitHub for now; the desktop downloads are unchanged.
+- **Codie: What it does.** A new tab looks at the code as a whole and works out what kind of program it is (a microcontroller sketch, web server, web page, game, data-analysis script, file tool, command-line tool, chat bot, keyboard firmware and more), how it flows (where it starts, what it takes in, what it does, what it gives out), and the smaller jobs it does along the way. It shows the lines that led to each conclusion and says how sure it is. The summary on the Explain tab starts with it too, and saved reports include it.
 
 Licensed under GPL-3.0-or-later.
 

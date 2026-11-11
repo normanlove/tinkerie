@@ -79,6 +79,7 @@ type Report struct {
 	Concepts []ConceptUse `json:"concepts"`
 	Warnings []Warning    `json:"warnings"`
 	Game     GameReport   `json:"game"`
+	Purpose  Purpose      `json:"purpose"`
 	Stats    Stats        `json:"stats"`
 }
 
@@ -273,6 +274,7 @@ func Analyse(code, hint string) Report {
 	rep.Concepts = collectConcepts(lines)
 	rep.Warnings = findWarnings(l, src)
 	rep.Game = analyseGame(det, code, lines, rep.Outline)
+	rep.Purpose = analysePurpose(rep, src)
 	rep.Summary = summarise(rep)
 	return rep
 }
@@ -913,6 +915,9 @@ func summarise(r Report) []string {
 		how = "Reading this as " + name + "."
 	}
 	out = append(out, how+" "+l.About)
+	if r.Purpose.Headline != "" {
+		out = append(out, "**What it does:** "+r.Purpose.Headline+" See the *What it does* tab for how Codie worked that out.")
+	}
 	var bits []string
 	if r.Stats.Functions > 0 {
 		bits = append(bits, plural(r.Stats.Functions, "function"))

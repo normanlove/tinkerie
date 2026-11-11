@@ -191,7 +191,7 @@
     if (!r) {
       $("#detected").textContent = ""; $("#summary").innerHTML = ""; $("#stats").textContent = "";
       $("#lines").innerHTML = `<div class="empty"><b>Paste some code to begin</b>Each line will be explained here: what it does, and why it's there.<br>Not sure where to start? Pick something from <i>Examples</i>, or open the <i>Game school</i>.</div>`;
-      for (const v of ["outline", "concepts", "game", "warnings"]) $("#" + v).innerHTML = `<div class="empty">Nothing yet.</div>`;
+      for (const v of ["purpose", "outline", "concepts", "game", "warnings"]) $("#" + v).innerHTML = `<div class="empty">Nothing yet.</div>`;
       syncGutter(); return;
     }
     const L = r.lang;
@@ -239,6 +239,7 @@
       : `<div class="empty"><b>Nothing to warn about</b>Codie checks for common slips such as = instead of ==, ignored errors, slow calls in game loops and risky commands. It can't run the code, so it won't catch everything.</div>`;
 
     renderGame(r.game);
+    renderPurpose(r.purpose);
     syncGutter();
     if (curLine) setCur(curLine);
   }
@@ -246,6 +247,34 @@
   const kindNames = { def: "function", var: "variable", assign: "set", cont: "…", close: "end", open: "start", directive: "setting", jump: "jump", print: "output", input: "input", other: "line", string: "text" };
   const kindName = k => kindNames[k] || k;
   const outlineKind = k => ({ function: "def", method: "def", event: "def", class: "class", struct: "class", interface: "class", enum: "class", loop: "loop", if: "if", switch: "switch", try: "try" }[k] || "");
+
+  // What it does: the program as a whole, with the clues that led there
+  function renderPurpose(p) {
+    if (!p) { $("#purpose").innerHTML = ""; return; }
+    const clue = c => c.line ? `<button class="chip ln-link" data-go="${c.line}" title="Go to line ${c.line}">line ${c.line}</button>${c.code ? ` <code>${esc(c.code)}</code>` : ""}` : "";
+    const sureCls = { "fairly sure": "sure", "best guess": "guess", "not sure": "unsure" }[p.sure] || "guess";
+    let h = `<div class="purpose-head"><span class="sure ${sureCls}">${esc(p.sure)}</span><h3>${md(p.headline)}</h3></div>`;
+    if (p.kinds && p.kinds.length) {
+      const k = p.kinds[0];
+      h += `<p>${md(cap(k.title))} is ${md(k.about)}.</p>`;
+      h += `<div class="section-h">Why Codie thinks so</div>`;
+      for (const k of p.kinds) {
+        h += `<div class="card purpose-kind"><h3>${esc(cap(k.title))}</h3><ul class="clues">${(k.clues || []).map(c => `<li>${md(cap(c.why))}${c.line ? `<div class="clue-src">${clue(c)}</div>` : ""}</li>`).join("") || "<li>Words in its names and comments point this way.</li>"}</ul></div>`;
+      }
+    }
+    if (p.flow && p.flow.length) {
+      h += `<div class="section-h">How it flows</div><ol class="flow">${p.flow.map(f => `<li><b>${esc(f.step)}</b><span>${md(cap(f.text))}.</span>${(f.clues || []).length ? `<div class="clue-src">${f.clues.map(clue).join(" ")}</div>` : ""}</li>`).join("")}</ol>`;
+    }
+    if (p.also && p.also.length) h += `<div class="section-h">Along the way it</div><ul class="tips">${p.also.map(a => `<li>${esc(a)}</li>`).join("")}</ul>`;
+    if (p.comment || p.names) {
+      h += `<div class="section-h">In its own words</div>`;
+      if (p.comment) h += `<p>Its first comment says: <i>“${esc(p.comment)}”</i></p>`;
+      if (p.names) h += `<p>${esc(p.names)}</p>`;
+    }
+    h += `<p class="dim small">Codie works this out by matching clues (the libraries and commands it uses, its names and comments) against common kinds of program. It doesn't run the code, so treat it as a well-informed guess and check the clues.</p>`;
+    $("#purpose").innerHTML = h;
+  }
+  const cap = s => String(s || "").replace(/^./, c => c.toUpperCase());
 
   function renderGame(g) {
     const n = g.hits.length;
@@ -324,6 +353,13 @@
       out += `**Line ${ln.n}${end > ln.n ? "–" + end : ""}**\n\n\`\`\`\n${ln.kind === "comment" ? ln.parts[0].code : ln.text.trim()}\n\`\`\`\n\n`;
       for (const p of ln.parts) out += `- ${plain(p.what)}${p.why ? "\n  - Why: " + plain(p.why) : ""}\n`;
       for (const n of ln.notes || []) out += `- Note: ${plain(n)}\n`;
+      out += "\n";
+    }
+    const P = r.purpose;
+    if (P && P.headline) {
+      out += `## What it does (${P.sure})\n\n${plain(P.headline)}\n\n`;
+      for (const f of P.flow || []) out += `- **${f.step}:** ${plain(f.text)}\n`;
+      for (const k of P.kinds || []) out += `\nClues for ${k.title}:\n${(k.clues || []).map(c => `- ${plain(c.why)}${c.line ? ` (line ${c.line})` : ""}`).join("\n")}\n`;
       out += "\n";
     }
     if (r.outline.length) out += `## Outline\n\n${r.outline.map(o => `${"  ".repeat(o.depth)}- ${o.kind} ${o.name || ""} (lines ${o.start}–${o.end})`).join("\n")}\n\n`;

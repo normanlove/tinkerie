@@ -18,6 +18,7 @@ window.TEACH = {
     // tabs
     "Explain": ["Explain", "Every line of your code, in order: what it does and why it's there. Click a card to jump to that line."],
     "Outline": ["Outline", "The shape of the program: its functions, classes, loops and checks, nested the way the code is. Click one to jump to it."],
+    "What it does": ["What it does", "Codie looks at the code as a whole and works out what kind of program it is (a microcontroller sketch, a web server, a game, a data-analysis script…), how it flows (where it starts, what it takes in, what it gives out), and shows the clues it used so you can check. It's a well-informed guess from patterns, not AI, and it says how sure it is."],
     "Concepts": ["Concepts", "The programming ideas this code uses (variables, loops, functions, classes, error handling…), each with a short explanation and the lines that use it."],
     "Game logic": ["Game logic", "If this is game code: which engine or machine it's for, how that engine's game loop runs one frame, and where the code handles input, movement, collisions, spawning, timers and score."],
     "Warnings": ["Warnings", "Common mistakes and risky habits Codie spotted, with a tip for each. Codie doesn't run your code, so this is a helpful check, not a guarantee."],

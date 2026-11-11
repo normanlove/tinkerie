@@ -456,15 +456,16 @@ APPS = [
     pairs=[("flashie", "Flash a board, then watch it here."), ("scopie", "For analogue signals, not just digital ones.")],
   ),
   dict(
-    id="codie", needshort="Nothing: just code", name="Codie", ver="0.4.2-alpha", color="#22c39a", icon="codie.svg",
+    id="codie", needshort="Nothing: just code", name="Codie", ver="0.5.0-alpha", color="#22c39a", icon="codie.svg",
     tagline="Paste in code. Find out what every line does, and why.",
     short="A code explainer for 20+ languages, with a game-development section and a Game school.",
     need="Nothing but some code (examples included)",
     plain=("In plain words",
            "Found some code online, in a book or in a game you're modding, and not sure what it does? Paste it into Codie. "
            "It explains every line in plain English: what it does and why it's there. It also spots game code, explains how that "
-           "engine's game loop works, and teaches the ideas every game uses."),
-    chips=["Line-by-line explanations", "20+ languages", "Windows Go", "Game logic", "Game school", "C64, ZX Spectrum and BBC BASIC"],
+           "engine's game loop works, and teaches the ideas every game uses. The What it does tab sums up the whole program: what kind of "
+           "program it is, how it flows from start to finish, and the clues it worked that out from."),
+    chips=["Line-by-line explanations", "What the whole program does", "20+ languages", "Windows Go", "Game logic", "Game school", "C64, ZX Spectrum and BBC BASIC"],
     firsts=[
       ("Pick an example", "The Examples menu has everyday programs, Windows Go, game engines and 1980s BASIC."),
       ("Click a line", "Click any line of code (or any card) to see its explanation side by side."),
