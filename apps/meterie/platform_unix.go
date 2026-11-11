@@ -20,7 +20,6 @@ import (
 	"tinkerie/shared/serialport"
 )
 
-
 type unixSerial struct{ p *serialport.Port }
 
 // Read waits up to 150 ms for data, like the Windows port, so the reader loop

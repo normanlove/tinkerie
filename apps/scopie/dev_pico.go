@@ -283,7 +283,7 @@ func (p *picoA) ApplyPanel(pp *Panel) error {
 		auto = maxInt(20, int(float64(p.n)*p.dt*3000))
 	}
 	return p.check("SetSimpleTrigger", "setting the trigger", uintptr(p.handle), 1, uintptr(src),
-		uintptr(int16(thr))&0xFFFF, uintptr(dir), 0, uintptr(int16(auto)))
+		uintptr(int16(thr)), uintptr(dir), 0, uintptr(int16(auto)))
 }
 
 func (p *picoA) interval(tb uint32) (float64, bool) {
@@ -540,8 +540,8 @@ func (p *pico2000) ApplyPanel(pp *Panel) error {
 	if cp.TrigMode != "normal" {
 		auto = maxInt(20, int(float64(p.n)*p.dt*3000))
 	}
-	p.fn("set_trigger", uintptr(p.handle), uintptr(src), uintptr(int16(thr))&0xFFFF, uintptr(dir),
-		uintptr(int16(-frac*100))&0xFFFF, uintptr(int16(auto)))
+	p.fn("set_trigger", uintptr(p.handle), uintptr(src), uintptr(int16(thr)), uintptr(dir),
+		uintptr(int16(-frac*100)), uintptr(int16(auto)))
 	return nil
 }
 

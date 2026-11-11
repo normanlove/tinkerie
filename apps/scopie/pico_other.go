@@ -1,6 +1,6 @@
-//go:build !windows
+//go:build !windows && !(darwin && cgo)
 
 package scopie
 
-// loadPico: Pico's libraries are only used on Windows in this version.
+// loadPico: Pico's libraries are used on Windows and the Mac build.
 func loadPico(name string) picoLib { return nil }
