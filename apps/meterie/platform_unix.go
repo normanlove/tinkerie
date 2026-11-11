@@ -22,9 +22,7 @@ import (
 )
 
 var (
-	errHIDOnly = errors.New("this meter's USB cable works on Windows only for now; meters with a USB-serial cable work here")
 	errBLEOnly = errors.New("Bluetooth meters work on Windows only for now")
-	errCamOnly = errors.New("Camera mode works on Windows only for now")
 )
 
 type unixSerial struct{ p *serialport.Port }
@@ -44,26 +42,20 @@ func platformOpenSerial(path string, cfg SerialCfg) (Port, error) {
 	return unixSerial{p}, nil
 }
 
-func platformOpenCH9325(path string, cfg SerialCfg) (Port, error) { return nil, errHIDOnly }
-func platformOpenCP2110(path string, cfg SerialCfg) (Port, error) { return nil, errHIDOnly }
-func platformOpenHIDRaw(path string) (Port, error)                { return nil, errHIDOnly }
-func platformOpenBU86X(path string) (Port, error)                 { return nil, errHIDOnly }
-func platformOpenBLE(addr uint64, svc, chr string) (Port, error)  { return nil, errBLEOnly }
+func platformOpenBLE(addr uint64, svc, chr string) (Port, error) { return nil, errBLEOnly }
 func platformBLEScan(on bool) error {
 	if on {
 		return errBLEOnly
 	}
 	return nil
 }
-func platformBLEResults() []PortInfo                { return previewBLE }
-func platformListCameras() []string                 { return nil }
-func platformOpenCamera(i int) (FrameSource, error) { return nil, errCamOnly }
+func platformBLEResults() []PortInfo { return previewBLE }
 
 func platformListPorts() []PortInfo {
 	if previewPorts != nil { // the preview renderer's pretend ports
 		return previewPorts
 	}
-	var out []PortInfo
+	out := listHID()
 	for _, in := range serialport.List() {
 		name := strings.TrimSpace(in.Manufacturer + " " + in.Product)
 		if name == "" {

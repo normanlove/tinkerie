@@ -6,7 +6,7 @@
 set -e
 cd "$(dirname "$0")"
 VERSION=$(sed -n 's/^VERSION=//p' build.sh)
-./build.sh all
+./build.sh all # with SKIP_MAC=1 the Mac apps already in dist/ are used
 out=dist/packages
 rm -rf "$out"
 mkdir -p "$out"

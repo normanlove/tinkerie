@@ -78,7 +78,8 @@ public abstract class WebActivity extends Activity {
     ValueCallback<Uri[]> chooserCallback;
     PickCallback pickCallback;
     File pendingSave;
-    PermissionRequest pendingMic;
+    PermissionRequest pendingMedia;
+    String[] pendingMediaWant;
 
     interface PickCallback {
         void done(Uri uri);
@@ -406,18 +407,29 @@ public abstract class WebActivity extends Activity {
 
         @Override
         public void onPermissionRequest(final PermissionRequest r) {
+            // the microphone (Tunie's belt tuner) and the camera (Meterie's camera mode)
             runOnUiThread(() -> {
-                boolean mic = false;
-                for (String res : r.getResources()) if (PermissionRequest.RESOURCE_AUDIO_CAPTURE.equals(res)) mic = true;
-                if (!mic) {
+                List<String> want = new ArrayList<>(), perms = new ArrayList<>();
+                for (String res : r.getResources()) {
+                    if (PermissionRequest.RESOURCE_AUDIO_CAPTURE.equals(res)) {
+                        want.add(res);
+                        perms.add(Manifest.permission.RECORD_AUDIO);
+                    } else if (PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(res)) {
+                        want.add(res);
+                        perms.add(Manifest.permission.CAMERA);
+                    }
+                }
+                if (want.isEmpty()) {
                     r.deny();
                     return;
                 }
-                if (Build.VERSION.SDK_INT < 23 || checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-                    r.grant(new String[]{PermissionRequest.RESOURCE_AUDIO_CAPTURE});
-                } else {
-                    pendingMic = r;
-                    requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, REQ_MIC);
+                List<String> missing = new ArrayList<>();
+                if (Build.VERSION.SDK_INT >= 23) for (String p : perms) if (checkSelfPermission(p) != PackageManager.PERMISSION_GRANTED) missing.add(p);
+                if (missing.isEmpty()) r.grant(want.toArray(new String[0]));
+                else {
+                    pendingMedia = r;
+                    pendingMediaWant = want.toArray(new String[0]);
+                    requestPermissions(missing.toArray(new String[0]), REQ_MIC);
                 }
             });
         }
@@ -620,10 +632,12 @@ public abstract class WebActivity extends Activity {
 
     @Override
     public void onRequestPermissionsResult(int req, String[] perms, int[] results) {
-        if (req == REQ_MIC && pendingMic != null) {
-            if (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) pendingMic.grant(new String[]{PermissionRequest.RESOURCE_AUDIO_CAPTURE});
-            else pendingMic.deny();
-            pendingMic = null;
+        if (req == REQ_MIC && pendingMedia != null) {
+            boolean all = results.length > 0;
+            for (int g : results) all &= g == PackageManager.PERMISSION_GRANTED;
+            if (all) pendingMedia.grant(pendingMediaWant);
+            else pendingMedia.deny();
+            pendingMedia = null;
         }
     }
 

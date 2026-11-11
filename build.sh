@@ -1,5 +1,8 @@
 #!/bin/sh
-# Builds Tinkerie. Needs Go 1.24+ (standard library only, no cgo).
+# Builds Tinkerie. Needs Go 1.24+ (standard library only). Everything is plain
+# Go except the Mac build, which uses Apple's IOKit (USB scopes, logic
+# analysers, meter cables) through cgo: build it on a Mac with Xcode's
+# command-line tools. Built elsewhere, the Mac app works without USB devices.
 #
 #   ./build.sh            this computer's system (Windows exe, Mac app, Linux or Pi program)
 #   ./build.sh windows    Tinkerie.exe
@@ -29,7 +32,15 @@ unix() { # name os arch [arm]
 mac() { # name arch
   app="dist/$1/Tinkerie.app/Contents"
   mkdir -p "$app/MacOS" "$app/Resources"
-  GOOS=darwin GOARCH=$2 go build -trimpath -ldflags "-s -w" -o "$app/MacOS/tinkerie" .
+  if [ "$(uname -s)" = Darwin ]; then
+    # IOKit through cgo; runs on macOS 11 and newer
+    carch=$2; [ "$carch" = amd64 ] && carch=x86_64
+    CGO_ENABLED=1 CC="clang -arch $carch" MACOSX_DEPLOYMENT_TARGET=11.0 CGO_CFLAGS="-mmacosx-version-min=11.0" CGO_LDFLAGS="-mmacosx-version-min=11.0" \
+      GOOS=darwin GOARCH=$2 go build -trimpath -ldflags "-s -w" -o "$app/MacOS/tinkerie" .
+  else
+    echo "Note: building the Mac app without IOKit (no USB devices). Build on a Mac for the full app."
+    GOOS=darwin GOARCH=$2 go build -trimpath -ldflags "-s -w" -o "$app/MacOS/tinkerie" .
+  fi
   sed "s/VERSION/$NUMVER/g" build/Info.plist > "$app/Info.plist"
   cp build/tinkerie.icns "$app/Resources/"
   chmod +x "$app/MacOS/tinkerie"
@@ -62,8 +73,10 @@ case "$target" in
   pi32) unix pi-32bit linux arm 7 ;;
   all)
     windows
-    mac mac-apple-silicon arm64
-    mac mac-intel amd64
+    if [ -z "$SKIP_MAC" ]; then # the release builds the Mac apps on a Mac
+      mac mac-apple-silicon arm64
+      mac mac-intel amd64
+    fi
     unix linux-x86_64 linux amd64
     unix pi-64bit linux arm64
     unix pi-32bit linux arm 7

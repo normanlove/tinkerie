@@ -352,6 +352,7 @@ func runWeb() {
 		w.Header().Set("Content-Type", "audio/wav")
 		w.Write(b)
 	})
+	pageCam.routes(mux)
 	go http.Serve(ln, guardLocal(mux))
 	url := "http://" + ln.Addr().String() + "/"
 	log.Println("Meterie window at", url)
@@ -591,6 +592,7 @@ func (f *webFront) serveFrame(w http.ResponseWriter, r *http.Request) {
 		m["sound"] = f.sound
 		f.sound = nil
 	}
+	pageCam.frameFields(m)
 	f.nSent++
 	f.nBytes += len(tiles)
 	f.mu.Unlock()

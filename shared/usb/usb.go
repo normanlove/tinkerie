@@ -1,6 +1,7 @@
-// Package usb gives Tinkerie apps raw USB access on Linux (including Raspberry
-// Pi OS) through the kernel's usbfs, in pure Go with no cgo and no libusb.
-// Windows apps use WinUSB; macOS would need IOKit (cgo), so it isn't covered.
+// Package usb gives Tinkerie apps raw USB access: on Linux (including Raspberry
+// Pi OS) and Android through the kernel's usbfs in pure Go, and on macOS
+// through IOKit (darwin.go, the one place that needs cgo). Windows apps use
+// WinUSB directly.
 //
 // Devices are listed from sysfs and opened as /dev/bus/usb/BBB/DDD. A normal
 // user needs permission for that: install-usb.sh adds a udev rule for the

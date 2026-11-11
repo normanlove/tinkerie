@@ -1,3 +1,5 @@
+//go:build linux || (darwin && cgo)
+
 package probie
 
 // USB logic analysers (Cypress FX2 / fx2lafw) on Linux and Raspberry Pi OS,

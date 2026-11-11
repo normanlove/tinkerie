@@ -12,7 +12,34 @@ permissions:
   contents: write
   actions: read # the SignPath step reads this run's artifact
 jobs:
+  # The Mac apps use Apple's IOKit through cgo, so they're built on a Mac.
+  # This runs on every push (it also checks the Mac code still builds).
+  mac:
+    runs-on: macos-14
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+      - name: Build the Mac apps (Apple silicon and Intel)
+        run: ./build.sh mac && ./build.sh mac-intel
+      - name: Check them
+        run: |
+          file dist/mac-apple-silicon/Tinkerie.app/Contents/MacOS/tinkerie dist/mac-intel/Tinkerie.app/Contents/MacOS/tinkerie
+          otool -l dist/mac-apple-silicon/Tinkerie.app/Contents/MacOS/tinkerie | grep -A3 LC_BUILD_VERSION | head -4
+          CGO_ENABLED=1 MACOSX_DEPLOYMENT_TARGET=11.0 go vet ./shared/usb ./apps/meterie ./apps/scopie ./apps/probie
+          CGO_ENABLED=1 MACOSX_DEPLOYMENT_TARGET=11.0 go test ./shared/... ./apps/meterie/...
+      - name: Keep them for the release
+        run: tar cf mac-apps.tar dist/mac-apple-silicon dist/mac-intel
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac-apps
+          path: mac-apps.tar
+          retention-days: 3
+
   release:
+    needs: mac
     runs-on: ubuntu-latest
     timeout-minutes: 330
     env:
@@ -36,9 +63,15 @@ jobs:
       - name: Test Flashie and shared code
         if: steps.v.outputs.new == 'yes'
         run: go test ./apps/flashie/... ./apps/codie/... ./shared/... .
+      - uses: actions/download-artifact@v4
+        if: steps.v.outputs.new == 'yes'
+        with:
+          name: mac-apps
       - name: Build and package
         if: steps.v.outputs.new == 'yes'
-        run: ./package.sh
+        run: |
+          tar xf mac-apps.tar && rm mac-apps.tar
+          SKIP_MAC=1 ./package.sh
       # Signing (see .signpath/README.md). Skipped until SignPath is set up.
       - name: Upload Tinkerie.exe for signing
         id: unsigned

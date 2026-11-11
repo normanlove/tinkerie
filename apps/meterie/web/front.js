@@ -149,7 +149,54 @@ async function loop() {
     if (m.stopSound && audio) { audio.pause(); audio = null; }
     if (m.sound) { if (audio) audio.pause(); audio = new Audio(`sound?id=${m.sound.id}`); audio.loop = m.sound.loop; audio.play().catch(() => {}); }
     if (m.need && m.need.length) uploadGlyphs(m.need);
+    if (m.camList) listCameras();
+    if (m.cam !== undefined && m.cam !== camOn) setCamera(m.cam);
   }
+}
+
+// ------------------------------------------------------------------ camera
+// Camera mode: Meterie asks for a camera; the browser asks the person, and
+// frames go back as JPEGs for the display reader.
+let camOn = -1, camStream = null, camTimer = 0, camIds = [];
+const camVideo = document.createElement("video");
+camVideo.muted = true; camVideo.playsInline = true;
+const camCv = document.createElement("canvas");
+async function listCameras() {
+  try {
+    const devs = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "videoinput");
+    camIds = devs.map((d) => d.deviceId);
+    const names = devs.map((d, i) => d.label || `Camera ${i + 1}`);
+    await fetch("camlist", { method: "POST", body: JSON.stringify(names) });
+  } catch (e) {}
+}
+function camError(e) {
+  const msg = e && e.name === "NotAllowedError" ? "The camera wasn't allowed. Allow it in the window's address bar or system settings, then press Start again."
+    : e && e.name === "NotFoundError" ? "No camera found." : "The camera couldn't start: " + (e && e.message || e);
+  fetch("camerr", { method: "POST", body: msg });
+}
+async function setCamera(i) {
+  camOn = i;
+  clearInterval(camTimer);
+  if (camStream) { camStream.getTracks().forEach((t) => t.stop()); camStream = null; }
+  if (i < 0) return;
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { camError({ message: "this browser has no camera access" }); return; }
+  try {
+    const id = camIds[i];
+    camStream = await navigator.mediaDevices.getUserMedia({ video: id ? { deviceId: { exact: id }, width: { ideal: 1280 } } : { width: { ideal: 1280 } } });
+  } catch (e) { camOn = -1; camError(e); return; }
+  if (camOn !== i) { camStream.getTracks().forEach((t) => t.stop()); camStream = null; return; }
+  listCameras(); // names are only known once the camera is allowed
+  camVideo.srcObject = camStream;
+  await camVideo.play().catch(() => {});
+  let busy = false;
+  camTimer = setInterval(() => {
+    if (busy || !camVideo.videoWidth) return;
+    busy = true;
+    const s = Math.min(1, 1280 / camVideo.videoWidth);
+    camCv.width = Math.round(camVideo.videoWidth * s); camCv.height = Math.round(camVideo.videoHeight * s);
+    camCv.getContext("2d").drawImage(camVideo, 0, 0, camCv.width, camCv.height);
+    camCv.toBlob((b) => { fetch("camframe", { method: "POST", body: b }).finally(() => { busy = false; }); }, "image/jpeg", 0.9);
+  }, 150);
 }
 addEventListener("resize", () => send({ t: "resize" }));
 cv.focus();

@@ -1,6 +1,7 @@
 #!/bin/sh
-# Lets you use USB scopes (Scopie) and logic analysers (Probie) on Linux and
-# Raspberry Pi OS without root. Run once: ./install-usb.sh  (asks for your password)
+# Lets you use USB scopes (Scopie), logic analysers (Probie), USB lab
+# instruments and multimeter USB cables (Meterie) on Linux and Raspberry Pi OS
+# without root. Run once: ./install-usb.sh  (asks for your password)
 # then unplug and replug the device. To remove: ./install-usb.sh --remove
 set -e
 rules=/etc/udev/rules.d/60-tinkerie.rules
@@ -20,10 +21,15 @@ tmp=$(mktemp)
     echo "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"$v\", MODE=\"0660\", GROUP=\"plugdev\", TAG+=\"uaccess\""
   done
   echo "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"0483\", ATTR{idProduct}==\"2d42\", MODE=\"0660\", GROUP=\"plugdev\", TAG+=\"uaccess\""
+  # Multimeter USB-HID cables: UNI-T UT-D04 (CH9325, HE2325U), UNI-T CP2110, Victor, Brymen BU-86X
+  for vp in 1a86:e008 04fa:2490 10c4:ea80 1244:d237 0820:0001; do
+    echo "KERNEL==\"hidraw*\", ATTRS{idVendor}==\"${vp%:*}\", ATTRS{idProduct}==\"${vp#*:}\", MODE=\"0660\", GROUP=\"plugdev\", TAG+=\"uaccess\""
+  done
 } > "$tmp"
 sudo install -m 0644 "$tmp" "$rules"
 rm -f "$tmp"
 sudo udevadm control --reload-rules
 sudo udevadm trigger --subsystem-match=usb || true
+sudo udevadm trigger --subsystem-match=hidraw || true
 getent group plugdev >/dev/null && ! id -nG | grep -qw plugdev && sudo usermod -aG plugdev "$USER" && echo "Added you to the plugdev group: log out and back in once."
-echo "Done. Unplug and replug your scope or logic analyser."
+echo "Done. Unplug and replug your scope, logic analyser, instrument or meter cable."
