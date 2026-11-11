@@ -1,0 +1,37 @@
+
+files/home:
+drwx------ u0_a53   u0_a53            2026-11-11 21:05 .config
+drwx------ u0_a53   u0_a53            2026-11-11 21:06 Documents
+drwx------ u0_a53   u0_a53            2026-11-11 21:06 logs
+
+files/home/.config:
+drwx------ u0_a53   u0_a53            2026-11-11 21:05 Tinkerie
+drwx------ u0_a53   u0_a53            2026-11-11 21:05 nrmluvdev
+
+files/home/.config/Tinkerie:
+
+files/home/.config/nrmluvdev:
+drwx------ u0_a53   u0_a53            2026-11-11 21:05 Codie
+
+files/home/.config/nrmluvdev/Codie:
+-rw------- u0_a53   u0_a53         75 2026-11-11 21:05 codie.log
+
+files/home/Documents:
+drwx------ u0_a53   u0_a53            2026-11-11 21:06 Wirie
+
+files/home/Documents/Wirie:
+drwx------ u0_a53   u0_a53            2026-11-11 21:06 Exports
+drwx------ u0_a53   u0_a53            2026-11-11 21:06 Parts
+drwx------ u0_a53   u0_a53            2026-11-11 21:06 Projects
+-rw------- u0_a53   u0_a53        116 2026-11-11 21:06 wirie.log
+
+files/home/Documents/Wirie/Exports:
+
+files/home/Documents/Wirie/Parts:
+
+files/home/Documents/Wirie/Projects:
+
+files/home/logs:
+-rw------- u0_a53   u0_a53         75 2026-11-11 21:05 codie.log
+-rw------- u0_a53   u0_a53        155 2026-11-11 21:06 launcher.log
+-rw------- u0_a53   u0_a53         41 2026-11-11 21:06 wirie.log

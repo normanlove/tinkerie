@@ -1,0 +1,8 @@
+    intent={dat=http://127.0.0.1:47820/ flg=0x10080000 cmp=net.tinkerie.app/.AppActivity}
+    realActivity=net.tinkerie.app/.AppActivity
+    intent={dat=http://127.0.0.1:47824/ flg=0x10080000 cmp=net.tinkerie.app/.AppActivity}
+    realActivity=net.tinkerie.app/.AppActivity
+    intent={flg=0x10000000 cmp=net.tinkerie.app/.MainActivity}
+    realActivity=net.tinkerie.app/.MainActivity
+    intent={act=android.intent.action.MAIN cat=[android.intent.category.HOME] flg=0x10000000 cmp=com.android.launcher/com.android.launcher2.Launcher}
+    realActivity=com.android.launcher/com.android.launcher2.Launcher
