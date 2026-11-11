@@ -24,7 +24,7 @@ import (
 )
 
 // Version is the suite version shown in the launcher.
-const Version = "0.12.2-alpha"
+const Version = "0.13.0-alpha"
 
 // App describes one tile in the launcher.
 type App struct {

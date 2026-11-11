@@ -11,14 +11,10 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 Each package has a *READ ME FIRST.txt*.
 
 ### New in {VERSION}
-- **Keebie: diodes on show.** New layouts take the diodes off the keys into a tidy bank on the front: a row above the keys, a row below them, or a little map of the keyboard above them. The board grows to fit, and the controller moves out of the way.
-- **Keebie: switch pins and LED facing.** Choose 5-pin holes (fit 5-pin and 3-pin MX switches) or 3-pin only for plate builds, and south- or north-facing LEDs.
-- **Keebie shows its diodes and LEDs.** They were always added, but on the back of the board where they were easy to miss. A new **Parts** view shows every diode, LED and capacitor on the keyboard before you build, and the build message says how many went on and links straight to the back of the board.
-- **Diode layouts:** upright beside each switch (right or left), flat below or above it, or at 45° in the corner, on the back or on show at the front. Every spot is checked against the switch's pads, holes and LED. Optional 100nF capacitor beside each LED.
-- **Move and turn the controller:** drag it, nudge it with the arrow keys, turn it with R or the 90° buttons; the board outline follows. Its support parts can be packed tightly, set out in neat rows, or put in one tidy line.
-- **New keyboard and Close keyboard** buttons in Keebie.
+- **Tinkerie for Android** (Android 5.0 and newer: phones, tablets and Chromebooks). The same apps, each in its own window. Plug boards, scopes and analysers in with a USB OTG adapter: Flashie flashes boards (including UF2 boards like the Pico, and SD cards in a USB reader), Probie and Scopie capture, and the serial apps work with Arduino and other native-USB boards, CH340, CP210x, FTDI and PL2303 adapters. Files the apps save appear in the Files app under *Tinkerie*. Compiling Arduino code still needs a computer.
 
 ### Also in recent alpha builds
+- **0.12.x-alpha:** Keebie diode layouts (including on show, off the keys), a Parts view, a movable controller, switch pins and LED facing.
 - **0.11.0-alpha:** Tracie became Probie, with an Explain tab that explains captures in plain words; Codie went back to explaining code.
 - **0.10.0-alpha:** Codie explained captures from Scopie, Tracie and Meterie (that's now Probie's Explain tab).
 - **0.9.1-alpha:** Keebie fixes: key spacing, widening keys, much faster redraws.

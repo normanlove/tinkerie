@@ -39,6 +39,7 @@
   const ua = navigator.userAgent, plat = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
   let os = '';
   if (/Win/i.test(plat) || /Windows/i.test(ua)) os = 'windows';
+  else if (/Android/i.test(ua)) os = 'android';
   else if (/Mac/i.test(plat) || /Mac OS X/.test(ua)) os = /iPhone|iPad/.test(ua) ? '' : 'mac';
   else if (/aarch64|arm64/i.test(plat + ua) && /Linux/i.test(plat + ua) && !/Android/i.test(ua)) os = 'pi';
   else if (/armv7|armv6/i.test(plat + ua) && !/Android/i.test(ua)) os = 'pi32';

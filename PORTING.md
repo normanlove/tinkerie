@@ -97,3 +97,16 @@ Wirie, Makie, Tunie, Flashie, Probie and Codie are web pages. Each loads `teach-
 - Some apps still have their own generator tools (`apps/scopie/tools/mkres`, `apps/tunie/tools/mkres`, `apps/wirie/tools/mkrsrc.go`, `apps/meterie/tools/mksyso`). They write web icons, which is fine, but they also write an `rsrc_windows_amd64.syso` into the app's folder. Delete that file afterwards: only the root `.syso` may be linked, or the build fails with duplicate resources.
 - The apps' own READMEs still describe building them as separate programs. In this repository, build from the root instead.
 - On Windows the launcher looks for Edge, Chrome or Brave and falls back to the default browser. Elsewhere it tries Chromium-based browsers, then `xdg-open` or `open`.
+
+## Android
+
+`android/` is a small Java app (no libraries) around the same Go program, built for each Android ABI with the NDK (`android/build.sh`) and shipped inside the APK as `lib/<abi>/libtinkerie.so`, so Android lets it run. The Java side:
+
+- runs the launcher (and, through it, every app) as child processes, in a foreground service so long jobs keep going;
+- shows each app's page in a WebView window of its own (Recents shows them like desktop windows);
+- answers the Go programs on an abstract Unix socket named in `TINKERIE_BRIDGE` (`shared/droid`): open a window, a link or a folder, choose a file, list USB devices, and open one, handing over its file descriptor once the person allows it;
+- shows `$HOME/Documents` in the Files app as "Tinkerie" (`DocsProvider`).
+
+On the Go side, `droid.Active()` is true on Android. `shared/usb` lists and opens devices through the bridge (usbfs works the same on the handed-over descriptor), `shared/serialport` drives USB serial adapters over USB (`usbserial.go`: CDC-ACM, CH34x, CP210x, FTDI, PL2303) because apps can't open `/dev/tty*`, and Flashie writes UF2 boards and SD card readers over USB mass storage (`shared/usb/msc.go`). Compiling Arduino code isn't available: arduino-cli's compilers are built for desktop Linux.
+
+`.github/workflows/android.yml` tries each push on Android 5, 10 and 15 emulators (`android/smoke.sh`) and adds the signed APK to each release; signing needs the `ANDROID_KEYSTORE_B64` and `ANDROID_KEYSTORE_PASSWORD` repository secrets.

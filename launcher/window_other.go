@@ -3,11 +3,11 @@
 package launcher
 
 import (
-	"tinkerie/shared/droid"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"syscall"
+	"tinkerie/shared/droid"
 )
 
 // openWindow shows the launcher in a Chromium "app" window if one is installed,

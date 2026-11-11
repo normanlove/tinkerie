@@ -55,6 +55,7 @@ DOWNLOADS = [  # os key, label for the button, row label, file, note
   ("linux", "Linux", "Linux PC (64-bit)", f"Tinkerie-{VERSION}-linux-x86_64.tar.gz", "Intel or AMD processor."),
   ("pi", "Raspberry Pi", "Raspberry Pi OS 64-bit", f"Tinkerie-{VERSION}-pi-64bit.tar.gz", "Pi 3, 4, 5 and newer."),
   ("pi32", "Raspberry Pi (32-bit)", "Raspberry Pi OS 32-bit", f"Tinkerie-{VERSION}-pi-32bit.tar.gz", "Pi 2, 3, 4, 5 and Zero 2 W."),
+  ("android", "Android", "Android 5.0 or newer", f"Tinkerie-{VERSION}-android.apk", "Phones, tablets and Chromebooks. Boards and scopes plug in with a USB OTG adapter."),
 ]
 
 
@@ -248,6 +249,12 @@ def build_start():
         ("Start it", "<pre>cd Tinkerie-*-linux-x86_64\n./tinkerie</pre>"),
         ("Add it to your menu", "<pre>./install.sh</pre>Remove it again with <code>./install.sh --remove</code>."),
         ("For USB devices", "For serial boards, join the dialout group: <pre>sudo usermod -aG dialout $USER</pre>For USB scopes and logic analysers, run <code>./install-usb.sh</code> once. Then log out and back in."),
+      ]),
+      "android": ("Android", [
+        ("Download the app on your phone", f'Tinkerie-{VERSION}-android.apk, from the <a href="index.html#download">download list</a>.'),
+        ("Install it", "Open the download. Android asks whether your browser (or Files app) may install apps: allow it, then tap <b>Install</b>. It isn't from the Play Store, so Play Protect may ask you to confirm."),
+        ("Pick an app", "Each app opens in its own window; switch between them in Recents. On a phone, the <b>⇔</b> button switches between the desktop layout (pinch to zoom) and fitting the phone."),
+        ("Plug things in", "Boards, scopes and analysers connect with a USB OTG adapter or cable. Android asks once whether Tinkerie may use each one. Your files are in the Files app under <b>Tinkerie</b>."),
       ]),
       "pi": ("Raspberry Pi", [
         ("Pick 64-bit or 32-bit", "Most Raspberry Pi OS installs are 64-bit now. Type <code>uname -m</code> in a terminal: <code>aarch64</code> means 64-bit."),

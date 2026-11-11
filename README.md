@@ -20,8 +20,11 @@ Get the newest version from the **[Releases page](https://github.com/normanlove/
 | Linux PC (64-bit Intel/AMD) | `Tinkerie-…-linux-x86_64.tar.gz` |
 | Raspberry Pi OS 64-bit (Pi 3, 4, 5) | `Tinkerie-…-pi-64bit.tar.gz` |
 | Raspberry Pi OS 32-bit (Pi 2, 3, 4, 5, Zero 2 W) | `Tinkerie-…-pi-32bit.tar.gz` |
+| Android 5.0 or newer (phones, tablets, Chromebooks) | `Tinkerie-…-android.apk` |
 
-Each package has a **READ ME FIRST.txt** that explains how to start it and what works on that system. Windows may warn about an unrecognised app the first time: choose *More info* then *Run anyway*. Macs need the one-time *Open Anyway* step in System Settings ▸ Privacy & Security.
+On Android, open the .apk on your phone and allow installing from your browser or Files app when asked. Plug boards, scopes and analysers in with a USB OTG adapter or cable; Android asks once whether Tinkerie may use each one.
+
+Each desktop package has a **READ ME FIRST.txt** that explains how to start it and what works on that system. Windows may warn about an unrecognised app the first time: choose *More info* then *Run anyway*. Macs need the one-time *Open Anyway* step in System Settings ▸ Privacy & Security.
 
 ## Using it
 
@@ -66,18 +69,23 @@ build.bat             Windows: builds Tinkerie.exe
 go test ./...         runs every app's tests (Makie's geometry tests take about 12 minutes)
 ```
 
+The Android app is built with `android/build.sh` (needs the Android SDK and NDK, Java 17 and Gradle); GitHub builds it for every release and tries it on Android 5, 10 and 15 emulators.
+
 Mac builds come out as `dist/<name>/Tinkerie.app`, Linux and Pi builds as `dist/<name>/tinkerie` with an `install.sh` that adds Tinkerie to the applications menu.
 
 ## Platforms
 
-| | Windows | Linux, Raspberry Pi | Mac |
-|---|---|---|---|
-| Launcher, Wirie, Makie, Tunie, Flashie, Codie | everything | everything | everything |
-| Scopie | everything | everything (USB scopes: run `install-usb.sh` once) | no USB scopes yet |
-| Probie | everything | everything (logic analyser: run `install-usb.sh` once) | serial monitor; no logic analyser yet |
-| Meterie | everything | USB-serial meters (like the HoldPeak HP-90EPC) | USB-serial meters |
+| | Windows | Linux, Raspberry Pi | Mac | Android |
+|---|---|---|---|---|
+| Launcher, Wirie, Makie, Tunie, Codie | everything | everything | everything | everything |
+| Flashie | everything | everything | everything | everything except compiling Arduino code (flashing ready-made and keyboard firmware works); boards over USB OTG |
+| Scopie | everything | everything (USB scopes: run `install-usb.sh` once) | no USB scopes yet | everything, USB scopes over OTG |
+| Probie | everything | everything (logic analyser: run `install-usb.sh` once) | serial monitor; no logic analyser yet | everything, over OTG |
+| Meterie | everything | USB-serial meters (like the HoldPeak HP-90EPC) | USB-serial meters | USB-serial meters |
 
 Meterie's HID-cable meters, Bluetooth meters and Camera mode are Windows-only for now. On a Mac, USB scopes and logic analysers need Apple's IOKit, which these pure-Go builds don't use.
+
+On Android, Tinkerie talks to USB serial adapters itself (Arduino and other native-USB boards, CH340, CP210x, FTDI and PL2303), because Android doesn't let apps open serial ports. Each app opens in its own window (switch between them in Recents), and everything the apps save appears in the Files app under **Tinkerie**. It needs a recent *Android System WebView* (Android 5 phones can update to a new enough one from the Play Store).
 
 For other platforms and how the source is laid out, see [PORTING.md](PORTING.md).
 

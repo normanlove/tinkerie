@@ -12,17 +12,11 @@ Everything, in every app. Every app has teaching mode: point at anything to see 
 F2 turns it off.
 
 New in {VERSION}:
-- Keebie: diodes on show, in a bank above or below the keys.
-- Keebie: 5-pin or 3-pin MX switches, and south- or north-facing LEDs.
-- Keebie: a Parts view shows every diode, LED and capacitor before you build
-  (they go on the back of the board); choose how the diodes are laid out
-  (beside, below, above or at 45 degrees, back or front) and add a capacitor
-  beside each LED.
-- Keebie: drag and turn the controller, and lay its parts out packed, in rows
-  or in one line.
-- Keebie: New keyboard and Close keyboard buttons.
+- Tinkerie for Android (5.0 and newer), with USB boards, scopes and analysers
+  over USB OTG. Get Tinkerie-{VERSION}-android.apk from the releases page.
 
 Also in recent alpha builds:
+- 0.12.x-alpha: Keebie diode layouts, Parts view, movable controller.
 - 0.11.0-alpha: Tracie became Probie, with an Explain tab; Codie is code only.
 - 0.10.0-alpha: Codie explained signals (now Probie's Explain tab).
 - 0.9.1-alpha: Keebie fixes (key spacing, widening keys, faster redraws).

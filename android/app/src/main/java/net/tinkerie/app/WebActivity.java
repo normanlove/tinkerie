@@ -338,9 +338,11 @@ public abstract class WebActivity extends Activity {
             html = m.find() ? html.substring(0, m.end()) + headScript() + html.substring(m.end()) : headScript() + html;
             java.util.Map<String, String> headers = new java.util.HashMap<>();
             headers.put("Cache-Control", "no-store");
+            Log.i("Tinkerie", "page " + u + " (layout " + layoutWidth() + ")");
             return new android.webkit.WebResourceResponse("text/html", "UTF-8", 200, "OK", headers,
                     new java.io.ByteArrayInputStream(html.getBytes("UTF-8")));
         } catch (Exception e) {
+            Log.w("Tinkerie", "page " + u, e);
             return null;
         }
     }
@@ -455,7 +457,12 @@ public abstract class WebActivity extends Activity {
     // Runs in every page: saves downloads made in the page (Save buttons that
     // build a file in JavaScript), and gives phones a desktop-width layout.
     void injectShim() {
-        String js = "(function(){if(window.__tk)return;window.__tk=1;"
+        String js = "(function(){var W=" + layoutWidth() + ";"
+                + "function vp(){if(!document.head)return;var m=document.querySelector('meta[name=viewport]');"
+                + "if(!W){if(m&&/width=\\d/.test(m.content))m.content='width=device-width, initial-scale=1';return}"
+                + "if(!m){m=document.createElement('meta');m.name='viewport';document.head.appendChild(m);}"
+                + "if(m.content!=='width='+W)m.content='width='+W;}vp();document.addEventListener('DOMContentLoaded',vp);"
+                + "if(window.__tk)return;window.__tk=1;"
                 + "var rv=URL.revokeObjectURL;URL.revokeObjectURL=function(u){setTimeout(function(){rv.call(URL,u)},60000)};"
                 + "function save(h,n){fetch(h).then(function(r){return r.blob()}).then(function(b){var f=new FileReader();"
                 + "f.onload=function(){var s=f.result;TinkerieAndroid.saveFile(n||'download',b.type||'application/octet-stream',s.substring(s.indexOf(',')+1))};"

@@ -519,6 +519,7 @@ APP = {a["id"]: a for a in APPS}
 FAQ = [
   ("What does \"alpha\" mean?", ["Tinkerie works and you can use every app today, but it's still young. Some features haven't been tried on every board, scope, meter or computer yet, and things may change between versions. If something doesn't work, please report it on GitHub: that's how alpha software gets better."]),
   ("Is Tinkerie really free?", ["Yes. Tinkerie is free software under the GNU GPL (version 3 or later). You can use it, share it and change it. There are no adverts, accounts or subscriptions."]),
+  ("Does it work on Android?", ["Yes, on Android 5.0 and newer: phones, tablets and Chromebooks. Every app is there, and boards, scopes and analysers plug in with a USB OTG adapter. Compiling Arduino code still needs a computer; flashing ready-made firmware works on the phone."]),
   ("Do I need to install anything?", ["No. Tinkerie is one program. On Windows you just double-click Tinkerie.exe. On Linux and Raspberry Pi, ./install.sh adds it to your menu if you'd like it there."]),
   ("Windows says it's an unrecognised app. Is that OK?", ["Windows warns about any program that isn't signed with a paid certificate. Click More info, then Run anyway. The full source code is on GitHub if you'd like to check it."]),
   ("My Mac won't open it.", ["The first time, macOS blocks apps from outside the App Store. Open it once, then go to System Settings › Privacy & Security and click Open Anyway."]),

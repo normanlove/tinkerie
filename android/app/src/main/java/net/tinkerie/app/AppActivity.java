@@ -39,10 +39,59 @@ public class AppActivity extends WebActivity {
         }
     }
 
+    android.widget.TextView layoutButton;
+
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         take(getIntent());
+        if (getResources().getConfiguration().screenWidthDp < 900) addLayoutButton();
+    }
+
+    // Phones: switch between the app's desktop layout (pinch to zoom) and
+    // fitting it to the phone's width. Remembered for each app.
+    void addLayoutButton() {
+        layoutButton = new android.widget.TextView(this);
+        layoutButton.setTextColor(0xFFE8ECF3);
+        layoutButton.setTextSize(12);
+        layoutButton.setPadding(24, 10, 24, 10);
+        android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+        bg.setColor(0xCC1A2230);
+        bg.setCornerRadius(40);
+        bg.setStroke(2, 0x552DD4BF);
+        layoutButton.setBackground(bg);
+        layoutButton.setAlpha(0.75f);
+        updateLayoutButton();
+        layoutButton.setOnClickListener(v -> {
+            prefs().edit().putBoolean("desktop." + app, !desktop()).apply();
+            updateLayoutButton();
+            if (pageUrl != null) {
+                web.evaluateJavascript("window.__tk=0", null);
+                web.reload();
+            }
+        });
+        android.widget.FrameLayout.LayoutParams lp = new android.widget.FrameLayout.LayoutParams(
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+                android.view.Gravity.BOTTOM | android.view.Gravity.END);
+        lp.setMargins(0, 0, 16, 16);
+        root.addView(layoutButton, lp);
+    }
+
+    void updateLayoutButton() {
+        if (layoutButton != null) layoutButton.setText(desktop() ? "⇔ Fit to phone" : "⇔ Desktop layout");
+    }
+
+    android.content.SharedPreferences prefs() {
+        return getSharedPreferences("layout", MODE_PRIVATE);
+    }
+
+    boolean desktop() {
+        return prefs().getBoolean("desktop." + app, !"codie".equals(app)); // Codie already suits a phone
+    }
+
+    @Override
+    boolean wantsDesktopWidth() {
+        return desktop();
     }
 
     @Override
