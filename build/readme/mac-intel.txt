@@ -21,11 +21,13 @@ What works on this system
 Every app has teaching mode: point at anything to see what it does. F2 turns it off.
 
 New in {VERSION}:
-- Wirie: turn parts to any angle (type it, or drag the round handle above a part),
-  and auto-fix in the design check: one click, or a mode that fixes problems every
-  time the check runs.
+- Keebie: part spacing, new diode patterns (zig-zag, wave, arch, chevron, slant,
+  smile, alternating, herringbone), through-hole parts by default, power and
+  activity lights, knobs and screens on any keyboard, standoffs placed for you
+  or by hand, the controller's USB end marked, and a parts list for every board.
 
 Also in recent alpha builds:
+- 0.15.0-alpha: Wirie turns parts to any angle, and auto-fixes design-check problems.
 - 0.14.0-alpha: Mac and Linux catch up with Windows: HID, Bluetooth and Camera
   meters, Mac USB scopes, logic analysers and PicoScope.
 - 0.13.0-alpha: Tinkerie for Android (5.0 and newer), with USB boards, scopes and

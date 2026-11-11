@@ -89,6 +89,13 @@ function silkLines(layer) {
     const p1 = fp.pads[0];
     if (p1 && fp.pads.length > 2 && fp.silk !== "none" && !fp.pinLabels) { const m = 0.5; out.push({ pts: tf([[x0 - m, p1.y - 0.6], [x0 - m, p1.y + 0.6]]), w: 0.2 }); }
     if (b.stripe) out.push({ pts: tf([[x0 + b.w * 0.18, y0 + 0.1], [x0 + b.w * 0.18, y1 - 0.1]]), w: 0.25 });
+    // which end the USB socket is: an arrow pointing out of that edge and "USB"
+    if (b.module && b.usb) {
+      const s = b.usb === "bottom" ? -1 : 1, e = b.usb === "bottom" ? y1 : y0, cx = b.x;
+      out.push({ pts: tf([[cx - 1.2, e + s * 1.9], [cx, e + s * 0.7], [cx + 1.2, e + s * 1.9]]), w: 0.2 });
+      const ts = textStrokes("USB", 1.1, "c", false);
+      for (const l of ts.lines) out.push({ pts: tf(l.map(([x, y]) => [cx + x, e + s * 3.3 + y])), w: 0.15 });
+    }
     if (fp.id.startsWith("c_elec") || fp.id === "c_tant_a") { const p = fp.pads[0]; out.push({ pts: tf([[p.x - 1.6, p.y - 1.6], [p.x - 0.6, p.y - 1.6]]), w: W }); out.push({ pts: tf([[p.x - 1.1, p.y - 2.1], [p.x - 1.1, p.y - 1.1]]), w: W }); }
     // reference designator
     if (!c.hideRef) {

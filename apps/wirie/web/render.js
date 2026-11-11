@@ -151,6 +151,13 @@ function drawPCB(cv) {
           ctx.fillText(fp.value || fp.name, 0, 0); ctx.restore();
         }
       }
+      if (fp.body.module && fp.body.usb) { // the USB plug end, sticking out of the board edge it faces
+        const bd = fp.body, s = bd.usb === "bottom" ? 1 : -1, e = bd.y + s * bd.h / 2, w = Math.min(9, bd.w * 0.6) / 2;
+        const P = [[-w, e - s * 0.6], [w, e - s * 0.6], [w, e + s * 3], [-w, e + s * 3]].map(([x, y]) => compXform(c, bd.x + x, y));
+        ctx.fillStyle = "rgba(255,179,71,0.18)"; ctx.strokeStyle = "#ffb347"; ctx.lineWidth = 1.2 * px; ctx.setLineDash([3 * px, 2 * px]);
+        ctx.beginPath(); P.forEach((q, i) => i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1])); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.setLineDash([]);
+        if (VIEW.zoom > 3) { const [tx, ty] = compXform(c, bd.x, e + s * 1.3); ctx.save(); ctx.translate(tx, ty); if (VIEW.flip) ctx.scale(-1, 1); ctx.fillStyle = "#ffb347"; ctx.font = `700 ${Math.min(1.6, w * 0.45)}px Segoe UI, system-ui, sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("USB", 0, 0); ctx.restore(); }
+      }
       if (sel) { const b = compBox(c); ctx.strokeStyle = COL.sel; ctx.lineWidth = 1.5 * px; ctx.setLineDash([4 * px, 3 * px]); ctx.strokeRect(b.x0 - 0.4, b.y0 - 0.4, b.x1 - b.x0 + 0.8, b.y1 - b.y0 + 0.8); ctx.setLineDash([]); }
     }
     const rh = typeof rotHandle === "function" && rotHandle();

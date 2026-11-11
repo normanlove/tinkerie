@@ -155,7 +155,7 @@ function moduleFP(o) {
   let k = 1;
   L.forEach((nm, i) => pads.push(tht(k++, -sp / 2, oy - (nL - 1) * pitch / 2 + i * pitch, { sq: i === 0, name: nm, func: (o.funcs || {})[nm] || "" })));
   for (let i = nR - 1; i >= 0; i--) pads.push(tht(k++, sp / 2, oy - (nR - 1) * pitch / 2 + i * pitch, { name: R[i], func: (o.funcs || {})[R[i]] || "" }));
-  return addFP({ id: o.id, name: o.name, cat: o.cat || "Microcontrollers", prefix: o.prefix || "U", value: o.value || o.name, desc: o.desc, tags: o.tags, verify: o.verify, pads, holes: o.holes || [], body: { x: 0, y: 0, w: o.w, h: o.h, col: o.col || "#0d3b66", module: true, usb: o.usb }, pinLabels: true, mcu: o.mcu !== false && (o.cat || "Microcontrollers") === "Microcontrollers", gpio: o.gpio });
+  return addFP({ id: o.id, name: o.name, cat: o.cat || "Microcontrollers", prefix: o.prefix || "U", value: o.value || o.name, desc: o.desc, tags: o.tags, verify: o.verify, pads, holes: o.holes || [], body: { x: 0, y: 0, w: o.w, h: o.h, col: o.col || "#0d3b66", module: true, usb: o.usb || ((o.desc || "").match(/USB(?:-C)? at (top|bottom)/) || [])[1] }, pinLabels: true, mcu: o.mcu !== false && (o.cat || "Microcontrollers") === "Microcontrollers", gpio: o.gpio });
 }
 const F_I2C = (sda, scl) => ({ [sda]: "SDA", [scl]: "SCL" });
 const F_SPI = (mosi, miso, sck, cs) => ({ [mosi]: "MOSI", [miso]: "MISO", [sck]: "SCK", [cs]: "CS" });

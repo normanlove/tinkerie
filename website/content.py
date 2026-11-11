@@ -3,7 +3,7 @@
 
 APPS = [
   dict(
-    id="wirie", needshort="No hardware needed", name="Wirie", ver="0.12.0-alpha", color="#ef8a3c", icon="wirie.png",
+    id="wirie", needshort="No hardware needed", name="Wirie", ver="0.13.0-alpha", color="#ef8a3c", icon="wirie.png",
     tagline="Design your own circuit boards, even if you've never made one before.",
     short="Design circuit boards and custom keyboards, plan stripboard builds, look up pinouts and work out battery life.",
     need="No hardware needed",
@@ -61,7 +61,9 @@ APPS = [
         "Turn the switch solder points per key for custom-height builds",
         "Pick any common controller (Pro Micro, Elite-C, RP2040 boards, Pico, Black Pill, nice!nano, XIAO) or a bare ATmega32U4, RP2040 or STM32 chip, and Keebie adds the USB-C, crystal, regulator, flash and buttons it needs",
         "Diodes, matrix, per-key RGB, stabilisers and mounting holes are placed for you; QMK/ZMK firmware files and a switch plate (SVG/DXF) come out too",
-        "Choose how the diodes are laid out (upright beside each switch, flat above or below it, or at 45° in the corner), on the back or at the front, or off the keys altogether in a bank on show above or below them, with an optional capacitor beside each LED; the Parts view shows them all before you build",
+        "Choose how the diodes are laid out: beside, above, below or in the corner of each switch, alternating column by column, or off the keys in a bank on show (a row, zig-zag, wave, arch, chevron, slant or smile), with a part-spacing setting so rows never crowd; the Parts view shows them all before you build",
+        "Through-hole parts by default (1N4148 diodes, 6×6mm reset button, SS12D00 switch), power and activity lights, knobs and a screen (0.91in, 0.96in or 1.3in) on any keyboard",
+        "Standoffs placed for you or by hand (M2, M2.5 or M3), the controller's USB end marked, and a parts list for every board: switches, keycaps, standoffs, screws and cables included",
         "Drag and turn the controller to wherever suits your case, and lay its parts out packed, in neat rows or in one tidy line",
         "New keyboard and Close keyboard buttons start afresh or put a keyboard away",
         "One click sends it to Makie for a printed case, or to Flashie to set the keymap and flash the firmware",
@@ -207,7 +209,7 @@ APPS = [
     pairs=[("makie", "Uses your measured clearances so printed parts fit."), ("probie", "Watch your printer's serial output.")],
   ),
   dict(
-    id="flashie", needshort="Board or SD card", name="Flashie", ver="0.8.0-alpha", color="#7b5cf5", icon="flashie.svg",
+    id="flashie", needshort="Board or SD card", name="Flashie", ver="0.8.1-alpha", color="#7b5cf5", icon="flashie.svg",
     tagline="Put new firmware on your boards, and operating systems on SD cards.",
     short="Flash ESP32, Pico, Arduino and STM32 boards, build programs from blocks, make keyboard firmware, and write SD cards and USB installers.",
     need="A microcontroller board, or an SD card / USB drive",
@@ -253,7 +255,7 @@ APPS = [
       ("Keyboard: firmware for your own keyboard", "For keyboards designed in Wirie's Keebie tab.", [
         "Click a key and pick what it sends: letters, shortcuts, media keys, text, or a layer key",
         "Up to 4 layers; knobs get a press, a turn left and a turn right on each",
-        "Show the layer, typing speed or a title on the screen; rainbow or solid per-key RGB",
+        "Show the layer, typing speed or a title on the screen; rainbow or solid per-key RGB; an activity light that flashes as you type",
         "Writes Arduino firmware, compiles it and flashes ATmega32U4 (Pro Micro), RP2040 and STM32 keyboards",
       ]),
       ("Write image: SD cards and USB drives", "Like Raspberry Pi Imager, and a bit like Rufus.", [

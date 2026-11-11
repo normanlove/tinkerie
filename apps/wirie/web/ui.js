@@ -837,7 +837,7 @@ function exportDialog() {
       <button class="excard" id="x_etch">${ico("print", "big")}<b>Print for home etching</b><small>1:1 copper artwork for toner transfer or UV</small></button>
       <button class="excard" id="x_png">${ico("eye", "big")}<b>Board picture</b><small>A realistic PNG render to show off</small></button>
       <button class="excard makie" id="x_makie">${ico("box", "big")}<b>Case data for Makie</b><small>Board shape, holes, 3D part sizes & connector openings — Makie builds the enclosure</small></button>
-      <button class="excard" id="x_bom">${ico("chip", "big")}<b>Parts list (BOM)</b><small>CSV you can open in Excel to order parts</small></button>
+      <button class="excard" id="x_bom">${ico("chip", "big")}<b>Parts list</b><small>Everything to buy, grouped, with quantities: copy it or save a CSV for Excel</small></button>
     </div><div id="x_res"></div>
     <div class="mfoot"><span class="credit">Files are tagged “Made with Wirie by ${APP.author}”</span><button class="btn ghost" data-close>Close</button></div>`, "wide");
   const sh = m.querySelector("#x_show"); if (sh) sh.onclick = e => { e.preventDefault(); closeModal(); UI.rtab = "check"; UI.drcShow = true; renderProps(); };
@@ -856,7 +856,7 @@ function exportDialog() {
   };
   m.querySelector("#x_etch").onclick = () => etchDialog();
   m.querySelector("#x_png").onclick = () => savePicture();
-  m.querySelector("#x_bom").onclick = () => { downloadFile((S.name || "board") + "-BOM.csv", bomCSV(), "text/csv"); toast("BOM downloaded"); };
+  m.querySelector("#x_bom").onclick = () => { closeModal(); partsListDialog(false); };
 }
 function etchDialog() {
   const m = modal(`<div class="mhead">${ico("print", "big")}<div><h2>Print for home etching</h2><p class="dim">Prints at exactly 1:1. In the print dialog set <b>Scale: 100% / Actual size</b> and turn off "fit to page".</p></div><button class="x" data-close>${ico("close")}</button></div>

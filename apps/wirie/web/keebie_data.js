@@ -102,6 +102,7 @@ const KB_SCREENS = [
   { id: "none", name: "No screen" },
   { id: "oled091", name: "0.91\" OLED, 128 × 32 (I2C)", w: 128, h: 32 },
   { id: "oled096", name: "0.96\" OLED, 128 × 64 (I2C)", w: 128, h: 64 },
+  { id: "oled13", name: "1.3\" OLED, 128 × 64 (I2C, SH1106)", w: 128, h: 64 },
 ];
 
 const KB_MCU = Object.fromEntries(KB_MCUS.map(m => [m.id, m]));
