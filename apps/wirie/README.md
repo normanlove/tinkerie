@@ -39,6 +39,8 @@ Displays & LED matrices (OLED/TFT/e-paper/LCD/7-seg/WS2812 panels), a big surfac
 - **Through-hole by default:** 1N4148 (DO-35) diodes, a 6×6mm reset button, an SS12D00 power switch, 3mm LEDs and leaded resistors. Per-key RGB LEDs and bare-chip circuitry stay surface-mount (there's no through-hole equivalent).
 - **Status lights:** a power light, and an activity light on a spare pin that flashes as keys are sent (Flashie's firmware, or a small C file with the QMK files).
 - **Standoffs:** M2, M2.5 or M3 at a chosen height, placed for you or by hand (click the board to add one, click one to remove it).
+- **Screens:** 0.91in, 0.96in, 1.3in and 2.42in OLEDs and a 16×2 LCD on I2C; the nice!view and colour TFTs (ST7789 1.3/1.54/1.9in, GC9A01 round, ST7735 1.8in) on SPI pins of their own.
+- **Place on their own:** the screen, status lights and reset button can each have their own block, dragged anywhere on the board (the outline grows to reach it, with a bridge so the board stays one piece).
 - **Parts list:** everything to buy for every board of the keyboard; the Export window's Parts list does the same for any board.
 - **USB:** controller footprints show which end the USB socket is, on the board and in silkscreen.
 - **The controller:** click it to select it, then drag it, nudge it with the arrow keys or the Move boxes, and turn it (R turns 15°, or ↺/↻ 90°); the board outline follows. *Controller's parts* lays its support parts out packed tightly, in neat rows of alike parts, or in one tidy line. Keebie warns if the controller ends up over the keys.

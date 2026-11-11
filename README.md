@@ -32,10 +32,10 @@ Double-click `Tinkerie.exe` to open the launcher and pick an app. Each app opens
 
 | App | What it does | Version |
 |---|---|---|
-| **Wirie** | Beginner-friendly circuit board designer (Keebie custom keyboards, Boardie stripboard, Calcie calculators, Pinnie, Powerie) | 0.13.0-alpha |
+| **Wirie** | Beginner-friendly circuit board designer (Keebie custom keyboards, Boardie stripboard, Calcie calculators, Pinnie, Powerie) | 0.14.0-alpha |
 | **Makie** | 3D-printing part designer. Builds cases for Wirie boards, including keyboard cases with a switch plate | 0.10.0-alpha |
 | **Tunie** | 3D printer tuning and calibration. Shares fit clearances with Makie | 0.5.0-alpha |
-| **Flashie** | Firmware flasher for microcontroller boards (ESP32, Pico, Arduino, STM32), plus a "Write image" tab that puts Raspberry Pi OS (with your Wi-Fi, user and SSH set up), Linux, or a Windows 10/11 installer onto an SD card or USB drive, and a Keyboard tab that makes and flashes firmware for Keebie keyboards | 0.8.1-alpha |
+| **Flashie** | Firmware flasher for microcontroller boards (ESP32, Pico, Arduino, STM32), plus a "Write image" tab that puts Raspberry Pi OS (with your Wi-Fi, user and SSH set up), Linux, or a Windows 10/11 installer onto an SD card or USB drive, and a Keyboard tab that makes and flashes firmware for Keebie keyboards | 0.9.0-alpha |
 | **Scopie** | Oscilloscope program (Hantek 6022BE/BL and others, plus network scopes and demo) | 0.9.2-alpha |
 | **Meterie** | PC multimeter: HoldPeak HP-90EPC, UNI-T, OWON, Brymen, Fluke and more | 0.6.2-alpha |
 | **Probie** | Serial monitor and logic analyser, with an Explain tab that explains captures in plain words (its own, and Scopie's and Meterie's). Probie was called Tracie before 0.11 | 0.6.0-alpha |

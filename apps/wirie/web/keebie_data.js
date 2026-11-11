@@ -100,10 +100,22 @@ for (const m of KB_MCUS) if (KB_ARD[m.id]) m.ard = KB_ARD[m.id];
 // small screens Keebie can add (SSD1306 OLED modules on I2C)
 const KB_SCREENS = [
   { id: "none", name: "No screen" },
-  { id: "oled091", name: "0.91\" OLED, 128 × 32 (I2C)", w: 128, h: 32 },
-  { id: "oled096", name: "0.96\" OLED, 128 × 64 (I2C)", w: 128, h: 64 },
-  { id: "oled13", name: "1.3\" OLED, 128 × 64 (I2C, SH1106)", w: 128, h: 64 },
+  // I2C screens: two pins (SDA, SCL)
+  { id: "oled091", name: "0.91\" OLED, 128 × 32 (I2C)", w: 128, h: 32, bus: "i2c", drv: "ssd1306", fp: "oled091" },
+  { id: "oled096", name: "0.96\" OLED, 128 × 64 (I2C)", w: 128, h: 64, bus: "i2c", drv: "ssd1306", fp: "oled096" },
+  { id: "oled13", name: "1.3\" OLED, 128 × 64 (I2C, SH1106)", w: 128, h: 64, bus: "i2c", drv: "sh1106", fp: "oled13" },
+  { id: "oled242", name: "2.42\" OLED, 128 × 64 (I2C, SSD1309)", w: 128, h: 64, bus: "i2c", drv: "ssd1306", fp: "oled242" },
+  { id: "lcd1602", name: "16 × 2 character LCD (I2C backpack)", w: 16, h: 2, bus: "i2c", drv: "lcd", fp: "lcd1602i2c" },
+  // SPI screens: their own pins (clock, data, select, and for colour screens DC and reset)
+  { id: "niceview", name: "nice!view, 160 × 68 (SPI, very low power)", w: 160, h: 68, bus: "spi", drv: "sharp", fp: "niceview", pins: { SCK: "sck", MOSI: "mosi", CS: "cs" } },
+  { id: "st7789_13", name: "1.3\" colour TFT, 240 × 240 (SPI, ST7789)", w: 240, h: 240, bus: "spi", drv: "st7789", fp: "tft_st7789_13", pins: { SCL: "sck", SDA: "mosi", CS: "cs", DC: "dc", RES: "rst" }, bl: "BLK" },
+  { id: "st7789_154", name: "1.54\" colour TFT, 240 × 240 (SPI, ST7789)", w: 240, h: 240, bus: "spi", drv: "st7789", fp: "tft_st7789_154", pins: { SCL: "sck", SDA: "mosi", CS: "cs", DC: "dc", RES: "rst" }, bl: "BLK" },
+  { id: "st7789_19", name: "1.9\" colour TFT, 170 × 320 (SPI, ST7789)", w: 170, h: 320, bus: "spi", drv: "st7789", fp: "tft_st7789_19", pins: { SCL: "sck", SDA: "mosi", CS: "cs", DC: "dc", RES: "rst" }, bl: "BLK" },
+  { id: "gc9a01", name: "1.28\" round colour TFT, 240 × 240 (SPI, GC9A01)", w: 240, h: 240, bus: "spi", drv: "gc9a01", fp: "tft_gc9a01", pins: { SCL: "sck", SDA: "mosi", CS: "cs", DC: "dc", RST: "rst" }, bl: "BLK" },
+  { id: "st7735", name: "1.8\" colour TFT, 128 × 160 (SPI, ST7735)", w: 128, h: 160, bus: "spi", drv: "st7735", fp: "tft_st7735", pins: { SCL: "sck", SDA: "mosi", CS: "cs", DC: "dc", RES: "rst" }, bl: "BL" },
 ];
+// the SPI screen's signals, in the order Keebie gives them pins
+const KB_SPI_ROLES = ["sck", "mosi", "cs", "dc", "rst"];
 
 const KB_MCU = Object.fromEntries(KB_MCUS.map(m => [m.id, m]));
 

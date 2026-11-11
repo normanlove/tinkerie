@@ -17,6 +17,8 @@ const RECAT = {
 
 // =============== DISPLAYS & LED MATRICES ===============
 const DISP = "Displays & LEDs";
+stripModule("oled242", "OLED display 2.42in 128x64 (I2C, SSD1309)", ["GND", "VCC", "SCL", "SDA"], { cat: DISP, desc: "Big SSD1309 OLED. Many come set for SPI: check the resistors on the back are moved for I2C", tags: "oled 2.42 ssd1309 i2c 128x64 big", w: 61, h: 39.5, col: "#123", pinsAt: "top" });
+stripModule("niceview", "nice!view display (Sharp memory LCD 160x68, SPI)", ["MOSI", "SCK", "VCC", "GND", "CS"], { cat: DISP, funcs: { MOSI: "MOSI", SCK: "SCK", VCC: "PWR3", GND: "GND", CS: "CS" }, desc: "Low-power reflective screen for wireless keyboards. Same 5 pins as the nice!view", tags: "nice view sharp memory lcd ls011b7dh03 zmk", w: 36, h: 14, col: "#2a2f38", pinsAt: "top" });
 stripModule("oled091", "OLED display 0.91in 128x32 (I2C)", ["GND", "VCC", "SCL", "SDA"], { cat: DISP, desc: "Tiny SSD1306 strip display", tags: "oled 128x32 ssd1306 i2c", w: 38, h: 12, col: "#123" });
 stripModule("oled15spi", "OLED display 1.5in 128x128 (SPI, 7-pin)", ["GND", "VCC", "SCL", "SDA", "RES", "DC", "CS"], { cat: DISP, funcs: { GND: "GND", VCC: "PWR", SCL: "SCK", SDA: "MOSI", RES: "SIG", DC: "SIG", CS: "CS" }, desc: "SSD1327/SSD1351 OLED", tags: "oled spi ssd1327 ssd1351", w: 34, h: 45, col: "#123", pinsAt: "top" });
 for (const [id, nm, w, h] of [["st7789_13", "1.3in 240x240", 28, 40], ["st7789_154", "1.54in 240x240", 31, 44], ["st7789_19", "1.9in 170x320", 26, 50], ["st7789_20", "2.0in 240x320", 36, 58]])

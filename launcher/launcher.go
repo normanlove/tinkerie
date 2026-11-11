@@ -24,7 +24,7 @@ import (
 )
 
 // Version is the suite version shown in the launcher.
-const Version = "0.16.0-alpha"
+const Version = "0.17.0-alpha"
 
 // App describes one tile in the launcher.
 type App struct {
@@ -39,10 +39,10 @@ type App struct {
 
 // Apps is the suite, in launcher order.
 var Apps = []App{
-	{"wirie", "Wirie", "Circuit board designer, with Keebie keyboards, Boardie, Calcie, Pinnie and Powerie", "0.13.0-alpha", "wirie.png", "", false},
+	{"wirie", "Wirie", "Circuit board designer, with Keebie keyboards, Boardie, Calcie, Pinnie and Powerie", "0.14.0-alpha", "wirie.png", "", false},
 	{"makie", "Makie", "3D-printing part designer. Builds cases for Wirie boards and keyboards", "0.11.0-alpha", "makie.png", "", false},
 	{"tunie", "Tunie", "3D printer tuning and calibration", "0.5.0-alpha", "tunie.png", "", false},
-	{"flashie", "Flashie", "Firmware flasher for ESP32, Pico, Arduino and STM32, keyboard firmware maker, and SD card / USB image writer", "0.8.1-alpha", "flashie.svg", "", false},
+	{"flashie", "Flashie", "Firmware flasher for ESP32, Pico, Arduino and STM32, keyboard firmware maker, and SD card / USB image writer", "0.9.0-alpha", "flashie.svg", "", false},
 	{"scopie", "Scopie", "Oscilloscope: Hantek 6022, network scopes and more", "0.10.0-alpha", "scopie.png", "", false},
 	{"meterie", "Meterie", "PC multimeter: HoldPeak, UNI-T, OWON, Brymen, Fluke…", "0.7.0-alpha", "meterie.png", "", false},
 	{"probie", "Probie", "Serial monitor and logic analyser that explains captures in plain words: its own, and Scopie's and Meterie's", "0.7.0-alpha", "probie.svg", "", false},

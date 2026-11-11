@@ -1,0 +1,25 @@
+# Rewrites the text of already-published releases from build/past-notes/<tag>.md
+# (for correcting release notes after the fact). Runs when those files change.
+name: Fix release notes
+on:
+  push:
+    branches: [main]
+    paths: ["build/past-notes/**"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  notes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update release text
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for f in build/past-notes/*.md; do
+            tag=$(basename "$f" .md)
+            if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+              gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --notes-file "$f" && echo "updated $tag"
+            else echo "no release $tag"; fi
+          done

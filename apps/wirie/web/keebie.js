@@ -202,11 +202,15 @@ function kbKnobCount(K) {
 function kbPinPlan(K) {
   const m = kbMcu(K); let pins = kbBasePins(K);
   const scr = K.oled && K.oled !== "none";
-  const i2c = scr ? (m.ard ? m.ard.i2c : m.id === "nicenano" ? ["D2", "D3"] : ["D4", "D5"]) : null;
+  const sd = KB_SCREENS.find(x => x.id === K.oled);
+  const i2c = scr && sd && sd.bus === "i2c" ? (m.ard ? m.ard.i2c : m.id === "nicenano" ? ["D2", "D3"] : ["D4", "D5"]) : null;
   if (i2c) pins = pins.filter(p => !i2c.includes(p));
+  // an SPI screen gets pins of its own for each signal it uses
+  let spi = null;
+  if (scr && sd && sd.bus === "spi") { const roles = KB_SPI_ROLES.filter(r => Object.values(sd.pins).includes(r)); if (pins.length >= roles.length) { spi = {}; for (const r of roles) spi[r] = pins.pop(); } }
   const enc = []; for (let i = 0; i < kbKnobCount(K) && pins.length >= 2; i++) enc.push(pins.splice(pins.length - 2, 2));
   const act = K.actLed && pins.length ? pins.pop() : null; // the activity light's pin
-  return { pins, i2c, enc, act };
+  return { pins, i2c, spi, enc, act };
 }
 function kbFreePins(K) { return kbPinPlan(K).pins; }
 // keys in wiring order (snakes through the matrix rows; the LED chain follows it)
@@ -218,12 +222,12 @@ function kbOrd(G, b) { const M = G.matrix; return b.places.slice().sort((p, q) =
 // the controller plan only depends on a few settings: remember it between redraws
 const KB_PLAN_CACHE = new Map();
 function kbPlanCtrl(K, half) {
-  const key = JSON.stringify([K.mcu, K.outline.margin, K.rgb, K.oled, K.split.mode, half || 0, kbKnobCount(K), kbPinPlan(K), K.pack || "compact", K.dspace, K.pwrLed, K.actLed]);
+  const key = JSON.stringify([K.mcu, K.outline.margin, K.rgb, K.oled, K.split.mode, half || 0, kbKnobCount(K), kbPinPlan(K), K.pack || "compact", K.dspace, K.pwrLed, K.actLed, K.sep || null]);
   let plan = KB_PLAN_CACHE.get(key);
   if (!plan) { plan = kbPlanCtrl0(K, half); if (KB_PLAN_CACHE.size > 30) KB_PLAN_CACHE.clear(); KB_PLAN_CACHE.set(key, plan); }
   // hand back a copy (callers move the parts), keeping the nets pointing at the copied parts
   const map = new Map(plan.parts.map(q => [q, Object.assign({}, q)]));
-  return Object.assign({}, plan, { parts: plan.parts.map(q => map.get(q)), nets: plan.nets.map(([n, pins]) => [n, pins.map(pin => Array.isArray(pin) && map.has(pin[0]) ? [map.get(pin[0]), ...pin.slice(1)] : pin)]) });
+  return Object.assign({}, plan, { loose: (plan.loose || []).map(L => Object.assign({}, L, { parts: L.parts.map(q => map.get(q)) })), parts: plan.parts.map(q => map.get(q)), nets: plan.nets.map(([n, pins]) => [n, pins.map(pin => Array.isArray(pin) && map.has(pin[0]) ? [map.get(pin[0]), ...pin.slice(1)] : pin)]) });
 }
 function kbPlanCtrl0(K, half) {
   const mcu = kbMcu(K), parts = [], nets = [], margin = K.outline.margin;
@@ -242,20 +246,23 @@ function kbPlanCtrl0(K, half) {
   let vcc = mcu.pwr;
   if (mcu.bare) vcc = kbSupport(mcu, B, U).vcc;
   else {
-    if (mcu.reset) { const s = B.add("sw6x6", "Reset (6x6mm)", "SW_RST"); B.net("RESET", [U, mcu.reset[0]], [s, "A"]); B.net("GND", [U, mcu.reset[1]], [s, "B"]); }
+    if (mcu.reset) { const s = B.add("sw6x6", "Reset (6x6mm)", "SW_RST"); s.group = "reset"; B.net("RESET", [U, mcu.reset[0]], [s, "A"]); B.net("GND", [U, mcu.reset[1]], [s, "B"]); }
     if (mcu.id === "nicenano") { const j = B.add("jstph2", "Battery", "J_BAT"), s = B.add("slide_ss12d00", "SS12D00 power", "SW_PWR"); B.net("BAT+", [j, "1"], [s, "A"]); B.net("RAW", [s, "COM"], [U, "RAW"]); B.net("GND", [j, "2"], [U, "GND"]); }
   }
   const split = K.split.mode === "two" && !mcu.wireless;
   if (split) { const t = B.add("kb_trrs", "TRRS", "J_TRRS"); t.fixed = "trrs"; B.net("GND", [t, "SLEEVE"], [U, /^stm32/.test(mcu.id) ? "VSS" : "GND"]); B.net("SERIAL", [t, "TIP"], [U, mcu.serial]); B.net(mcu.bare ? "5V" : "VCC_LINK", [t, "RING1"], ...(mcu.bare ? [] : [[U, mcu.logic]])); }
   const scr = KB_SCREENS.find(x => x.id === K.oled);
   if (scr && scr.w) {
-    const pp = kbPinPlan(K), o = B.add(scr.id, `OLED ${scr.w}x${scr.h}`, "DISP1");
-    B.net("SDA", [o, "SDA"], [U, pp.i2c[0]]); B.net("SCL", [o, "SCL"], [U, pp.i2c[1]]); B.net("GND", [o, "GND"]);
-    if (mcu.bare) B.net(vcc, [o, "VCC"]); else B.net("OLED_VCC", [o, "VCC"], [U, mcu.logic]);
+    const pp = kbPinPlan(K), o = B.add(scr.fp, scr.name.replace(/ \(.*$/, ""), "DISP1"); o.group = "screen";
+    if (scr.bus === "spi") { if (pp.spi) for (const [pad, role] of Object.entries(scr.pins)) B.net("SCR_" + role.toUpperCase(), [o, pad], [U, pp.spi[role]]); }
+    else { B.net("SDA", [o, "SDA"], [U, pp.i2c[0]]); B.net("SCL", [o, "SCL"], [U, pp.i2c[1]]); }
+    B.net("GND", [o, "GND"]);
+    const feed = mcu.bare ? [] : [[U, mcu.logic]], vn = mcu.bare ? vcc : "SCR_VCC";
+    B.net(vn, [o, "VCC"], ...(scr.bl ? [[o, scr.bl]] : []), ...feed);
   }
   if (K.rgb) { const c = mcu.bare ? B.add("c_0805", "10uF") : B.add("c_elec_5", "10uF"); const [cp, cn] = mcu.bare ? ["1", "2"] : ["+", "-"]; B.net(mcu.bare ? "5V" : "LED_5V", [c, cp], ...(mcu.bare ? [] : [[U, mcu.pwr]])); B.net("GND", [c, cn]); }
   // status lights: a 3mm LED and a 1k resistor each
-  const light = (name, ref, feed) => { const r = B.add("r_axial_7.62", "1k", "R_" + ref), d = B.add("led3", name === "power" ? "Green 3mm" : "Blue 3mm", "LED_" + ref); B.net(ref + "_LED", [r, "2"], [d, "A"]); B.net("GND", [d, "K"]); feed([r, "1"]); };
+  const light = (name, ref, feed) => { const r = B.add("r_axial_7.62", "1k", "R_" + ref), d = B.add("led3", name === "power" ? "Green 3mm" : "Blue 3mm", "LED_" + ref); r.group = d.group = "lights"; B.net(ref + "_LED", [r, "2"], [d, "A"]); B.net("GND", [d, "K"]); feed([r, "1"]); };
   if (K.pwrLed) light("power", "PWR", pin => mcu.bare ? B.net(vcc, pin) : B.net("PWR_LED", pin, [U, mcu.logic]));
   const act = kbPinPlan(K).act;
   if (K.actLed && act) light("activity", "ACT", pin => B.net("ACT", pin, [U, act]));
@@ -263,7 +270,8 @@ function kbPlanCtrl0(K, half) {
   const fpBox = (p, rot) => { const c = { fp: p.fp, x: 0, y: 0, rot, side: "top" }; return compBox(c); };
   const placed = [];
   const W0 = mcu.bare ? 40 : Math.max(LIB_BY_ID[mcu.fp].body.w + 16, split ? 36 : 28);
-  const W = Math.max(W0, scr && scr.w ? LIB_BY_ID[scr.id].body.w + 3 : 0);
+  const sep = g => !!(K.sep && K.sep[g]);
+  const W = Math.max(W0, scr && scr.w && !sep("screen") ? LIB_BY_ID[scr.fp].body.w + 3 : 0);
   const gap = 0.8 * kbSpaceF(K);
   const put = (p, x, y, rot) => { p.x = x; p.y = y; p.rot = rot; const b = fpBox(p, rot); placed.push({ x0: b.x0 + x - gap, y0: b.y0 + y - gap, x1: b.x1 + x + gap, y1: b.y1 + y + gap }); };
   const usb = parts.find(p => p.fixed === "usb"), trrs = parts.find(p => p.fixed === "trrs");
@@ -271,7 +279,7 @@ function kbPlanCtrl0(K, half) {
   if (mcu.bare) { const b = LIB_BY_ID[mcu.fp].body; put(U, W / 2, 9 + b.h / 2 + 2, 0); }
   else { const b = LIB_BY_ID[mcu.fp].body; put(U, W / 2, -margin + 1 + b.h / 2, 0); }
   if (trrs) { const xr = half === 0 ? W - 4.5 : 4.5; put(trrs, xr, -margin + 0.65, 0); }
-  const rest = parts.filter(p => !p.fixed).sort((a, b) => { const A = fpBox(a, 0), Bx = fpBox(b, 0); return (Bx.x1 - Bx.x0) * (Bx.y1 - Bx.y0) - (A.x1 - A.x0) * (A.y1 - A.y0); });
+  const rest = parts.filter(p => !p.fixed && !(p.group && sep(p.group))).sort((a, b) => { const A = fpBox(a, 0), Bx = fpBox(b, 0); return (Bx.x1 - Bx.x0) * (Bx.y1 - Bx.y0) - (A.x1 - A.x0) * (A.y1 - A.y0); });
   const hits = (r) => placed.some(q => r.x0 < q.x1 && r.x1 > q.x0 && r.y0 < q.y1 && r.y1 > q.y0);
   if (K.pack === "rows" || K.pack === "line") {
     // tidy: the support parts in rows under the controller, alike parts together, all facing the same way
@@ -296,7 +304,15 @@ function kbPlanCtrl0(K, half) {
     }
   }
   const H = Math.max(10, ...placed.map(q => q.y1)) + 0.5;
-  return { W, H, parts, nets, vcc, mcu };
+  // parts placed on their own (screen, status lights, reset button): each group packed in a little block
+  const loose = [];
+  for (const g of ["screen", "lights", "reset"]) {
+    const gp = parts.filter(p => p.group === g); if (!gp.length || !sep(g)) continue;
+    let x = 0.5, h = 0;
+    for (const p of gp) { const b = fpBox(p, 0); p.x = x - b.x0; p.y = 0.5 - b.y0; p.rot = 0; x += b.x1 - b.x0 + 1.4 * kbSpaceF(K); h = Math.max(h, b.y1 - b.y0); }
+    loose.push({ group: g, W: x - 1.4 * kbSpaceF(K) + 0.5, H: h + 1, parts: gp });
+  }
+  return { W, H, parts, nets, vcc, mcu, loose };
 }
 
 // ---------------------------------------------------------------- outline
@@ -329,6 +345,8 @@ function kbFillet(pts, r) {
   return o;
 }
 // trace the outside of a set of shapes (rotated key rectangles + the controller area)
+// a straight strip of board, w wide, from a to b
+function kbBridge(a, b, w) { const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1, nx = -dy / L * w / 2, ny = dx / L * w / 2; return [[a[0] + nx, a[1] + ny], [b[0] + nx, b[1] + ny], [b[0] - nx, b[1] - ny], [a[0] - nx, a[1] - ny]]; }
 function kbHug(shapes, radius) {
   let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
   for (const s of shapes) for (const [x, y] of s) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
@@ -427,6 +445,16 @@ function kbGeom(force) {
     ax += off.x || 0; ay += off.y || 0;
     const area = kbArea(ax, ay, plan.W, plan.H, off.rot || 0);
     const areaPoly = g => area.poly(g);
+    // blocks placed on their own: beside the controller to start with, then wherever they're dragged
+    const loose = []; let lx = pos === "left" || pos === "sideL" ? area.bb[2] + 3 : area.bb[0] - 3;
+    for (const L of plan.loose || []) {
+      const right = pos === "left" || pos === "sideL", x = right ? lx : lx - L.W; lx = right ? lx + L.W + 3 : lx - L.W - 3;
+      let top = 1e9; for (const poly of keyPolys) for (const [px2, py2] of poly) if (px2 >= x - 2 && px2 <= x + L.W + 2) top = Math.min(top, py2);
+      let y = (top < 1e9 ? top : by0) - L.H - 1;
+      if (bank && bank.side === "above" && x < bank.x1 + 1 && x + L.W > bank.x0 - 1) y = Math.min(y, bank.y0 - L.H - 1.5);
+      const key = L.group + ":" + h, lo = (K.sepOff || {})[key] || {};
+      loose.push({ group: L.group, key, parts: L.parts, area: kbArea(x + (lo.x || 0), y + (lo.y || 0), L.W, L.H, lo.rot || 0) });
+    }
     let polys;
     const custom = K.outline.mode === "custom" && K.outline.custom && K.outline.custom[h];
     if (custom) polys = [custom.map(p => p.slice())];
@@ -434,10 +462,17 @@ function kbGeom(force) {
       let x0 = Math.min(bx0, area.bb[0]), x1 = Math.max(bx1, area.bb[2]), y0 = Math.min(by0, area.bb[1]), y1 = area.bb[3];
       for (const p of ps) for (const [, y] of kbCorners(p, sx, sy)) y1 = Math.max(y1, y);
       if (bank) { x0 = Math.min(x0, bank.x0); x1 = Math.max(x1, bank.x1); y0 = Math.min(y0, bank.y0); y1 = Math.max(y1, bank.y1); }
+      for (const L of loose) { x0 = Math.min(x0, L.area.bb[0]); x1 = Math.max(x1, L.area.bb[2]); y0 = Math.min(y0, L.area.bb[1]); y1 = Math.max(y1, L.area.bb[3]); }
       polys = [kbRectPoly(x0 - m, y0 - m, x1 + m, y1 + m, K.outline.radius)];
     } else {
       const shapes = ps.map(p => p.k.shape === "iso" ? kbISOPoly(p, sx, sy, m) : kbCorners(p, sx, sy, m));
       shapes.push(areaPoly(m));
+      // each separate block, with a bridge to the nearest key or the controller so the board stays one piece
+      for (const L of loose) {
+        shapes.push(L.area.poly(m));
+        let best = null, bd = 1e9; for (const pt of [...keyPolys.flat(), ...area.poly(0)]) { const d = Math.hypot(pt[0] - L.area.cx, pt[1] - L.area.cy); if (d < bd) { bd = d; best = pt; } }
+        if (best) shapes.push(kbBridge([L.area.cx, L.area.cy], best, Math.max(4, Math.min(L.area.w, L.area.h) * 0.6)));
+      }
       if (bank) { // the bank, joined to the keys
         shapes.push(kbRectPoly(bank.x0 - m, bank.y0 - m, bank.x1 + m, bank.y1 + m, 0));
         const mid = (by0 + by1) / 2; // reach well into the keys, so staggered and angled rows still join up
@@ -451,7 +486,7 @@ function kbGeom(force) {
       }
       polys = kbHug(shapes, K.outline.radius);
     }
-    G.boards.push({ half: h, places: ps, plan, area, bank, polys, holes: [] });
+    G.boards.push({ half: h, places: ps, plan, area, loose, bank, polys, holes: [] });
   }
   for (const b of G.boards) if (b) b.holes = Array.isArray(K.so) ? K.so.filter(h => h[0] === b.half).map(h => [h[1], h[2]]) : KV.drag ? (KV.geom?.boards?.[b.half]?.holes || []) : kbHoles(K, G, b);
   KV.geom = G; KV.geomKey = key;
@@ -595,6 +630,7 @@ function kbHoles(K, G, b) {
   }
   for (let y = y0 + 3; y < y1 - 3; y += 1.6) for (let x = x0 + 3; x < x1 - 3; x += 1.6) {
     if (b.bank && x > b.bank.x0 - 4 && x < b.bank.x1 + 4 && y > b.bank.y0 - 4 && y < b.bank.y1 + 4) continue;
+    if ((b.loose || []).some(L => x > L.area.bb[0] - 4 && x < L.area.bb[2] + 4 && y > L.area.bb[1] - 4 && y < L.area.bb[3] + 4)) continue;
     if (A && (A.rot ? x > A.bb[0] - 6 && x < A.bb[2] + 6 && y > A.bb[1] - 6 && y < A.bb[3] + 6 : x > A.x - 3 && x < A.x + A.w + 3 && y > A.y - 6 && y < A.y + A.h + 3)) continue;
     let ok = true; for (const f of grid.get(cell(x, y)) || []) { const dx = x - f[0], dy = y - f[1], lim = r + f[2]; if (dx * dx + dy * dy < lim * lim) { ok = false; break; } }
     if (!ok || !inBoard(x, y)) continue;
@@ -664,8 +700,9 @@ function kbBuild(half) {
   // ---- controller and its circuitry
   const plan = b.plan, area = b.area, made = new Map();
   for (const p of plan.parts) {
-    const [wx, wy] = area.at(p.x, p.y);
-    const c = addComp(p.fp, X(wx), Y(wy), { ref: p.ref || undefined, value: p.value, rot: (p.rot + (area.rot || 0)) % 360, side: p.side });
+    const L = (b.loose || []).find(q => q.parts.includes(p)), ar = L ? L.area : area;
+    const [wx, wy] = ar.at(p.x, p.y);
+    const c = addComp(p.fp, X(wx), Y(wy), { ref: p.ref || undefined, value: p.value, rot: (p.rot + (ar.rot || 0)) % 360, side: p.side });
     if (c) made.set(p.id, c);
   }
   for (const [name, list] of plan.nets) for (const [p, pin] of list) { const c = made.get(p.id); if (c) net(name, c, pin); }
@@ -749,7 +786,8 @@ function kbQMK() {
   if (K.split.mode === "two") kb.split = { enabled: true, serial: { pin: q.map(m.serial) } };
   const PP = kbPinPlan(K);
   if (PP.enc.length) { kb.features.encoder = true; kb.encoder = { rotary: PP.enc.map(([a, b]) => ({ pin_a: q.map(a), pin_b: q.map(b) })) }; }
-  if (PP.i2c) kb.features.oled = true;
+  const sdq = KB_SCREENS.find(x => x.id === K.oled);
+  if (PP.i2c && sdq && /ssd1306|sh1106/.test(sdq.drv)) kb.features.oled = true; // other screens need QMK's Quantum Painter, set up by hand
   if (K.rgb) {
     kb.features.rgb_matrix = true; kb.ws2812 = { pin: q.map(m.led) };
     const xs = lay.map(l => l.o.x), ys = lay.map(l => l.o.y), mx = Math.max(...xs) || 1, my = Math.max(...ys) || 1;
@@ -823,7 +861,7 @@ function kbFlashieExport() {
     rows: PP.pins.slice(0, M.rows).map(pin), cols: PP.pins.slice(M.rows, M.rows + M.cols).map(pin),
     keys: lay.map(({ p, o }) => { const [row, col] = kbMatrixFor(K, G, p); return { id: p.k.id, label: p.k.label || "", x: o.x, y: o.y, w: p.w, h: p.h, r: o.r || 0, rx: o.rx, ry: o.ry, row, col, half: p.half, kind: p.k.kind || "key", qmk: kbKeycode(p.k.label, p.half === 1 || o.x > 9) }; }),
     knobs: knobs.map((p, i) => PP.enc[i] && { key: p.k.id, a: pin(PP.enc[i][0]), b: pin(PP.enc[i][1]) }).filter(Boolean),
-    screen: scr && scr.w ? { type: scr.id, name: scr.name, w: scr.w, h: scr.h, sda: pin(PP.i2c[0]), scl: pin(PP.i2c[1]) } : null,
+    screen: scr && scr.w && (PP.i2c || PP.spi) ? Object.assign({ type: scr.id, drv: scr.drv, bus: scr.bus, name: scr.name, w: scr.w, h: scr.h }, PP.i2c ? { sda: pin(PP.i2c[0]), scl: pin(PP.i2c[1]) } : { spi: Object.fromEntries(Object.entries(PP.spi).map(([r, pd]) => [r, pin(pd)])) }) : null,
     lights: K.pwrLed || PP.act ? { power: !!K.pwrLed, act: PP.act ? pin(PP.act) : null } : null,
     rgb: K.rgb ? { pin: pin(m.led), count: (G.boards[0] ? G.boards[0].places : G.places).filter(p => p.k.kind !== "knob").length } : null,
   };
@@ -972,6 +1010,9 @@ function kbSide() {
       <small class="kb-note">Click the controller on the keyboard to drag it or turn it. Use <b>Parts</b> above the keyboard to see every diode and LED.</small>
       ${sel("kb_oled", "Screen", opt(KB_SCREENS, K.oled || "none"), "Screen")}
       <small class="kb-note">Knobs: pick a key and set its <b>Type</b> to <i>Rotary knob</i>, or press <b>Knob</b> above the keyboard. Any keyboard can have knobs and a screen; if the controller runs out of pins, Keebie suggests one with more.</small>
+      <h5 class="kb-sub">Place on their own</h5>
+      <small class="kb-note">Ticked parts leave the controller's block and get one of their own that you can drag anywhere on the board.</small>
+      <div class="kb-row" data-help="Place on their own">${[["screen", "Screen"], ["lights", "Status lights"], ["reset", "Reset button"]].map(([g, t]) => `<label class="kb-check"><input type="checkbox" data-sep="${g}" ${K.sep && K.sep[g] ? "checked" : ""}> ${t}</label>`).join("")}</div>
       <h5 class="kb-sub">Status lights</h5>
       <label class="kb-check" data-help="Power light"><input type="checkbox" id="kb_pwrled" ${K.pwrLed ? "checked" : ""}> Power light: on while the keyboard has power</label>
       <label class="kb-check" data-help="Activity light"><input type="checkbox" id="kb_actled" ${K.actLed ? "checked" : ""}> Activity light: flashes when a key is sent (uses 1 pin)</label>
@@ -1015,6 +1056,7 @@ function kbSide() {
     KV.soMode = !KV.soMode; kbChanged("place standoffs"); kbSide();
   });
   on("kb_soauto", "onclick", () => { K.so = null; KV.soMode = false; kbChanged("standoffs placed for you"); kbSide(); });
+  $$("#kbSide [data-sep]").forEach(c => c.onchange = () => { if (!K.sep) K.sep = {}; K.sep[c.dataset.sep] = c.checked; if (!c.checked && typeof KV.csel === "string" && KV.csel.startsWith(c.dataset.sep + ":")) KV.csel = null; kbChanged(c.checked ? "place on its own" : "back with the controller"); });
   on("kb_space", "onchange", () => { K.dspace = val("kb_space"); kbChanged("part spacing"); });
   on("kb_pwrled", "onchange", () => { K.pwrLed = $("#kb_pwrled").checked; kbChanged("power light"); });
   on("kb_actled", "onchange", () => { K.actLed = $("#kb_actled").checked; kbChanged("activity light"); });
@@ -1055,12 +1097,12 @@ function kbSide() {
 function kbBigger0(K, m) {
   const cur = kbMcu(K);
   return KB_MCUS.filter(m => !!m.wireless === !!cur.wireless && !!m.bare === !!cur.bare && m.id !== cur.id && m.pins.length > cur.pins.length)
-    .sort((a, b) => a.pins.length - b.pins.length).find(m => { const K2 = Object.assign({}, K, { mcu: m.id }), PP = kbPinPlan(K2), M = kbMatrix(K2, kbPlace(K2)); return PP.pins.length >= M.rows + M.cols && PP.enc.length >= kbKnobCount(K2) && (!K2.actLed || PP.act); });
+    .sort((a, b) => a.pins.length - b.pins.length).find(m => { const K2 = Object.assign({}, K, { mcu: m.id }), PP = kbPinPlan(K2), M = kbMatrix(K2, kbPlace(K2)); const sd2 = KB_SCREENS.find(x => x.id === K2.oled); return PP.pins.length >= M.rows + M.cols && PP.enc.length >= kbKnobCount(K2) && (!K2.actLed || PP.act) && !(sd2 && sd2.bus === "spi" && !PP.spi); });
 }
 function kbBiggerMcu(K) { try { return kbBigger0(K); } catch (e) { return null; } }
 function kbStats() {
   const el = $("#kbStats"); if (!el) return;
-  const K = KBS(), G = kbGeom(), M = G.matrix, PP = kbPinPlan(K), base = kbBasePins(K), extra = PP.enc.length * 2 + (PP.i2c ? 2 : 0), pins = PP.pins, need = M.rows + M.cols;
+  const K = KBS(), G = kbGeom(), M = G.matrix, PP = kbPinPlan(K), base = kbBasePins(K), extra = PP.enc.length * 2 + (PP.i2c ? 2 : 0) + (PP.spi ? Object.keys(PP.spi).length : 0) + (PP.act ? 1 : 0), pins = PP.pins, need = M.rows + M.cols;
   const nKnob = kbKnobCount(K);
   const sizes = {}; for (const k of K.keys.filter(q => q.kind !== "knob")) { const s = k.shape === "iso" ? "ISO enter" : (k.h > k.w ? `${k.h}u vertical` : `${k.w}u`); sizes[s] = (sizes[s] || 0) + 1; }
   const stabs = G.places.filter(p => kbStab(K, G, p)).length;
@@ -1068,7 +1110,11 @@ function kbStats() {
   const warn = [];
   if (PP.enc.length < nKnob) warn.push(`Not enough free pins for ${nKnob} knob${nKnob > 1 ? "s" : ""}: each knob needs 2 pins of its own.`);
   if (K.actLed && !PP.act) warn.push("No free pin left for the activity light.");
-  const short = PP.enc.length < nKnob || need > pins.length || (K.actLed && !PP.act);
+  const sd = KB_SCREENS.find(x => x.id === K.oled);
+  if (sd && sd.bus === "spi" && !PP.spi) warn.push(`Not enough free pins for the ${sd.name.split(",")[0]}: it needs ${new Set(Object.values(sd.pins)).size} of its own.`);
+  if (sd && sd.bus === "spi" && G.mcu.volt === 5) warn.push(`The ${sd.name.split(",")[0]} expects 3.3V signals; a 5V controller can damage it. An RP2040 controller (same footprint: RP2040 Pro Micro) is safer.`);
+  if (sd && sd.drv === "lcd" && G.mcu.volt === 3.3) warn.push("16×2 LCDs want 5V: on a 3.3V controller the text may be faint (most still work).");
+  const short = PP.enc.length < nKnob || need > pins.length || (K.actLed && !PP.act) || (sd && sd.bus === "spi" && !PP.spi);
   const better = short ? kbBiggerMcu(K) : null;
   if (need > pins.length) warn.push(`The matrix needs ${need} pins but the ${G.mcu.name} has ${pins.length} free. Try: ${KB_MCUS.filter(m => m.pins.length - 2 >= need).map(m => m.name.split(" (")[0]).slice(0, 3).join(", ") || "a split layout"}.`);
   if (M.dup.length) warn.push(`${M.dup.length} key(s) share a matrix position with another key: check the row/column overrides.`);
@@ -1086,15 +1132,22 @@ function kbStats() {
 }
 
 // ---- the controller's hand placement (one per half)
-function kbCtrlOff(K, h) { if (!Array.isArray(K.ctrlOff)) K.ctrlOff = []; return K.ctrlOff[h] || (K.ctrlOff[h] = { x: 0, y: 0, rot: 0 }); }
+function kbCtrlOff(K, h) {
+  if (typeof h === "string") { if (!K.sepOff) K.sepOff = {}; return K.sepOff[h] || (K.sepOff[h] = { x: 0, y: 0, rot: 0 }); } // a separate block ("screen:0")
+  if (!Array.isArray(K.ctrlOff)) K.ctrlOff = []; return K.ctrlOff[h] || (K.ctrlOff[h] = { x: 0, y: 0, rot: 0 });
+}
+const KB_GROUPS = { screen: "Screen", lights: "Status lights", reset: "Reset button" };
+const kbKeyHalf = h => typeof h === "string" ? +h.split(":")[1] : h;
 function kbCtrlPanel(el, K, h) {
   const off = kbCtrlOff(K, h), mcu = kbMcu(K);
-  el.innerHTML = `<h4>Controller${K.split.mode === "two" ? (h ? " (right half)" : " (left half)") : ""}</h4>
-    <p class="dim">${esc(mcu.name)}${mcu.bare ? " and its circuitry" : ""}. Drag it to move it, or use the boxes below.</p>
+  const grp = typeof h === "string" ? h.split(":")[0] : null, hh = kbKeyHalf(h);
+  el.innerHTML = `<h4>${grp ? KB_GROUPS[grp] : "Controller"}${K.split.mode === "two" ? (hh ? " (right half)" : " (left half)") : ""}</h4>
+    <p class="dim">${grp ? `Placed on its own, away from the controller. Drag it anywhere on the board (the outline grows to reach it), or use the boxes below.` : `${esc(mcu.name)}${mcu.bare ? " and its circuitry" : ""}. Drag it to move it, or use the boxes below.`}</p>
     <div class="kb-row"><label class="fld" data-help="Controller nudge X"><span>Move across</span><div class="kb-inp"><input id="kc_x" type="number" step="0.5" value="${off.x || 0}"><em>mm</em></div></label><label class="fld" data-help="Controller nudge Y"><span>Move down</span><div class="kb-inp"><input id="kc_y" type="number" step="0.5" value="${off.y || 0}"><em>mm</em></div></label></div>
     <label class="fld" data-help="Controller angle"><span>Angle</span><div class="kb-inp"><input id="kc_r" type="number" step="15" value="${off.rot || 0}"><em>°</em></div></label>
     <div class="kb-row"><button class="btn sm" id="kc_l" data-help="Turn controller left">↺ 90°</button><button class="btn sm" id="kc_rr" data-help="Turn controller right">↻ 90°</button></div>
     <button class="btn sm wide" id="kc_0" data-help="Reset controller">Put it back where Keebie chose</button>
+    ${grp ? `<button class="btn sm wide" id="kc_join" data-help="Join the controller">Put it back with the controller</button>` : ""}
     ${K.outline.mode === "custom" ? `<p class="kb-warn">Your outline is custom: drag its corners so the board still covers the controller.</p>` : ""}
     <ul class="kb-help"><li>Drag to move (<kbd>Alt</kbd> for fine steps)</li><li><kbd>Arrows</kbd> move 1 mm (<kbd>Shift</kbd> 5 mm)</li><li><kbd>R</kbd> / <kbd>Shift R</kbd> turn 15°</li><li><kbd>Esc</kbd> deselect</li></ul>`;
   const num = id => parseFloat($("#" + id).value) || 0;
@@ -1105,13 +1158,14 @@ function kbCtrlPanel(el, K, h) {
   $("#kc_l").onclick = () => set(() => off.rot = (((off.rot || 0) - 90) % 360 + 360) % 360);
   $("#kc_rr").onclick = () => set(() => off.rot = ((off.rot || 0) + 90) % 360);
   $("#kc_0").onclick = () => set(() => { off.x = 0; off.y = 0; off.rot = 0; });
+  if (grp) $("#kc_join").onclick = () => { K.sep[grp] = false; KV.csel = null; kbChanged("join the controller"); kbSide(); };
 }
 
 // ---- key properties panel
 function kbPropsPanel() {
   const el = $("#kbProps"); if (!el) return;
   const K = KBS(), sel = K.keys.filter(k => KV.sel.has(k.id));
-  if (!sel.length && KV.csel != null && kbGeom().boards[KV.csel]) { kbCtrlPanel(el, K, KV.csel); return; }
+  if (!sel.length && KV.csel != null && kbGeom().boards[kbKeyHalf(KV.csel)]) { kbCtrlPanel(el, K, KV.csel); return; }
   if (!sel.length) {
     el.innerHTML = `<h4>Keys</h4><p class="dim">Click a key to change it; Shift-click or drag a box to pick several.</p>
       <ul class="kb-help"><li><kbd>Arrows</kbd> move ¼ key (<kbd>Shift</kbd> 1 key)</li><li><kbd>R</kbd> / <kbd>Shift R</kbd> turn 5°</li><li><kbd>F</kbd> turn the switch footprint 90°</li><li><kbd>Ctrl D</kbd> duplicate · <kbd>Del</kbd> delete</li><li><kbd>Ctrl A</kbd> select all · wheel to zoom, right-drag to pan</li></ul>
@@ -1274,7 +1328,8 @@ function kbDraw() {
     for (const pl of b.polys) o.push(`<path d="${path(pl)}" class="kb-board"/>`);
     const A = b.area, csel = KV.csel === b.half;
     o.push(`<g data-ctrl="${b.half}" class="kb-ctrl ${csel ? "sel" : ""}" transform="rotate(${A.rot || 0} ${A.cx} ${A.cy})"><rect x="${A.x}" y="${A.y}" width="${A.w}" height="${A.h}" rx="1.5" class="kb-area"/>`);
-    for (const p of b.plan.parts) { const fp = LIB_BY_ID[p.fp]; if (!fp) continue; const bb = compBox({ fp: p.fp, x: A.x + p.x, y: A.y + p.y, rot: p.rot, side: "top" }); o.push(`<rect x="${bb.x0}" y="${bb.y0}" width="${bb.x1 - bb.x0}" height="${bb.y1 - bb.y0}" rx="0.4" class="kb-part ${p.fixed ? "big" : ""}"/>`);
+    const looseParts = new Set((b.loose || []).flatMap(L => L.parts));
+    for (const p of b.plan.parts) { const fp = LIB_BY_ID[p.fp]; if (!fp || looseParts.has(p)) continue; const bb = compBox({ fp: p.fp, x: A.x + p.x, y: A.y + p.y, rot: p.rot, side: "top" }); o.push(`<rect x="${bb.x0}" y="${bb.y0}" width="${bb.x1 - bb.x0}" height="${bb.y1 - bb.y0}" rx="0.4" class="kb-part ${p.fixed ? "big" : ""}"/>`);
       if (p.fixed === "mcu" && fp.body.usb) { // where the controller's USB socket is
         const sgn = fp.body.usb === "bottom" ? 1 : -1, [ux, uy] = rotPt(0, sgn * (fp.body.h / 2 + 1.6), p.rot); const tx = A.x + p.x + ux, ty = A.y + p.y + uy;
         o.push(`<g class="kb-usb"><rect x="${tx - 4.5}" y="${ty - 1.8}" width="9" height="3.6" rx="0.8"/><text x="${tx}" y="${ty + 0.05}" font-size="2.2">USB ${sgn < 0 ? "▲" : "▼"}</text></g>`);
@@ -1282,6 +1337,13 @@ function kbDraw() {
     if (csel) o.push(`<rect x="${A.x - 1}" y="${A.y - 1}" width="${A.w + 2}" height="${A.h + 2}" rx="2" class="kb-selr" stroke-width="${2 * px}"/>`);
     o.push(`</g>`);
     o.push(`<text x="${A.cx}" y="${A.bb[1] - 1.2 - K.outline.margin - (LIB_BY_ID[G.mcu.fp].body.usb === "top" && !A.rot ? 3.2 : 0)}" class="kb-areat" font-size="${Math.max(2.4, 11 * px)}">${esc(G.mcu.name.split(" (")[0])}${G.mcu.bare ? " + circuitry" : ""}${A.rot ? ` · ${Math.round(A.rot)}°` : ""}</text>`);
+    for (const L of b.loose || []) { // blocks placed on their own: drag them like the controller
+      const A2 = L.area, s2 = KV.csel === L.key;
+      o.push(`<g data-ctrl="${L.key}" class="kb-ctrl kb-loose ${s2 ? "sel" : ""}" transform="rotate(${A2.rot || 0} ${A2.cx} ${A2.cy})"><rect x="${A2.x}" y="${A2.y}" width="${A2.w}" height="${A2.h}" rx="1.2" class="kb-area"/>`);
+      for (const p of L.parts) { const bb = compBox({ fp: p.fp, x: A2.x + p.x, y: A2.y + p.y, rot: p.rot, side: "top" }); o.push(`<rect x="${bb.x0}" y="${bb.y0}" width="${bb.x1 - bb.x0}" height="${bb.y1 - bb.y0}" rx="0.4" class="kb-part ${L.group === "screen" ? "big" : ""}"/>`); }
+      if (s2) o.push(`<rect x="${A2.x - 1}" y="${A2.y - 1}" width="${A2.w + 2}" height="${A2.h + 2}" rx="2" class="kb-selr" stroke-width="${2 * px}"/>`);
+      o.push(`</g><text x="${A2.cx}" y="${A2.bb[1] - 1.2}" class="kb-areat" font-size="${Math.max(2.2, 10 * px)}">${KB_GROUPS[L.group]}</text>`);
+    }
     for (const [x, y] of b.holes) o.push(`<g class="kb-so${KV.soMode ? " edit" : ""}"><circle cx="${x}" cy="${y}" r="${kbStandoff(K).od / 2}" class="kb-sood"/><circle cx="${x}" cy="${y}" r="${kbStandoff(K).hole / 2}" class="kb-hole"/></g>`);
     if (b.bank) {
       const B = b.bank; o.push(`<rect x="${B.x0}" y="${B.y0}" width="${B.x1 - B.x0}" height="${B.y1 - B.y0}" rx="1" class="kb-bank"/><text x="${B.x0}" y="${B.y0 - 1}" class="kb-bankt" font-size="${Math.max(2.2, 10 * px)}">Diodes (${B.spots.size})</text>`);
@@ -1329,7 +1391,7 @@ function kbDown(e) {
   const g = e.target.closest("[data-key]");
   const cg = !g && e.target.closest("[data-ctrl]");
   if (cg) {
-    const h = +cg.dataset.ctrl; KV.sel.clear(); KV.csel = h;
+    const h = cg.dataset.ctrl.includes(":") ? cg.dataset.ctrl : +cg.dataset.ctrl; KV.sel.clear(); KV.csel = h;
     const off = kbCtrlOff(K, h);
     KV.drag = { ctrl: true, h, x0: x, y0: y, ox: off.x || 0, oy: off.y || 0, moved: false };
     kbDraw(); kbPropsPanel(); return;
@@ -1367,7 +1429,7 @@ function kbMove(e) {
 }
 function kbUp() {
   const d = KV.drag; KV.drag = null; KV.box = null;
-  if (d && (d.keys || d.vtx || d.ctrl) && d.moved) { kbChanged(d.ctrl ? "move controller" : d.vtx ? "outline corner" : "move keys"); return; }
+  if (d && (d.keys || d.vtx || d.ctrl) && d.moved) { kbChanged(d.ctrl ? (typeof d.h === "string" ? "move " + KB_GROUPS[d.h.split(":")[0]].toLowerCase() : "move controller") : d.vtx ? "outline corner" : "move keys"); return; }
   kbDraw(); kbPropsPanel();
 }
 function kbDbl(e) {

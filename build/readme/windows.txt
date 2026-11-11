@@ -12,12 +12,14 @@ Everything, in every app. Every app has teaching mode: point at anything to see 
 F2 turns it off.
 
 New in {VERSION}:
-- Keebie: part spacing, new diode patterns (zig-zag, wave, arch, chevron, slant,
-  smile, alternating, herringbone), through-hole parts by default, power and
-  activity lights, knobs and screens on any keyboard, standoffs placed for you
-  or by hand, the controller's USB end marked, and a parts list for every board.
+- Keebie: many more screens (OLEDs from 0.91in to 2.42in, a 16x2 LCD, the
+  nice!view and colour TFTs, round ones too), and the screen, status lights and
+  reset button can be placed on their own anywhere on the keyboard.
+- Flashie makes firmware for every one of those screens.
 
 Also in recent alpha builds:
+- 0.16.0-alpha: Keebie part spacing, diode patterns, through-hole parts, status
+  lights, standoffs, USB markers and parts lists.
 - 0.15.0-alpha: Wirie turns parts to any angle, and auto-fixes design-check problems.
 - 0.14.0-alpha: Mac and Linux catch up with Windows: HID, Bluetooth and Camera
   meters, Mac USB scopes, logic analysers and PicoScope.

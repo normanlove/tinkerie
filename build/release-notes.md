@@ -10,10 +10,18 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 
 Each package has a *READ ME FIRST.txt*.
 
+<!-- release notes for 0.17.0-alpha: package.sh checks this line, so update the notes with every version -->
 ### New in {VERSION}
-- **Tinkerie for Android** (Android 5.0 and newer: phones, tablets and Chromebooks). The same apps, each in its own window. Plug boards, scopes and analysers in with a USB OTG adapter: Flashie flashes boards (including UF2 boards like the Pico, and SD cards in a USB reader), Probie and Scopie capture, and the serial apps work with Arduino and other native-USB boards, CH340, CP210x, FTDI and PL2303 adapters. Files the apps save appear in the Files app under *Tinkerie*. Compiling Arduino code still needs a computer.
+- **Keebie screens:** many more to choose from: 0.91in, 0.96in, 1.3in and 2.42in OLEDs, a 16×2 character LCD, the nice!view, and 1.3in, 1.54in and 1.9in colour TFTs, a 1.28in round TFT and a 1.8in TFT. SPI screens get pins of their own; Keebie warns when a screen and controller don't suit each other (3.3V screens on a 5V controller).
+- **Place parts on their own:** the screen, status lights and reset button can leave the controller's block and be dragged anywhere on the keyboard; the board outline grows to reach them.
+- **Flashie** makes firmware for every new screen (SSD1306/SSD1309, SH1106, Sharp memory LCD, ST7789, ST7735, GC9A01 and I2C character LCDs), redrawing only when something changes.
+- **Release notes** on GitHub now describe each release (they were stuck on the Android notes since 0.13.0).
 
 ### Also in recent alpha builds
+- **0.16.0-alpha:** Keebie: part spacing (tight, comfortable, roomy) so diode rows don't crowd; new diode patterns (zig-zag, wave, arch, chevron, slant, smile, alternating, herringbone, staggered); the "little map" layout was removed. Through-hole by default: 1N4148 diodes, 6×6mm reset button, SS12D00 power switch, 3mm LEDs and leaded resistors, picked from the most common parts. Power and activity lights, knobs and a screen (now also 1.3in) on any keyboard, with a one-click switch to a controller with enough pins. Standoffs (M2, M2.5 or M3) placed for you or by hand; controllers show which end their USB socket is; a parts list for the whole keyboard (every board) and for any PCB.
+- **0.15.0-alpha:** Wirie: turn parts to any angle: type it in, drag the round handle above a part, or Shift+R for 15°. Auto-fix in the design check: redraws clashing tracks, moves parts that clash or sit off the board, widens thin tracks and routes the rest. Auto-fix mode does it every time the check runs.
+- **0.14.0-alpha:** Mac and Linux catch up with Windows: Meterie's HID-cable meters, Bluetooth meters and Camera mode on Mac, Linux and Raspberry Pi; USB scopes, logic analysers and PicoScope on Mac; Camera mode on Android.
+- **0.13.0-alpha:** Tinkerie for Android (5.0 and newer), with USB boards, scopes and analysers over USB OTG.
 - **0.12.x-alpha:** Keebie diode layouts (including on show, off the keys), a Parts view, a movable controller, switch pins and LED facing.
 - **0.11.0-alpha:** Tracie became Probie, with an Explain tab that explains captures in plain words; Codie went back to explaining code.
 - **0.10.0-alpha:** Codie explained captures from Scopie, Tracie and Meterie (that's now Probie's Explain tab).

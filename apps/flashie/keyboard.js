@@ -99,7 +99,8 @@ function wiring() {
   const f = K.file, rows = f.rows.map((p, i) => ({ key: 'row' + i, label: 'Row ' + i, p })), cols = f.cols.map((p, i) => ({ key: 'col' + i, label: 'Column ' + i, p }));
   const list = [...rows, ...cols];
   (f.knobs || []).forEach((n, i) => { list.push({ key: `k${i}a`, label: `Knob ${i + 1} A`, p: n.a }, { key: `k${i}b`, label: `Knob ${i + 1} B`, p: n.b }); });
-  if (f.screen) list.push({ key: 'sda', label: 'Screen SDA', p: f.screen.sda }, { key: 'scl', label: 'Screen SCL', p: f.screen.scl });
+  if (f.screen && f.screen.spi) for (const [r, p] of Object.entries(f.screen.spi)) list.push({ key: 'scr_' + r, label: 'Screen ' + { sck: 'clock (SCK)', mosi: 'data (MOSI)', cs: 'select (CS)', dc: 'DC', rst: 'reset' }[r], p });
+  else if (f.screen) list.push({ key: 'sda', label: 'Screen SDA', p: f.screen.sda }, { key: 'scl', label: 'Screen SCL', p: f.screen.scl });
   if (f.rgb) list.push({ key: 'led', label: 'LED data', p: f.rgb.pin });
   if (f.lights && f.lights.act) list.push({ key: 'act', label: 'Activity light', p: f.lights.act });
   return list;
@@ -143,10 +144,15 @@ function generate() {
   const rowPins = f.rows.map((p, i) => pinOf('row' + i, p)), colPins = f.cols.map((p, i) => pinOf('col' + i, p));
   const c2r = f.diode !== 'ROW2COL';
   const scr = f.screen, rgb = f.rgb, act = f.lights && f.lights.act ? pinOf('act', f.lights.act) : '';
-  const sda = scr && pinOf('sda', scr.sda), scl = scr && pinOf('scl', scr.scl);
+  const sda = scr && !scr.spi && pinOf('sda', scr.sda), scl = scr && !scr.spi && pinOf('scl', scr.scl);
+  // which screen driver: older Keebie files only had SSD1306 OLEDs (and the 1.3in SH1106)
+  const drv = scr ? scr.drv || (scr.type === 'oled13' ? 'sh1106' : 'ssd1306') : '';
+  const sp = r => scr && scr.spi && scr.spi[r] ? pinOf('scr_' + r, scr.spi[r]) : '-1';
+  const kind = drv === 'lcd' ? 'lcd' : /st77|gc9a01/.test(drv) ? 'tft' : 'mono';
+  const SCRLIB = { ssd1306: ['Adafruit SSD1306', 'Adafruit_SSD1306.h'], sh1106: ['Adafruit SH110X', 'Adafruit_SH110X.h'], sharp: ['Adafruit SHARP Memory Display', 'Adafruit_SharpMem.h'],
+    st7789: ['Adafruit ST7735 and ST7789 Library', 'Adafruit_ST7789.h'], st7735: ['Adafruit ST7735 and ST7789 Library', 'Adafruit_ST7735.h'], gc9a01: ['Adafruit GC9A01A', 'Adafruit_GC9A01A.h'], lcd: ['LiquidCrystal I2C', 'LiquidCrystal_I2C.h'] };
   const wire = core === 'rp2040' && scr ? ((+sda >> 1) & 1 ? 'Wire1' : 'Wire') : 'Wire';
-  const sh = scr && scr.type === 'oled13'; // 1.3in screens use the SH1106 chip
-  const libs = []; if (scr) libs.push(sh ? 'Adafruit SH110X' : 'Adafruit SSD1306', 'Adafruit GFX Library'); if (rgb && m.rgb.mode !== 'off') libs.push('Adafruit NeoPixel');
+  const libs = []; if (scr) { libs.push(SCRLIB[drv][0]); if (drv !== 'lcd') libs.push('Adafruit GFX Library'); } if (rgb && m.rgb.mode !== 'off') libs.push('Adafruit NeoPixel');
   const useRgb = rgb && m.rgb.mode !== 'off';
   const col = m.rgb.color.replace('#', '');
   const rgbv = [0, 2, 4].map(i => parseInt(col.slice(i, i + 2), 16) || 0);
@@ -161,7 +167,7 @@ function generate() {
   o(`#else`);
   o(`  #include <Keyboard.h>`);
   o(`#endif`);
-  if (scr) o(`#include <Wire.h>\n#include <Adafruit_GFX.h>\n#include <${sh ? 'Adafruit_SH110X' : 'Adafruit_SSD1306'}.h>`);
+  if (scr) o(`#include <Wire.h>${drv !== 'lcd' ? '\n#include <Adafruit_GFX.h>' : ''}\n#include <${SCRLIB[drv][1]}>`);
   if (useRgb) o(`#include <Adafruit_NeoPixel.h>`);
   o(``);
   o(`typedef uint32_t kbpin_t;`);
@@ -305,8 +311,14 @@ function generate() {
   }
   if (scr) {
     o(``);
-    o(`// ---------------------------------------------------------------- screen (${sh ? 'SH1106' : 'SSD1306'})`);
-    o(sh ? `Adafruit_SH1106G screen(${scr.w}, ${scr.h}, &${wire}, -1);` : `Adafruit_SSD1306 screen(${scr.w}, ${scr.h}, &${wire}, -1);`);
+    o(`// ---------------------------------------------------------------- screen (${scr.name || drv})`);
+    if (drv === 'ssd1306') o(`Adafruit_SSD1306 screen(${scr.w}, ${scr.h}, &${wire}, -1);`);
+    if (drv === 'sh1106') o(`Adafruit_SH1106G screen(${scr.w}, ${scr.h}, &${wire}, -1);`);
+    if (drv === 'sharp') o(`Adafruit_SharpMem screen(${sp('sck')}, ${sp('mosi')}, ${sp('cs')}, ${scr.w}, ${scr.h});`);
+    if (drv === 'st7789') o(`Adafruit_ST7789 screen(${sp('cs')}, ${sp('dc')}, ${sp('mosi')}, ${sp('sck')}, ${sp('rst')});`);
+    if (drv === 'st7735') o(`Adafruit_ST7735 screen(${sp('cs')}, ${sp('dc')}, ${sp('mosi')}, ${sp('sck')}, ${sp('rst')});`);
+    if (drv === 'gc9a01') o(`Adafruit_GC9A01A screen(${sp('cs')}, ${sp('dc')}, ${sp('mosi')}, ${sp('sck')}, ${sp('rst')});`);
+    if (drv === 'lcd') o(`LiquidCrystal_I2C screen(0x27, ${scr.w}, ${scr.h});  // most backpacks are 0x27; some are 0x3F`);
     o(`bool screenOK = false;`);
     o(`static uint16_t wpm() {`);
     o(`  uint32_t now = millis(); uint8_t n = 0;`);
@@ -315,16 +327,32 @@ function generate() {
     o(`}`);
     o(`static void drawScreen() {`);
     o(`  if (!screenOK) return;`);
-    o(`  screen.clearDisplay();`);
-    o(`  screen.setTextColor(${sh ? 'SH110X_WHITE' : 'SSD1306_WHITE'});`);
-    o(`  screen.setCursor(0, 0);`);
-    const big = scr.h >= 64;
-    if (m.screen.title) { o(`  screen.setTextSize(${big ? 2 : 1});`); o(`  screen.println(${cstr(m.screen.title.slice(0, big ? 10 : 21))});`); }
-    o(`  screen.setTextSize(1);`);
-    if (m.screen.layer) o(`  screen.print("Layer: "); screen.println(layerNames[topLayer()]);`);
-    if (m.screen.wpm) o(`  screen.print("WPM: "); screen.println(wpm());`);
-    if (m.screen.keys) o(`  screen.print("Keys: "); screen.println(presses);`);
-    o(`  screen.display();`);
+    // only redraw when something shown has changed (colour screens flicker otherwise)
+    o(`  static uint32_t shown = 0xFFFFFFFF;`);
+    o(`  uint32_t now = (uint32_t)topLayer() << 24 ^ (uint32_t)${m.screen.wpm ? 'wpm()' : '0'} << 12 ^ ${m.screen.keys ? 'presses' : '0'};`);
+    o(`  if (now == shown) return;`);
+    o(`  shown = now;`);
+    const title = m.screen.title || '';
+    if (kind === 'lcd') {
+      o(`  screen.clear();`);
+      o(`  screen.setCursor(0, 0);`);
+      o(`  screen.print(${cstr(title.slice(0, scr.w))});`);
+      o(`  screen.setCursor(0, 1);`);
+      const bits = []; if (m.screen.layer) bits.push(`  screen.print(layerNames[topLayer()]); screen.print(" ");`); if (m.screen.wpm) bits.push(`  screen.print(wpm()); screen.print("wpm ");`); if (m.screen.keys) bits.push(`  screen.print(presses);`);
+      bits.forEach(o);
+    } else {
+      const big = scr.h >= 64, huge = Math.min(scr.w, scr.h) >= 160;
+      const ink = drv === 'sharp' ? 'BLACK' : drv === 'sh1106' ? 'SH110X_WHITE' : drv === 'ssd1306' ? 'SSD1306_WHITE' : '0xFFFF';
+      if (kind === 'tft') { o(`  screen.fillScreen(0x0000);`); o(`  screen.setTextColor(${ink}, 0x0000);`); o(`  screen.setCursor(${drv === 'gc9a01' ? 40 : 6}, ${drv === 'gc9a01' ? 60 : 6});`); }
+      else { o(`  screen.clearDisplay();`); o(`  screen.setTextColor(${ink});`); o(`  screen.setCursor(0, 0);`); }
+      const ts = huge ? 3 : big ? 2 : 1, bs = huge ? 2 : 1;
+      if (title) { o(`  screen.setTextSize(${ts});`); o(`  screen.println(${cstr(title.slice(0, huge ? 12 : big ? 10 : 21))});`); }
+      o(`  screen.setTextSize(${bs});`);
+      if (m.screen.layer) o(`  screen.print("Layer: "); screen.println(layerNames[topLayer()]);`);
+      if (m.screen.wpm) o(`  screen.print("WPM: "); screen.println(wpm());`);
+      if (m.screen.keys) o(`  screen.print("Keys: "); screen.println(presses);`);
+      if (kind === 'mono') o(drv === 'sharp' ? `  screen.refresh();` : `  screen.display();`);
+    }
     o(`}`);
   }
   if (useRgb) {
@@ -351,10 +379,16 @@ function generate() {
   o(`  Consumer.begin();`);
   o(`#endif`);
   if (scr) {
-    if (core === 'rp2040') o(`  ${wire}.setSDA(${sda});\n  ${wire}.setSCL(${scl});`);
-    if (core === 'stm32') o(`  Wire.setSDA(${sda});\n  Wire.setSCL(${scl});`);
-    o(sh ? `  screenOK = screen.begin(0x3C, true);` : `  screenOK = screen.begin(SSD1306_SWITCHCAPVCC, 0x3C);`);
-    if (m.screen.flip) o(`  screen.setRotation(2);`);
+    if (!scr.spi && core === 'rp2040') o(`  ${wire}.setSDA(${sda});\n  ${wire}.setSCL(${scl});`);
+    if (!scr.spi && core === 'stm32') o(`  Wire.setSDA(${sda});\n  Wire.setSCL(${scl});`);
+    if (drv === 'ssd1306') o(`  screenOK = screen.begin(SSD1306_SWITCHCAPVCC, 0x3C);`);
+    if (drv === 'sh1106') o(`  screenOK = screen.begin(0x3C, true);`);
+    if (drv === 'sharp') o(`  screenOK = screen.begin();\n  screen.clearDisplay();`);
+    if (drv === 'st7789') o(`  screen.init(${scr.w}, ${scr.h});\n  screenOK = true;`);
+    if (drv === 'st7735') o(`  screen.initR(INITR_BLACKTAB);\n  screenOK = true;`);
+    if (drv === 'gc9a01') o(`  screen.begin();\n  screenOK = true;`);
+    if (drv === 'lcd') o(`  screen.init();\n  screen.backlight();\n  screenOK = true;`);
+    if (m.screen.flip && drv !== 'lcd') o(`  screen.setRotation(2);`);
     o(`  drawScreen();`);
   }
   if (useRgb) o(`  leds.begin();\n  leds.setBrightness(${Math.round(Math.max(1, Math.min(100, m.rgb.bright)) * 2.55)});\n  leds.show();`);

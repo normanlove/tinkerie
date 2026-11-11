@@ -3,7 +3,7 @@
 
 APPS = [
   dict(
-    id="wirie", needshort="No hardware needed", name="Wirie", ver="0.13.0-alpha", color="#ef8a3c", icon="wirie.png",
+    id="wirie", needshort="No hardware needed", name="Wirie", ver="0.14.0-alpha", color="#ef8a3c", icon="wirie.png",
     tagline="Design your own circuit boards, even if you've never made one before.",
     short="Design circuit boards and custom keyboards, plan stripboard builds, look up pinouts and work out battery life.",
     need="No hardware needed",
@@ -62,7 +62,7 @@ APPS = [
         "Pick any common controller (Pro Micro, Elite-C, RP2040 boards, Pico, Black Pill, nice!nano, XIAO) or a bare ATmega32U4, RP2040 or STM32 chip, and Keebie adds the USB-C, crystal, regulator, flash and buttons it needs",
         "Diodes, matrix, per-key RGB, stabilisers and mounting holes are placed for you; QMK/ZMK firmware files and a switch plate (SVG/DXF) come out too",
         "Choose how the diodes are laid out: beside, above, below or in the corner of each switch, alternating column by column, or off the keys in a bank on show (a row, zig-zag, wave, arch, chevron, slant or smile), with a part-spacing setting so rows never crowd; the Parts view shows them all before you build",
-        "Through-hole parts by default (1N4148 diodes, 6×6mm reset button, SS12D00 switch), power and activity lights, knobs and a screen (0.91in, 0.96in or 1.3in) on any keyboard",
+        "Through-hole parts by default (1N4148 diodes, 6×6mm reset button, SS12D00 switch), power and activity lights, knobs and a screen on any keyboard: OLEDs from 0.91in to 2.42in, a 16×2 LCD, the nice!view or a colour TFT (round ones too), placed with the controller or anywhere you like",
         "Standoffs placed for you or by hand (M2, M2.5 or M3), the controller's USB end marked, and a parts list for every board: switches, keycaps, standoffs, screws and cables included",
         "Drag and turn the controller to wherever suits your case, and lay its parts out packed, in neat rows or in one tidy line",
         "New keyboard and Close keyboard buttons start afresh or put a keyboard away",
@@ -209,7 +209,7 @@ APPS = [
     pairs=[("makie", "Uses your measured clearances so printed parts fit."), ("probie", "Watch your printer's serial output.")],
   ),
   dict(
-    id="flashie", needshort="Board or SD card", name="Flashie", ver="0.8.1-alpha", color="#7b5cf5", icon="flashie.svg",
+    id="flashie", needshort="Board or SD card", name="Flashie", ver="0.9.0-alpha", color="#7b5cf5", icon="flashie.svg",
     tagline="Put new firmware on your boards, and operating systems on SD cards.",
     short="Flash ESP32, Pico, Arduino and STM32 boards, build programs from blocks, make keyboard firmware, and write SD cards and USB installers.",
     need="A microcontroller board, or an SD card / USB drive",

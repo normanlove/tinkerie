@@ -34,6 +34,11 @@ sed -i 's/$/\r/' "$out/Tinkerie-$VERSION-windows/READ ME FIRST.txt"
 cp Tinkerie.exe "$out/Tinkerie-$VERSION-windows/"
 (cd "$out" && zip -qr "Tinkerie-$VERSION-windows.zip" "Tinkerie-$VERSION-windows")
 cp Tinkerie.exe "$out/"
+# The GitHub release text comes from build/release-notes.md: refuse to package
+# a version whose notes haven't been written, so a release never repeats old notes.
+if ! grep -q "release notes for $VERSION" build/release-notes.md; then
+  echo "build/release-notes.md hasn't been updated for $VERSION (its first line under 'Which file?' must say 'release notes for $VERSION')" >&2; exit 1
+fi
 sed "s/{VERSION}/$VERSION/g" build/release-notes.md > "$out/notes.md"
 rm -rf "$src"
 for p in linux-x86_64 pi-64bit pi-32bit mac-apple-silicon mac-intel windows; do rm -rf "$out/Tinkerie-$VERSION-$p"; done
