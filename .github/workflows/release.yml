@@ -15,7 +15,7 @@ jobs:
   # The Mac apps use Apple's IOKit through cgo, so they're built on a Mac.
   # This runs on every push (it also checks the Mac code still builds).
   mac:
-    runs-on: macos-14
+    runs-on: macos-latest
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
