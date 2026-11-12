@@ -67,6 +67,7 @@ Each app serves its window from its own local port (127.0.0.1 only). They must n
 | Tunie | 47821 | the same |
 | Probie | 47822 | the same |
 | Codie | 47824 | the same as Makie |
+| Fixie | 47825 | the same as Makie |
 | Meterie | 47823 (suite link, for other apps to read the meter) | any free port, written to `%APPDATA%\nrmluvdev\suite\meterie.json` |
 | Scopie | 47831 | the same as Makie |
 | Flashie, launcher | any free port | |

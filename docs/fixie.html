@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fixie · Tinkerie</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Fixie: A repair guide that takes you step by step from a broken device to the fault, with the tools to use and what to look for. Part of Tinkerie, free maker tools by nrmluvdev.">
+<meta property="og:title" content="Fixie · Tinkerie">
+<meta property="og:description" content="Fixie: A repair guide that takes you step by step from a broken device to the fault, with the tools to use and what to look for. Part of Tinkerie, free maker tools by nrmluvdev.">
+<link rel="icon" href="img/icons/tinkerie.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&family=Unbounded:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div style="--app:#f5b324">
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top"><div class="wrap">
+  <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
+  <nav class="nav" aria-label="Main">
+    <div class="apps-menu"><button type="button" aria-expanded="false" aria-haspopup="true">Apps <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><div class="menu"><a href="wirie.html"><img src="img/icons/wirie.png" alt=""><span><b>Wirie</b><small>Design circuit boards and custom keyboards</small></span></a><a href="makie.html"><img src="img/icons/makie.png" alt=""><span><b>Makie</b><small>A Tinkercad-style 3D designer with threads</small></span></a><a href="tunie.html"><img src="img/icons/tunie.png" alt=""><span><b>Tunie</b><small>Print a test</small></span></a><a href="flashie.html"><img src="img/icons/flashie.svg" alt=""><span><b>Flashie</b><small>Flash ESP32</small></span></a><a href="scopie.html"><img src="img/icons/scopie.png" alt=""><span><b>Scopie</b><small>A friendly oscilloscope app for Hantek</small></span></a><a href="meterie.html"><img src="img/icons/meterie.png" alt=""><span><b>Meterie</b><small>Connect your multimeter to show huge readings</small></span></a><a href="probie.html"><img src="img/icons/probie.svg" alt=""><span><b>Probie</b><small>A serial monitor with a live plotter</small></span></a><a href="codie.html"><img src="img/icons/codie.svg" alt=""><span><b>Codie</b><small>A code explainer for 20+ languages</small></span></a><a href="fixie.html"><img src="img/icons/fixie.svg" alt=""><span><b>Fixie</b><small>A repair guide that takes you step by step from a broken device to the fault</small></span></a><a class="menu-start" href="start.html">Getting started guide →</a></div></div>
+    <a class="hide-s" href="start.html">Getting started</a>
+    <a class="hide-s" href="about.html">About Tinkerie</a>
+    <a class="hide-s" href="https://github.com/normanlove/tinkerie">GitHub</a>
+    <a class="btn btn-go" href="index.html#download" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg><span class="lbl">Download</span></a>
+    <button class="theme" id="theme" type="button" aria-label="Switch theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></button>
+  </nav>
+</div></header>
+<main id="main">
+<div class="ruler" aria-hidden="true"></div>
+<section class="app-hero"><div class="wrap">
+  <nav class="crumbs" aria-label="You are here"><a href="index.html">Tinkerie</a><span aria-hidden="true">›</span><a href="index.html#apps">Apps</a><span aria-hidden="true">›</span><span>Fixie</span></nav>
+  <div class="grid">
+    <div>
+      <div class="app-title"><img src="img/icons/fixie.svg" alt=""><div><h1>Fixie</h1><span class="ver">Version 0.1.0-alpha · in Tinkerie 0.27.0-alpha</span><span class="alpha-pill">Alpha</span></div></div>
+      <p class="lead">Something broken? Find out why, one check at a time.</p>
+      <div class="plain"><span class="label">In plain words</span><p>Your kettle won&#x27;t heat, the TV has sound but no picture, the controller won&#x27;t charge. Pick what it is and what it&#x27;s doing, and Fixie takes you through it one check at a time, easiest first: what to do, which tools to use, what a good and a bad result look like. Type in your meter reading and it tells you which it is. Each answer leads to the next check, until it reaches the likely fault, how hard it is to fix and the parts you&#x27;ll need. It only asks you to open things up when it has to, and tells you how to do it safely.</p></div>
+      <div class="chips"><span class="chip">19 kinds of device</span><span class="chip">15 symptoms</span><span class="chip">Over 130 steps</span><span class="chip">Reads your meter readings</span><span class="chip">Tools guide</span><span class="chip">Pictures of failed parts</span><span class="chip">Safety first</span><span class="chip">Repair log and reports</span></div>
+      <div class="hero" style="padding:0"><div class="cta"><a class="btn btn-go" href="index.html#download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg>Download Tinkerie</a><a class="btn btn-line" href="#first">First five minutes</a></div><p class="osnote">You'll need: Nothing to start; a multimeter for most repairs.</p></div>
+    </div>
+    <figure><div class="shot"><span class="tag">Fixie</span><button class="zoom" type="button" data-full="img/shots/fixie-measure.webp" data-caption="Type in a reading, and Fixie says whether it&#x27;s good and which answer it points to." aria-label="Enlarge: Type in a reading, and Fixie says whether it&#x27;s good and which answer it points to."><img src="img/shots/fixie-measure.webp" alt="Type in a reading, and Fixie says whether it&#x27;s good and which answer it points to." width="1440" height="900"></button></div><figcaption>Type in a reading, and Fixie says whether it&#x27;s good and which answer it points to.</figcaption></figure>
+  </div>
+</div></section>
+
+<section class="band alt" id="first"><div class="wrap">
+  <div class="head"><div><span class="label">Your first five minutes</span><h2>Try this first</h2></div></div>
+  <ol class="firsts"><li><h3>Pick a device</h3><p>Phones, laptops, consoles, TVs, kettles, fans, power tools, LED strips, 3D printers, Arduino boards and more.</p></li><li><h3>Say what it&#x27;s doing</h3><p>Dead, won&#x27;t charge, no picture, no sound, overheating, got wet, cuts out, trips the electricity…</p></li><li><h3>Follow the steps</h3><p>Each step says what to do, which tools to use and what to look for. Type in your readings.</p></li><li><h3>Fix it</h3><p>The likely fault, how hard it is, the parts you need, and a report to keep or take to a repair shop.</p></li></ol>
+</div></section>
+
+<section class="band"><div class="wrap"><div class="head"><div><span class="label">Screenshots</span><h2>A closer look</h2><p>Click any picture to see it bigger.</p></div></div><div class="thumbs"><figure><div class="shot"><button class="zoom" type="button" data-full="img/shots/fixie-step.webp" data-caption="Each step: what to do, the tools, what it looks like, and a safety check before opening anything up." aria-label="Enlarge: Each step: what to do, the tools, what it looks like, and a safety check before opening anything up."><img src="img/shots/fixie-step-sm.webp" alt="Each step: what to do, the tools, what it looks like, and a safety check before opening anything up." width="720" height="450" loading="lazy"></button></div><figcaption>Each step: what to do, the tools, what it looks like, and a safety check before opening anything up.</figcaption></figure><figure><div class="shot"><button class="zoom" type="button" data-full="img/shots/fixie-result.webp" data-caption="The likely fault, how hard the fix is, the parts and tools, with your notes." aria-label="Enlarge: The likely fault, how hard the fix is, the parts and tools, with your notes."><img src="img/shots/fixie-result-sm.webp" alt="The likely fault, how hard the fix is, the parts and tools, with your notes." width="720" height="450" loading="lazy"></button></div><figcaption>The likely fault, how hard the fix is, the parts and tools, with your notes.</figcaption></figure><figure><div class="shot"><button class="zoom" type="button" data-full="img/shots/fixie-signs.webp" data-caption="What to look for: good and faulty parts side by side." aria-label="Enlarge: What to look for: good and faulty parts side by side."><img src="img/shots/fixie-signs-sm.webp" alt="What to look for: good and faulty parts side by side." width="720" height="450" loading="lazy"></button></div><figcaption>What to look for: good and faulty parts side by side.</figcaption></figure><figure><div class="shot"><button class="zoom" type="button" data-full="img/shots/fixie-tools.webp" data-caption="The tools guide: what each one is for, how to use it, and a starter kit." aria-label="Enlarge: The tools guide: what each one is for, how to use it, and a starter kit."><img src="img/shots/fixie-tools-sm.webp" alt="The tools guide: what each one is for, how to use it, and a starter kit." width="720" height="450" loading="lazy"></button></div><figcaption>The tools guide: what each one is for, how to use it, and a starter kit.</figcaption></figure></div></div></section>
+
+<section class="band"><div class="wrap">
+  <div class="head"><div><span class="label">Everything it does</span><h2>Features</h2></div></div>
+  <div class="features"><div class="feature"><h3>Step by step</h3><p>From symptom to fault.</p><ul><li>Easy checks first: the socket, the charger, the batteries, the lead</li><li>Each step says what to do, why, which tools to use, and what a good and a bad result look like</li><li>Steps that don&#x27;t apply to your device are skipped (no mains checks on a phone, no battery checks on a kettle)</li><li>Type in your meter reading: Fixie compares it with what it should be and highlights the matching answer</li><li>Works out what a heating element should read from its voltage and power</li><li>Go back to any step and choose differently</li></ul></div><div class="feature"><h3>What it covers</h3><p>19 kinds of device, 15 symptoms.</p><ul><li>Phones, tablets, laptops, desktop PCs, consoles, controllers, remotes, keyboards and mice</li><li>TVs, monitors, amplifiers, radios, headphones and Bluetooth speakers</li><li>Kettles, toasters, irons, fans, blenders, vacuums, washing machines, toys</li><li>Cordless tools and battery packs, LED lamps and strips, 3D printers, Arduino, ESP32 and Pico projects</li><li>Dead, cuts out, won&#x27;t charge, no picture, no sound, buttons, motors, heating, USB and wireless, uploads, LEDs, overheating, water damage, faults that come and go, tripping the electricity</li></ul></div><div class="feature"><h3>Safety first</h3><p>It tells you when to stop.</p><ul><li>A safety check before every step inside something that runs from the mains or has a lithium battery</li><li>A warning before any measurement with the power on</li><li>Microwaves get outside checks only: their capacitor can kill even unplugged</li><li>A Safety tab on mains, big capacitors, lithium batteries, soldering and static</li><li>Each fix says how hard it is, and when a repair shop is the better choice</li></ul></div><div class="feature"><h3>Tools and signs</h3><p>Know what you&#x27;re looking at.</p><ul><li>26 tools, from a multimeter to a hot air station: what each is for, roughly what it costs, how to use it</li><li>Tick the tools you have; each step marks them</li><li>Pictures of good and failed parts: bulging capacitors, burnt parts, corrosion, cracked joints, blown fuses, swollen batteries, damaged ports</li></ul></div><div class="feature"><h3>Your repairs</h3><p>Kept as you go.</p><ul><li>Every repair is saved with each step, answer, reading and note</li><li>Carry on where you left off, even after closing Fixie</li><li>Save a report to keep, or to take to a repair shop</li></ul></div></div>
+</div></section>
+
+
+
+<section class="band alt"><div class="wrap stack">
+  <div class="head" style="margin:0"><div><span class="label">Before you start</span><h2>Good to know</h2></div></div><div class="stack"><div class="callout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-9.5v.5"/></svg><p>Fixie is a guide, not a guarantee. If a step feels unsafe, stop: a repair shop can take it from where you got to, and your report shows them what you&#x27;ve checked.</p></div></div>
+  <div class="head" style="margin:30px 0 0"><div><span class="label">Works well with</span><h2>Pairs nicely with</h2></div></div>
+  <div class="pairs"><a class="pair" href="meterie.html"><img src="img/icons/meterie.png" alt=""><div><b>Meterie</b><p>Show your multimeter&#x27;s readings on the computer and log them over time.</p></div></a><a class="pair" href="scopie.html"><img src="img/icons/scopie.png" alt=""><div><b>Scopie</b><p>Follow a signal through a circuit with an oscilloscope.</p></div></a></div>
+  <nav class="pager" aria-label="Other apps" style="margin-top:30px">
+    <a href="codie.html"><span class="muted">← Previous app</span><b>Codie</b></a>
+    <a href="wirie.html"><span class="muted">Next app →</span><b>Wirie</b></a>
+  </nav>
+</div></section>
+</main>
+<footer><div class="wrap">
+  <div class="stack">
+    <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
+    <p>Free maker tools, designed and created by <b>nrmluvdev</b>. Version 0.27.0-alpha: Tinkerie is in alpha.</p>
+    <p>Free software under the GNU GPL, version 3 or later. It comes with no warranty.</p>
+  </div>
+  <div><h4>The apps</h4><ul><li><a href="wirie.html">Wirie</a></li><li><a href="makie.html">Makie</a></li><li><a href="tunie.html">Tunie</a></li><li><a href="flashie.html">Flashie</a></li><li><a href="scopie.html">Scopie</a></li><li><a href="meterie.html">Meterie</a></li><li><a href="probie.html">Probie</a></li><li><a href="codie.html">Codie</a></li><li><a href="fixie.html">Fixie</a></li></ul></div>
+  <div><h4>Help and source</h4><ul>
+    <li><a href="start.html">Getting started</a></li>
+    <li><a href="about.html">About Tinkerie</a></li>
+    <li><a href="index.html#faq">Questions</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie/releases">All downloads</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie">Source code on GitHub</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie/issues">Report a problem</a></li>
+    <li><a href="code-signing.html">Code signing policy</a></li>
+  </ul></div>
+</div></footer>
+<script src="site.js"></script>
+</div>
+</body>
+</html>

@@ -40,6 +40,7 @@ Double-click `Tinkerie.exe` to open the launcher and pick an app. Each app opens
 | **Meterie** | PC multimeter: HoldPeak HP-90EPC, UNI-T, OWON, Brymen, Fluke and more | 0.8.2-alpha |
 | **Probie** | Serial monitor and logic analyser, with an Explain tab that explains captures in plain words (its own, and Scopie's and Meterie's). Probie was called Tracie before 0.11 | 0.8.2-alpha |
 | **Codie** | Code explainer: paste code and see what each line does and why, in 20+ languages (including Windows Go and the BASIC of the C64, ZX Spectrum and BBC Micro), with a game-development section and a Game school | 0.5.0-alpha |
+| **Fixie** | Repair guide: step by step from a broken device to the fault, with which tools to use, what to look for and how to fix it, plus a tools guide, pictures of failed parts, safety advice and a repair log | 0.1.0-alpha |
 
 Every app's own guide is its `README.md` in `apps\<name>\`.
 
@@ -89,7 +90,7 @@ Mac builds come out as `dist/<name>/Tinkerie.app`, Linux and Pi builds as `dist/
 
 | | Windows | Linux, Raspberry Pi | Mac | Android |
 |---|---|---|---|---|
-| Launcher, Wirie, Makie, Tunie, Codie | everything | everything | everything | everything |
+| Launcher, Wirie, Makie, Tunie, Codie, Fixie | everything | everything | everything | everything |
 | Flashie | everything | everything | everything | everything except compiling Arduino code (flashing ready-made and keyboard firmware works); boards over USB OTG |
 | Scopie | everything | everything except PicoScope (USB scopes: run `install-usb.sh` once) | everything (PicoScope needs Pico's PicoSDK) | everything, USB scopes over OTG |
 | Probie | everything | everything (logic analyser: run `install-usb.sh` once) | everything | everything, over OTG |

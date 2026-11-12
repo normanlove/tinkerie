@@ -517,6 +517,68 @@ APPS = [
     callouts=[("info", "Codie reads code; it doesn't run it. Everything happens on your computer, so your code is never uploaded anywhere.")],
     pairs=[("flashie", "Flashie's Create tab builds firmware code and explains it as it goes."), ("probie", "Run your code on a board and watch what it prints.")],
   ),
+  dict(
+    id="fixie", needshort="Nothing: a multimeter helps", name="Fixie", ver="0.1.0-alpha", color="#f5b324", icon="fixie.svg",
+    tagline="Something broken? Find out why, one check at a time.",
+    short="A repair guide that takes you step by step from a broken device to the fault, with the tools to use and what to look for.",
+    need="Nothing to start; a multimeter for most repairs",
+    plain=("In plain words",
+           "Your kettle won't heat, the TV has sound but no picture, the controller won't charge. Pick what it is and what it's doing, and Fixie "
+           "takes you through it one check at a time, easiest first: what to do, which tools to use, what a good and a bad result look like. "
+           "Type in your meter reading and it tells you which it is. Each answer leads to the next check, until it reaches the likely fault, "
+           "how hard it is to fix and the parts you'll need. It only asks you to open things up when it has to, and tells you how to do it safely."),
+    chips=["19 kinds of device", "15 symptoms", "Over 130 steps", "Reads your meter readings", "Tools guide", "Pictures of failed parts", "Safety first", "Repair log and reports"],
+    firsts=[
+      ("Pick a device", "Phones, laptops, consoles, TVs, kettles, fans, power tools, LED strips, 3D printers, Arduino boards and more."),
+      ("Say what it's doing", "Dead, won't charge, no picture, no sound, overheating, got wet, cuts out, trips the electricity…"),
+      ("Follow the steps", "Each step says what to do, which tools to use and what to look for. Type in your readings."),
+      ("Fix it", "The likely fault, how hard it is, the parts you need, and a report to keep or take to a repair shop."),
+    ],
+    shots=[
+      ("fixie-measure", "Type in a reading, and Fixie says whether it's good and which answer it points to."),
+      ("fixie-step", "Each step: what to do, the tools, what it looks like, and a safety check before opening anything up."),
+      ("fixie-result", "The likely fault, how hard the fix is, the parts and tools, with your notes."),
+      ("fixie-signs", "What to look for: good and faulty parts side by side."),
+      ("fixie-tools", "The tools guide: what each one is for, how to use it, and a starter kit."),
+    ],
+    features=[
+      ("Step by step", "From symptom to fault.", [
+        "Easy checks first: the socket, the charger, the batteries, the lead",
+        "Each step says what to do, why, which tools to use, and what a good and a bad result look like",
+        "Steps that don't apply to your device are skipped (no mains checks on a phone, no battery checks on a kettle)",
+        "Type in your meter reading: Fixie compares it with what it should be and highlights the matching answer",
+        "Works out what a heating element should read from its voltage and power",
+        "Go back to any step and choose differently",
+      ]),
+      ("What it covers", "19 kinds of device, 15 symptoms.", [
+        "Phones, tablets, laptops, desktop PCs, consoles, controllers, remotes, keyboards and mice",
+        "TVs, monitors, amplifiers, radios, headphones and Bluetooth speakers",
+        "Kettles, toasters, irons, fans, blenders, vacuums, washing machines, toys",
+        "Cordless tools and battery packs, LED lamps and strips, 3D printers, Arduino, ESP32 and Pico projects",
+        "Dead, cuts out, won't charge, no picture, no sound, buttons, motors, heating, USB and wireless, uploads, LEDs, overheating, water damage, faults that come and go, tripping the electricity",
+      ]),
+      ("Safety first", "It tells you when to stop.", [
+        "A safety check before every step inside something that runs from the mains or has a lithium battery",
+        "A warning before any measurement with the power on",
+        "Microwaves get outside checks only: their capacitor can kill even unplugged",
+        "A Safety tab on mains, big capacitors, lithium batteries, soldering and static",
+        "Each fix says how hard it is, and when a repair shop is the better choice",
+      ]),
+      ("Tools and signs", "Know what you're looking at.", [
+        "26 tools, from a multimeter to a hot air station: what each is for, roughly what it costs, how to use it",
+        "Tick the tools you have; each step marks them",
+        "Pictures of good and failed parts: bulging capacitors, burnt parts, corrosion, cracked joints, blown fuses, swollen batteries, damaged ports",
+      ]),
+      ("Your repairs", "Kept as you go.", [
+        "Every repair is saved with each step, answer, reading and note",
+        "Carry on where you left off, even after closing Fixie",
+        "Save a report to keep, or to take to a repair shop",
+      ]),
+    ],
+    table=None,
+    callouts=[("info", "Fixie is a guide, not a guarantee. If a step feels unsafe, stop: a repair shop can take it from where you got to, and your report shows them what you've checked.")],
+    pairs=[("meterie", "Show your multimeter's readings on the computer and log them over time."), ("scopie", "Follow a signal through a circuit with an oscilloscope.")],
+  ),
 ]
 
 APP = {a["id"]: a for a in APPS}

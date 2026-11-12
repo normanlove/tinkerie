@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" data-look-touch="mouse" data-look-slot="header.top .tools">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fixie — repair guide</title>
+<link rel="icon" href="icon.svg">
+<link rel="stylesheet" href="app.css">
+<script src="look.js"></script>
+</head>
+<body>
+<!-- Fixie · part of the free Tinkerie maker suite · created by nrmluvdev -->
+<header class="top">
+  <div class="brand">
+    <img src="icon.svg" alt="" width="34" height="34">
+    <div><b>Fixie</b><small>Repair guide</small></div>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" data-tab="repair" aria-selected="true" data-help="Repair tab">Repair</button>
+    <button role="tab" data-tab="tools" data-help="Tools tab">Tools</button>
+    <button role="tab" data-tab="signs" data-help="Signs tab">What to look for</button>
+    <button role="tab" data-tab="safety" data-help="Safety tab">Safety</button>
+    <button role="tab" data-tab="log" data-help="My repairs tab">My repairs <i id="nLog"></i></button>
+  </nav>
+  <div class="tools">
+    <button id="newRepair" class="btn primary" title="Start a new repair">New repair</button>
+    <button id="saveReport" class="btn ghost" title="Save the repair report">Save report</button>
+    <button id="teachBtn" class="btn ghost icon" title="Teaching tips (F2)">?</button>
+  </div>
+</header>
+
+<main>
+  <section class="view" id="v-repair" aria-label="Repair"></section>
+  <section class="view" id="v-tools" hidden aria-label="Tools"></section>
+  <section class="view" id="v-signs" hidden aria-label="What to look for"></section>
+  <section class="view" id="v-safety" hidden aria-label="Safety"></section>
+  <section class="view" id="v-log" hidden aria-label="My repairs"></section>
+</main>
+
+<div id="pop" class="pop" hidden role="dialog" aria-modal="true"><div class="pop-card" id="popCard"></div></div>
+
+<footer class="bar">
+  <span id="ver">Fixie</span>
+  <span>A guide, not a guarantee: if a step feels unsafe, stop and ask a repair shop.</span>
+  <span>Part of Tinkerie · made by nrmluvdev</span>
+</footer>
+
+<script src="teach-tips.js"></script>
+<script src="teach.js"></script>
+<script src="art.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

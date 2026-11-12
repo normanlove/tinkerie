@@ -1,6 +1,6 @@
 > ⚠️ **Tinkerie is in alpha.** Everything works, but it's still being tested on real hardware, so expect rough edges and changes. Please [report](https://github.com/normanlove/tinkerie/issues) anything that doesn't work.
 
-Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie, Probie and Codie in one program.
+Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie, Probie, Codie and Fixie in one program.
 
 ### Which file?
 - **Windows 10/11:** `Tinkerie-{VERSION}-windows.exe` (just run it), or `Tinkerie-{VERSION}-windows.zip` if your connection blocks .exe downloads (it also has the source)
@@ -10,9 +10,9 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 
 Each package has a *READ ME FIRST.txt*.
 
-<!-- release notes for 0.26.0-alpha: package.sh checks this line, so update the notes with every version -->
+<!-- release notes for 0.27.0-alpha: package.sh checks this line, so update the notes with every version -->
 ### New in {VERSION}
-- **Wirie: castellated modules soldered flat.** Boards with half-holes along their edges (Raspberry Pi Pico, Pico W, Pico 2 and 2 W, Waveshare RP2040-Zero, Seeed XIAO, ESP32-C3 SuperMini) now have a surface-mount version: select the part and choose *Mounting: Soldered flat (castellated)*. Its pins become edge pads, it sits low with no headers, and every connection stays as it was (re-route to redraw the tracks). Keebie has the same option for the controller, and the parts list, Pinnie, Powerie and Makie's case height all follow it.
+- **New app: Fixie, the repair guide.** Pick what you're fixing (19 kinds of device, from phones, laptops and consoles to kettles, power tools, LED strips and 3D printers) and what it's doing (dead, won't charge, no picture, no sound, overheating, got wet, cuts out and more), and Fixie takes you through it one check at a time, easiest first. Each step says what to do, which tools to use and what a good and a bad result look like; type in your meter reading and it tells you which. It ends at the likely fault, how hard the fix is and the parts you need. Also: a tools guide with a starter kit, pictures of failed parts, safety advice (with a safety check before any step inside mains or lithium-battery devices), and a repair log with reports.
 
 Licensed under GPL-3.0-or-later.
 

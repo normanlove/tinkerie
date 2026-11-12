@@ -123,6 +123,7 @@ public class AppActivity extends WebActivity {
             case 47821: return "tunie";
             case 47822: return "probie";
             case 47824: return "codie";
+            case 47825: return "fixie";
             case 47831: return "scopie";
             default: return "";
         }

@@ -1,0 +1,3848 @@
+{
+ "version": 1,
+ "devices": [
+  {
+   "id": "phone",
+   "name": "Phone or tablet",
+   "group": "Portable",
+   "tags": [
+    "lipo",
+    "usb",
+    "screen",
+    "audio",
+    "touch",
+    "buttons",
+    "wireless",
+    "glued"
+   ],
+   "open": "Phones and tablets are glued shut. Warm the edge of the back or screen to about 80°C (a hair dryer or heat pad), lift it with a suction cup and slide plastic picks round the edge. Disconnect the battery connector first, before anything else."
+  },
+  {
+   "id": "laptop",
+   "name": "Laptop",
+   "group": "Computers",
+   "tags": [
+    "lipo",
+    "adapter",
+    "screen",
+    "audio",
+    "buttons",
+    "touch",
+    "usb",
+    "wireless",
+    "fan",
+    "storage",
+    "pc"
+   ],
+   "open": "Most laptops open from the bottom: remove every screw (some hide under rubber feet or stickers), then prise the base off with a plastic pick. Unplug the battery before touching the board."
+  },
+  {
+   "id": "desktop",
+   "name": "Desktop PC",
+   "group": "Computers",
+   "tags": [
+    "mains",
+    "hv",
+    "usb",
+    "audio",
+    "fan",
+    "storage",
+    "pc"
+   ],
+   "open": "Side panel off; everything inside is modular. The power supply box holds mains voltage: never open the power supply itself unless you know mains repair."
+  },
+  {
+   "id": "console",
+   "name": "Games console",
+   "group": "Computers",
+   "tags": [
+    "mains",
+    "hv",
+    "usb",
+    "wireless",
+    "fan",
+    "storage",
+    "pc",
+    "audio"
+   ],
+   "open": "Consoles use security screws (often Torx T8/T9 or tri-point) and warranty stickers. The built-in power supply holds mains voltage."
+  },
+  {
+   "id": "controller",
+   "name": "Game controller",
+   "group": "Portable",
+   "tags": [
+    "lipo",
+    "usb",
+    "buttons",
+    "wireless",
+    "audio"
+   ],
+   "open": "Usually Torx or Phillips screws, sometimes under the grips' covers or stickers, then clips. Unplug the battery first."
+  },
+  {
+   "id": "remote",
+   "name": "Remote control",
+   "group": "Portable",
+   "tags": [
+    "battery",
+    "buttons",
+    "led"
+   ],
+   "open": "Most snap apart: work a plastic pick round the seam. Some have one screw under the battery cover."
+  },
+  {
+   "id": "tv",
+   "name": "TV or monitor",
+   "group": "Screens and sound",
+   "tags": [
+    "mains",
+    "hv",
+    "screen",
+    "audio",
+    "buttons",
+    "lights"
+   ],
+   "open": "Lay it face down on something soft. The back comes off with screws and clips. The power supply board holds mains voltage and big capacitors: unplug it and leave it a few minutes before touching anything."
+  },
+  {
+   "id": "audio",
+   "name": "Amplifier, stereo or radio",
+   "group": "Screens and sound",
+   "tags": [
+    "mains",
+    "hv",
+    "audio",
+    "buttons"
+   ],
+   "open": "Screws round the case. Amplifiers have big filter capacitors that stay charged after unplugging: discharge them before working inside."
+  },
+  {
+   "id": "earbuds",
+   "name": "Headphones, earbuds or Bluetooth speaker",
+   "group": "Screens and sound",
+   "tags": [
+    "lipo",
+    "usb",
+    "audio",
+    "wireless",
+    "buttons",
+    "glued"
+   ],
+   "open": "Small and usually glued or ultrasonically welded. Prise the seam gently with a thin plastic pick; mind the tiny battery and its fine wires."
+  },
+  {
+   "id": "heater",
+   "name": "Kettle, toaster, iron or hair dryer",
+   "group": "Home",
+   "tags": [
+    "mains",
+    "heater",
+    "buttons"
+   ],
+   "open": "Often tamper-proof screws (Torx with a pin, or oval-head). The element runs straight from the mains, so it must be unplugged before you open it."
+  },
+  {
+   "id": "motorhome",
+   "name": "Fan, blender, vacuum or mixer",
+   "group": "Home",
+   "tags": [
+    "mains",
+    "motor",
+    "buttons"
+   ],
+   "open": "Screws, often hidden under feet or labels. Fans and blenders run their motors straight from the mains: unplug before opening."
+  },
+  {
+   "id": "washer",
+   "name": "Washing machine, dishwasher or fridge",
+   "group": "Home",
+   "tags": [
+    "mains",
+    "motor",
+    "heater",
+    "buttons",
+    "hv"
+   ],
+   "open": "Big appliances: switch off at the wall and pull the plug. Water may be inside. Many faults (door locks, pumps, filters) can be reached from the front or back panels."
+  },
+  {
+   "id": "powertool",
+   "name": "Cordless tool or battery pack",
+   "group": "Tools and making",
+   "tags": [
+    "lipo",
+    "motor",
+    "buttons"
+   ],
+   "open": "Screws round the body. Battery packs hold a lot of energy even when 'flat': never short the terminals, and keep them away from metal tools."
+  },
+  {
+   "id": "lights",
+   "name": "LED lamp, LED strip or fairy lights",
+   "group": "Tools and making",
+   "tags": [
+    "adapter",
+    "lights",
+    "led"
+   ],
+   "open": "Strips need no opening. Lamps with a built-in driver run from the mains: unplug first, and treat the driver as live."
+  },
+  {
+   "id": "diy",
+   "name": "Arduino, ESP32, Pico or DIY project",
+   "group": "Tools and making",
+   "tags": [
+    "usbpow",
+    "usb",
+    "mcu",
+    "led"
+   ],
+   "open": "Nothing to open: unplug USB and anything else powering it before changing wiring."
+  },
+  {
+   "id": "printer3d",
+   "name": "3D printer",
+   "group": "Tools and making",
+   "tags": [
+    "mains",
+    "hv",
+    "motor",
+    "heater",
+    "fan",
+    "screen",
+    "mcu",
+    "usb"
+   ],
+   "open": "Switch off and unplug at the wall. The power supply has mains terminals, often with no cover: keep fingers and tools away from them."
+  },
+  {
+   "id": "toy",
+   "name": "Battery toy or gadget",
+   "group": "Home",
+   "tags": [
+    "battery",
+    "buttons",
+    "motor",
+    "led",
+    "audio"
+   ],
+   "open": "Usually small Phillips screws. Check for one under the battery cover or under stickers."
+  },
+  {
+   "id": "keyboard",
+   "name": "Keyboard or mouse",
+   "group": "Computers",
+   "tags": [
+    "usbpow",
+    "usb",
+    "buttons",
+    "wireless",
+    "led"
+   ],
+   "open": "Keycaps pull off with a keycap puller. Mice usually have screws under the gliding pads."
+  },
+  {
+   "id": "microwave",
+   "name": "Microwave oven",
+   "group": "Home",
+   "tags": [
+    "mains",
+    "hv",
+    "heater",
+    "motor",
+    "fan",
+    "buttons"
+   ],
+   "open": "Do not open a microwave. Its high-voltage capacitor can hold a lethal charge long after it's unplugged, and its magnetron runs at over 2000V. Fixie only takes you through the checks you can do from the outside.",
+   "noopen": true
+  }
+ ],
+ "symptoms": [
+  {
+   "id": "dead",
+   "name": "Completely dead",
+   "desc": "No lights, no sound, nothing happens.",
+   "start": "dead.1"
+  },
+  {
+   "id": "shutsoff",
+   "name": "Turns on, then switches off or restarts",
+   "desc": "Starts, then cuts out, keeps rebooting, or switches off under load.",
+   "start": "so.1"
+  },
+  {
+   "id": "charge",
+   "name": "Won't charge, or the battery runs out fast",
+   "desc": "The charging light or icon doesn't come on, or it's flat in no time.",
+   "for": "lipo",
+   "start": "ch.1"
+  },
+  {
+   "id": "display",
+   "name": "No picture, or the screen is dim, lined or garbled",
+   "desc": "It sounds or feels like it's on, but the screen is wrong.",
+   "for": "screen",
+   "start": "dp.1"
+  },
+  {
+   "id": "sound",
+   "name": "No sound, or it hums, crackles or distorts",
+   "desc": "Speakers silent, one side out, or sound is noisy.",
+   "for": "audio",
+   "start": "snd.1"
+  },
+  {
+   "id": "buttons",
+   "name": "Buttons, keys or the touchscreen don't respond",
+   "desc": "Something you press doesn't do anything, or does the wrong thing.",
+   "for": "buttons|touch",
+   "start": "bt.1"
+  },
+  {
+   "id": "motor",
+   "name": "A motor or fan won't spin, or is noisy",
+   "desc": "Hums, grinds, or doesn't turn.",
+   "for": "motor|fan",
+   "start": "m.1"
+  },
+  {
+   "id": "heat",
+   "name": "Doesn't heat up, or won't stop heating",
+   "desc": "Element stays cold, or it overheats or won't switch off.",
+   "for": "heater",
+   "start": "h.1"
+  },
+  {
+   "id": "connect",
+   "name": "Won't connect: USB, Wi-Fi or Bluetooth",
+   "desc": "The computer doesn't see it, or it won't pair.",
+   "for": "usb|wireless",
+   "start": "cn.1"
+  },
+  {
+   "id": "upload",
+   "name": "The computer can't see the board, or code won't upload",
+   "desc": "No COM port, upload errors, or it won't run your code.",
+   "for": "mcu",
+   "start": "up.1"
+  },
+  {
+   "id": "lights",
+   "name": "LEDs flicker, part is out, or colours are wrong",
+   "desc": "Some LEDs dark, wrong colours, dim at one end.",
+   "for": "lights",
+   "start": "l.1"
+  },
+  {
+   "id": "hot",
+   "name": "Gets hot, smells of burning, or smoked",
+   "desc": "Too hot to touch, a burning smell, smoke or a bang.",
+   "start": "hot.1"
+  },
+  {
+   "id": "water",
+   "name": "Got wet, or had a drink spilled on it",
+   "desc": "Rain, a spill, dropped in water, or condensation.",
+   "start": "w.1"
+  },
+  {
+   "id": "intermittent",
+   "name": "Works sometimes, cuts out when moved",
+   "desc": "Comes and goes, works when you hold the cable just so.",
+   "start": "int.1"
+  },
+  {
+   "id": "trips",
+   "name": "Trips the electricity or blows its fuse",
+   "desc": "The house breaker or RCD trips, or the plug fuse blows.",
+   "for": "mains",
+   "start": "tr.1"
+  }
+ ],
+ "steps": {
+  "dead.1": {
+   "t": "Rule out the power source",
+   "why": "Most 'dead' devices aren't: the socket, lead, charger or batteries are the problem far more often than the device itself.",
+   "do": [
+    {
+     "if": "mains|adapter",
+     "t": "Plug it into a different wall socket that you know works (try a lamp in it first). Skip extension leads and power strips for now."
+    },
+    {
+     "if": "adapter|usbpow|lipo",
+     "t": "Try a different charger, adapter or USB cable that you know works with another device."
+    },
+    {
+     "if": "usbpow",
+     "t": "Try a different USB port, ideally one on the back of a computer or a phone charger rather than a hub."
+    },
+    {
+     "if": "battery",
+     "t": "Put in fresh batteries, checking each one faces the right way (+ to +)."
+    },
+    {
+     "if": "lipo",
+     "t": "Leave it on the charger for at least 30 minutes: a completely flat battery may show nothing at first."
+    }
+   ],
+   "q": "Does it come to life with power you know is good?",
+   "a": [
+    {
+     "t": "Yes, it works now",
+     "go": "r.supply"
+    },
+    {
+     "t": "No, still dead",
+     "go": "dead.2"
+    }
+   ],
+   "tools": [
+    "cable"
+   ],
+   "good": "It powers up, so the device is fine and the supply was the problem.",
+   "bad": "Still nothing: carry on."
+  },
+  "dead.2": {
+   "t": "Check the batteries and their contacts",
+   "why": "Leaking batteries leave a crust that stops the current, and springs lose their grip.",
+   "do": [
+    "Take the batteries out and look at the springs and contacts with a torch.",
+    "Green, blue or white crust is corrosion from a leaking battery.",
+    "Measure each battery with a multimeter on DC volts (the 20V range, or auto). A fresh AA or AAA reads about 1.5–1.6V; under 1.2V is flat."
+   ],
+   "q": "Were the contacts crusty, or the batteries flat?",
+   "a": [
+    {
+     "t": "Yes",
+     "go": "r.contacts"
+    },
+    {
+     "t": "No, they look clean and the batteries are good",
+     "go": "dead.4"
+    }
+   ],
+   "tools": [
+    "meter",
+    "torch"
+   ],
+   "good": "Shiny metal contacts, firm springs, and each cell above 1.3V.",
+   "bad": "Crust on the contacts, a weak spring, or a cell below 1.2V.",
+   "only": "battery",
+   "skip": "dead.3",
+   "measure": {
+    "label": "Lowest battery voltage",
+    "unit": "V",
+    "bands": [
+     {
+      "lt": 1.2,
+      "a": 0,
+      "say": "Flat: that battery needs replacing."
+     },
+     {
+      "lt": 1.3,
+      "a": 0,
+      "say": "Nearly flat."
+     },
+     {
+      "a": 1,
+      "say": "Good.",
+      "ok": true
+     }
+    ]
+   },
+   "signs": [
+    "corrosion"
+   ]
+  },
+  "dead.3": {
+   "t": "Measure what the charger or adapter gives out",
+   "why": "A dead adapter looks exactly like a dead device. Measuring it takes a minute.",
+   "do": [
+    "Read the label on the adapter: it says what it should give out, such as 'Output: 12V ⎓ 2A' or '5V 3A'.",
+    {
+     "if": "adapter",
+     "t": "Set the multimeter to DC volts. For a round barrel plug, put one probe inside the hole (centre pin) and the other on the outside sleeve. The small symbol on the label shows which is + (usually the centre)."
+    },
+    {
+     "if": "usbpow|lipo",
+     "t": "For USB, plug a USB power meter between the charger and the device: it shows the voltage and the current. Without one, use a spare cable cut open, or a USB breakout board."
+    },
+    "An adapter with nothing plugged in can read up to about 10% high: that's normal."
+   ],
+   "q": "Is the output close to what the label says?",
+   "a": [
+    {
+     "t": "Yes",
+     "go": "dead.3b"
+    },
+    {
+     "t": "No: nothing, much lower, or jumping about",
+     "go": "r.adapter"
+    }
+   ],
+   "tools": [
+    "meter",
+    "usbmeter"
+   ],
+   "good": "Within about 10% of the label (a 5V USB charger: 4.75–5.25V).",
+   "bad": "0V, far too low, or a reading that keeps changing.",
+   "only": "adapter|usbpow|lipo",
+   "skip": "dead.4",
+   "measure": {
+    "label": "Voltage you measured",
+    "unit": "V",
+    "near": {
+     "label": "Voltage on the label",
+     "lo": 0.9,
+     "hi": 1.15,
+     "ok": 0,
+     "bad": 1
+    }
+   }
+  },
+  "dead.3b": {
+   "t": "Watch whether it takes any current",
+   "why": "A device that draws current is getting power and doing something with it. One that draws nothing isn't connected.",
+   "do": [
+    "With the USB power meter (or a bench power supply's current reading) in line, plug the device in and watch the current (A) for a minute.",
+    {
+     "if": "lipo",
+     "t": "Then try a forced restart: on an iPhone press volume up, volume down, then hold the side button for 15 seconds; on most Android phones hold power and volume down for 20 seconds; on a laptop, unplug the charger and hold the power button for 30 seconds."
+    }
+   ],
+   "q": "What does the meter show?",
+   "a": [
+    {
+     "t": "0.00 A: nothing at all",
+     "go": "dead.port"
+    },
+    {
+     "t": "It draws some current",
+     "go": "dead.flat"
+    }
+   ],
+   "tools": [
+    "usbmeter"
+   ],
+   "only": "lipo|usbpow",
+   "skip": "dead.4",
+   "measure": {
+    "label": "Current it draws",
+    "unit": "A",
+    "bands": [
+     {
+      "lt": 0.02,
+      "a": 0,
+      "say": "Nothing: it isn't connecting."
+     },
+     {
+      "a": 1,
+      "say": "It's taking power.",
+      "ok": true
+     }
+    ]
+   }
+  },
+  "dead.port": {
+   "t": "Inspect and clean the charging port",
+   "why": "Pocket lint packs into USB-C and Lightning ports until the plug can't reach the contacts.",
+   "do": [
+    "Shine a torch into the port and look with a magnifier or your phone's camera zoomed in.",
+    "Scrape out lint with a wooden toothpick or a plastic pick. Never use metal: the pins short easily.",
+    "Check the plug clicks firmly home and doesn't wobble. Look for bent or missing pins."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "A lot of lint, and it charges now",
+     "go": "r.lint"
+    },
+    {
+     "t": "The port wobbles or pins are damaged",
+     "go": "r.port"
+    },
+    {
+     "t": "The port is clean and solid",
+     "go": "dead.4"
+    }
+   ],
+   "tools": [
+    "torch",
+    "magnifier",
+    "spudger"
+   ],
+   "signs": [
+    "connector"
+   ]
+  },
+  "dead.flat": {
+   "t": "Give the battery time",
+   "why": "Lithium batteries that have gone below their safe voltage charge very slowly at first, and some devices show nothing until they've recovered.",
+   "do": [
+    "Leave it on its own charger for an hour.",
+    "Then do the forced restart again."
+   ],
+   "q": "Did it start?",
+   "a": [
+    {
+     "t": "Yes",
+     "go": "r.flat"
+    },
+    {
+     "t": "No",
+     "go": "dead.4"
+    }
+   ]
+  },
+  "dead.4": {
+   "t": "Check the fuse, the lead and the switch",
+   "why": "These are the simplest parts on the power path, and the most likely to fail.",
+   "do": [
+    {
+     "if": "mains",
+     "t": "Unplug it. In the UK, plugs have a fuse: open the plug (or the fuse drawer) and test the fuse with the multimeter on continuity (the beep setting). A beep means it's good; no beep means it's blown."
+    },
+    {
+     "if": "mains",
+     "t": "Check the lead along its length, especially where it goes into the plug and the device: cuts, kinks, scorch marks or a loose cord grip."
+    },
+    {
+     "if": "mains|adapter",
+     "t": "Unplugged, test each wire of the lead end to end on continuity, bending the lead as you go. The beep should stay steady."
+    },
+    "Make sure the on/off switch clicks and, if you can reach its contacts, that it beeps on continuity when switched on."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "A blown fuse",
+     "go": "dead.fuse",
+     "only": "mains"
+    },
+    {
+     "t": "A damaged lead",
+     "go": "r.cable",
+     "only": "mains|adapter"
+    },
+    {
+     "t": "A faulty switch",
+     "go": "r.button"
+    },
+    {
+     "t": "All fine",
+     "go": "dead.5"
+    }
+   ],
+   "tools": [
+    "meter",
+    "screwdrivers"
+   ],
+   "good": "The fuse and each wire beep steadily (close to 0Ω).",
+   "bad": "No beep (OL on the display), or a beep that cuts in and out as you bend the lead.",
+   "signs": [
+    "fuse"
+   ]
+  },
+  "dead.fuse": {
+   "t": "Replace the fuse once",
+   "why": "A fuse blows for a reason. If a new one blows straight away, something inside is shorted and must be found first.",
+   "do": [
+    "Fit a new fuse of exactly the same rating (it's printed on it: 3A, 5A, 13A…). Never fit a bigger fuse, and never bridge it with wire or foil.",
+    "Plug in and switch on."
+   ],
+   "q": "What happened?",
+   "a": [
+    {
+     "t": "It works",
+     "go": "r.fuseok"
+    },
+    {
+     "t": "The new fuse blew too",
+     "go": "tr.2"
+    }
+   ],
+   "tools": [
+    "fuses"
+   ],
+   "signs": [
+    "fuse"
+   ]
+  },
+  "dead.5": {
+   "t": "Open it up and look inside",
+   "why": "Faults that kill a device usually leave marks you can see: burnt parts, bulging capacitors or corrosion.",
+   "do": [
+    "Take a photo before every step, and keep screws in order (an ice-cube tray or a magnetic mat works well).",
+    {
+     "if": "lipo",
+     "t": "Disconnect the battery first: lever its connector straight up with a plastic tool."
+    },
+    {
+     "if": "hv",
+     "t": "Wait a few minutes after unplugging, then check the big capacitors are discharged (see Safety) before touching anything."
+    },
+    "Look over every part of the board under a bright light, with a magnifier. Sniff too: burnt parts have a sharp smell."
+   ],
+   "q": "What did you see?",
+   "a": [
+    {
+     "t": "Burnt or blackened parts",
+     "go": "r.burnt"
+    },
+    {
+     "t": "Bulging or leaking capacitors",
+     "go": "r.caps"
+    },
+    {
+     "t": "Swollen battery",
+     "go": "r.swollen",
+     "only": "lipo"
+    },
+    {
+     "t": "Green or white crust (corrosion)",
+     "go": "w.3"
+    },
+    {
+     "t": "A loose or unplugged cable",
+     "go": "r.connector"
+    },
+    {
+     "t": "Nothing obvious",
+     "go": "dead.6"
+    }
+   ],
+   "tools": [
+    "screwdrivers",
+    "spudger",
+    "torch",
+    "magnifier",
+    "esd"
+   ],
+   "open": true,
+   "signs": [
+    "caps",
+    "burnt",
+    "corrosion",
+    "battery",
+    "connector"
+   ]
+  },
+  "dead.6": {
+   "t": "Test the fuse inside",
+   "why": "Devices that run from the mains have a fuse on the power board, near where the mains comes in.",
+   "do": [
+    "Unplugged. Find the fuse near the mains input: a glass tube or a small ceramic or black part marked F1 (or F with a number).",
+    "Test it on continuity."
+   ],
+   "q": "Is the fuse inside good?",
+   "a": [
+    {
+     "t": "It beeps: good",
+     "go": "dead.7"
+    },
+    {
+     "t": "No beep: blown",
+     "go": "r.psufuse"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "good": "A steady beep.",
+   "bad": "No beep, or the glass is blackened inside.",
+   "open": true,
+   "only": "mains",
+   "skip": "dead.7",
+   "signs": [
+    "fuse"
+   ]
+  },
+  "dead.7": {
+   "t": "Measure the power rails",
+   "why": "Boards turn the input into a few fixed voltages ('rails'), such as 5V, 3.3V and 1.8V. A missing rail points straight at the fault.",
+   "do": [
+    "Find test points or parts marked 5V, 3V3, VCC or VBAT, or the regulators (small 3- or 5-legged parts near the power input). A board diagram or service manual helps a lot.",
+    "Put the black probe on ground: a metal shield, a USB socket's shell or a screw hole. Not on the mains side of a power supply: that ground is live.",
+    {
+     "if": "pc",
+     "t": "On a PC power supply you can check it on its own: link the green wire to a black one on the 24-pin plug and it starts. Yellow should be 12V, red 5V, orange 3.3V, purple 5V standby."
+    },
+    "Switch on and measure each rail with the red probe. Keep one hand away from the board."
+   ],
+   "q": "Are the voltages there?",
+   "a": [
+    {
+     "t": "All present and right",
+     "go": "dead.9"
+    },
+    {
+     "t": "One is missing or much too low",
+     "go": "dead.8"
+    },
+    {
+     "t": "Nothing at all from the supply",
+     "go": "r.psu"
+    }
+   ],
+   "tools": [
+    "meter",
+    "probes"
+   ],
+   "good": "Each rail within about 5% of its value.",
+   "bad": "0V, or a rail that's well below what it should be (pulled down by a short).",
+   "open": true,
+   "live": true,
+   "measure": {
+    "label": "Voltage on the rail",
+    "unit": "V",
+    "near": {
+     "label": "What the rail should be",
+     "lo": 0.93,
+     "hi": 1.07,
+     "ok": 0,
+     "bad": 1
+    }
+   }
+  },
+  "dead.8": {
+   "t": "Find the short",
+   "why": "A rail that's missing or pulled low is often shorted to ground by one failed part, which gets warm when power goes into it.",
+   "do": [
+    "Unplug. Measure the resistance from the rail to ground. Under about 5Ω usually means a short (a busy rail with a big chip can read 10–100Ω: compare with a similar board if you can).",
+    "Feed the rail from a bench power supply set to its voltage, with the current limit low (start at 0.5A). The shorted part warms up.",
+    "Find the warm part: a thermal camera, a drop of isopropyl alcohol that evaporates first, freeze spray that melts first, or carefully with a fingertip.",
+    "The usual suspects: tiny ceramic capacitors, protection diodes, and regulators."
+   ],
+   "q": "Did you find a part that heats up?",
+   "a": [
+    {
+     "t": "Yes",
+     "go": "r.short"
+    },
+    {
+     "t": "It's shorted, but nothing warms up",
+     "go": "r.shortpro"
+    },
+    {
+     "t": "It isn't shorted",
+     "go": "r.regulator"
+    }
+   ],
+   "tools": [
+    "meter",
+    "benchpsu",
+    "hotspot"
+   ],
+   "open": true,
+   "measure": {
+    "label": "Resistance, rail to ground",
+    "unit": "Ω",
+    "bands": [
+     {
+      "lt": 5,
+      "a": 0,
+      "say": "That's a short."
+     },
+     {
+      "a": 2,
+      "say": "Not shorted.",
+      "ok": true
+     }
+    ]
+   }
+  },
+  "dead.9": {
+   "t": "Check the power button and start-up",
+   "why": "With power present, the next step is whether it's being told to start.",
+   "do": [
+    "Test the power button on continuity: it should beep only while pressed.",
+    {
+     "if": "pc",
+     "t": "On a desktop, short the two 'PWR SW' pins on the motherboard with a screwdriver tip to bypass the case button."
+    },
+    {
+     "if": "pc",
+     "t": "Take out all but one memory stick, unplug extra drives and cards, and clear the BIOS settings (the CMOS jumper or the coin battery out for a minute)."
+    },
+    "Listen for beeps and watch for blinking lights: they're often a code for the fault."
+   ],
+   "q": "What happened?",
+   "a": [
+    {
+     "t": "It starts now",
+     "go": "r.button"
+    },
+    {
+     "t": "It beeps or flashes a pattern",
+     "go": "r.codes"
+    },
+    {
+     "t": "Still nothing",
+     "go": "r.board"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "open": true
+  },
+  "so.1": {
+   "t": "Notice exactly when it switches off",
+   "why": "When it cuts out says a lot about why.",
+   "do": [
+    "Use it until it cuts out, a few times, and notice what's happening each time."
+   ],
+   "q": "When does it switch off?",
+   "a": [
+    {
+     "t": "On battery, but fine on the charger",
+     "go": "ch.4",
+     "only": "lipo|battery"
+    },
+    {
+     "t": "After it's been on a while, or when warm",
+     "go": "so.2"
+    },
+    {
+     "t": "When it's working hard (games, motor load, loud)",
+     "go": "so.3"
+    },
+    {
+     "t": "Straight away, a second after starting",
+     "go": "so.4"
+    },
+    {
+     "t": "At random",
+     "go": "int.1"
+    }
+   ]
+  },
+  "so.2": {
+   "t": "Check the cooling",
+   "why": "Chips switch themselves off to protect themselves when they overheat. Dust and dried thermal paste are the usual reasons.",
+   "do": [
+    "Check the fan spins when it's on, and air comes out of the vents.",
+    "Look into the vents with a torch: grey felt across the heatsink fins blocks the air completely.",
+    {
+     "if": "pc",
+     "t": "Free tools like HWMonitor (Windows) show the temperatures. Over about 95°C for a processor is too hot."
+    },
+    "Thermal paste dries out after four or five years in laptops and consoles."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "Dust or fluff clogging it",
+     "go": "r.cooling"
+    },
+    {
+     "t": "The fan doesn't spin",
+     "go": "m.1"
+    },
+    {
+     "t": "It's clean and the fan works",
+     "go": "so.3"
+    }
+   ],
+   "tools": [
+    "torch",
+    "screwdrivers"
+   ],
+   "only": "fan|pc",
+   "skip": "so.3",
+   "signs": [
+    "dust"
+   ]
+  },
+  "so.3": {
+   "t": "Check the power holds up under load",
+   "why": "A tired battery, a weak adapter or a small power supply can't keep up when the device works hard.",
+   "do": [
+    "Measure the supply while it's working hard: a USB power meter in line, or the meter across the battery or the power input.",
+    {
+     "if": "laptop",
+     "t": "Check the adapter's watts match the one it came with. A lower-power adapter makes laptops shut off or slow down."
+    },
+    {
+     "if": "pc",
+     "t": "Check the power supply's watts are enough for the graphics card (its maker says what's recommended)."
+    }
+   ],
+   "q": "Does the voltage drop a lot when it's working?",
+   "a": [
+    {
+     "t": "Yes, by more than about 10%",
+     "go": "r.weaksupply"
+    },
+    {
+     "t": "No, it holds steady",
+     "go": "so.4"
+    }
+   ],
+   "tools": [
+    "meter",
+    "usbmeter"
+   ]
+  },
+  "so.4": {
+   "t": "Look for swollen batteries and bulging capacitors",
+   "why": "These two are the classic reasons for a start-and-stop loop.",
+   "do": [
+    {
+     "if": "lipo",
+     "t": "Disconnect the battery and look at it: it should be completely flat. Puffy, bent or rounded means swollen."
+    },
+    "Look at the round capacitors on the board: their tops should be flat. Domed or leaking tops mean they've failed."
+   ],
+   "q": "What did you see?",
+   "a": [
+    {
+     "t": "A swollen battery",
+     "go": "r.swollen",
+     "only": "lipo"
+    },
+    {
+     "t": "Bulging or leaking capacitors",
+     "go": "r.caps"
+    },
+    {
+     "t": "A part that's very hot",
+     "go": "dead.8"
+    },
+    {
+     "t": "Neither",
+     "go": "r.board"
+    }
+   ],
+   "tools": [
+    "screwdrivers",
+    "spudger",
+    "torch"
+   ],
+   "open": true,
+   "signs": [
+    "caps",
+    "battery"
+   ]
+  },
+  "ch.1": {
+   "t": "Try a known-good charger and cable",
+   "why": "Cables fail far more often than devices. A cheap or worn cable may charge some devices and not others.",
+   "do": [
+    "Try a different cable, and a different charger, that you know work.",
+    "If it can charge wirelessly, try that: if wireless works and the cable doesn't, the port is the problem."
+   ],
+   "q": "What happened?",
+   "a": [
+    {
+     "t": "It charges with the other charger or cable",
+     "go": "r.supply"
+    },
+    {
+     "t": "Wireless works, the cable doesn't",
+     "go": "dead.port"
+    },
+    {
+     "t": "Still won't charge",
+     "go": "ch.2"
+    }
+   ],
+   "tools": [
+    "cable"
+   ]
+  },
+  "ch.2": {
+   "t": "Measure the charging current",
+   "why": "How much current it takes tells you which part of the charging path has stopped.",
+   "do": [
+    "Plug a USB power meter between the charger and the device and watch the current for a minute.",
+    "Normal charging is usually 0.5–3A. Phones slow right down near full."
+   ],
+   "q": "What does it show?",
+   "a": [
+    {
+     "t": "0.00 A",
+     "go": "dead.port"
+    },
+    {
+     "t": "Below 0.3 A and stays there",
+     "go": "ch.3"
+    },
+    {
+     "t": "0.3 A or more, but the battery doesn't fill",
+     "go": "ch.4"
+    }
+   ],
+   "tools": [
+    "usbmeter"
+   ],
+   "measure": {
+    "label": "Charging current",
+    "unit": "A",
+    "bands": [
+     {
+      "lt": 0.02,
+      "a": 0,
+      "say": "Nothing is flowing."
+     },
+     {
+      "lt": 0.3,
+      "a": 1,
+      "say": "Very low."
+     },
+     {
+      "a": 2,
+      "say": "It's charging at a normal rate.",
+      "ok": true
+     }
+    ]
+   }
+  },
+  "ch.3": {
+   "t": "Check the port's contacts",
+   "why": "A worn port makes poor contact, so it only charges slowly, or only at an angle.",
+   "do": [
+    "Clean the port as in the port step (wooden toothpick, torch, no metal).",
+    "Gently hold the plug at different angles while watching the current."
+   ],
+   "q": "What happened?",
+   "a": [
+    {
+     "t": "Lint came out and it charges now",
+     "go": "r.lint"
+    },
+    {
+     "t": "It charges only at an angle",
+     "go": "r.port"
+    },
+    {
+     "t": "No change",
+     "go": "ch.4"
+    }
+   ],
+   "tools": [
+    "torch",
+    "spudger",
+    "usbmeter"
+   ],
+   "signs": [
+    "connector"
+   ]
+  },
+  "ch.4": {
+   "t": "Check the battery's health",
+   "why": "Batteries wear out: after a few hundred charges they hold much less.",
+   "do": [
+    {
+     "if": "phone",
+     "t": "iPhone: Settings, Battery, Battery Health. Android: many phones show it under Settings, Battery or Device care, or use an app like AccuBattery."
+    },
+    {
+     "if": "laptop",
+     "t": "Windows: run 'powercfg /batteryreport' in a command prompt and compare 'Design capacity' with 'Full charge capacity'. macOS: System Information, Power, shows the cycle count and condition."
+    },
+    {
+     "if": "powertool",
+     "t": "Measure the pack's voltage: an 18V pack reads about 18–20.5V when charged. Packs that read very low (under about 14V) may have shut themselves off; one weak cell group is common."
+    },
+    {
+     "if": "lipo",
+     "t": "Look at the battery itself: any puffiness at all means it's swollen."
+    }
+   ],
+   "q": "How is the battery?",
+   "a": [
+    {
+     "t": "Worn: much less than it should hold",
+     "go": "r.battery"
+    },
+    {
+     "t": "Swollen",
+     "go": "r.swollen"
+    },
+    {
+     "t": "Healthy",
+     "go": "ch.5"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "only": "lipo",
+   "skip": "r.battery",
+   "signs": [
+    "battery"
+   ]
+  },
+  "ch.5": {
+   "t": "Check the charging circuit",
+   "why": "If the battery is fine and power reaches the device, the charging chip or its battery sensor is next.",
+   "do": [
+    "Measure the voltage on the battery's connector while it's charging: a single lithium cell slowly rises towards 4.2V (some to 4.35V).",
+    "Many batteries have a third wire for a temperature sensor. If it's broken or missing, the charger refuses to charge."
+   ],
+   "q": "Does the battery voltage rise while charging?",
+   "a": [
+    {
+     "t": "Yes, slowly",
+     "go": "r.battery"
+    },
+    {
+     "t": "No",
+     "go": "r.chargeic"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "open": true,
+   "live": true
+  },
+  "dp.1": {
+   "t": "Is it the screen, or what feeds it?",
+   "why": "First find out whether the device is running and only the screen is out.",
+   "do": [
+    {
+     "if": "laptop|desktop|console",
+     "t": "Connect another monitor or TV by HDMI or DisplayPort."
+    },
+    {
+     "if": "phone",
+     "t": "Ring it from another phone, or plug it into a computer: if it rings, vibrates or shows up, it's on."
+    },
+    {
+     "if": "tv",
+     "t": "Press Input or Source and try every input, and try a different HDMI cable and port. Check the TV's menu appears with nothing plugged in."
+    },
+    "Listen for sounds and watch for lights that show it's running."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "It works on another screen, or is clearly on",
+     "go": "dp.2"
+    },
+    {
+     "t": "Nothing on any screen, and no sign of life",
+     "go": "dp.6",
+     "only": "pc"
+    },
+    {
+     "t": "Can't tell",
+     "go": "dp.2"
+    }
+   ]
+  },
+  "dp.2": {
+   "t": "Shine a torch at the screen",
+   "why": "LCD screens need a backlight. If only the backlight is out, the picture is still there, just in the dark.",
+   "do": [
+    "With it on, shine a bright torch at the screen from close up, at an angle, in a dark room."
+   ],
+   "q": "What do you see?",
+   "a": [
+    {
+     "t": "A faint picture",
+     "go": "dp.3"
+    },
+    {
+     "t": "Nothing at all",
+     "go": "dp.4"
+    },
+    {
+     "t": "A picture with lines, blotches or wrong colours",
+     "go": "dp.5"
+    }
+   ],
+   "tools": [
+    "torch"
+   ],
+   "good": "Nothing faint means the backlight isn't the (only) problem.",
+   "bad": "A faint picture under the torch means the backlight has failed."
+  },
+  "dp.3": {
+   "t": "Check the backlight",
+   "why": "One dead LED in a TV's backlight strip stops the whole strip, and laptops have a small backlight fuse.",
+   "do": [
+    {
+     "if": "tv",
+     "t": "TVs: the LEDs are strips behind the panel. Lift the panel out carefully (it's fragile) and test each LED with an LED tester, or a meter's diode test (it may only glow faintly)."
+    },
+    {
+     "if": "laptop|phone",
+     "t": "Laptops and phones: look for a small fuse near the display connector on the board, and check it on continuity."
+    },
+    "Burnt spots on the LEDs' lenses show the failed ones."
+   ],
+   "q": "Did you find a dead LED or a blown fuse?",
+   "a": [
+    {
+     "t": "Yes",
+     "go": "r.backlight"
+    },
+    {
+     "t": "No",
+     "go": "r.backlightdriver"
+    }
+   ],
+   "tools": [
+    "meter",
+    "ledtester",
+    "spudger"
+   ],
+   "open": true,
+   "signs": [
+    "burnt"
+   ]
+  },
+  "dp.4": {
+   "t": "Reseat the display cable",
+   "why": "Display cables are thin and come loose after a knock.",
+   "do": [
+    {
+     "if": "lipo",
+     "t": "Disconnect the battery first."
+    },
+    "Find the display connector, open its latch (a flip-up bar or a sliding lock), pull the cable out, look at the contacts and refit it straight and fully home.",
+    "Look along the cable for creases, tears or burn marks."
+   ],
+   "q": "Did that help?",
+   "a": [
+    {
+     "t": "Yes",
+     "go": "r.connector"
+    },
+    {
+     "t": "No",
+     "go": "r.panel"
+    }
+   ],
+   "tools": [
+    "spudger",
+    "magnifier"
+   ],
+   "open": true,
+   "signs": [
+    "connector"
+   ]
+  },
+  "dp.5": {
+   "t": "Read the pattern",
+   "why": "The shape of a screen fault tells you which part has failed.",
+   "do": [
+    "Press gently along the edges of the screen and see if lines change."
+   ],
+   "q": "What does it look like?",
+   "a": [
+    {
+     "t": "Lines change when I press the edge",
+     "go": "r.bond"
+    },
+    {
+     "t": "Cracks, ink blots or spreading patches",
+     "go": "r.panel"
+    },
+    {
+     "t": "Half the screen or all the colours are wrong (TV)",
+     "go": "r.tcon",
+     "only": "tv"
+    },
+    {
+     "t": "Lines that don't change",
+     "go": "dp.4"
+    }
+   ]
+  },
+  "dp.6": {
+   "t": "Check it starts properly",
+   "why": "No picture anywhere means the computer isn't finishing its start-up.",
+   "do": [
+    "Listen for beeps and watch the lights for a pattern.",
+    {
+     "if": "desktop",
+     "t": "Reseat the memory and the graphics card. Try one memory stick at a time, in the slot the motherboard's manual says."
+    },
+    {
+     "if": "laptop",
+     "t": "Reseat the memory if it's not soldered in."
+    },
+    "Clear the BIOS settings (the CMOS jumper, or take the coin battery out for a minute)."
+   ],
+   "q": "Does it start now?",
+   "a": [
+    {
+     "t": "Yes",
+     "go": "r.ram"
+    },
+    {
+     "t": "It beeps or flashes a pattern",
+     "go": "r.codes"
+    },
+    {
+     "t": "No",
+     "go": "dead.7"
+    }
+   ],
+   "tools": [
+    "screwdrivers",
+    "esd"
+   ],
+   "open": true
+  },
+  "snd.1": {
+   "t": "Rule out settings and sources",
+   "why": "Most sound faults are a setting, a cable or Bluetooth connected to something else.",
+   "do": [
+    "Check the volume and mute, and that the right output is chosen (computers and phones switch outputs on their own).",
+    {
+     "if": "wireless",
+     "t": "Turn Bluetooth off on other phones and computers nearby: it may be connected to one of them."
+    },
+    "Try a different source and cable.",
+    "Plug headphones in and out of the headphone socket a few times: a stuck switch inside it mutes the speakers."
+   ],
+   "q": "Is there sound now?",
+   "a": [
+    {
+     "t": "Yes",
+     "go": "r.settings"
+    },
+    {
+     "t": "No",
+     "go": "snd.2"
+    }
+   ],
+   "tools": [
+    "cable"
+   ]
+  },
+  "snd.2": {
+   "t": "Test the speaker",
+   "why": "Speakers fail on their own: the fine coil wire breaks, or the cone tears.",
+   "do": [
+    "If headphones work but the speaker doesn't, it's the speaker or its wiring.",
+    "Unplug or unsolder one speaker wire, then measure the speaker's resistance. A '4Ω' or '8Ω' speaker reads a bit less, about 3–7Ω.",
+    "Push the cone very gently: it should move smoothly with no scraping."
+   ],
+   "q": "What did the speaker read?",
+   "a": [
+    {
+     "t": "Open (OL) or 0Ω",
+     "go": "r.speaker"
+    },
+    {
+     "t": "A few ohms: it looks fine",
+     "go": "snd.3"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "open": true,
+   "measure": {
+    "label": "Speaker resistance",
+    "unit": "Ω",
+    "bands": [
+     {
+      "lt": 1,
+      "a": 0,
+      "say": "Shorted."
+     },
+     {
+      "lt": 40,
+      "a": 1,
+      "say": "Normal for a speaker.",
+      "ok": true
+     },
+     {
+      "a": 0,
+      "say": "Open: the coil is broken."
+     }
+    ]
+   }
+  },
+  "snd.3": {
+   "t": "Listen to the fault",
+   "why": "Each noise has a usual cause.",
+   "do": [
+    "Listen with the volume low and turn it up slowly. Move the knobs and switches."
+   ],
+   "q": "What do you hear?",
+   "a": [
+    {
+     "t": "Crackles when I move a knob or switch",
+     "go": "r.pot"
+    },
+    {
+     "t": "A steady hum or buzz",
+     "go": "r.hum"
+    },
+    {
+     "t": "Silence on one or both sides",
+     "go": "snd.4"
+    },
+    {
+     "t": "Distortion, worse when loud",
+     "go": "r.distort"
+    }
+   ]
+  },
+  "snd.4": {
+   "t": "Follow the sound through the circuit",
+   "why": "Find the last point where the sound is still there.",
+   "do": [
+    "With it on and the volume halfway, touch the input of the amplifier chip or stage with a screwdriver tip held by its handle: a hum in the speaker means everything from there on works.",
+    "With an oscilloscope (Scopie), follow a test tone from the input to the output and see where it stops.",
+    "Measure the amplifier chip's supply pins.",
+    {
+     "if": "audio",
+     "t": "Amplifiers have a protection relay that clicks on a few seconds after switching on. If it clicks off again, the output has a fault."
+    }
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "A hum appears when I touch the amp's input",
+     "go": "r.preamp"
+    },
+    {
+     "t": "No hum even at the amplifier, or the relay clicks off",
+     "go": "r.amp"
+    }
+   ],
+   "tools": [
+    "scope",
+    "meter"
+   ],
+   "open": true,
+   "live": true
+  },
+  "bt.1": {
+   "t": "Clean the button",
+   "why": "Dirt, sticky drinks and skin oil stop buttons making contact.",
+   "do": [
+    "Switch off. For a keyboard, pull off the keycap.",
+    "Clean round the button with isopropyl alcohol on a cotton bud, and blow out crumbs.",
+    "Press the button 20–30 times to work the cleaner in, then let it dry for 10 minutes.",
+    {
+     "if": "phone|laptop|pc",
+     "t": "Many devices have a hardware test in their diagnostics or a test app: use it to see whether the button registers at all."
+    }
+   ],
+   "q": "Does it work now?",
+   "a": [
+    {
+     "t": "Yes",
+     "go": "r.clean"
+    },
+    {
+     "t": "No",
+     "go": "bt.2"
+    }
+   ],
+   "tools": [
+    "ipa",
+    "brush"
+   ]
+  },
+  "bt.2": {
+   "t": "Check the touchscreen",
+   "why": "Touch problems are often the screen protector, the charger or the software.",
+   "do": [
+    "Take off the case and screen protector, clean the screen, and restart.",
+    "Try it on battery with the charger unplugged: a poor charger can make touch go wild.",
+    "If the screen was replaced recently, cheap replacements often have poor touch."
+   ],
+   "q": "What happened?",
+   "a": [
+    {
+     "t": "Fine now",
+     "go": "r.clean"
+    },
+    {
+     "t": "It only misbehaves on the charger",
+     "go": "r.weaksupply"
+    },
+    {
+     "t": "Touch is still dead or jumpy",
+     "go": "r.digitizer"
+    }
+   ],
+   "only": "touch",
+   "skip": "bt.3"
+  },
+  "bt.3": {
+   "t": "Test the switch with a meter",
+   "why": "Find out whether the switch itself closes.",
+   "do": [
+    "Unplugged or battery disconnected, put the meter on continuity across the switch's legs.",
+    "It should beep only while you press it. Small square 4-leg switches have their legs joined in pairs, so try across corners."
+   ],
+   "q": "Does it beep when pressed, and not when released?",
+   "a": [
+    {
+     "t": "Yes",
+     "go": "bt.4"
+    },
+    {
+     "t": "No, or it beeps all the time",
+     "go": "r.button"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "open": true
+  },
+  "bt.4": {
+   "t": "Follow the track",
+   "why": "If the switch is fine, the connection from it is broken.",
+   "do": [
+    "Follow the copper track or flex cable from the switch towards the chip, testing continuity along it.",
+    "Look closely for a cracked track, corrosion or a torn flex cable."
+   ],
+   "q": "Did you find a break?",
+   "a": [
+    {
+     "t": "Yes",
+     "go": "r.trace"
+    },
+    {
+     "t": "No",
+     "go": "r.board"
+    }
+   ],
+   "tools": [
+    "meter",
+    "magnifier"
+   ],
+   "open": true,
+   "signs": [
+    "trace",
+    "corrosion"
+   ]
+  },
+  "m.1": {
+   "t": "Turn it by hand",
+   "why": "A motor that can't turn freely can't start, and may hum or blow its fuse.",
+   "do": [
+    "Unplug it. Turn the shaft, blades or wheel by hand.",
+    "Feel for stiffness and grinding, and look for hair, string or fluff wound round the shaft."
+   ],
+   "q": "How does it turn?",
+   "a": [
+    {
+     "t": "Stiff, jammed or grinding",
+     "go": "r.bearing"
+    },
+    {
+     "t": "Freely",
+     "go": "m.2"
+    }
+   ],
+   "signs": [
+    "dust"
+   ]
+  },
+  "m.2": {
+   "t": "Check power reaches the motor",
+   "why": "Find out whether it's the motor, or what drives it.",
+   "do": [
+    {
+     "if": "fan",
+     "t": "PC and small DC fans: measure across the red and black wires (12V or 5V) while the device is on."
+    },
+    {
+     "if": "powertool|toy",
+     "t": "Battery motors: measure across the motor's two terminals with the trigger or switch on."
+    },
+    {
+     "if": "mains",
+     "t": "Mains motors: only measure live if you're trained in mains work. Otherwise skip to testing the switch unplugged."
+    }
+   ],
+   "q": "Does power reach the motor?",
+   "a": [
+    {
+     "t": "Yes, but it doesn't turn",
+     "go": "m.3"
+    },
+    {
+     "t": "No power at the motor",
+     "go": "m.4"
+    }
+   ],
+   "tools": [
+    "meter",
+    "probes"
+   ],
+   "open": true,
+   "live": true
+  },
+  "m.3": {
+   "t": "Test the motor",
+   "why": "Brushes wear down, windings break, and fans need their start capacitor.",
+   "do": [
+    "Unplugged, measure the resistance across the motor: a few ohms is normal. Open (OL) means a broken winding or worn brushes.",
+    "Universal motors (drills, blenders, vacuums, mixers) have two carbon brushes, often behind round caps. Under about 5mm long, they're worn out.",
+    {
+     "if": "mains",
+     "t": "Pedestal and ceiling fans that hum but don't spin need a new start capacitor (a small box marked µF)."
+    },
+    {
+     "if": "fan",
+     "t": "For a computer fan, try a spare fan of the same size."
+    }
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "Worn brushes",
+     "go": "r.brushes",
+     "only": "mains|powertool"
+    },
+    {
+     "t": "It hums but doesn't start (fan)",
+     "go": "r.runcap",
+     "only": "mains"
+    },
+    {
+     "t": "An open winding or a dead fan",
+     "go": "r.motor"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "open": true
+  },
+  "m.4": {
+   "t": "Test the switch, speed control and thermal fuse",
+   "why": "Something before the motor has stopped passing power.",
+   "do": [
+    "Unplugged, test the on/off switch and each speed setting on continuity.",
+    "Fans and motors often have a thermal fuse or cut-out taped into the windings. It should beep.",
+    {
+     "if": "powertool",
+     "t": "Trigger switches in cordless tools wear out: test the trigger at full press."
+    }
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "A faulty switch",
+     "go": "r.button"
+    },
+    {
+     "t": "A blown thermal fuse",
+     "go": "r.thermalfuse"
+    },
+    {
+     "t": "All fine",
+     "go": "r.board"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "open": true
+  },
+  "h.1": {
+   "t": "Check the obvious first",
+   "why": "Heaters have safety switches that stop them working when something isn't quite right.",
+   "do": [
+    {
+     "if": "heater",
+     "t": "Kettles: sit it squarely on its base and close the lid. Toasters: the lever should latch down. Irons: check the temperature dial isn't on 'off'."
+    },
+    {
+     "if": "mcu",
+     "t": "3D printers show an error (thermal runaway, MINTEMP, MAXTEMP, heating failed). Note exactly what it says."
+    }
+   ],
+   "q": "What's happening?",
+   "a": [
+    {
+     "t": "It shows an error message",
+     "go": "h.4",
+     "only": "mcu"
+    },
+    {
+     "t": "It won't stop heating",
+     "go": "r.relay"
+    },
+    {
+     "t": "It stays cold",
+     "go": "h.2"
+    }
+   ]
+  },
+  "h.2": {
+   "t": "Test the heating element",
+   "why": "The element is just a wire with a known resistance, so a meter tells you if it's broken.",
+   "do": [
+    "Unplug it and measure across the element's two terminals.",
+    "The expected resistance is the voltage squared divided by the power: 230V and 2000W is 230×230÷2000 ≈ 26Ω. Fixie works it out below.",
+    "Also measure from each terminal to the metal case or earth: that must read open (OL)."
+   ],
+   "q": "What does the element read?",
+   "a": [
+    {
+     "t": "Open (OL): broken",
+     "go": "r.element"
+    },
+    {
+     "t": "About what it should",
+     "go": "h.3"
+    },
+    {
+     "t": "A low reading to the metal case",
+     "go": "r.elementearth"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "open": true,
+   "measure": {
+    "label": "Element resistance",
+    "unit": "Ω",
+    "calc": "element"
+   }
+  },
+  "h.3": {
+   "t": "Test the thermostat and thermal fuse",
+   "why": "These cut the power when it's hot. They also fail open and stop it heating at all.",
+   "do": [
+    "Unplugged and cold, test the thermostat and the thermal fuse (a small metal capsule marked with a temperature, like 'TF 240°C') on continuity."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "The thermal fuse is open",
+     "go": "r.thermalfuse"
+    },
+    {
+     "t": "The thermostat doesn't close",
+     "go": "r.thermostat"
+    },
+    {
+     "t": "Both are fine",
+     "go": "r.board"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "open": true
+  },
+  "h.4": {
+   "t": "Read the error",
+   "why": "3D printer errors say exactly which part of the heating loop has failed.",
+   "do": [
+    "MINTEMP means the temperature sensor reads impossibly cold: an open sensor wire. MAXTEMP means impossibly hot: a shorted sensor.",
+    "A common sensor is a 100k thermistor: unplug it and measure about 100kΩ at room temperature (it falls as it warms).",
+    "'Heating failed' or 'thermal runaway' means it didn't heat as expected: a loose sensor, a failing heater, or a fan blowing on the nozzle.",
+    "Check the crimped connectors on the heater and sensor wires: they work loose and burn."
+   ],
+   "q": "Which error?",
+   "a": [
+    {
+     "t": "MINTEMP or MAXTEMP",
+     "go": "r.thermistor"
+    },
+    {
+     "t": "Heating failed or thermal runaway",
+     "go": "h.2"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "signs": [
+    "melted"
+   ]
+  },
+  "cn.1": {
+   "t": "Try another cable, port and computer",
+   "why": "Many USB cables only carry power, with no data wires inside.",
+   "do": [
+    "Use a cable you know transfers data (one you've used to copy files with).",
+    "Try a different port, directly on the computer rather than a hub, and if you can, a different computer."
+   ],
+   "q": "Does it connect now?",
+   "a": [
+    {
+     "t": "Yes",
+     "go": "r.datacable"
+    },
+    {
+     "t": "No",
+     "go": "cn.2"
+    }
+   ],
+   "tools": [
+    "cable"
+   ]
+  },
+  "cn.2": {
+   "t": "See whether the computer notices it at all",
+   "why": "Whether it appears, and how, points to the cause.",
+   "do": [
+    "Windows: open Device Manager and plug it in. Watch for something new appearing, or an 'Unknown USB device' with a yellow mark.",
+    "Mac: System Information, USB. Linux: run 'lsusb', or 'sudo dmesg -w' and plug it in."
+   ],
+   "q": "What happened?",
+   "a": [
+    {
+     "t": "Nothing appears at all",
+     "go": "cn.3"
+    },
+    {
+     "t": "It appears with an error (like 'device descriptor request failed')",
+     "go": "r.usbdata"
+    },
+    {
+     "t": "It appears, but the app can't use it",
+     "go": "r.driver"
+    }
+   ]
+  },
+  "cn.3": {
+   "t": "Wireless checks",
+   "why": "Pairing gets muddled, and antenna leads come loose.",
+   "do": [
+    "Forget the device on both sides and pair again. Switch both off and on.",
+    "Move closer, away from microwaves and other 2.4GHz gadgets.",
+    {
+     "if": "laptop|console|pc",
+     "t": "Inside, Wi-Fi cards have small antenna leads that snap onto the card: they pop off after a repair."
+    }
+   ],
+   "q": "What happened?",
+   "a": [
+    {
+     "t": "It connects now",
+     "go": "r.settings"
+    },
+    {
+     "t": "I found a loose antenna lead",
+     "go": "r.connector"
+    },
+    {
+     "t": "Still nothing",
+     "go": "r.board"
+    }
+   ],
+   "only": "wireless",
+   "skip": "dead.port",
+   "signs": [
+    "connector"
+   ]
+  },
+  "up.1": {
+   "t": "Use a data cable, and look for the port",
+   "why": "The commonest cause by far is a charge-only USB cable.",
+   "do": [
+    "Use a cable you know transfers data.",
+    "Plug the board in and look in Device Manager (Windows), System Information (Mac) or 'ls /dev/tty*' (Linux) for a new COM or serial port.",
+    "Flashie and Probie list the ports too."
+   ],
+   "q": "Does a port appear?",
+   "a": [
+    {
+     "t": "Yes",
+     "go": "up.3"
+    },
+    {
+     "t": "No",
+     "go": "up.2"
+    }
+   ],
+   "tools": [
+    "cable"
+   ]
+  },
+  "up.2": {
+   "t": "Check the driver and the board's power",
+   "why": "Cheaper boards use a USB-serial chip that needs a driver on some computers.",
+   "do": [
+    "Look at the small chip near the USB socket: CH340, CP2102 or FT232 each have a free driver from their maker.",
+    "Boards with USB built into the main chip (Pico, ESP32-S3, Pro Micro) need no driver.",
+    "Check the power LED. If it's off, measure 5V and 3.3V on the board's pins."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "The driver fixed it",
+     "go": "r.driver"
+    },
+    {
+     "t": "The power LED is off",
+     "go": "dead.8"
+    },
+    {
+     "t": "The LED is on, but there's still no port",
+     "go": "up.4"
+    }
+   ],
+   "tools": [
+    "meter"
+   ]
+  },
+  "up.3": {
+   "t": "Put it into upload (bootloader) mode",
+   "why": "Boards need to be in a special mode to accept new code. Most switch on their own, but not always.",
+   "do": [
+    "ESP32: hold BOOT, tap EN (or RST), let go of BOOT, then upload.",
+    "Raspberry Pi Pico: hold BOOTSEL while plugging it in: a drive called RPI-RP2 appears. Drag a .uf2 file onto it, or use Flashie.",
+    "Pro Micro and Leonardo: tap reset twice quickly, then upload within 8 seconds.",
+    "Close anything else using the port (a serial monitor, Probie, Cura).",
+    "Check the right board and port are chosen in your software."
+   ],
+   "q": "Does it upload now?",
+   "a": [
+    {
+     "t": "Yes",
+     "go": "r.bootmode"
+    },
+    {
+     "t": "No",
+     "go": "up.4"
+    }
+   ]
+  },
+  "up.4": {
+   "t": "Check what's wired to the pins",
+   "why": "Some pins decide how the chip starts. Something connected to them can stop uploads.",
+   "do": [
+    "Unplug everything from the board except USB, and try again.",
+    "ESP32 start-up pins: GPIO 0, 2, 5, 12 and 15. ESP8266: GPIO 0, 2 and 15. Arduino Uno: D0 and D1 are the USB serial pins."
+   ],
+   "q": "Does it work with nothing else connected?",
+   "a": [
+    {
+     "t": "Yes",
+     "go": "r.strap"
+    },
+    {
+     "t": "No",
+     "go": "r.mcu"
+    }
+   ]
+  },
+  "l.1": {
+   "t": "Find where it goes wrong",
+   "why": "LED strips are a chain: a fault affects everything after it.",
+   "do": [
+    "Switch on and look along the strip."
+   ],
+   "q": "What do you see?",
+   "a": [
+    {
+     "t": "Everything after one point is out or wrong",
+     "go": "r.ledjoint"
+    },
+    {
+     "t": "Flickers, or dim and yellowish at the far end",
+     "go": "r.voltdrop"
+    },
+    {
+     "t": "One colour is missing everywhere",
+     "go": "r.ledchannel"
+    },
+    {
+     "t": "Nothing lights at all",
+     "go": "dead.3"
+    }
+   ]
+  },
+  "hot.1": {
+   "t": "Make it safe first",
+   "why": "Heat, smoke and burning smells are warnings. Stop using it before checking anything else.",
+   "do": [
+    "Unplug it and don't switch it on again until you know why.",
+    {
+     "if": "lipo",
+     "t": "If a lithium battery is swelling, hissing or smoking, move it outside or onto a stone or metal surface away from anything that can burn. If it catches fire, call the fire service."
+    }
+   ],
+   "q": "What happened?",
+   "a": [
+    {
+     "t": "A swollen or hissing battery",
+     "go": "r.swollen",
+     "only": "lipo"
+    },
+    {
+     "t": "It smelt of burning, smoked or banged",
+     "go": "hot.2"
+    },
+    {
+     "t": "It's just hotter than it used to be",
+     "go": "so.2"
+    }
+   ],
+   "signs": [
+    "battery"
+   ]
+  },
+  "hot.2": {
+   "t": "Find what burnt",
+   "why": "Burnt parts leave dark marks, split cases and a smell that tells you where to look.",
+   "do": [
+    "Open it and look for discoloured board, split or charred parts, and melted plastic. Follow your nose.",
+    "In mains power supplies, small box-shaped 'X' or 'Y' capacitors near the mains input often crack and smoke as they age."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "A cracked or burnt box capacitor near the mains input",
+     "go": "r.x2",
+     "only": "mains"
+    },
+    {
+     "t": "A melted plug or connector",
+     "go": "r.melt"
+    },
+    {
+     "t": "A burnt part on the board",
+     "go": "r.burnt"
+    },
+    {
+     "t": "Nothing I can see",
+     "go": "r.board"
+    }
+   ],
+   "tools": [
+    "torch",
+    "magnifier"
+   ],
+   "open": true,
+   "signs": [
+    "burnt",
+    "melted",
+    "caps"
+   ]
+  },
+  "w.1": {
+   "t": "Switch it off and stop it charging",
+   "why": "Water itself does little harm. Electricity flowing through it is what causes corrosion and shorts.",
+   "do": [
+    "Switch it off and unplug it. Don't try to see if it still works.",
+    "Take out the batteries if you can.",
+    "Skip the bag of rice: it doesn't dry the inside, and adds dust. Opening it up and cleaning it is what works.",
+    "Sugary, salty or milky drinks corrode much faster than water, so act within hours."
+   ],
+   "q": "Done?",
+   "a": [
+    {
+     "t": "Done",
+     "go": "w.2"
+    }
+   ]
+  },
+  "w.2": {
+   "t": "Open it and disconnect the battery",
+   "why": "A connected battery keeps corrosion going even when it's 'off'.",
+   "do": [
+    {
+     "if": "lipo",
+     "t": "Open it and unplug the battery connector before anything else."
+    },
+    "Take out any boards you can reach easily, so both sides can dry."
+   ],
+   "q": "Done?",
+   "a": [
+    {
+     "t": "Done",
+     "go": "w.3"
+    }
+   ],
+   "tools": [
+    "screwdrivers",
+    "spudger"
+   ],
+   "open": true
+  },
+  "w.3": {
+   "t": "Clean off the corrosion",
+   "why": "Isopropyl alcohol shifts the residue and dries quickly.",
+   "do": [
+    "Scrub every wet area with 99% isopropyl alcohol and a soft brush (a toothbrush is fine), especially connectors and the pins of chips.",
+    "An ultrasonic cleaner does a better job, but take speakers, microphones and buzzers out first.",
+    "Let it dry for at least a day somewhere warm.",
+    "Look under a magnifier for parts or tracks that have been eaten away."
+   ],
+   "q": "How does it look?",
+   "a": [
+    {
+     "t": "Clean, dry and intact",
+     "go": "w.4"
+    },
+    {
+     "t": "Parts or tracks are eaten away",
+     "go": "r.corrosion"
+    }
+   ],
+   "tools": [
+    "ipa",
+    "brush",
+    "magnifier"
+   ],
+   "open": true,
+   "signs": [
+    "corrosion"
+   ]
+  },
+  "w.4": {
+   "t": "Put it back together and test",
+   "why": "Test carefully: a short that's left can do more damage.",
+   "do": [
+    "If you can, power it from a bench power supply with a low current limit first.",
+    "Test every function: screen, sound, buttons, charging."
+   ],
+   "q": "How is it?",
+   "a": [
+    {
+     "t": "Everything works",
+     "go": "r.water"
+    },
+    {
+     "t": "Some things don't work",
+     "go": "r.corrosion"
+    },
+    {
+     "t": "It's dead",
+     "go": "dead.7"
+    }
+   ],
+   "tools": [
+    "benchpsu"
+   ]
+  },
+  "int.1": {
+   "t": "Find what sets it off",
+   "why": "If you can make the fault happen when you want, you can find it.",
+   "do": [
+    "With it on, wiggle the cable at each end.",
+    "Tap gently round the case and board with a plastic tool.",
+    "Warm it with a hair dryer, then cool it with freeze spray."
+   ],
+   "q": "What sets it off?",
+   "a": [
+    {
+     "t": "Moving the lead or plug",
+     "go": "int.2"
+    },
+    {
+     "t": "Tapping the board or case",
+     "go": "int.3"
+    },
+    {
+     "t": "Heat or cold",
+     "go": "int.4"
+    },
+    {
+     "t": "I can't make it happen",
+     "go": "int.5"
+    }
+   ],
+   "tools": [
+    "spudger",
+    "hotspot"
+   ]
+  },
+  "int.2": {
+   "t": "Test the lead and socket",
+   "why": "Leads break inside next to the plugs, where they bend the most.",
+   "do": [
+    "Unplugged, set the meter to continuity and bend the lead along its length while it beeps: a crackle or a gap is a break.",
+    "Check the socket on the device: wobbly sockets have cracked solder joints underneath."
+   ],
+   "q": "Where's the fault?",
+   "a": [
+    {
+     "t": "The lead",
+     "go": "r.cable"
+    },
+    {
+     "t": "The socket",
+     "go": "r.joint"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "signs": [
+    "joint",
+    "connector"
+   ]
+  },
+  "int.3": {
+   "t": "Look for cracked solder joints",
+   "why": "Heat and knocks crack the joints on big, heavy or hot parts.",
+   "do": [
+    "Look with a magnifier at joints of sockets, transformers, regulators, heatsinks and big capacitors.",
+    "A crack is a thin dark ring round the pin, or a dull, grainy joint."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "Cracked joints",
+     "go": "r.joint"
+    },
+    {
+     "t": "A loose connector",
+     "go": "r.connector"
+    },
+    {
+     "t": "Nothing",
+     "go": "int.4"
+    }
+   ],
+   "tools": [
+    "magnifier",
+    "torch"
+   ],
+   "open": true,
+   "signs": [
+    "joint",
+    "connector"
+   ]
+  },
+  "int.4": {
+   "t": "Warm and freeze one part at a time",
+   "why": "Faulty parts often fail only when hot or cold.",
+   "do": [
+    "With it running, spray freeze spray onto one part at a time, or warm one area with a hair dryer.",
+    "When the fault comes and goes as you treat a single part, you've found it."
+   ],
+   "q": "Did you find the part?",
+   "a": [
+    {
+     "t": "Yes",
+     "go": "r.thermalpart"
+    },
+    {
+     "t": "No",
+     "go": "int.5"
+    }
+   ],
+   "tools": [
+    "hotspot"
+   ],
+   "open": true,
+   "live": true
+  },
+  "int.5": {
+   "t": "Keep a log",
+   "why": "Faults that come and go need a record to show the pattern.",
+   "do": [
+    "Write down each time it happens: how long it had been on, how warm, and what it was doing. Use the notes box below.",
+    "Meterie can log the supply voltage over hours and show any dips. Probie can record what a board prints over serial."
+   ],
+   "q": "What did the log show?",
+   "a": [
+    {
+     "t": "The supply dips when it fails",
+     "go": "r.weaksupply"
+    },
+    {
+     "t": "No pattern yet",
+     "go": "r.board"
+    }
+   ],
+   "tools": [
+    "meter"
+   ]
+  },
+  "tr.1": {
+   "t": "Which protection is tripping?",
+   "why": "Overcurrent and earth leakage have different causes.",
+   "do": [
+    "Look at your fuse box. An RCD (the switch with a 'T' test button) means current is leaking to earth. A breaker (MCB) or a blown plug fuse means too much current: a short."
+   ],
+   "q": "What trips?",
+   "a": [
+    {
+     "t": "The RCD",
+     "go": "tr.3"
+    },
+    {
+     "t": "A breaker or fuse, the moment it's switched on",
+     "go": "tr.2"
+    },
+    {
+     "t": "Only after it's been on a while, or when damp",
+     "go": "tr.3"
+    }
+   ]
+  },
+  "tr.2": {
+   "t": "Test for a short across the mains input",
+   "why": "A short inside the power supply makes the fuse blow straight away.",
+   "do": [
+    "Unplugged, with its power switch on, measure resistance between the live and neutral pins of the plug.",
+    "Heaters and motors read a few ohms to a few hundred ohms: that's normal. Electronics with a power supply should read high (thousands of ohms, often climbing as the capacitor charges).",
+    "Inside, look for a split or burnt disc (a varistor or 'MOV') and burnt X-capacitors near the mains input.",
+    "Test the bridge rectifier (four diodes, or a square block with ~ + − marks) and the switching transistor on the meter's diode test."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "A split varistor or burnt X-capacitor",
+     "go": "r.mov"
+    },
+    {
+     "t": "A shorted rectifier or transistor",
+     "go": "r.psufuse"
+    },
+    {
+     "t": "No short",
+     "go": "tr.3"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "open": true,
+   "signs": [
+    "burnt",
+    "caps"
+   ]
+  },
+  "tr.3": {
+   "t": "Test the insulation to earth",
+   "why": "Leakage to the earth wire usually comes from a failing heating element, a damaged lead or water inside.",
+   "do": [
+    "Unplugged, with its switch on, measure from live and neutral (one at a time) to the earth pin.",
+    "A multimeter should read open (OL) or many megohms. An insulation tester at 500V is the proper test."
+   ],
+   "q": "What does it read?",
+   "a": [
+    {
+     "t": "Low resistance to earth",
+     "go": "r.elementearth"
+    },
+    {
+     "t": "Open: fine",
+     "go": "r.pro"
+    }
+   ],
+   "tools": [
+    "meter",
+    "insulation"
+   ],
+   "measure": {
+    "label": "Resistance to earth",
+    "unit": "MΩ",
+    "bands": [
+     {
+      "lt": 1,
+      "a": 0,
+      "say": "Too low: that's a leak to earth."
+     },
+     {
+      "a": 1,
+      "say": "Fine for a multimeter test.",
+      "ok": true
+     }
+    ]
+   }
+  },
+  "r.supply": {
+   "result": true,
+   "t": "The power source was the problem",
+   "cause": "The socket, lead, charger or batteries, not the device.",
+   "fix": [
+    "Keep using the supply that works.",
+    "Replace the faulty charger or lead with one that matches: same voltage, same plug, the same or more current, and from a reputable maker."
+   ],
+   "level": "Easy",
+   "parts": [
+    "Charger or lead"
+   ]
+  },
+  "r.contacts": {
+   "result": true,
+   "t": "Flat batteries or corroded contacts",
+   "cause": "Batteries had run down, or leaked and left a crust on the contacts.",
+   "fix": [
+    "Wear gloves and remove any leaking batteries.",
+    "Dab the crust with vinegar or lemon juice (it neutralises the leak from ordinary alkaline batteries), then clean with isopropyl alcohol.",
+    "Rub contacts bright with a fibreglass pen or fine sandpaper, and bend weak springs out a little.",
+    "If the crust has crept up the wires, resolder or replace them."
+   ],
+   "level": "Easy",
+   "parts": [
+    "Fresh batteries"
+   ],
+   "tools": [
+    "ipa",
+    "brush"
+   ]
+  },
+  "r.adapter": {
+   "result": true,
+   "t": "The adapter or charger has failed",
+   "cause": "It isn't giving out the voltage on its label.",
+   "fix": [
+    "Replace it with one of the same voltage, the same plug size and polarity (the + and − symbol on the label), and at least the same current (A).",
+    "Don't open sealed adapters: they hold mains voltage."
+   ],
+   "level": "Easy",
+   "parts": [
+    "Matching adapter"
+   ]
+  },
+  "r.lint": {
+   "result": true,
+   "t": "Lint in the charging port",
+   "cause": "Packed pocket fluff stopped the plug going all the way in.",
+   "fix": [
+    "Keep the port clean with a wooden toothpick now and then.",
+    "A dust plug helps if you carry it in a pocket."
+   ],
+   "level": "Easy"
+  },
+  "r.port": {
+   "result": true,
+   "t": "A worn or damaged charging port",
+   "cause": "The contacts have worn or bent, or the port has come loose from the board.",
+   "fix": [
+    "On many phones and tablets the port is on a separate small board or flex cable that unplugs: order the part for your exact model.",
+    "If it's soldered to the main board, it needs hot air, flux and care to replace (or a repair shop).",
+    "Wobbly sockets on laptops and gadgets often just need their joints resoldering."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Charging port or charge board"
+   ],
+   "tools": [
+    "iron",
+    "hotair",
+    "flux"
+   ]
+  },
+  "r.flat": {
+   "result": true,
+   "t": "A deeply flat battery",
+   "cause": "The battery had run down below its safe level and needed time to recover.",
+   "fix": [
+    "Check the battery's health (see the charging guide): if it's below about 80%, a new battery is worth it.",
+    "Avoid leaving it flat for weeks: lithium batteries are damaged by it."
+   ],
+   "level": "Easy"
+  },
+  "r.cable": {
+   "result": true,
+   "t": "A broken lead",
+   "cause": "The wire has broken inside, usually where it bends next to a plug.",
+   "fix": [
+    "Replace the lead if it unplugs.",
+    "For a fixed lead, cut it off a little past the break and refit it, with the cord grip clamping the outer sheath. Or fit a new lead of the same rating.",
+    "On mains leads, brown goes to live (L), blue to neutral (N), green-and-yellow to earth (E)."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Lead",
+    "Plug"
+   ],
+   "tools": [
+    "screwdrivers"
+   ]
+  },
+  "r.fuseok": {
+   "result": true,
+   "t": "The fuse had blown",
+   "cause": "A single surge or a moment's overload.",
+   "fix": [
+    "Keep an eye on it. If the new fuse blows too, something is shorted inside.",
+    "Always use the same rating."
+   ],
+   "level": "Easy",
+   "parts": [
+    "Fuse of the same rating"
+   ],
+   "next": "tr.2"
+  },
+  "r.burnt": {
+   "result": true,
+   "t": "A burnt part",
+   "cause": "A part has overheated and failed, often because something after it shorted.",
+   "fix": [
+    "Note its markings (resistor colour bands, a code printed on it) before removing it. A photo of a working board, or the service manual, helps if it's unreadable.",
+    "Before fitting a new one, look for why it burnt: test what it feeds for a short.",
+    "Scrape out any blackened board around it: charred board conducts."
+   ],
+   "level": "Hard",
+   "parts": [
+    "The burnt part, by its markings"
+   ],
+   "tools": [
+    "iron",
+    "wick",
+    "flux",
+    "meter"
+   ],
+   "next": "dead.8"
+  },
+  "r.caps": {
+   "result": true,
+   "t": "Failed capacitors",
+   "cause": "Electrolytic capacitors dry out with age and heat, and then bulge or leak.",
+   "fix": [
+    "Replace each one with the same capacitance (µF), the same or higher voltage, and 105°C rating.",
+    "In power supplies, use 'low-ESR' types.",
+    "Fit them the right way round: the stripe on the side is the negative leg.",
+    "Clean up any leaked electrolyte with isopropyl alcohol: it corrodes."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Capacitors of matching value"
+   ],
+   "tools": [
+    "iron",
+    "wick",
+    "flux"
+   ]
+  },
+  "r.connector": {
+   "result": true,
+   "t": "A loose connector",
+   "cause": "A cable had worked loose or wasn't fully seated.",
+   "fix": [
+    "Reseat it fully, with its latch closed.",
+    "If the contacts look dull or green, clean them with isopropyl alcohol first."
+   ],
+   "level": "Easy",
+   "tools": [
+    "spudger"
+   ]
+  },
+  "r.psufuse": {
+   "result": true,
+   "t": "A short in the power supply",
+   "cause": "The fuse inside blew because a part in the power supply shorted: commonly the bridge rectifier, the switching transistor (MOSFET) or the controller chip.",
+   "fix": [
+    "Don't just fit a new fuse: it will blow again, and can take more parts with it.",
+    "On the meter's diode test, check the rectifier diodes and the transistor for a short (close to 0V both ways).",
+    "Replace the shorted parts, then power it through a 'dim bulb tester' (a lamp in series) so a remaining fault can't do more damage.",
+    "Often it's easier and safer to replace the whole power supply board, by the part number on its sticker."
+   ],
+   "level": "Hard",
+   "parts": [
+    "Power supply board, or the shorted parts"
+   ],
+   "pro": "Mains power supplies are dangerous to work on. If you're not experienced, swap the whole board or take it to a repair shop."
+  },
+  "r.psu": {
+   "result": true,
+   "t": "The power supply has failed",
+   "cause": "The power supply isn't giving out anything.",
+   "fix": [
+    "Desktop PCs: replace the power supply unit; any good one with enough watts and the right plugs will do.",
+    "TVs, consoles and others: the power board can usually be bought by the part number on its sticker."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Power supply unit or board"
+   ]
+  },
+  "r.short": {
+   "result": true,
+   "t": "A shorted part",
+   "cause": "One part has failed short and was pulling the whole rail down.",
+   "fix": [
+    "Remove the warm part. Tiny ceramic capacitors fail like this often, and many boards still work without one of them for testing, but always fit a new one of the same value.",
+    "Measure the rail again: the short should be gone."
+   ],
+   "level": "Hard",
+   "parts": [
+    "The shorted part"
+   ],
+   "tools": [
+    "hotair",
+    "iron",
+    "flux",
+    "magnifier"
+   ]
+  },
+  "r.shortpro": {
+   "result": true,
+   "t": "A short under a chip",
+   "cause": "The short is probably under a large chip, or inside the board.",
+   "fix": [
+    "Feed a little more current (carefully, 1–2A at the rail's voltage) to warm the faulty part enough to find.",
+    "Otherwise this is a job for a board-level repair shop."
+   ],
+   "level": "Pro",
+   "pro": "Board-level repair needs a microscope, hot air and experience."
+  },
+  "r.regulator": {
+   "result": true,
+   "t": "A regulator isn't working",
+   "cause": "The rail isn't shorted, so whatever makes it isn't doing its job.",
+   "fix": [
+    "Measure the regulator's input: if the input is there and the output isn't, the regulator has failed (or its enable pin isn't being switched on).",
+    "Replace the regulator with the same part (its code is printed on it)."
+   ],
+   "level": "Hard",
+   "parts": [
+    "Regulator"
+   ],
+   "tools": [
+    "iron",
+    "hotair"
+   ]
+  },
+  "r.button": {
+   "result": true,
+   "t": "A faulty switch or button",
+   "cause": "The switch contacts have worn or got dirty.",
+   "fix": [
+    "Spray contact cleaner into it and work it many times.",
+    "Replace it with the same type: small tactile buttons are cheap and sold by size (6×6mm, 12×12mm…).",
+    "Mains switches must be replaced with one rated for the same voltage and current."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Switch"
+   ],
+   "tools": [
+    "iron",
+    "wick",
+    "contact"
+   ]
+  },
+  "r.codes": {
+   "result": true,
+   "t": "It's reporting a fault code",
+   "cause": "The device is running and telling you what's wrong.",
+   "fix": [
+    "Count the beeps or flashes and look up the pattern in the manual or the maker's support site.",
+    "Memory and graphics faults are the commonest: reseat or swap the part."
+   ],
+   "level": "Easy"
+  },
+  "r.board": {
+   "result": true,
+   "t": "A fault on the main board",
+   "cause": "The simple checks are clear, so the fault is in the board's own circuits.",
+   "fix": [
+    "Search for the board's part number with the fault: others have often found the cause.",
+    "With Scopie, check the crystal or clock is running. With Probie, watch the debug output many boards print at start-up.",
+    "A donor board from a broken device of the same model is often the cheapest fix.",
+    "Or take it to a board-level repair shop."
+   ],
+   "level": "Pro"
+  },
+  "r.cooling": {
+   "result": true,
+   "t": "Overheating",
+   "cause": "Dust or dried thermal paste stops the heat getting out.",
+   "fix": [
+    "Blow dust out with compressed air, holding the fan still so it doesn't over-spin.",
+    "Clean off old thermal paste with isopropyl alcohol and apply a pea-sized blob of new paste.",
+    "Replace thermal pads with pads of the same thickness."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Thermal paste",
+    "Thermal pads"
+   ],
+   "tools": [
+    "screwdrivers",
+    "ipa"
+   ]
+  },
+  "r.weaksupply": {
+   "result": true,
+   "t": "Not enough power",
+   "cause": "The supply or battery can't keep up when the device works hard.",
+   "fix": [
+    "Use an adapter or power supply with at least the rated watts.",
+    "Replace a worn battery.",
+    "Check for thin or long cables that drop the voltage."
+   ],
+   "level": "Easy",
+   "parts": [
+    "Adapter, power supply or battery"
+   ]
+  },
+  "r.swollen": {
+   "result": true,
+   "t": "A swollen lithium battery",
+   "cause": "Gas has built up inside: it's failing and a fire risk.",
+   "fix": [
+    "Stop charging and using it now.",
+    "Remove it carefully: never puncture, bend or crush it. Soften the adhesive with isopropyl alcohol and use plastic tools only.",
+    "Store it in a metal box or on a stone floor, away from anything that burns, until you can recycle it.",
+    "Take it to a battery recycling point (most supermarkets and tips): never in household waste.",
+    "Fit a new battery from a reputable source."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Replacement battery"
+   ],
+   "tools": [
+    "spudger",
+    "ipa"
+   ],
+   "pro": "If it's very swollen or the case is cracked, many repair shops will remove it safely."
+  },
+  "r.battery": {
+   "result": true,
+   "t": "A worn-out battery",
+   "cause": "The battery has lost much of what it can hold.",
+   "fix": [
+    "Fit a new battery from a reputable maker.",
+    "Then charge it fully, and use it until it switches off once, so the device learns its new capacity."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Battery"
+   ],
+   "tools": [
+    "screwdrivers",
+    "spudger"
+   ]
+  },
+  "r.chargeic": {
+   "result": true,
+   "t": "The charging circuit has failed",
+   "cause": "Power reaches the device but doesn't go into the battery.",
+   "fix": [
+    "Check the battery's temperature-sensor wire first.",
+    "Next is the charging chip near the port: a board-level repair.",
+    "On laptops the charging circuit is sometimes on the separate DC-in board."
+   ],
+   "level": "Hard",
+   "pro": "Charging chips are tiny and under shields: a board-level repair shop can do this."
+  },
+  "r.backlight": {
+   "result": true,
+   "t": "Dead backlight LEDs or fuse",
+   "cause": "One failed LED stops a whole strip; laptops and phones have a backlight fuse.",
+   "fix": [
+    "TVs: replace the whole set of strips with a kit for your model (others will follow the first).",
+    "Laptops: replace the fuse with the same value (or bridge it only to test, then fit a proper one)."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Backlight strips or fuse"
+   ],
+   "tools": [
+    "ledtester",
+    "iron"
+   ]
+  },
+  "r.backlightdriver": {
+   "result": true,
+   "t": "The backlight driver has failed",
+   "cause": "The circuit that powers the backlight isn't working.",
+   "fix": [
+    "TVs: the driver is often on the power board; replace the board by its part number.",
+    "Laptops and phones: a board-level repair."
+   ],
+   "level": "Hard",
+   "parts": [
+    "Power board"
+   ]
+  },
+  "r.panel": {
+   "result": true,
+   "t": "The screen itself has failed",
+   "cause": "The panel (or its touch layer) is damaged.",
+   "fix": [
+    "Replace the screen with one for your exact model. For phones, buy a complete assembly with the frame if you can.",
+    "TV panels usually cost too much to replace: compare with buying a new set."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Screen or display assembly"
+   ],
+   "tools": [
+    "spudger",
+    "heatpad"
+   ]
+  },
+  "r.digitizer": {
+   "result": true,
+   "t": "The touch layer has failed",
+   "cause": "On most modern phones the touch layer is part of the screen.",
+   "fix": [
+    "Replace the screen assembly for your exact model."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Screen assembly"
+   ],
+   "tools": [
+    "spudger",
+    "heatpad"
+   ]
+  },
+  "r.bond": {
+   "result": true,
+   "t": "The screen's ribbon or bonding has failed",
+   "cause": "Lines that change when pressed come from where the ribbon cable is bonded to the glass.",
+   "fix": [
+    "This can't be fixed reliably at home. Replace the screen."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Screen"
+   ]
+  },
+  "r.tcon": {
+   "result": true,
+   "t": "The T-con board has failed",
+   "cause": "The T-con board turns the picture signal into what the panel needs.",
+   "fix": [
+    "T-con boards are cheap and swap with two ribbon cables: buy one by the part number printed on it.",
+    "Check its fuse first (often a small surface-mount fuse near the power input)."
+   ],
+   "level": "Easy",
+   "parts": [
+    "T-con board"
+   ],
+   "tools": [
+    "screwdrivers"
+   ]
+  },
+  "r.ram": {
+   "result": true,
+   "t": "Memory or a card wasn't seated",
+   "cause": "A loose memory stick or card stops a computer starting.",
+   "fix": [
+    "Reseat it firmly until the clips close. If one stick causes the fault, replace it."
+   ],
+   "level": "Easy",
+   "tools": [
+    "esd"
+   ]
+  },
+  "r.settings": {
+   "result": true,
+   "t": "A setting or connection",
+   "cause": "Nothing was broken.",
+   "fix": [
+    "Keep a note of the setting that fixed it."
+   ],
+   "level": "Easy"
+  },
+  "r.speaker": {
+   "result": true,
+   "t": "A broken speaker",
+   "cause": "The speaker's coil has broken or shorted.",
+   "fix": [
+    "Replace the speaker with one of the same impedance (Ω), size and power, or more power."
+   ],
+   "level": "Easy",
+   "parts": [
+    "Speaker"
+   ],
+   "tools": [
+    "iron"
+   ]
+  },
+  "r.pot": {
+   "result": true,
+   "t": "A dirty volume knob or switch",
+   "cause": "Dust and oxidation inside the control make it crackle.",
+   "fix": [
+    "Spray contact cleaner into the gap in the control's body, then turn it end to end 20 times.",
+    "If it's worn through, replace it with the same value (printed on it, like 'B10K')."
+   ],
+   "level": "Easy",
+   "parts": [
+    "Contact cleaner",
+    "Potentiometer"
+   ],
+   "tools": [
+    "contact"
+   ]
+  },
+  "r.hum": {
+   "result": true,
+   "t": "Hum",
+   "cause": "Usually old smoothing capacitors in the power supply, or a ground loop between connected equipment.",
+   "fix": [
+    "Unplug other equipment and try again: if the hum stops, it's a ground loop (a ground-loop isolator fixes it).",
+    "If it hums on its own, replace the big smoothing capacitors in the power supply."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Capacitors"
+   ],
+   "tools": [
+    "iron"
+   ]
+  },
+  "r.distort": {
+   "result": true,
+   "t": "Distortion",
+   "cause": "A damaged speaker cone, or the amplifier running out of power.",
+   "fix": [
+    "Check the speaker cone for tears and a scraping coil.",
+    "Check the amplifier's supply voltage holds steady when loud."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Speaker"
+   ]
+  },
+  "r.preamp": {
+   "result": true,
+   "t": "The fault is before the amplifier",
+   "cause": "The amplifier works, so the signal is lost earlier: input socket, volume control, source switch or preamp.",
+   "fix": [
+    "Follow the signal back from the amplifier to the input to find where it disappears (Scopie helps)."
+   ],
+   "level": "Hard",
+   "tools": [
+    "scope"
+   ]
+  },
+  "r.amp": {
+   "result": true,
+   "t": "The amplifier has failed",
+   "cause": "The amplifier chip or output transistors have failed.",
+   "fix": [
+    "Check its supply voltage first.",
+    "Replace the amplifier chip (its code is printed on it), or the output transistors in pairs."
+   ],
+   "level": "Hard",
+   "parts": [
+    "Amplifier chip or transistors"
+   ],
+   "tools": [
+    "iron",
+    "wick"
+   ]
+  },
+  "r.clean": {
+   "result": true,
+   "t": "Dirt was the problem",
+   "cause": "Cleaning brought the contacts back.",
+   "fix": [
+    "Done. Keep drinks away next time."
+   ],
+   "level": "Easy"
+  },
+  "r.trace": {
+   "result": true,
+   "t": "A broken track",
+   "cause": "A copper track has cracked or corroded through.",
+   "fix": [
+    "Scrape back the coating either side of the break with a knife until the copper shines.",
+    "Solder a fine wire (30 AWG) across the break, or follow the track to the next solder point.",
+    "Cover it with UV solder mask or nail varnish."
+   ],
+   "level": "Medium",
+   "tools": [
+    "iron",
+    "flux",
+    "magnifier"
+   ]
+  },
+  "r.bearing": {
+   "result": true,
+   "t": "A jammed or worn bearing",
+   "cause": "Hair and dirt wrap round the shaft, and bearings dry out.",
+   "fix": [
+    "Unplug it. Clear any hair or fluff from the shaft.",
+    "Clean the bearing and add a drop of light machine oil (not WD-40, it dries out).",
+    "If it still grinds, replace the bearing or the motor."
+   ],
+   "level": "Easy",
+   "parts": [
+    "Bearing or motor"
+   ],
+   "tools": [
+    "screwdrivers"
+   ]
+  },
+  "r.brushes": {
+   "result": true,
+   "t": "Worn carbon brushes",
+   "cause": "The brushes press on the motor's spinning part and wear down over time.",
+   "fix": [
+    "Replace both brushes with the right size for your motor (measure them, or search the model number).",
+    "Run it gently for a minute so they bed in."
+   ],
+   "level": "Easy",
+   "parts": [
+    "Carbon brushes"
+   ],
+   "tools": [
+    "screwdrivers"
+   ]
+  },
+  "r.motor": {
+   "result": true,
+   "t": "The motor has failed",
+   "cause": "A winding has broken, or the motor is worn out.",
+   "fix": [
+    "Replace the motor (or fan) with the same type, voltage and size."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Motor or fan"
+   ]
+  },
+  "r.runcap": {
+   "result": true,
+   "t": "A failed start capacitor",
+   "cause": "Fans need a capacitor to start turning: without it they only hum.",
+   "fix": [
+    "Replace it with a motor run capacitor of the same µF value and at least the same voltage (marked on it, often 450V AC)."
+   ],
+   "level": "Easy",
+   "parts": [
+    "Run capacitor"
+   ],
+   "tools": [
+    "screwdrivers"
+   ]
+  },
+  "r.thermalfuse": {
+   "result": true,
+   "t": "A blown thermal fuse",
+   "cause": "It blew because something got too hot.",
+   "fix": [
+    "Find out why first: a blocked vent, a seized motor or a stuck thermostat.",
+    "Replace it with the same temperature and current rating. Crimp it, or solder quickly with a heatsink clip: heat from the iron can blow a new one."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Thermal fuse"
+   ],
+   "tools": [
+    "iron",
+    "crimper"
+   ]
+  },
+  "r.relay": {
+   "result": true,
+   "t": "A stuck relay or thermostat",
+   "cause": "The switch that cuts the power has welded shut.",
+   "fix": [
+    "Unplug it. Replace the relay or thermostat with the same rating.",
+    "This is a safety fault: don't use it until it's fixed."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Relay or thermostat"
+   ]
+  },
+  "r.element": {
+   "result": true,
+   "t": "A broken heating element",
+   "cause": "The element's wire has burnt through.",
+   "fix": [
+    "Replace the element (or the whole appliance if the element is part of it, like most kettles)."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Heating element"
+   ]
+  },
+  "r.elementearth": {
+   "result": true,
+   "t": "Leakage to earth",
+   "cause": "The element or wiring is leaking current to the metal case: dangerous.",
+   "fix": [
+    "Don't use it.",
+    "Replace the element, or the damaged lead.",
+    "Have it safety-tested (a PAT test) before using it again."
+   ],
+   "level": "Pro",
+   "pro": "Earth faults on mains appliances are a shock risk: a qualified electrician or appliance repairer should test it."
+  },
+  "r.thermostat": {
+   "result": true,
+   "t": "A faulty thermostat",
+   "cause": "It isn't switching on.",
+   "fix": [
+    "Replace the thermostat with the same temperature and rating."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Thermostat"
+   ]
+  },
+  "r.thermistor": {
+   "result": true,
+   "t": "A faulty temperature sensor",
+   "cause": "The sensor wire is broken or shorted, or the sensor has failed.",
+   "fix": [
+    "Check the wire along its length and the plug on the board.",
+    "Replace the thermistor with the same type (the printer's firmware expects a particular one, often a 100k NTC 3950)."
+   ],
+   "level": "Easy",
+   "parts": [
+    "Thermistor"
+   ],
+   "tools": [
+    "screwdrivers"
+   ]
+  },
+  "r.datacable": {
+   "result": true,
+   "t": "A charge-only cable or a bad port",
+   "cause": "The cable has no data wires, or the port was faulty.",
+   "fix": [
+    "Label your charge-only cables so they don't get mixed up."
+   ],
+   "level": "Easy"
+  },
+  "r.usbdata": {
+   "result": true,
+   "t": "A USB data fault",
+   "cause": "It has power, but the two data lines (D+ and D−) aren't getting through cleanly.",
+   "fix": [
+    "Try another cable and port first.",
+    "Inside, check the USB socket's joints and the small protection chip next to it."
+   ],
+   "level": "Medium",
+   "tools": [
+    "iron",
+    "magnifier"
+   ]
+  },
+  "r.driver": {
+   "result": true,
+   "t": "A missing driver",
+   "cause": "The computer can see it but doesn't know what to do with it.",
+   "fix": [
+    "Install the driver from the device's maker (for USB-serial chips: WCH for CH340, Silicon Labs for CP210x, FTDI for FT232).",
+    "Restart the computer, then try again."
+   ],
+   "level": "Easy"
+  },
+  "r.bootmode": {
+   "result": true,
+   "t": "It needed upload mode",
+   "cause": "The board wasn't switching into upload mode on its own.",
+   "fix": [
+    "Use the button sequence each time, or fit a 10µF capacitor between EN and GND on ESP32 boards that never switch on their own."
+   ],
+   "level": "Easy"
+  },
+  "r.strap": {
+   "result": true,
+   "t": "Something on a start-up pin",
+   "cause": "Something connected to a start-up pin stopped the chip entering upload mode.",
+   "fix": [
+    "Move that wiring to a different pin, or disconnect it while uploading."
+   ],
+   "level": "Easy"
+  },
+  "r.mcu": {
+   "result": true,
+   "t": "The board has failed",
+   "cause": "The chip or its regulator has failed.",
+   "fix": [
+    "Check its 3.3V or 5V supply for a short.",
+    "Development boards are cheap: replacing it is usually best."
+   ],
+   "level": "Easy",
+   "parts": [
+    "Replacement board"
+   ]
+  },
+  "r.ledjoint": {
+   "result": true,
+   "t": "A bad joint or LED in the strip",
+   "cause": "The connection, or the first LED where the fault starts, has failed.",
+   "fix": [
+    "Press on the joint: if it flickers back, resolder it.",
+    "Otherwise cut out that segment at the copper pads and solder in a new piece."
+   ],
+   "level": "Easy",
+   "parts": [
+    "LED strip"
+   ],
+   "tools": [
+    "iron"
+   ]
+  },
+  "r.voltdrop": {
+   "result": true,
+   "t": "Voltage drop along the strip",
+   "cause": "Long strips lose voltage along their thin copper.",
+   "fix": [
+    "Feed power in at both ends, and every 2–5 metres along long runs.",
+    "Use thicker wire to the strip, and a supply with enough current."
+   ],
+   "level": "Easy",
+   "parts": [
+    "Wire"
+   ]
+  },
+  "r.ledchannel": {
+   "result": true,
+   "t": "One colour channel has failed",
+   "cause": "The controller's driver for that colour, or a wire, has failed.",
+   "fix": [
+    "Check the wire for that colour from the controller. Swap two colour wires to see whether the fault moves.",
+    "Replace the controller if the fault stays with its output."
+   ],
+   "level": "Easy",
+   "parts": [
+    "LED controller"
+   ]
+  },
+  "r.x2": {
+   "result": true,
+   "t": "A failed suppression capacitor",
+   "cause": "The X or Y capacitor across the mains has aged and burnt.",
+   "fix": [
+    "Replace it only with an X2-rated (or Y-rated, if that's what it was) capacitor of the same value. Never an ordinary capacitor."
+   ],
+   "level": "Medium",
+   "parts": [
+    "X2 or Y capacitor"
+   ],
+   "tools": [
+    "iron"
+   ]
+  },
+  "r.melt": {
+   "result": true,
+   "t": "A melted connector",
+   "cause": "A poor contact got hot and melted the plastic.",
+   "fix": [
+    "Replace both halves of the connector, and the wire up to clean copper.",
+    "Use a connector rated for the current."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Connector"
+   ],
+   "tools": [
+    "crimper",
+    "iron"
+   ]
+  },
+  "r.mov": {
+   "result": true,
+   "t": "A blown surge protector part",
+   "cause": "The varistor (MOV) or X-capacitor shorted after a surge.",
+   "fix": [
+    "Replace it with the same type and voltage, and check the fuse.",
+    "If there was a big surge, check other parts too."
+   ],
+   "level": "Hard",
+   "parts": [
+    "Varistor",
+    "Fuse"
+   ],
+   "tools": [
+    "iron"
+   ]
+  },
+  "r.water": {
+   "result": true,
+   "t": "Dried out and working",
+   "cause": "The clean-up worked.",
+   "fix": [
+    "Keep an eye on it for a few weeks: corrosion can carry on in places you couldn't reach."
+   ],
+   "level": "Easy"
+  },
+  "r.corrosion": {
+   "result": true,
+   "t": "Corrosion damage",
+   "cause": "The liquid ate away parts or connections.",
+   "fix": [
+    "Replace damaged connectors and flex cables.",
+    "Repair eaten tracks with fine wire.",
+    "Replace small parts that have gone (you'll need the board diagram)."
+   ],
+   "level": "Hard",
+   "tools": [
+    "iron",
+    "hotair",
+    "magnifier"
+   ]
+  },
+  "r.joint": {
+   "result": true,
+   "t": "Cracked solder joints",
+   "cause": "Heat and movement have cracked the solder.",
+   "fix": [
+    "Add a little flux and reflow each joint with a hot iron (about 350°C for leaded solder, 380°C for lead-free) and a bit of fresh solder.",
+    "For old lead-free joints, adding some leaded solder helps it flow."
+   ],
+   "level": "Medium",
+   "tools": [
+    "iron",
+    "solder",
+    "flux"
+   ]
+  },
+  "r.thermalpart": {
+   "result": true,
+   "t": "A part that fails with temperature",
+   "cause": "You found the part that misbehaves when hot or cold.",
+   "fix": [
+    "Replace it. Reflow its joints first if it's large: often it's the joint, not the part."
+   ],
+   "level": "Medium",
+   "tools": [
+    "iron",
+    "hotair"
+   ]
+  },
+  "r.pro": {
+   "result": true,
+   "t": "Time for a qualified repairer",
+   "cause": "This fault needs mains-safety training or special equipment.",
+   "fix": [
+    "Have it tested by an appliance repairer or electrician (a PAT test checks earth and insulation).",
+    "Note down everything you've checked so far: it saves them time."
+   ],
+   "level": "Pro"
+  }
+ },
+ "tools": [
+  {
+   "id": "meter",
+   "name": "Multimeter",
+   "starter": true,
+   "cost": "£15–£40",
+   "why": "Measures voltage, resistance and continuity: the main tool for finding faults.",
+   "how": [
+    "DC volts (V⎓): black probe on ground, red on the point to measure. Use auto-range, or a range above what you expect.",
+    "Continuity (the beep or speaker symbol): beeps when two points are connected. Only on unplugged circuits.",
+    "Resistance (Ω): unplugged only. Parts still on the board may read lower, because of what's around them.",
+    "Diode test: a good diode reads about 0.5–0.7V one way and open (OL) the other. Close to 0V both ways is a short."
+   ],
+   "app": "meterie",
+   "appWhy": "Meterie shows your meter on the computer and logs it over time."
+  },
+  {
+   "id": "screwdrivers",
+   "name": "Precision screwdriver set",
+   "starter": true,
+   "cost": "£10–£30",
+   "why": "Small devices use tiny and special screws.",
+   "how": [
+    "Get a set with Phillips PH000–PH1, Torx T3–T10 (including security Torx with a hole), pentalobe for iPhones, and tri-point for consoles.",
+    "Push down firmly while turning: stripped screws are the hardest thing to recover from."
+   ]
+  },
+  {
+   "id": "spudger",
+   "name": "Plastic pry tools and picks",
+   "starter": true,
+   "cost": "£5",
+   "why": "Open clips and glued seams without scratching or shorting anything.",
+   "how": [
+    "Use plastic for anything near the battery or board.",
+    "Thin guitar-pick-style picks slide into glued seams."
+   ]
+  },
+  {
+   "id": "torch",
+   "name": "Bright torch",
+   "starter": true,
+   "cost": "Any",
+   "why": "Inspection needs strong, angled light.",
+   "how": [
+    "Shine it low and from the side to show cracks, bulges and corrosion."
+   ]
+  },
+  {
+   "id": "magnifier",
+   "name": "Magnifier or microscope",
+   "starter": true,
+   "cost": "£5–£60",
+   "why": "Cracked joints and tiny parts are invisible without magnification.",
+   "how": [
+    "A phone camera zoomed in works well to start.",
+    "A USB microscope or a 10× loupe is a big step up."
+   ]
+  },
+  {
+   "id": "cable",
+   "name": "Known-good cables and chargers",
+   "starter": true,
+   "cost": "Already in your drawer",
+   "why": "To rule out the supply quickly.",
+   "how": [
+    "Keep one charger and cable you know work, labelled, just for testing.",
+    "Label charge-only USB cables."
+   ]
+  },
+  {
+   "id": "ipa",
+   "name": "Isopropyl alcohol (99%)",
+   "starter": true,
+   "cost": "£5–£10",
+   "why": "Cleans flux, corrosion and sticky residue, and evaporates quickly.",
+   "how": [
+    "Use 99% rather than 70% (which has more water).",
+    "It's flammable: use it unplugged, in a ventilated room."
+   ]
+  },
+  {
+   "id": "brush",
+   "name": "Soft brush (an old toothbrush)",
+   "starter": true,
+   "cost": "Free",
+   "why": "Scrubs corrosion and dust off boards.",
+   "how": [
+    "Use with isopropyl alcohol."
+   ]
+  },
+  {
+   "id": "iron",
+   "name": "Soldering iron",
+   "starter": true,
+   "cost": "£20–£80",
+   "why": "To replace parts and repair joints.",
+   "how": [
+    "A temperature-controlled iron with a few tips (a chisel and a fine point) covers most jobs.",
+    "Keep the tip clean and tinned (coated in solder).",
+    "Work in a ventilated room."
+   ]
+  },
+  {
+   "id": "solder",
+   "name": "Solder",
+   "starter": true,
+   "cost": "£8",
+   "why": "Joins parts.",
+   "how": [
+    "0.5–0.8mm leaded solder (60/40 or 63/37) is the easiest to use; lead-free needs a hotter iron.",
+    "Wash your hands after handling leaded solder."
+   ]
+  },
+  {
+   "id": "flux",
+   "name": "Flux",
+   "starter": true,
+   "cost": "£5–£10",
+   "why": "Makes solder flow and joints form properly.",
+   "how": [
+    "A flux pen or no-clean gel flux. Clean it off afterwards with isopropyl alcohol."
+   ]
+  },
+  {
+   "id": "wick",
+   "name": "Desoldering wick or pump",
+   "starter": true,
+   "cost": "£5–£15",
+   "why": "Removes solder so parts can come out.",
+   "how": [
+    "Press the wick onto the joint with the iron; the solder soaks into it.",
+    "A pump sucks molten solder up in one go."
+   ]
+  },
+  {
+   "id": "esd",
+   "name": "Anti-static wrist strap",
+   "starter": false,
+   "cost": "£5",
+   "why": "Static from your body can damage chips.",
+   "how": [
+    "Clip it to the metal of the case or an earthed point.",
+    "Work on a mat, not carpet."
+   ]
+  },
+  {
+   "id": "usbmeter",
+   "name": "USB power meter",
+   "starter": false,
+   "cost": "£8–£25",
+   "why": "Shows voltage and current through a USB cable: the quickest charging test.",
+   "how": [
+    "Plug it between the charger and the device.",
+    "USB-C models also show the fast-charging protocol."
+   ]
+  },
+  {
+   "id": "benchpsu",
+   "name": "Bench power supply",
+   "starter": false,
+   "cost": "£40–£100",
+   "why": "Powers a board at a set voltage with a current limit, so a fault can't do more damage.",
+   "how": [
+    "Set the voltage first, with the current limit low, before connecting.",
+    "Watch the current: a jump to the limit means a short."
+   ]
+  },
+  {
+   "id": "hotspot",
+   "name": "Hot-spot finder",
+   "starter": false,
+   "cost": "£0–£250",
+   "why": "Finds the part that's getting hot.",
+   "how": [
+    "Thermal camera: the clearest.",
+    "Isopropyl alcohol: wipe a thin film on the board; it evaporates first from the hot part.",
+    "Freeze spray: frost melts first on the hot part, and it can bring back faults that only happen when warm.",
+    "A careful fingertip works on low-voltage boards."
+   ]
+  },
+  {
+   "id": "probes",
+   "name": "Fine test probes and clips",
+   "starter": false,
+   "cost": "£5–£15",
+   "why": "Reach tiny test points without slipping and shorting things.",
+   "how": [
+    "Needle-point probes or grabber clips. A slipped probe can short two pins and cause damage."
+   ]
+  },
+  {
+   "id": "scope",
+   "name": "Oscilloscope",
+   "starter": false,
+   "cost": "£50–£400",
+   "why": "Shows signals that change too fast for a meter: clocks, audio, data.",
+   "how": [
+    "Use it to check a crystal is running, follow an audio signal, or look at ripple on a power rail."
+   ],
+   "app": "scopie",
+   "appWhy": "Scopie runs USB and network scopes."
+  },
+  {
+   "id": "hotair",
+   "name": "Hot air station",
+   "starter": false,
+   "cost": "£40–£120",
+   "why": "Removes and fits surface-mount parts and connectors.",
+   "how": [
+    "Use plenty of flux, and protect nearby plastic parts with Kapton tape or foil."
+   ]
+  },
+  {
+   "id": "heatpad",
+   "name": "Heat pad or hair dryer",
+   "starter": false,
+   "cost": "£0–£30",
+   "why": "Softens the glue on phones and tablets.",
+   "how": [
+    "About 80°C for a few minutes, then a suction cup and picks."
+   ]
+  },
+  {
+   "id": "ledtester",
+   "name": "LED backlight tester",
+   "starter": false,
+   "cost": "£15–£30",
+   "why": "Lights each LED in a TV backlight strip, which a meter can't.",
+   "how": [
+    "Touch its probes across one LED at a time."
+   ]
+  },
+  {
+   "id": "contact",
+   "name": "Contact cleaner spray",
+   "starter": false,
+   "cost": "£6",
+   "why": "Cleans switches, knobs and connectors.",
+   "how": [
+    "Use a cleaner made for electronics, not WD-40."
+   ]
+  },
+  {
+   "id": "fuses",
+   "name": "Spare fuses",
+   "starter": false,
+   "cost": "£3",
+   "why": "Plug fuses (3A, 5A, 13A) and glass fuses.",
+   "how": [
+    "Always replace with the same rating and type (fast or slow-blow)."
+   ]
+  },
+  {
+   "id": "crimper",
+   "name": "Crimp tool",
+   "starter": false,
+   "cost": "£15–£30",
+   "why": "For connectors and thermal fuses that shouldn't be soldered.",
+   "how": [
+    "Use the right size of crimp for the wire."
+   ]
+  },
+  {
+   "id": "insulation",
+   "name": "Insulation tester or PAT tester",
+   "starter": false,
+   "cost": "£80+ (or a repair shop)",
+   "why": "Tests mains appliances at high voltage for leakage to earth.",
+   "how": [
+    "A multimeter test is a rough check only: a PAT test is the proper one."
+   ]
+  },
+  {
+   "id": "discharge",
+   "name": "Capacitor discharge tool",
+   "starter": false,
+   "cost": "£5 (DIY)",
+   "why": "Safely empties big capacitors in mains power supplies.",
+   "how": [
+    "A 1–10kΩ resistor rated 5W or more, with insulated leads and clips. Hold it across the capacitor's legs for several seconds.",
+    "Then measure: under about 5V is safe to touch.",
+    "Never short a big capacitor with a screwdriver."
+   ]
+  }
+ ],
+ "signs": [
+  {
+   "id": "caps",
+   "name": "Bulging or leaking capacitors",
+   "look": "Round electrolytic capacitors should have flat tops. Domed tops, crusty brown deposits, or a capacitor pushed up off the board mean it's failed.",
+   "means": "Restart loops, no power, hum, a picture that takes a while to appear.",
+   "fix": "Replace with the same µF, same or higher voltage, 105°C."
+  },
+  {
+   "id": "burnt",
+   "name": "Burnt parts",
+   "look": "Brown or black marks on the board or a part, cracked part bodies, a sharp burnt smell.",
+   "means": "The part failed, often because something after it shorted.",
+   "fix": "Replace it, and find out what made it burn."
+  },
+  {
+   "id": "corrosion",
+   "name": "Corrosion",
+   "look": "Green, blue or white crust on contacts and pins; dull or eaten-away copper.",
+   "means": "Liquid got in, or a battery leaked.",
+   "fix": "Clean with isopropyl alcohol and a brush; replace parts that have been eaten away."
+  },
+  {
+   "id": "joint",
+   "name": "Cracked solder joints",
+   "look": "A thin dark ring round a pin, or a dull, grainy joint that's lifted from the pad. Common on sockets and heavy or hot parts.",
+   "means": "Faults that come and go when it's moved or warms up.",
+   "fix": "Reflow with flux and a little fresh solder."
+  },
+  {
+   "id": "fuse",
+   "name": "A blown fuse",
+   "look": "Glass fuses: a broken wire inside, or blackened or silvered glass. Others: no beep on continuity.",
+   "means": "Too much current flowed: a surge, or a short.",
+   "fix": "Same rating only. If the new one blows, find the short first."
+  },
+  {
+   "id": "battery",
+   "name": "A swollen battery",
+   "look": "A lithium battery that is puffy, rounded or bent instead of flat. A case or screen that is pushed apart.",
+   "means": "A failing battery: a fire risk.",
+   "fix": "Stop charging it. Remove carefully and recycle."
+  },
+  {
+   "id": "connector",
+   "name": "Loose or damaged connectors",
+   "look": "A plug that wobbles, bent or missing pins, cracked joints under the socket, a ribbon cable out of its latch.",
+   "means": "Intermittent faults, no charging, missing picture or sound.",
+   "fix": "Clean, reseat, resolder, or replace the socket."
+  },
+  {
+   "id": "melted",
+   "name": "Melted plastic",
+   "look": "Deformed or browned connectors, a melted plug, discoloured wire insulation.",
+   "means": "A poor connection or too much current made heat.",
+   "fix": "Replace both halves of the connector and the damaged wire."
+  },
+  {
+   "id": "trace",
+   "name": "A broken track",
+   "look": "A thin crack across a copper line, often near screw holes, edges or corrosion.",
+   "means": "Something stopped working completely after a drop or a spill.",
+   "fix": "Bridge it with fine wire."
+  },
+  {
+   "id": "dust",
+   "name": "Dust and hair",
+   "look": "Grey felt across heatsink fins, fluff round fans, hair wound round motor shafts.",
+   "means": "Overheating, shutdowns, a noisy or slow fan or motor.",
+   "fix": "Blow out with compressed air, clean the shaft."
+  }
+ ],
+ "safety": [
+  {
+   "id": "mains",
+   "t": "Mains electricity",
+   "level": "danger",
+   "points": [
+    "Unplug it, and keep the plug where you can see it. Switching off isn't enough.",
+    "Power supplies have big capacitors that stay charged after unplugging. Wait a few minutes, then measure across them: under about 5V is safe. Use a discharge resistor if they hold charge.",
+    "On the mains side of a power supply, 'ground' is live. Never clip a probe there with it plugged in.",
+    "If you must measure with it on, keep one hand in your pocket and use probes with shrouded tips.",
+    "Never fit a bigger fuse, and never bridge a fuse with wire or foil.",
+    "After a mains repair, check the earth wire is connected and nothing bare can be touched. A PAT test is the proper check."
+   ]
+  },
+  {
+   "id": "stop",
+   "t": "Leave these to a professional",
+   "level": "danger",
+   "points": [
+    "Microwave ovens: the high-voltage capacitor can kill even when unplugged.",
+    "Old CRT TVs and monitors: the tube holds thousands of volts for days.",
+    "Camera flashes and disposable cameras: a capacitor that gives a painful, dangerous shock.",
+    "Anything wired into the house (cookers, boilers, electric showers)."
+   ]
+  },
+  {
+   "id": "lithium",
+   "t": "Lithium batteries",
+   "level": "warn",
+   "points": [
+    "Disconnect the battery before anything else when you open a device.",
+    "Never puncture, bend or crush one. Use plastic tools near it.",
+    "Swollen batteries must not be charged. Store them away from anything that burns and recycle them.",
+    "Never short the terminals: big currents flow and they get very hot.",
+    "If one catches fire, get away from it and call the fire service."
+   ]
+  },
+  {
+   "id": "solder",
+   "t": "Soldering",
+   "level": "warn",
+   "points": [
+    "The iron is about 350°C: always put it back in its stand.",
+    "Work in a ventilated room, or use a fume extractor.",
+    "Wear glasses: solder can spit.",
+    "Wash your hands after using leaded solder, and don't eat at the bench."
+   ]
+  },
+  {
+   "id": "static",
+   "t": "Static",
+   "level": "info",
+   "points": [
+    "Touch something earthed, or wear a wrist strap, before handling boards.",
+    "Hold boards by their edges. Keep them in anti-static bags."
+   ]
+  },
+  {
+   "id": "chem",
+   "t": "Chemicals",
+   "level": "info",
+   "points": [
+    "Isopropyl alcohol and freeze spray are flammable: use them with the device unplugged and away from the iron.",
+    "Battery leakage is caustic: wear gloves."
+   ]
+  },
+  {
+   "id": "when",
+   "t": "When to stop",
+   "level": "info",
+   "points": [
+    "If you're unsure what a step involves, stop and ask, or take it to a repair shop.",
+    "If it's under warranty, opening it may void that: check first.",
+    "If parts would cost more than a replacement, a repair shop or recycling may be the better choice."
+   ]
+  }
+ ]
+}
