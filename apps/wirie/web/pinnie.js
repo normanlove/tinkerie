@@ -171,7 +171,7 @@ function powerTags(name) {
   return null;
 }
 function pinnieTags(fp, pad) {
-  const id = fp.id, nm = pad.name; const first = nm.split("/")[0];
+  const id = fp.castellatedOf || fp.id, nm = pad.name; const first = nm.split("/")[0]; // castellated twins have the same pins
   const pw = powerTags(nm); if (pw) return pw;
   if (/^(SD[0-3]|CMD|CLK|CS0|MISO|MOSI|SCLK)$/.test(nm) && /^(nodemcu|esp12f|esp32devkitc38)$/.test(id)) return [nm, "Flash memory — do not use ⚠"];
   if (nm === "AVCC") return ["AVCC: powers the ADC — connect to VCC"];

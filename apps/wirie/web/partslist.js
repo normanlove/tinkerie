@@ -55,7 +55,7 @@ function keebPartsRows() {
     plan.get(k).n++;
   }
   for (const g of plan.values()) {
-    if (g.mcu) { add("Electronics", g.n, G.mcu.name, G.mcu.bare ? "The chip: order the board with factory assembly" : "Plus pin headers or low-profile sockets to mount it"); continue; }
+    if (g.mcu) { add("Electronics", g.n, G.mcu.name, G.mcu.bare ? "The chip: order the board with factory assembly" : g.fp.castellatedOf ? "Soldered flat by its castellated edges: no headers needed" : "Plus pin headers or low-profile sockets to mount it"); continue; }
     const smd = g.fp.pads.every(p => !p.drill);
     add("Electronics", g.n, g.value || g.fp.value, g.fp.name + (smd ? " · surface-mount" : ""));
   }

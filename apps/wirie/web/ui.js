@@ -560,6 +560,7 @@ function renderProps() {
       <div class="grid3">${fieldHTML("p_x", "X", c.x, "mm", "number")}${fieldHTML("p_y", "Y", c.y, "mm", "number")}${fieldHTML("p_ang", "Angle", c.rot, "°", "number")}</div>
       <div class="btnrow"><button class="btn" id="p_rot" title="Rotate 90° (R)">${ico("rotate")}Rotate</button><button class="btn icon" id="p_r15" title="Rotate 15° (Shift+R)">15°</button><button class="btn" id="p_flip">${ico("flip")}${c.side === "bottom" ? "Move to top" : "Move to back"}</button><button class="btn danger icon" id="p_del" title="Delete">${ico("trash")}</button></div>
       ${fp.pinLabels ? `<button class="btn primary wide" id="p_smart">${ico("magic")}Smart connect…</button><label class="chk"><input type="checkbox" id="p_silk" ${c.silkPins ? "checked" : ""}><span>Print pin names on the board</span></label>` : ""}
+      ${fp.castellated || fp.castellatedOf ? `<h4>Mounting</h4><div class="seg" id="p_mount" data-help="Castellated mounting"><button data-m="tht" class="${fp.castellatedOf ? "" : "on"}">Pin headers</button><button data-m="smd" class="${fp.castellatedOf ? "on" : ""}">Soldered flat (castellated)</button></div>` : ""}
       <label class="chk"><input type="checkbox" id="p_hide" ${c.hideRef ? "checked" : ""}><span>Hide reference text (${esc(c.ref)})</span></label>
       <h4>Case / 3D <em>for Makie</em></h4><div class="grid2">${fieldHTML("p_ch", "Part height", caseInfo(fp, c).h, "mm", "number")}${fieldHTML("p_rz", "Raised above board", caseInfo(fp, c).raise ?? 0, "mm", "number")}</div>
       <h4>Pins <em>${pads.length}</em></h4><div class="pinlist">${pads.map(p => { const nn = A.netOfPad[p.key]; return `<div class="pin" data-k="${p.key}"><b>${esc(p.name)}</b><span>${nn ? `<span class="pill" style="--c:${nn.color}">${esc(nn.name)}</span>` : `<span class="dim">—</span>`}</span>${nn ? `<button class="x" data-dis="${p.key}" title="Disconnect">${ico("close")}</button>` : `<button class="x" data-con="${p.key}" title="Connect from here">${ico("wire")}</button>`}</div>`; }).join("")}</div>`;
@@ -571,6 +572,13 @@ function renderProps() {
     if ($("#p_editpart")) $("#p_editpart").onclick = () => openPartCreator(fp.id);
     if ($("#p_smart")) $("#p_smart").onclick = () => smartConnect(c);
     if ($("#p_silk")) $("#p_silk").onchange = e => { c.silkPins = e.target.checked; commit("silk"); };
+    P.querySelectorAll("#p_mount button").forEach(bt => bt.onclick = () => {
+      const to = bt.dataset.m === "smd" ? fp.castellated : fp.castellatedOf; if (!to || !LIB_BY_ID[to]) return;
+      // its old tracks no longer meet the pins (holes become edge pads), so the auto-routed ones are redrawn
+      const on = new Set(fixTracksOn(c).filter(t => t.auto)); S.tracks = S.tracks.filter(t => !on.has(t));
+      c.fp = to; delete c.raise; delete c.caseH; invalidate(); commit("mounting"); refreshPanels();
+      toast(bt.dataset.m === "smd" ? "Soldered flat by its castellated edges: no headers needed." + (on.size ? " Re-route to join its pins up again." : "") : "Back on pin headers." + (on.size ? " Re-route to join its pins up again." : ""));
+    });
     $("#p_hide").onchange = e => { c.hideRef = e.target.checked; commit("hide"); };
     $("#p_ch").onchange = () => { const v = parseFloat($("#p_ch").value); if (v >= 0) { c.caseH = v; commit("case h"); } };
     $("#p_rz").onchange = () => { const v = parseFloat($("#p_rz").value); if (v >= 0) { c.raise = v; commit("raise"); } };

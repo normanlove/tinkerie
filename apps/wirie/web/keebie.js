@@ -134,6 +134,8 @@ function kbPitch(K) { const s = kbSwitch(K); return K.spacing > 0 ? [K.spacing, 
 // the switch footprint: 3-pin MX footprints drop the 5-pin peg holes
 function kbSwFp(K) { const s = kbSwitch(K); return K.pins === 3 && s.fam === "mx" && LIB_BY_ID[s.fp + "_3p"] ? s.fp + "_3p" : s.fp; }
 function kbMcu(K) { return KB_MCU[K.mcu] || KB_MCUS[0]; }
+// the controller's footprint: its castellated (soldered flat) twin when that's chosen and it has one
+function kbMcuFp(K, mcu) { mcu = mcu || kbMcu(K); const f = LIB_BY_ID[mcu.fp]; return K.mcuSmd && f && f.castellated ? f.castellated : mcu.fp; }
 
 // where every key ends up, in mm, after arc and split
 function kbPlace(K) {
@@ -222,7 +224,7 @@ function kbOrd(G, b) { const M = G.matrix; return b.places.slice().sort((p, q) =
 // the controller plan only depends on a few settings: remember it between redraws
 const KB_PLAN_CACHE = new Map();
 function kbPlanCtrl(K, half) {
-  const key = JSON.stringify([K.mcu, K.outline.margin, K.rgb, K.oled, K.split.mode, half || 0, kbKnobCount(K), kbPinPlan(K), K.pack || "compact", K.dspace, K.pwrLed, K.actLed, K.sep || null]);
+  const key = JSON.stringify([K.mcu, K.outline.margin, K.rgb, K.oled, K.split.mode, half || 0, kbKnobCount(K), kbPinPlan(K), K.pack || "compact", K.dspace, K.mcuSmd || false, K.pwrLed, K.actLed, K.sep || null]);
   let plan = KB_PLAN_CACHE.get(key);
   if (!plan) { plan = kbPlanCtrl0(K, half); if (KB_PLAN_CACHE.size > 30) KB_PLAN_CACHE.clear(); KB_PLAN_CACHE.set(key, plan); }
   // hand back a copy (callers move the parts), keeping the nets pointing at the copied parts
@@ -242,7 +244,7 @@ function kbPlanCtrl0(K, half) {
       return { dp: [[j, "DP1"], [j, "DP2"]], dn: [[j, "DN1"], [j, "DN2"]] };
     },
   };
-  const U = B.add(mcu.fp, mcu.bare ? mcu.name.replace(" chip", "") : LIB_BY_ID[mcu.fp].value, "U1"); U.fixed = "mcu";
+  const mfp = kbMcuFp(K, mcu), U = B.add(mfp, mcu.bare ? mcu.name.replace(" chip", "") : LIB_BY_ID[mfp].value, "U1"); U.fixed = "mcu";
   let vcc = mcu.pwr;
   if (mcu.bare) vcc = kbSupport(mcu, B, U).vcc;
   else {
@@ -1068,6 +1070,7 @@ function kbSide() {
       <small class="kb-note">Ticked parts leave the controller's block and get one of their own that you can drag anywhere on the board.</small>
       <div class="kb-row" data-help="Place on their own">${[["screen", "Screen"], ["lights", "Status lights"], ["reset", "Reset button"]].map(([g, t]) => `<label class="kb-check"><input type="checkbox" data-sep="${g}" ${K.sep && K.sep[g] ? "checked" : ""}> ${t}</label>`).join("")}</div>
       <h5 class="kb-sub">Status lights</h5>
+      ${LIB_BY_ID[kbMcu(K).fp] && LIB_BY_ID[kbMcu(K).fp].castellated ? `<label class="kb-check" data-help="Castellated mounting"><input type="checkbox" id="kb_mcusmd" ${K.mcuSmd ? "checked" : ""}> Solder the controller flat by its castellated edges (no headers)</label>` : ""}
       <label class="kb-check" data-help="Power light"><input type="checkbox" id="kb_pwrled" ${K.pwrLed ? "checked" : ""}> Power light: on while the keyboard has power</label>
       <label class="kb-check" data-help="Activity light"><input type="checkbox" id="kb_actled" ${K.actLed ? "checked" : ""}> Activity light: flashes when a key is sent (uses 1 pin)</label>
     </section>
@@ -1112,6 +1115,7 @@ function kbSide() {
   on("kb_soauto", "onclick", () => { K.so = null; KV.soMode = false; kbChanged("standoffs placed for you"); kbSide(); });
   $$("#kbSide [data-sep]").forEach(c => c.onchange = () => { if (!K.sep) K.sep = {}; K.sep[c.dataset.sep] = c.checked; if (!c.checked && typeof KV.csel === "string" && KV.csel.startsWith(c.dataset.sep + ":")) KV.csel = null; kbChanged(c.checked ? "place on its own" : "back with the controller"); });
   on("kb_space", "onchange", () => { K.dspace = val("kb_space"); kbChanged("part spacing"); });
+  on("kb_mcusmd", "onchange", () => { K.mcuSmd = $("#kb_mcusmd").checked; kbChanged("controller mounting"); });
   on("kb_pwrled", "onchange", () => { K.pwrLed = $("#kb_pwrled").checked; kbChanged("power light"); });
   on("kb_actled", "onchange", () => { K.actLed = $("#kb_actled").checked; kbChanged("activity light"); });
   on("kb_parts", "onclick", () => partsListDialog(true));

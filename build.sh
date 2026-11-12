@@ -14,10 +14,10 @@
 #   ./build.sh all        every one of the above
 #
 # To change the icon: go run ./tools/mkicon, then (for Windows)
-#   go run ./tools/mksyso -ico build/tinkerie.ico -out rsrc_windows_amd64.syso -version 0.25.0-alpha
+#   go run ./tools/mksyso -ico build/tinkerie.ico -out rsrc_windows_amd64.syso -version 0.26.0-alpha
 set -e
 cd "$(dirname "$0")"
-VERSION=0.25.0-alpha
+VERSION=0.26.0-alpha
 NUMVER=${VERSION%%-*} # macOS wants plain numbers
 export CGO_ENABLED=0
 

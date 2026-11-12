@@ -3,7 +3,7 @@
 
 APPS = [
   dict(
-    id="wirie", needshort="No hardware needed", name="Wirie", ver="0.16.2-alpha", color="#ef8a3c", icon="wirie.png",
+    id="wirie", needshort="No hardware needed", name="Wirie", ver="0.17.0-alpha", color="#ef8a3c", icon="wirie.png",
     tagline="Design your own circuit boards, even if you've never made one before.",
     short="Design circuit boards and custom keyboards, plan stripboard builds, look up pinouts and work out battery life.",
     need="No hardware needed",
@@ -34,6 +34,7 @@ APPS = [
         "Board templates: Raspberry Pi HAT and Zero pHAT, Pico, Nano and ESP32 carriers, round boards",
         "Two-layer auto-router with wider power tracks and vias. It routes ground too, so every connection is visible",
         "Turn parts to any angle: type it in, or drag the round handle",
+        "Castellated modules (Pico, RP2040-Zero, XIAO, ESP32-C3 SuperMini) can be soldered flat onto edge pads, with no pin headers",
         "Ground fill that's checked to really reach every ground pin, design-rule check with one-click auto-fix (or auto-fix mode), realistic board preview",
       ]),
       ("Boardie: stripboard and perfboard", "Build the same circuit without ordering a PCB.", [

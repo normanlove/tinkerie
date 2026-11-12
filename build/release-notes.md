@@ -10,9 +10,9 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 
 Each package has a *READ ME FIRST.txt*.
 
-<!-- release notes for 0.25.0-alpha: package.sh checks this line, so update the notes with every version -->
+<!-- release notes for 0.26.0-alpha: package.sh checks this line, so update the notes with every version -->
 ### New in {VERSION}
-- **Makie cases make room for parts that stick out:** when a part hangs over the board edge (a microcontroller module's USB end, a USB-C socket, a button, an antenna), the generated case cuts a pocket in the wall for it, open at the top so the board still drops in, and the lid gets a filler that closes the slot above it. The case notes list each one and how far it sticks out. Works for board cases and keyboard cases.
+- **Wirie: castellated modules soldered flat.** Boards with half-holes along their edges (Raspberry Pi Pico, Pico W, Pico 2 and 2 W, Waveshare RP2040-Zero, Seeed XIAO, ESP32-C3 SuperMini) now have a surface-mount version: select the part and choose *Mounting: Soldered flat (castellated)*. Its pins become edge pads, it sits low with no headers, and every connection stays as it was (re-route to redraw the tracks). Keebie has the same option for the controller, and the parts list, Pinnie, Powerie and Makie's case height all follow it.
 
 Licensed under GPL-3.0-or-later.
 

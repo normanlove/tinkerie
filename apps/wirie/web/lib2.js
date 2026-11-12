@@ -137,12 +137,27 @@ moduleFP({ id: "esp32cam", name: "ESP32-CAM (AI-Thinker)", value: "ESP32-CAM", d
 moduleFP({ id: "blackpill", name: "STM32 Black Pill (F401/F411)", value: "Black Pill", desc: "WeAct STM32F4 board, 3.3V logic, USB-C at top", tags: "stm32 black pill f401 f411 weact", verify: true, left: ["B12", "B13", "B14", "B15", "A8", "A9", "A10", "A11", "A12", "A15", "B3", "B4", "B5", "B6", "B7", "B8", "B9", "5V", "GND", "3V3"], right: ["VB", "C13", "C14", "C15", "R", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "B0", "B1", "B2", "B10", "3V3", "GND", "5V"], rowSpacing: 15.24, w: 20.8, h: 53, col: "#151515", funcs: Object.assign({}, F_UART("A9", "A10"), F_I2C("B7", "B6"), F_SPI("A7", "A6", "A5", "A4"), { "5V": "PWR5", "3V3": "PWR3" }), usb: "top" });
 moduleFP({ id: "esp32s3devkit", name: "ESP32-S3 DevKitC-1 (44-pin)", value: "ESP32-S3 DevKitC", desc: "ESP32-S3 with native USB. Measure row spacing — clones differ", tags: "esp32 s3 devkitc", verify: true, left: ["3V3", "3V3", "RST", "4", "5", "6", "7", "15", "16", "17", "18", "8", "3", "46", "9", "10", "11", "12", "13", "14", "5V", "GND"], right: ["GND", "TX", "RX", "1", "2", "42", "41", "40", "39", "38", "37", "36", "35", "0", "45", "48", "47", "21", "20", "19", "GND", "GND"], rowSpacing: 25.4, w: 28, h: 62.5, col: "#151515", funcs: { "5V": "PWR5", "3V3": "PWR3", TX: "TX", RX: "RX", "8": "SDA", "9": "SCL", "11": "MOSI", "13": "MISO", "12": "SCK", "10": "CS" }, gpio: ["4", "5", "6", "7", "15", "16", "17", "18", "1", "2", "42", "41", "40", "39", "38", "21", "47", "48"], usb: "bottom" });
 moduleFP({ id: "arduino_micro", name: "Arduino Micro", value: "Arduino Micro", desc: "Leonardo in a DIP-34 shape, native USB", tags: "arduino micro 32u4", verify: true, left: ["D13", "3V3", "AREF", "A0", "A1", "A2", "A3", "A4", "A5", "NC", "NC", "5V", "RST", "GND", "VIN", "MISO", "SCK"], right: ["D12", "D11", "D10", "D9", "D8", "D7", "D6", "D5", "D4", "D3", "D2", "GND", "RST", "RX", "TX", "SS", "MOSI"], rowSpacing: 15.24, w: 18, h: 48, col: "#0f7c84", funcs: { "5V": "PWR5", "3V3": "PWR3", D2: "SDA", D3: "SCL", MOSI: "MOSI", MISO: "MISO", SCK: "SCK", SS: "CS", TX: "TX", RX: "RX" }, usb: "top" });
-// Pico castellated (SMD)
-(function () {
-  const f = moduleFP({ id: "pico_smd", name: "Raspberry Pi Pico (castellated SMD)", value: "Pico (SMD)", desc: "Solder the Pico flat onto your board by its castellated edges", tags: "rp2040 pico smd castellated surface mount", left: PICO_L, right: PICO_R, rowSpacing: 17.78, w: 21, h: 51, col: "#0f4f2c", funcs: PICO_F, usb: "top" });
-  for (const p of f.pads) { p.drill = 0; p.shape = "rect"; p.w = 3.2; p.h = 1.6; p.x = p.x < 0 ? -9.3 : 9.3; }
-  f.smd = true;
-})();
+// Castellated modules: boards with half-cut holes along their edges (the
+// "castellations") can be soldered flat onto your board like a big chip, with
+// no pin headers. Each gets a surface-mount twin, "<id>_smd", with the same
+// pins: the Mounting choice in a part's properties swaps between them.
+const CASTELLATED = ["pico", "picow", "pico2", "pico2w", "rp2040zero", "xiao", "esp32c3sm"];
+function castellatedTwin(base, id) {
+  const fp = LIB_BY_ID[base]; if (!fp || LIB_BY_ID[id]) return;
+  const xs = fp.pads.map(p => Math.abs(p.x)), edge = fp.body.w / 2;
+  const ys = fp.pads.map(p => p.y).sort((a, b) => a - b), pitch = Math.min(...ys.slice(1).map((y, i) => y - ys[i]).filter(d => d > 0.5));
+  const len = edge < 10 ? 2.6 : 3.2, wid = Math.min(1.6, pitch * 0.62);
+  const pads = fp.pads.map(p => {
+    const vert = Math.abs(p.x) < edge - 2.2; // a pin along the top or bottom edge (rare): pad runs up/down
+    const s = Math.sign(p.x) || 1, cx = vert ? p.x : s * (Math.abs(p.x) + 0.4);
+    return { n: p.n, name: p.name, func: p.func, x: +cx.toFixed(3), y: p.y, shape: "rect", w: vert ? wid : len, h: vert ? len : wid, drill: 0, opp: false };
+  });
+  addFP(Object.assign({}, fp, { id, name: fp.name + " (castellated SMD)", value: fp.value + " (SMD)", desc: "Soldered flat onto your board by its castellated edges: no pin headers, and it sits low. " + (fp.desc || ""),
+    tags: (fp.tags || "") + " smd castellated surface mount", pads, holes: [], smd: true, castellatedOf: base, case: Object.assign({}, fp.case || {}, { raise: 0 }) }));
+  fp.castellated = id;
+}
+castellatedTwin("pico", "pico_smd"); // (its id from earlier versions)
+for (const b of CASTELLATED) castellatedTwin(b, b + "_smd");
 // ESP32-WROOM-32 module (SMD)
 (function () {
   const L = ["GND", "3V3", "EN", "SENSOR_VP", "SENSOR_VN", "IO34", "IO35", "IO32", "IO33", "IO25", "IO26", "IO27", "IO14", "IO12"];

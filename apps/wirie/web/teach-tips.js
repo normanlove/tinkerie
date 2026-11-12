@@ -54,6 +54,7 @@ window.TEACH = {
     "Activity light": ["Activity light", "Adds a 3mm LED and a 1k resistor on one of the controller's pins. The firmware (from Flashie, or the QMK files) flashes it whenever a key is sent to the computer."],
     "Use a controller with more pins": ["Use a controller with more pins", "Your keys, knobs, screen and lights need more pins than this controller has. This switches to the smallest controller of the same kind that has enough."],
     "Keyboard parts list": ["Parts list", "Everything to buy for this keyboard, for every board of it (both halves of a split): switches, keycaps, stabilisers, diodes, the controller and its parts, standoffs, screws and cables. Copy it, or save it as a CSV for Excel."],
+    "Castellated mounting": ["Pin headers or soldered flat", "Boards like the Pi Pico, RP2040-Zero, XIAO and ESP32-C3 SuperMini have half-holes along their edges (castellations). You can solder them on pin headers, or lay them flat on matching pads and solder along the edges: lower, cheaper and no headers, but harder to remove later. The pin connections stay the same when you switch."],
     "Board parts list": ["This board's parts", "Every part on the board in the PCB tab, grouped by value, with how many you need and their references (R1, C2…)."],
     "Copy parts list": ["Copy as text", "Copies the parts list as plain text, ready to paste into a message, a note or a shopping list."],
     "Download parts list": ["Download CSV", "Saves the parts list as a CSV file that opens in Excel, Google Sheets or LibreOffice."],

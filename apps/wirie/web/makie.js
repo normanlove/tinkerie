@@ -14,7 +14,7 @@ function caseInfo(fp, c) {
   const raise = c && c.raise !== undefined ? c.raise : null;
   const mod = (h, kind = "module") => { info.kind = kind; info.h = h; info.raise = raise ?? 2.5; };
   if (b.module) {
-    if (cat === "Microcontrollers") { mod(4.5); if (b.usb) info.edge = { type: USB_C_MODULES.test(id) ? "usb-c" : "usb-micro", local: [0, b.usb === "top" ? -1 : 1], w: 12, h: 7, zOff: 1.6 + 1.6, at: b.usb === "top" ? [b.x, b.y - b.h / 2] : [b.x, b.y + b.h / 2] }; }
+    if (cat === "Microcontrollers") { mod(4.5); if (b.usb) info.edge = { type: USB_C_MODULES.test(fp.castellatedOf || id) ? "usb-c" : "usb-micro", local: [0, b.usb === "top" ? -1 : 1], w: 12, h: 7, zOff: 1.6 + 1.6, at: b.usb === "top" ? [b.x, b.y - b.h / 2] : [b.x, b.y + b.h / 2] }; }
     else if (/oled|tft|lcd|epaper|nokia|max7219|tm1637|ht16k33|matrix/.test(id)) { mod(4.5, "display"); info.lid.push({ type: "display-window", shape: "rect", x: b.x, y: b.y + (fp.pads[0].y < b.y ? 2 : -2), w: Math.max(4, bodyW - 4), h: Math.max(4, bodyH - 8), approx: true }); }
     else if (id === "hcsr04") { mod(15, "sensor"); info.lid.push({ type: "sensor-hole", shape: "circle", x: b.x - 13, y: b.y, d: 16.5 }, { type: "sensor-hole", shape: "circle", x: b.x + 13, y: b.y, d: 16.5 }); }
     else if (id === "pir") { mod(25, "sensor"); info.lid.push({ type: "sensor-hole", shape: "circle", x: b.x, y: b.y, d: 23.5 }); }

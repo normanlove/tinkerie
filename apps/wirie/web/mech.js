@@ -7,6 +7,7 @@ const ELEC_H = { 4: 7, 5: 11, 6.3: 11, 8: 12, 10: 16, 12.5: 20, 16: 25, 18: 35 }
 // estimated height of the part above the board surface (mm)
 function partHeight(fp) {
   const id = fp.id, b = fp.body;
+  if (fp.castellatedOf) return 3.2; // a castellated module soldered flat: board plus its parts
   const rules = [
     [/^hdr2mm/, 6], [/^hdr127/, 5], [/^hdr_smd/, 8.5], [/^hdr/, 8.5], [/^idc/, 9], [/^jstxh/, 7], [/^jstph/, 6], [/^jstzh/, 4.5], [/^jstsh/, 3], [/^term5/, 10], [/^term35/, 8.5], [/^microfit/, 9.8], [/^atx24/, 13],
     [/^r_axial|^r_pow_1W/, 3], [/^r_pow_2W/, 5], [/^r_pow_5W/, 10], [/^r_vert/, 11], [/^rnet_sip/, 5], [/^trim3296/, 10], [/^pot16/, 25], [/^rv09/, 18], [/^ec11/, 20],

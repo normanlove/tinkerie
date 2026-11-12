@@ -205,7 +205,7 @@ function buildPowerie(root) {
   $p("#pw_addsel").onchange = e => { const i = +e.target.value; if (i) { addLoad(i); e.target.value = ""; drawRows(); refresh(); save(); } };
   $p("#pw_pcb").onclick = () => {
     let n = 0; const seen = {};
-    for (const c of S.comps) { const fp = compFP(c); if (!fp) continue; const i = LOADS.findIndex(l => l[5] && l[5].test(fp.id)); if (i < 0) continue; seen[i] = seen[i] || { qty: 0, refs: [] }; seen[i].qty++; seen[i].refs.push(c.ref); }
+    for (const c of S.comps) { const fp = compFP(c); if (!fp) continue; const i = LOADS.findIndex(l => l[5] && l[5].test(fp.castellatedOf || fp.id)); if (i < 0) continue; seen[i] = seen[i] || { qty: 0, refs: [] }; seen[i].qty++; seen[i].refs.push(c.ref); }
     for (const i in seen) { if (P.loads.some(l => l.preset === +i && l.name.includes(seen[i].refs[0]))) continue; addLoad(+i, seen[i].qty, seen[i].refs.join(", ")); n++; }
     drawRows(); refresh(); save();
     toast(n ? `Added ${n} part type${n > 1 ? "s" : ""} from your board — check the currents match how you'll use them.` : "No parts with known power figures on your PCB yet (or they're already listed).", n ? "good" : "");
