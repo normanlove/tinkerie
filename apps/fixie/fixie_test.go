@@ -5,6 +5,7 @@ package fixie
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"regexp"
 	"strings"
@@ -33,7 +34,7 @@ type gStep struct {
 	Only    string            `json:"only"`
 	Skip    string            `json:"skip"`
 	Next    string            `json:"next"`
-	Fix     []string          `json:"fix"`
+	Fix     []json.RawMessage `json:"fix"`
 	Measure *struct {
 		Label string  `json:"label"`
 		Bands []gBand `json:"bands"`
@@ -130,21 +131,50 @@ func (g guide) dangerous(name string) string {
 	return ""
 }
 
-// match is the same test as the window's: "a|b" is any of them, "!a" is not.
+// match is the same test as the window's: "a|b" is any of them, "a&b" is
+// both, "!a" is not ("&" binds tighter than "|").
 func match(cond string, tags map[string]bool) bool {
 	if cond == "" {
 		return true
 	}
 	for _, c := range strings.Split(cond, "|") {
-		if strings.HasPrefix(c, "!") {
-			if !tags[c[1:]] {
-				return true
+		all := true
+		for _, t := range strings.Split(c, "&") {
+			if strings.HasPrefix(t, "!") {
+				all = all && !tags[t[1:]]
+			} else {
+				all = all && tags[t]
 			}
-		} else if tags[c] {
+		}
+		if all {
 			return true
 		}
 	}
 	return false
+}
+
+// conds lists each line's condition ("" for a line everyone sees).
+func conds(raw []json.RawMessage) []string {
+	var out []string
+	for _, r := range raw {
+		var c struct {
+			If string `json:"if"`
+		}
+		_ = json.Unmarshal(r, &c)
+		out = append(out, c.If)
+	}
+	return out
+}
+
+// lines is how many of a step's lines (or a result's fixes) this device sees.
+func lines(cs []string, tags map[string]bool) int {
+	n := 0
+	for _, c := range cs {
+		if match(c, tags) {
+			n++
+		}
+	}
+	return n
 }
 
 func loadGuide(t *testing.T) guide {
@@ -186,7 +216,7 @@ func TestGuideRefs(t *testing.T) {
 		known[d.Tag] = true
 	}
 	checkCond := func(where, c string) {
-		for _, p := range strings.Split(c, "|") {
+		for _, p := range strings.FieldsFunc(c, func(r rune) bool { return r == '|' || r == '&' }) {
 			if p = strings.TrimPrefix(p, "!"); p != "" && !known[p] {
 				t.Errorf("%s: unknown tag %q", where, p)
 			}
@@ -236,7 +266,7 @@ func TestGuideRefs(t *testing.T) {
 				t.Errorf("%s: answer %q goes to missing %s", id, a.T, a.Go)
 			}
 		}
-		for _, raw := range s.Do {
+		for _, raw := range append(append([]json.RawMessage{}, s.Do...), s.Fix...) {
 			var c struct {
 				If string `json:"if"`
 			}
@@ -276,7 +306,17 @@ func TestGuidePaths(t *testing.T) {
 			feats = append(feats, f.ID)
 		}
 	}
-	powers := [][]string{{}, {"mains"}, {"adapter"}, {"usbpow"}, {"battery"}, {"lipo"}, {"adapter", "lipo"}, {"usbpow", "lipo"}, {"mains", "lipo"}}
+	doIf, fixIf := map[string][]string{}, map[string][]string{}
+	for id, s := range g.Steps {
+		doIf[id], fixIf[id] = conds(s.Do), conds(s.Fix)
+	}
+	problems := map[string]string{} // one example of each problem
+	report := func(key, example string) {
+		if _, ok := problems[key]; !ok {
+			problems[key] = example
+		}
+	}
+	powers := [][]string{{"mains"}, {"adapter"}, {"usbpow"}, {"battery"}, {"lipo"}, {"adapter", "lipo"}, {"usbpow", "lipo"}, {"mains", "lipo"}}
 	fails := 0
 	for kind := range kinds {
 		for _, pw := range powers {
@@ -303,10 +343,16 @@ func TestGuidePaths(t *testing.T) {
 					reached[id] = true
 					s := g.Steps[id]
 					if s.Result {
+						if lines(fixIf[id], tags) == 0 {
+							report("result "+id+" has no fix lines", fmt.Sprintf("kind %q, power %v, has %v", kind, pw, has))
+						}
 						return true
 					}
 					if s.Only != "" && !match(s.Only, tags) {
 						return walk(s.Skip)
+					}
+					if lines(doIf[id], tags) == 0 {
+						report("step "+id+" has nothing to do", fmt.Sprintf("kind %q, power %v, has %v", kind, pw, has))
 					}
 					n := 0
 					for _, a := range s.A {
@@ -332,6 +378,9 @@ func TestGuidePaths(t *testing.T) {
 				}
 			}
 		}
+	}
+	for k, ex := range problems {
+		t.Errorf("%s (e.g. %s)", k, ex)
 	}
 	for id := range g.Steps {
 		if !reached[id] {
@@ -363,6 +412,64 @@ func TestDanger(t *testing.T) {
 		}
 		if !known {
 			t.Errorf("legacy %s: unknown category %s", id, l.Cat)
+		}
+	}
+}
+
+// TestRelevance pins down steps that must never be shown for the usual
+// answers of each kind of device (the first was a 3D printer being asked to
+// put a Pico into BOOTSEL mode).
+func TestRelevance(t *testing.T) {
+	g := loadGuide(t)
+	never := map[string][]string{
+		"machine":  {"up.", "r.bootmode", "r.strap", "r.mcu", "ch.", "dead.3", "dead.flat", "l.1", "r.ram", "r.tcon", "r.runcap", "r.brushes", "bt.2"},
+		"project":  {"dead.flat", "ch.", "h.", "m.", "dp.", "tr.", "r.ram"},
+		"tool":     {"dead.3", "dead.3b", "dead.port", "ch.2", "ch.3", "up.", "dp.", "snd.", "cn.", "r.lint"},
+		"toy":      {"l.1", "ch.", "up.", "dead.3", "dead.fuse", "tr.", "r.runcap", "r.brushes"},
+		"computer": {"dead.6", "dp.2", "dp.3", "up.", "r.brushes", "r.runcap", "h.", "l.1"},
+		"phone":    {"dead.fuse", "dead.6", "tr.", "m.", "up.", "h.", "l.1", "r.ram", "r.tcon"},
+		"lights":   {"up.", "m.", "snd.", "dp.", "ch."},
+		"audio":    {"up.", "m.", "dp.", "h.", "tr."},
+		"screen":   {"up.", "m.", "ch.", "r.ram"},
+		"input":    {"up.", "m.", "dp.", "ch.", "tr."},
+		"console":  {"up.", "dp.", "ch.", "h.", "r.brushes", "r.runcap"},
+	}
+	for _, c := range g.Categories {
+		bad := never[c.ID]
+		if bad == nil {
+			continue
+		}
+		tags := g.tags(c.Kind, c.Power, c.Has)
+		seen := map[string]bool{}
+		var walk func(id string)
+		walk = func(id string) {
+			if seen[id] {
+				return
+			}
+			seen[id] = true
+			s := g.Steps[id]
+			if !s.Result && s.Only != "" && !match(s.Only, tags) {
+				walk(s.Skip)
+				return
+			}
+			for _, b := range bad {
+				if id == b || (strings.HasSuffix(b, ".") && strings.HasPrefix(id, b)) {
+					t.Errorf("%s: shown %s (%s)", c.ID, id, s.T)
+				}
+			}
+			for _, a := range s.A {
+				if match(a.Only, tags) {
+					walk(a.Go)
+				}
+			}
+			if s.Next != "" {
+				walk(s.Next)
+			}
+		}
+		for _, sy := range g.Symptoms {
+			if match(sy.For, tags) {
+				walk(sy.Start)
+			}
 		}
 	}
 }

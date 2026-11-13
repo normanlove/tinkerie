@@ -80,8 +80,8 @@
     const c = CAT[p.cat] || CAT.other;
     return { id: c.id, name: (p.name || "").trim() || c.name, tags: [...profileTags(p)], open: c.open, danger: dangerOf(p) };
   }
-  // "a|b" is any of them; "!a" is not a
-  const match = (cond, tags) => !cond || cond.split("|").some(c => c[0] === "!" ? !tags.has(c.slice(1)) : tags.has(c));
+  // "a|b" is any of them, "a&b" is both, "!a" is not a ("&" binds tighter than "|")
+  const match = (cond, tags) => !cond || cond.split("|").some(c => c.split("&").every(t => t[0] === "!" ? !tags.has(t.slice(1)) : tags.has(t)));
   // where a step really leads for this device: steps that don't apply are skipped,
   // and steps inside a device that mustn't be opened go to the professional
   function resolve(id, dev) {
@@ -147,7 +147,7 @@
         <div class="chips big" data-help="How it's powered">${G.power.map(x => chip("pw", x, pick.power.includes(x.id), x.hint)).join("")}</div>
         <div class="grp-h">What does it have? <span class="dim">(all that apply)</span></div>
         <div class="chips big" data-help="What it has">${G.features.map(x => chip("ft", x, pick.has.includes(x.id))).join("")}</div>
-        <div class="navrow"><button class="btn primary" id="dNext" data-help="Next: symptoms">Next: what's it doing?</button></div>
+        <div class="navrow"><button class="btn primary" id="dNext" data-help="Next: symptoms">Next: what's it doing?</button><span id="dNeed" class="verdict bad" hidden>Pick at least one way it's powered.</span></div>
       </div>
       <details class="nohelp" data-help="Not covered"><summary>What Fixie won't help with</summary>${dangerList()}</details>
       <div class="callout info"><span class="ic">i</span><div><b>New to repairs?</b>Read the Safety tab first, and check the Tools tab for the few tools that cover most jobs.</div></div>
@@ -166,7 +166,11 @@
     const toggle = (list, id) => list.includes(id) ? list.filter(x => x !== id) : [...list, id];
     $$("[data-pw]", v).forEach(b => b.onclick = () => { pick.power = toggle(pick.power, b.dataset.pw); b.classList.toggle("on"); b.setAttribute("aria-pressed", b.classList.contains("on")); });
     $$("[data-ft]", v).forEach(b => b.onclick = () => { pick.has = toggle(pick.has, b.dataset.ft); b.classList.toggle("on"); b.setAttribute("aria-pressed", b.classList.contains("on")); check(); });
-    $("#dNext", v).onclick = () => { if (dangerOf(pick)) return check(); pick.stage = "symptom"; renderRepair(); };
+    $("#dNext", v).onclick = () => {
+      if (dangerOf(pick)) return check();
+      if (!pick.power.length) { $("#dNeed", v).hidden = false; return; }
+      pick.stage = "symptom"; renderRepair();
+    };
     if (last) $("#resume").onclick = () => { cur = last; save(); renderRepair(); };
     check();
   }
@@ -324,7 +328,7 @@
       <h2>${esc(s.t)}<span class="level ${s.level}" title="How hard the fix is">${esc(s.level)}</span></h2>
       <p class="cause">${esc(s.cause)}</p>
       ${s.pro ? `<div class="callout warn"><span class="ic">!</span><div><b>Worth knowing</b>${esc(s.pro)}</div></div>` : ""}
-      <div class="sect"><h4>How to fix it</h4><ol class="do">${s.fix.map(f => `<li>${esc(f)}</li>`).join("")}</ol></div>
+      <div class="sect"><h4>How to fix it</h4><ol class="do">${doLines({ do: s.fix }, tagsOf(d)).map(f => `<li>${esc(f)}</li>`).join("")}</ol></div>
       ${s.parts ? `<div class="sect"><h4>Parts you may need</h4><ul class="plain">${s.parts.map(p => `<li>${esc(p)}</li>`).join("")}</ul></div>` : ""}
       ${s.tools ? `<div class="sect"><h4>Tools</h4>${toolChips(s.tools)}</div>` : ""}
       <div class="sect notes"><h4>Notes</h4><textarea id="note" placeholder="What you replaced, where you bought it, what it cost…" data-help="Step notes">${esc(at.note || "")}</textarea></div>
@@ -432,7 +436,7 @@
     r.path.forEach((p, i) => {
       const s = G.steps[p.id]; if (!s) return;
       if (s.result) {
-        t += `\n## Likely fault: ${s.t} (${s.level})\n\n${s.cause}\n\n` + s.fix.map(f => `- ${f}\n`).join("");
+        t += `\n## Likely fault: ${s.t} (${s.level})\n\n${s.cause}\n\n` + doLines({ do: s.fix }, tags).map(f => `- ${f}\n`).join("");
         if (s.parts) t += `\nParts: ${s.parts.join(", ")}\n`;
       } else {
         t += `\n## ${i + 1}. ${s.t}\n\n` + doLines(s, tags).map(l => `- ${l}\n`).join("");

@@ -62,11 +62,11 @@
   },
   {
    "id": "lights",
-   "name": "LED lights or LED strip"
+   "name": "LED lighting (strip, string or lamp)"
   },
   {
    "id": "mcu",
-   "name": "A programmable board (Arduino, ESP32, Pico…)"
+   "name": "A hobby board you program yourself (Arduino, ESP32, Pico…)"
   },
   {
    "id": "heater",
@@ -192,8 +192,7 @@
    "has": [
     "buttons",
     "motor",
-    "audio",
-    "lights"
+    "audio"
    ],
    "open": "Usually small Phillips screws: check under the battery cover and stickers. Some snap apart with a plastic pick round the seam."
   },
@@ -213,7 +212,7 @@
   {
    "id": "lights",
    "name": "Lights and LEDs",
-   "kind": "",
+   "kind": "lamp",
    "power": [
     "adapter"
    ],
@@ -225,7 +224,7 @@
   {
    "id": "project",
    "name": "Electronics project or board",
-   "kind": "",
+   "kind": "devboard",
    "power": [
     "usbpow"
    ],
@@ -238,7 +237,7 @@
   {
    "id": "input",
    "name": "Keyboard, mouse or remote",
-   "kind": "",
+   "kind": "input",
    "power": [
     "usbpow"
    ],
@@ -251,7 +250,7 @@
   {
    "id": "machine",
    "name": "3D printer or machine with motors",
-   "kind": "",
+   "kind": "printer",
    "power": [
     "mains"
    ],
@@ -259,7 +258,6 @@
     "motor",
     "fan",
     "screen",
-    "mcu",
     "usb",
     "heater"
    ],
@@ -268,7 +266,7 @@
   {
    "id": "household",
    "name": "Household gadget (fan, vacuum, shaver…)",
-   "kind": "",
+   "kind": "gadget",
    "power": [
     "mains"
    ],
@@ -667,7 +665,6 @@
     "heater",
     "fan",
     "screen",
-    "mcu",
     "usb"
    ]
   },
@@ -782,7 +779,7 @@
    "name": "Won't connect: USB, Wi-Fi or Bluetooth",
    "desc": "The computer doesn't see it, or it won't pair.",
    "for": "usb|wireless",
-   "start": "cn.1"
+   "start": "cn.0"
   },
   {
    "id": "upload",
@@ -834,8 +831,12 @@
      "t": "Plug it into a different wall socket that you know works (try a lamp in it first). Skip extension leads and power strips for now."
     },
     {
-     "if": "adapter|usbpow|lipo",
+     "if": "adapter|usbpow|lipo&!powertool",
      "t": "Try a different charger, adapter or USB cable that you know works with another device."
+    },
+    {
+     "if": "powertool",
+     "t": "Try a different battery pack that you know is charged, and charge this pack on its charger: the charger's light shows whether it's taking charge."
     },
     {
      "if": "usbpow",
@@ -846,7 +847,7 @@
      "t": "Put in fresh batteries, checking each one faces the right way (+ to +)."
     },
     {
-     "if": "lipo",
+     "if": "lipo&!powertool",
      "t": "Leave it on the charger for at least 30 minutes: a completely flat battery may show nothing at first."
     }
    ],
@@ -893,7 +894,7 @@
    "good": "Shiny metal contacts, firm springs, and each cell above 1.3V.",
    "bad": "Crust on the contacts, a weak spring, or a cell below 1.2V.",
    "only": "battery",
-   "skip": "dead.3",
+   "skip": "dead.pack",
    "measure": {
     "label": "Lowest battery voltage",
     "unit": "V",
@@ -919,6 +920,33 @@
     "corrosion"
    ]
   },
+  "dead.pack": {
+   "t": "Measure the battery pack",
+   "why": "Tool packs have protection that switches the pack off when it's run right down or a cell is faulty.",
+   "do": [
+    "Set the multimeter to DC volts and measure across the pack's main + and − terminals.",
+    "An 18V (20V max) pack reads about 18–20.5V charged, and about 15–16V flat. 12V packs: about 10.5–12.5V. 36V packs: about 32–41V.",
+    "A pack that reads 0V or very low has shut itself off: try it on its charger; some chargers can't wake a pack that's gone too low."
+   ],
+   "q": "What does the pack read?",
+   "a": [
+    {
+     "t": "About right",
+     "go": "dead.4"
+    },
+    {
+     "t": "Low, 0V, or it won't charge",
+     "go": "ch.4"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "good": "Within the range for its voltage.",
+   "bad": "0V, or far below the 'flat' figure.",
+   "only": "powertool",
+   "skip": "dead.3"
+  },
   "dead.3": {
    "t": "Measure what the charger or adapter gives out",
    "why": "A dead adapter looks exactly like a dead device. Measuring it takes a minute.",
@@ -929,8 +957,8 @@
      "t": "Set the multimeter to DC volts. For a round barrel plug, put one probe inside the hole (centre pin) and the other on the outside sleeve. The small symbol on the label shows which is + (usually the centre)."
     },
     {
-     "if": "usbpow|lipo",
-     "t": "For USB, plug a USB power meter between the charger and the device: it shows the voltage and the current. Without one, use a spare cable cut open, or a USB breakout board."
+     "if": "usbpow|usb",
+     "t": "For USB, plug a USB power meter between the charger and the device: it shows the voltage and the current. Without one, use a USB breakout board."
     },
     "An adapter with nothing plugged in can read up to about 10% high: that's normal."
    ],
@@ -951,7 +979,7 @@
    ],
    "good": "Within about 10% of the label (a 5V USB charger: 4.75–5.25V).",
    "bad": "0V, far too low, or a reading that keeps changing.",
-   "only": "adapter|usbpow|lipo",
+   "only": "adapter|usbpow|lipo&usb",
    "skip": "dead.4",
    "measure": {
     "label": "Voltage you measured",
@@ -971,8 +999,16 @@
    "do": [
     "With the USB power meter (or a bench power supply's current reading) in line, plug the device in and watch the current (A) for a minute.",
     {
-     "if": "lipo",
-     "t": "Then try a forced restart: on an iPhone press volume up, volume down, then hold the side button for 15 seconds; on most Android phones hold power and volume down for 20 seconds; on a laptop, unplug the charger and hold the power button for 30 seconds."
+     "if": "phone",
+     "t": "Then try a forced restart: on an iPhone press volume up, volume down, then hold the side button for 15 seconds; on most Android phones hold power and volume down for 20 seconds."
+    },
+    {
+     "if": "laptop",
+     "t": "Then unplug the charger and hold the power button for 30 seconds, and try again. Some laptops have a small battery-reset hole underneath."
+    },
+    {
+     "if": "lipo&!phone&!laptop",
+     "t": "Then hold the power button for 15–30 seconds; some gadgets also have a small reset hole."
     }
    ],
    "q": "What does the meter show?",
@@ -983,13 +1019,19 @@
     },
     {
      "t": "It draws some current",
-     "go": "dead.flat"
+     "go": "dead.flat",
+     "only": "lipo"
+    },
+    {
+     "t": "It draws some current",
+     "go": "dead.4",
+     "only": "!lipo"
     }
    ],
    "tools": [
     "usbmeter"
    ],
-   "only": "lipo|usbpow",
+   "only": "usbpow|usb&lipo",
    "skip": "dead.4",
    "measure": {
     "label": "Current it draws",
@@ -1009,8 +1051,8 @@
    }
   },
   "dead.port": {
-   "t": "Inspect and clean the charging port",
-   "why": "Pocket lint packs into USB-C and Lightning ports until the plug can't reach the contacts.",
+   "t": "Inspect and clean the USB or charging port",
+   "why": "Lint and dirt pack into USB and charging ports until the plug can't reach the contacts, and sockets work loose.",
    "do": [
     "Shine a torch into the port and look with a magnifier or your phone's camera zoomed in.",
     "Scrape out lint with a wooden toothpick or a plastic pick. Never use metal: the pins short easily.",
@@ -1019,7 +1061,7 @@
    "q": "What did you find?",
    "a": [
     {
-     "t": "A lot of lint, and it charges now",
+     "t": "Lint or dirt came out, and it works now",
      "go": "r.lint"
     },
     {
@@ -1060,7 +1102,7 @@
    ]
   },
   "dead.4": {
-   "t": "Check the fuse, the lead and the switch",
+   "t": "Check the switch, and any fuse or lead",
    "why": "These are the simplest parts on the power path, and the most likely to fail.",
    "do": [
     {
@@ -1216,7 +1258,7 @@
    "good": "A steady beep.",
    "bad": "No beep, or the glass is blackened inside.",
    "open": true,
-   "only": "mains",
+   "only": "mains&!desktop",
    "skip": "dead.7",
    "signs": [
     "fuse"
@@ -1320,14 +1362,29 @@
    "t": "Check the power button and start-up",
    "why": "With power present, the next step is whether it's being told to start.",
    "do": [
-    "Test the power button on continuity: it should beep only while pressed.",
     {
-     "if": "pc",
+     "if": "buttons",
+     "t": "Test the power button on continuity: it should beep only while pressed."
+    },
+    {
+     "if": "mcu",
+     "t": "Development boards: press reset, and check the power LED. An on-board LED that blinks shows its code is running."
+    },
+    {
+     "if": "!buttons&!mcu",
+     "t": "Check anything that switches it on (a switch, a sensor, a remote) is working."
+    },
+    {
+     "if": "desktop",
      "t": "On a desktop, short the two 'PWR SW' pins on the motherboard with a screwdriver tip to bypass the case button."
     },
     {
-     "if": "pc",
+     "if": "desktop",
      "t": "Take out all but one memory stick, unplug extra drives and cards, and clear the BIOS settings (the CMOS jumper or the coin battery out for a minute)."
+    },
+    {
+     "if": "laptop",
+     "t": "Unplug the battery inside and try on the charger alone; take out and refit the memory if it isn't soldered in."
     },
     "Listen for beeps and watch for blinking lights: they're often a code for the fault."
    ],
@@ -1362,7 +1419,12 @@
     {
      "t": "On battery, but fine on the charger",
      "go": "ch.4",
-     "only": "lipo|battery"
+     "only": "lipo"
+    },
+    {
+     "t": "Once the batteries aren't brand new",
+     "go": "dead.2",
+     "only": "battery"
     },
     {
      "t": "After it's been on a while, or when warm",
@@ -1392,7 +1454,14 @@
      "if": "pc",
      "t": "Free tools like HWMonitor (Windows) show the temperatures. Over about 95°C for a processor is too hot."
     },
-    "Thermal paste dries out after four or five years in laptops and consoles."
+    {
+     "if": "pc|console",
+     "t": "Thermal paste dries out after four or five years in laptops and consoles."
+    },
+    {
+     "if": "printer",
+     "t": "3D printers: check the power supply's and mainboard's fans spin and their vents are clear; a hot mainboard's stepper drivers shut down."
+    }
    ],
    "q": "What did you find?",
    "a": [
@@ -1413,7 +1482,7 @@
     "torch",
     "screwdrivers"
    ],
-   "only": "fan|pc",
+   "only": "fan",
    "skip": "so.3",
    "signs": [
     "dust"
@@ -1423,7 +1492,14 @@
    "t": "Check the power holds up under load",
    "why": "A tired battery, a weak adapter or a small power supply can't keep up when the device works hard.",
    "do": [
-    "Measure the supply while it's working hard: a USB power meter in line, or the meter across the battery or the power input.",
+    {
+     "if": "usbpow|usb",
+     "t": "Measure the supply while it's working hard: a USB power meter in line shows the voltage dropping."
+    },
+    {
+     "if": "!usbpow&!usb",
+     "t": "Measure the supply while it's working hard: the meter across the battery or the power input."
+    },
     {
      "if": "laptop",
      "t": "Check the adapter's watts match the one it came with. A lower-power adapter makes laptops shut off or slow down."
@@ -1450,7 +1526,7 @@
    ]
   },
   "so.4": {
-   "t": "Look for swollen batteries and bulging capacitors",
+   "t": "Look for failing capacitors and batteries",
    "why": "These two are the classic reasons for a start-and-stop loop.",
    "do": [
     {
@@ -1494,8 +1570,18 @@
    "t": "Try a known-good charger and cable",
    "why": "Cables fail far more often than devices. A cheap or worn cable may charge some devices and not others.",
    "do": [
-    "Try a different cable, and a different charger, that you know work.",
-    "If it can charge wirelessly, try that: if wireless works and the cable doesn't, the port is the problem."
+    {
+     "if": "!powertool",
+     "t": "Try a different cable, and a different charger, that you know work."
+    },
+    {
+     "if": "phone|sound",
+     "t": "If it can charge wirelessly, try that: if wireless works and the cable doesn't, the port is the problem."
+    },
+    {
+     "if": "powertool",
+     "t": "Try the pack on another charger, and another pack on this charger. A flashing fault light on the charger usually means the pack is too hot, too cold, or faulty."
+    }
    ],
    "q": "What happened?",
    "a": [
@@ -1505,7 +1591,8 @@
     },
     {
      "t": "Wireless works, the cable doesn't",
-     "go": "dead.port"
+     "go": "dead.port",
+     "only": "phone|sound"
     },
     {
      "t": "Still won't charge",
@@ -1541,6 +1628,8 @@
    "tools": [
     "usbmeter"
    ],
+   "only": "usb|usbpow",
+   "skip": "ch.4",
    "measure": {
     "label": "Charging current",
     "unit": "A",
@@ -1643,8 +1732,18 @@
    "t": "Check the charging circuit",
    "why": "If the battery is fine and power reaches the device, the charging chip or its battery sensor is next.",
    "do": [
-    "Measure the voltage on the battery's connector while it's charging: a single lithium cell slowly rises towards 4.2V (some to 4.35V).",
-    "Many batteries have a third wire for a temperature sensor. If it's broken or missing, the charger refuses to charge."
+    {
+     "if": "!powertool",
+     "t": "Measure the voltage on the battery's connector while it's charging: a single lithium cell slowly rises towards 4.2V (some to 4.35V)."
+    },
+    {
+     "if": "!powertool",
+     "t": "Many batteries have a third wire for a temperature sensor. If it's broken or missing, the charger refuses to charge."
+    },
+    {
+     "if": "powertool",
+     "t": "Measure the pack's voltage while it's on the charger: it should rise steadily. Chargers read the pack's temperature and cells through the small contacts between the main terminals: clean them and check none are bent."
+    }
    ],
    "q": "Does the battery voltage rise while charging?",
    "a": [
@@ -1668,8 +1767,12 @@
    "why": "First find out whether the device is running and only the screen is out.",
    "do": [
     {
-     "if": "laptop|desktop|console",
+     "if": "pc|console",
      "t": "Connect another monitor or TV by HDMI or DisplayPort."
+    },
+    {
+     "if": "printer",
+     "t": "3D printers: check the printer still moves and heats when you send it a job from a computer or SD card: if it does, only the screen is out."
     },
     {
      "if": "phone",
@@ -1684,17 +1787,24 @@
    "q": "What did you find?",
    "a": [
     {
-     "t": "It works on another screen, or is clearly on",
-     "go": "dp.2"
+     "t": "It works on another monitor",
+     "go": "r.monitor",
+     "only": "desktop"
     },
     {
-     "t": "Nothing on any screen, and no sign of life",
+     "t": "It works on another screen, or is clearly on",
+     "go": "dp.2",
+     "only": "!desktop"
+    },
+    {
+     "t": "Nothing on any screen",
      "go": "dp.6",
      "only": "pc"
     },
     {
      "t": "Can't tell",
-     "go": "dp.2"
+     "go": "dp.2",
+     "only": "!desktop"
     }
    ]
   },
@@ -1737,7 +1847,14 @@
      "if": "laptop|phone",
      "t": "Laptops and phones: look for a small fuse near the display connector on the board, and check it on continuity."
     },
-    "Burnt spots on the LEDs' lenses show the failed ones."
+    {
+     "if": "tv",
+     "t": "Burnt spots on the LEDs' lenses show the failed ones."
+    },
+    {
+     "if": "!tv&!laptop&!phone",
+     "t": "Small screens have their backlight in the screen module itself: check its cable and the backlight supply pins (often marked LED+ and LED−, or BL) on the board."
+    }
    ],
    "q": "Did you find a dead LED or a blown fuse?",
    "a": [
@@ -1767,6 +1884,10 @@
     {
      "if": "lipo",
      "t": "Disconnect the battery first."
+    },
+    {
+     "if": "printer",
+     "t": "3D printer screens join the mainboard by one or two ribbon cables (often EXP1 and EXP2): check both are pushed fully home, the right way round and in the right sockets."
     },
     "Find the display connector, open its latch (a flip-up bar or a sliding lock), pull the cable out, look at the contacts and refit it straight and fully home.",
     "Look along the cable for creases, tears or burn marks."
@@ -1864,7 +1985,7 @@
      "t": "Turn Bluetooth off on other phones and computers nearby: it may be connected to one of them."
     },
     "Try a different source and cable.",
-    "Plug headphones in and out of the headphone socket a few times: a stuck switch inside it mutes the speakers."
+    "If it has a headphone socket, plug headphones in and out a few times: a stuck switch inside it mutes the speakers."
    ],
    "q": "Is there sound now?",
    "a": [
@@ -1885,7 +2006,7 @@
    "t": "Test the speaker",
    "why": "Speakers fail on their own: the fine coil wire breaks, or the cone tears.",
    "do": [
-    "If headphones work but the speaker doesn't, it's the speaker or its wiring.",
+    "If it has a headphone socket and headphones work but the speaker doesn't, it's the speaker or its wiring.",
     "Unplug or unsolder one speaker wire, then measure the speaker's resistance. A '4Ω' or '8Ω' speaker reads a bit less, about 3–7Ω.",
     "Push the cone very gently: it should move smoothly with no scraping."
    ],
@@ -1960,7 +2081,7 @@
     "With an oscilloscope (Scopie), follow a test tone from the input to the output and see where it stops.",
     "Measure the amplifier chip's supply pins.",
     {
-     "if": "audio",
+     "if": "sound&mains",
      "t": "Amplifiers have a protection relay that clicks on a few seconds after switching on. If it clicks off again, the output has a fault."
     }
    ],
@@ -1971,8 +2092,13 @@
      "go": "r.preamp"
     },
     {
-     "t": "No hum even at the amplifier, or the relay clicks off",
+     "t": "No hum even at the amplifier",
      "go": "r.amp"
+    },
+    {
+     "t": "The relay clicks off",
+     "go": "r.amp",
+     "only": "sound&mains"
     }
    ],
    "tools": [
@@ -1986,7 +2112,15 @@
    "t": "Clean the button",
    "why": "Dirt, sticky drinks and skin oil stop buttons making contact.",
    "do": [
-    "Switch off. For a keyboard, pull off the keycap.",
+    "Switch it off, and unplug it from any charger or power.",
+    {
+     "if": "battery",
+     "t": "Take out the batteries."
+    },
+    {
+     "if": "input",
+     "t": "For a keyboard, pull off the keycap with a keycap puller."
+    },
     "Clean round the button with isopropyl alcohol on a cotton bud, and blow out crumbs.",
     "Press the button 20–30 times to work the cleaner in, then let it dry for 10 minutes.",
     {
@@ -2115,15 +2249,19 @@
    "do": [
     {
      "if": "fan",
-     "t": "PC and small DC fans: measure across the red and black wires (12V or 5V) while the device is on."
+     "t": "Cooling fans: measure across the fan plug's red and black wires (usually 12V or 5V) while the device is on."
     },
     {
-     "if": "powertool|toy",
-     "t": "Battery motors: measure across the motor's two terminals with the trigger or switch on."
+     "if": "motor&!mains",
+     "t": "Battery and low-voltage motors: measure across the motor's two terminals with the trigger or switch on."
     },
     {
-     "if": "mains",
-     "t": "Mains motors: only measure live if you're trained in mains work. Otherwise skip to testing the switch unplugged."
+     "if": "motor&mains&!printer",
+     "t": "Mains motors: only measure live if you're trained in mains work. Otherwise answer 'No power' and test the switch unplugged."
+    },
+    {
+     "if": "printer",
+     "t": "3D printer motors are driven by the mainboard: move the axis from the printer's menu and feel whether the motor locks (holds firm) when the printer is on."
     }
    ],
    "q": "Does power reach the motor?",
@@ -2148,15 +2286,25 @@
    "t": "Test the motor",
    "why": "Brushes wear down, windings break, and fans need their start capacitor.",
    "do": [
-    "Unplugged, measure the resistance across the motor: a few ohms is normal. Open (OL) means a broken winding or worn brushes.",
-    "Universal motors (drills, blenders, vacuums, mixers) have two carbon brushes, often behind round caps. Under about 5mm long, they're worn out.",
     {
-     "if": "mains",
+     "if": "motor&!printer",
+     "t": "Unplugged, measure the resistance across the motor: a few ohms is normal. Open (OL) means a broken winding or worn brushes."
+    },
+    {
+     "if": "printer",
+     "t": "Stepper motors: unplug the motor and measure across each pair of wires: two pairs read a few ohms (the two coils); open means a broken coil. Swap it with another axis's motor to see whether the fault moves."
+    },
+    {
+     "if": "mains&motor&!printer|powertool",
+     "t": "Drills, blenders, vacuums and mixers have two carbon brushes, often behind round caps. Under about 5mm long, they're worn out."
+    },
+    {
+     "if": "mains&motor&gadget",
      "t": "Pedestal and ceiling fans that hum but don't spin need a new start capacitor (a small box marked µF)."
     },
     {
      "if": "fan",
-     "t": "For a computer fan, try a spare fan of the same size."
+     "t": "For a cooling fan, try a spare fan of the same size and voltage."
     }
    ],
    "q": "What did you find?",
@@ -2164,16 +2312,27 @@
     {
      "t": "Worn brushes",
      "go": "r.brushes",
-     "only": "mains|powertool"
+     "only": "mains&motor&!printer|powertool"
     },
     {
      "t": "It hums but doesn't start (fan)",
      "go": "r.runcap",
-     "only": "mains"
+     "only": "mains&motor&gadget"
     },
     {
-     "t": "An open winding or a dead fan",
-     "go": "r.motor"
+     "t": "A broken coil or winding",
+     "go": "r.motor",
+     "only": "motor"
+    },
+    {
+     "t": "The fan is dead",
+     "go": "r.motor",
+     "only": "fan"
+    },
+    {
+     "t": "The motor's fine: the fault moved with the driver",
+     "go": "r.stepper",
+     "only": "printer"
     }
    ],
    "tools": [
@@ -2182,11 +2341,25 @@
    "open": true
   },
   "m.4": {
-   "t": "Test the switch, speed control and thermal fuse",
+   "t": "Check what feeds the motor",
    "why": "Something before the motor has stopped passing power.",
    "do": [
-    "Unplugged, test the on/off switch and each speed setting on continuity.",
-    "Fans and motors often have a thermal fuse or cut-out taped into the windings. It should beep.",
+    {
+     "if": "motor&!printer",
+     "t": "Unplugged, test the on/off switch and each speed setting on continuity."
+    },
+    {
+     "if": "motor&mains&!printer",
+     "t": "Mains motors often have a thermal fuse or cut-out taped into the windings. It should beep."
+    },
+    {
+     "if": "fan",
+     "t": "Cooling fans: check the fan's plug is fully on its header, and that the fan isn't turned off in the BIOS, firmware or fan settings."
+    },
+    {
+     "if": "printer",
+     "t": "3D printers: check the motor's cable at both ends and the end-stop switches; a stepper driver that's failed or too hot stops its motor."
+    },
     {
      "if": "powertool",
      "t": "Trigger switches in cordless tools wear out: test the trigger at full press."
@@ -2196,11 +2369,22 @@
    "a": [
     {
      "t": "A faulty switch",
-     "go": "r.button"
+     "go": "r.button",
+     "only": "motor&!printer"
     },
     {
      "t": "A blown thermal fuse",
-     "go": "r.thermalfuse"
+     "go": "r.thermalfuse",
+     "only": "motor&mains&!printer"
+    },
+    {
+     "t": "A loose plug or cable",
+     "go": "r.connector"
+    },
+    {
+     "t": "A failed stepper driver",
+     "go": "r.stepper",
+     "only": "printer"
     },
     {
      "t": "All fine",
@@ -2217,7 +2401,7 @@
    "why": "Heaters are watched by safety checks that stop them when something isn't right.",
    "do": [
     {
-     "if": "mcu",
+     "if": "printer",
      "t": "3D printers show an error (thermal runaway, MINTEMP, MAXTEMP, heating failed). Note exactly what it says."
     },
     "Check the heater's and sensor's plugs are pushed fully home and not scorched."
@@ -2227,7 +2411,7 @@
     {
      "t": "It shows an error message",
      "go": "h.4",
-     "only": "mcu"
+     "only": "printer"
     },
     {
      "t": "It won't stop heating",
@@ -2276,30 +2460,33 @@
    }
   },
   "h.3": {
-   "t": "Test the thermostat and thermal fuse",
-   "why": "These cut the power when it's hot. They also fail open and stop it heating at all.",
+   "t": "Check power reaches the heater",
+   "why": "The heater is fine, so either the board isn't switching it on or the connection to it is bad.",
    "do": [
-    "Unplugged and cold, test the thermostat and the thermal fuse (a small metal capsule marked with a temperature, like 'TF 240°C') on continuity."
+    "Plug the heater back in and set it to heat.",
+    "Measure across the heater's terminals on the board: it should show the supply voltage (often 12V or 24V) while heating.",
+    "Look at the board's heater fuse (a small blade or surface-mount fuse near the power input) and check it on continuity, switched off."
    ],
    "q": "What did you find?",
    "a": [
     {
-     "t": "The thermal fuse is open",
-     "go": "r.thermalfuse"
+     "t": "Full voltage, but the heater stays cold",
+     "go": "r.connector"
     },
     {
-     "t": "The thermostat doesn't close",
-     "go": "r.thermostat"
+     "t": "No voltage at the heater terminals",
+     "go": "r.heatdriver"
     },
     {
-     "t": "Both are fine",
-     "go": "r.board"
+     "t": "A blown fuse on the board",
+     "go": "r.heatdriver"
     }
    ],
    "tools": [
     "meter"
    ],
-   "open": true
+   "open": true,
+   "live": true
   },
   "h.4": {
    "t": "Read the error",
@@ -2326,6 +2513,26 @@
    ],
    "signs": [
     "melted"
+   ]
+  },
+  "cn.0": {
+   "t": "Which connection won't work?",
+   "why": "USB and wireless faults have different causes.",
+   "do": [
+    "Think about which connection is failing."
+   ],
+   "q": "Which is it?",
+   "a": [
+    {
+     "t": "USB to a computer",
+     "go": "cn.1",
+     "only": "usb"
+    },
+    {
+     "t": "Wi-Fi or Bluetooth",
+     "go": "cn.3",
+     "only": "wireless"
+    }
    ]
   },
   "cn.1": {
@@ -2361,7 +2568,7 @@
    "a": [
     {
      "t": "Nothing appears at all",
-     "go": "cn.3"
+     "go": "dead.port"
     },
     {
      "t": "It appears with an error (like 'device descriptor request failed')",
@@ -2392,15 +2599,14 @@
     },
     {
      "t": "I found a loose antenna lead",
-     "go": "r.connector"
+     "go": "r.connector",
+     "only": "pc|console"
     },
     {
      "t": "Still nothing",
      "go": "r.board"
     }
    ],
-   "only": "wireless",
-   "skip": "dead.port",
    "signs": [
     "connector"
    ]
@@ -2557,7 +2763,10 @@
    "why": "Burnt parts leave dark marks, split cases and a smell that tells you where to look.",
    "do": [
     "Open it and look for discoloured board, split or charred parts, and melted plastic. Follow your nose.",
-    "In mains power supplies, small box-shaped 'X' or 'Y' capacitors near the mains input often crack and smoke as they age."
+    {
+     "if": "mains",
+     "t": "In mains power supplies, small box-shaped 'X' or 'Y' capacitors near the mains input often crack and smoke as they age."
+    }
    ],
    "q": "What did you find?",
    "a": [
@@ -2595,7 +2804,10 @@
    "why": "Water itself does little harm. Electricity flowing through it is what causes corrosion and shorts.",
    "do": [
     "Switch it off and unplug it. Don't try to see if it still works.",
-    "Take out the batteries if you can.",
+    {
+     "if": "battery",
+     "t": "Take out the batteries."
+    },
     "Skip the bag of rice: it doesn't dry the inside, and adds dust. Opening it up and cleaning it is what works.",
     "Sugary, salty or milky drinks corrode much faster than water, so act within hours."
    ],
@@ -2608,14 +2820,14 @@
    ]
   },
   "w.2": {
-   "t": "Open it and disconnect the battery",
+   "t": "Open it up",
    "why": "A connected battery keeps corrosion going even when it's 'off'.",
    "do": [
     {
      "if": "lipo",
      "t": "Open it and unplug the battery connector before anything else."
     },
-    "Take out any boards you can reach easily, so both sides can dry."
+    "Open it up, and take out any boards you can reach easily, so both sides can dry."
    ],
    "q": "Done?",
    "a": [
@@ -2690,7 +2902,14 @@
    "t": "Find what sets it off",
    "why": "If you can make the fault happen when you want, you can find it.",
    "do": [
-    "With it on, wiggle the cable at each end.",
+    {
+     "if": "mains|adapter|usbpow|usb",
+     "t": "With it on, wiggle the cable at each end."
+    },
+    {
+     "if": "battery",
+     "t": "With it on, press gently on the battery cover and move the batteries in their springs."
+    },
     "Tap gently round the case and board with a plastic tool.",
     "Warm it with a hair dryer, then cool it with freeze spray."
    ],
@@ -2698,7 +2917,13 @@
    "a": [
     {
      "t": "Moving the lead or plug",
-     "go": "int.2"
+     "go": "int.2",
+     "only": "mains|adapter|usbpow|usb"
+    },
+    {
+     "t": "Moving it, or pressing on the battery cover",
+     "go": "r.contacts",
+     "only": "battery"
     },
     {
      "t": "Tapping the board or case",
@@ -2805,7 +3030,11 @@
    "why": "Faults that come and go need a record to show the pattern.",
    "do": [
     "Write down each time it happens: how long it had been on, how warm, and what it was doing. Use the notes box below.",
-    "Meterie can log the supply voltage over hours and show any dips. Probie can record what a board prints over serial."
+    "Meterie can log the supply voltage over hours and show any dips.",
+    {
+     "if": "mcu|printer",
+     "t": "Probie can record what the board prints over serial (USB) while it runs: errors often show there."
+    }
    ],
    "q": "What did the log show?",
    "a": [
@@ -2849,7 +3078,7 @@
    "why": "A short inside the power supply makes the fuse blow straight away.",
    "do": [
     "Unplugged, with its power switch on, measure resistance between the live and neutral pins of the plug.",
-    "Heaters and motors read a few ohms to a few hundred ohms: that's normal. Electronics with a power supply should read high (thousands of ohms, often climbing as the capacitor charges).",
+    "Motors read a few ohms to a few hundred ohms: that's normal. Electronics with a power supply should read high (thousands of ohms, often climbing as the capacitor charges).",
     "Inside, look for a split or burnt disc (a varistor or 'MOV') and burnt X-capacitors near the mains input.",
     "Test the bridge rectifier (four diodes, or a square block with ~ + − marks) and the switching transistor on the meter's diode test."
    ],
@@ -2963,11 +3192,14 @@
   },
   "r.lint": {
    "result": true,
-   "t": "Lint in the charging port",
-   "cause": "Packed pocket fluff stopped the plug going all the way in.",
+   "t": "Lint or dirt in the port",
+   "cause": "Packed fluff or dirt stopped the plug going all the way in.",
    "fix": [
     "Keep the port clean with a wooden toothpick now and then.",
-    "A dust plug helps if you carry it in a pocket."
+    {
+     "if": "phone|sound|input",
+     "t": "A dust plug helps if you carry it in a pocket or bag."
+    }
    ],
    "level": "Easy"
   },
@@ -2976,9 +3208,12 @@
    "t": "A worn or damaged charging port",
    "cause": "The contacts have worn or bent, or the port has come loose from the board.",
    "fix": [
-    "On many phones and tablets the port is on a separate small board or flex cable that unplugs: order the part for your exact model.",
+    {
+     "if": "phone",
+     "t": "On many phones and tablets the port is on a separate small board or flex cable that unplugs: order the part for your exact model."
+    },
     "If it's soldered to the main board, it needs hot air, flux and care to replace (or a repair shop).",
-    "Wobbly sockets on laptops and gadgets often just need their joints resoldering."
+    "A wobbly socket often just needs its joints resoldering."
    ],
    "level": "Medium",
    "parts": [
@@ -3007,7 +3242,10 @@
    "fix": [
     "Replace the lead if it unplugs.",
     "For a fixed lead, cut it off a little past the break and refit it, with the cord grip clamping the outer sheath. Or fit a new lead of the same rating.",
-    "On mains leads, brown goes to live (L), blue to neutral (N), green-and-yellow to earth (E)."
+    {
+     "if": "mains",
+     "t": "On mains leads, brown goes to live (L), blue to neutral (N), green-and-yellow to earth (E)."
+    }
    ],
    "level": "Medium",
    "parts": [
@@ -3107,12 +3345,27 @@
    "t": "The power supply has failed",
    "cause": "The power supply isn't giving out anything.",
    "fix": [
-    "Desktop PCs: replace the power supply unit; any good one with enough watts and the right plugs will do.",
-    "TVs, consoles and others: the power board can usually be bought by the part number on its sticker."
+    {
+     "if": "desktop",
+     "t": "Replace the power supply unit; any good one with enough watts and the right plugs will do."
+    },
+    {
+     "if": "mains&!desktop",
+     "t": "The power supply board can usually be bought by the part number on its sticker."
+    },
+    {
+     "if": "adapter|usbpow|usb",
+     "t": "Power reaches the device but its own power circuit makes nothing: check the input socket, any fuse just inside it, and the first regulator."
+    },
+    {
+     "if": "battery|lipo",
+     "t": "Check the battery's connector and the wires from it, then the power switch and the first regulator after it."
+    },
+    "If you're not confident working on power circuits, a repair shop can test it."
    ],
    "level": "Medium",
    "parts": [
-    "Power supply unit or board"
+    "Power supply or board"
    ]
   },
   "r.short": {
@@ -3169,7 +3422,10 @@
    "fix": [
     "Spray contact cleaner into it and work it many times.",
     "Replace it with the same type: small tactile buttons are cheap and sold by size (6×6mm, 12×12mm…).",
-    "Mains switches must be replaced with one rated for the same voltage and current."
+    {
+     "if": "mains",
+     "t": "Mains switches must be replaced with one rated for the same voltage and current."
+    }
    ],
    "level": "Medium",
    "parts": [
@@ -3187,7 +3443,10 @@
    "cause": "The device is running and telling you what's wrong.",
    "fix": [
     "Count the beeps or flashes and look up the pattern in the manual or the maker's support site.",
-    "Memory and graphics faults are the commonest: reseat or swap the part."
+    {
+     "if": "pc",
+     "t": "Memory and graphics faults are the commonest: reseat or swap the part."
+    }
    ],
    "level": "Easy"
   },
@@ -3209,8 +3468,18 @@
    "cause": "Dust or dried thermal paste stops the heat getting out.",
    "fix": [
     "Blow dust out with compressed air, holding the fan still so it doesn't over-spin.",
-    "Clean off old thermal paste with isopropyl alcohol and apply a pea-sized blob of new paste.",
-    "Replace thermal pads with pads of the same thickness."
+    {
+     "if": "pc|console",
+     "t": "Clean off old thermal paste with isopropyl alcohol and apply a pea-sized blob of new paste."
+    },
+    {
+     "if": "pc|console",
+     "t": "Replace thermal pads with pads of the same thickness."
+    },
+    {
+     "if": "!pc&!console",
+     "t": "Replace a fan that's slow or noisy with one of the same size and voltage."
+    }
    ],
    "level": "Medium",
    "parts": [
@@ -3227,8 +3496,14 @@
    "t": "Not enough power",
    "cause": "The supply or battery can't keep up when the device works hard.",
    "fix": [
-    "Use an adapter or power supply with at least the rated watts.",
-    "Replace a worn battery.",
+    {
+     "if": "mains|adapter|usbpow|usb",
+     "t": "Use an adapter or power supply with at least the rated watts."
+    },
+    {
+     "if": "battery|lipo",
+     "t": "Replace worn batteries."
+    },
     "Check for thin or long cables that drop the voltage."
    ],
    "level": "Easy",
@@ -3262,8 +3537,18 @@
    "t": "A worn-out battery",
    "cause": "The battery has lost much of what it can hold.",
    "fix": [
-    "Fit a new battery from a reputable maker.",
-    "Then charge it fully, and use it until it switches off once, so the device learns its new capacity."
+    {
+     "if": "!powertool",
+     "t": "Fit a new battery from a reputable maker."
+    },
+    {
+     "if": "powertool",
+     "t": "Fit a new pack from the tool's maker or a reputable brand. Rebuilding packs needs a spot welder and care."
+    },
+    {
+     "if": "phone|laptop",
+     "t": "Then charge it fully, and use it until it switches off once, so the device learns its new capacity."
+    }
    ],
    "level": "Medium",
    "parts": [
@@ -3281,7 +3566,10 @@
    "fix": [
     "Check the battery's temperature-sensor wire first.",
     "Next is the charging chip near the port: a board-level repair.",
-    "On laptops the charging circuit is sometimes on the separate DC-in board."
+    {
+     "if": "laptop",
+     "t": "On laptops the charging circuit is sometimes on the separate DC-in board."
+    }
    ],
    "level": "Hard",
    "pro": "Charging chips are tiny and under shields: a board-level repair shop can do this."
@@ -3291,8 +3579,18 @@
    "t": "Dead backlight LEDs or fuse",
    "cause": "One failed LED stops a whole strip; laptops and phones have a backlight fuse.",
    "fix": [
-    "TVs: replace the whole set of strips with a kit for your model (others will follow the first).",
-    "Laptops: replace the fuse with the same value (or bridge it only to test, then fit a proper one)."
+    {
+     "if": "tv",
+     "t": "Replace the whole set of strips with a kit for your model: the others will follow the first."
+    },
+    {
+     "if": "laptop|phone",
+     "t": "Replace the fuse with the same value (bridge it only to test, then fit a proper one)."
+    },
+    {
+     "if": "!tv&!laptop&!phone",
+     "t": "Replace the screen module: small screens have the backlight built in."
+    }
    ],
    "level": "Medium",
    "parts": [
@@ -3308,8 +3606,14 @@
    "t": "The backlight driver has failed",
    "cause": "The circuit that powers the backlight isn't working.",
    "fix": [
-    "TVs: the driver is often on the power board; replace the board by its part number.",
-    "Laptops and phones: a board-level repair."
+    {
+     "if": "tv",
+     "t": "The driver is often on the power board: replace the board by its part number."
+    },
+    {
+     "if": "!tv",
+     "t": "Check the backlight supply on the board (often marked LED+ or BL); a missing supply is a board-level repair."
+    }
    ],
    "level": "Hard",
    "parts": [
@@ -3321,8 +3625,15 @@
    "t": "The screen itself has failed",
    "cause": "The panel (or its touch layer) is damaged.",
    "fix": [
-    "Replace the screen with one for your exact model. For phones, buy a complete assembly with the frame if you can.",
-    "TV panels usually cost too much to replace: compare with buying a new set."
+    "Replace the screen with one for your exact model.",
+    {
+     "if": "phone",
+     "t": "For phones, buy a complete assembly with the frame if you can."
+    },
+    {
+     "if": "tv",
+     "t": "TV panels usually cost too much to replace: compare with buying a new set."
+    }
    ],
    "level": "Medium",
    "parts": [
@@ -3375,6 +3686,30 @@
    ],
    "tools": [
     "screwdrivers"
+   ]
+  },
+  "r.monitor": {
+   "result": true,
+   "t": "The monitor is the problem",
+   "cause": "The computer works on another monitor, so its own screen is fine.",
+   "fix": [
+    "Start a new repair for the monitor itself, as a TV, monitor or display.",
+    "Check its cable and input setting first."
+   ],
+   "level": "Easy"
+  },
+  "r.stepper": {
+   "result": true,
+   "t": "A failed stepper driver",
+   "cause": "The motor is fine, but the driver chip that powers it has failed or overheats.",
+   "fix": [
+    "On boards with plug-in drivers, swap it for a spare of the same type.",
+    "On boards with soldered drivers, the mainboard usually needs replacing.",
+    "Check the driver's cooling, and its current setting (Vref) if it's adjustable."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Stepper driver or mainboard"
    ]
   },
   "r.ram": {
@@ -3596,7 +3931,7 @@
    "cause": "The part that switches the heater (a MOSFET on the board, or a relay) has failed shorted, so the heater gets full power all the time.",
    "fix": [
     "Switch it off at the wall now, and don't use it until it's fixed: a heater stuck on is a fire risk.",
-    "Replace the heater's MOSFET or relay, or the control board. Many 3D printer owners add an external MOSFET board.",
+    "Replace the heater's MOSFET or the control board. Many 3D printer owners add an external MOSFET board.",
     "Make sure the firmware's thermal runaway protection is turned on."
    ],
    "level": "Hard",
@@ -3629,16 +3964,23 @@
    "level": "Pro",
    "pro": "Earth faults on mains appliances are a shock risk: a qualified electrician or appliance repairer should test it."
   },
-  "r.thermostat": {
+  "r.heatdriver": {
    "result": true,
-   "t": "A faulty thermostat",
-   "cause": "It isn't switching on.",
+   "t": "The board isn't powering the heater",
+   "cause": "The heater's fuse on the board has blown, or its switching MOSFET has failed.",
    "fix": [
-    "Replace the thermostat with the same temperature and rating."
+    "If the fuse blew, look for why first: a pinched heater wire touching the frame, or a shorted heater.",
+    "Replace the fuse with the same rating.",
+    "A failed MOSFET can be replaced on the board, or an external MOSFET board added; otherwise replace the mainboard."
    ],
-   "level": "Medium",
+   "level": "Hard",
    "parts": [
-    "Thermostat"
+    "Fuse",
+    "MOSFET or MOSFET board"
+   ],
+   "tools": [
+    "meter",
+    "iron"
    ]
   },
   "r.thermistor": {
@@ -3685,7 +4027,11 @@
    "t": "A missing driver",
    "cause": "The computer can see it but doesn't know what to do with it.",
    "fix": [
-    "Install the driver from the device's maker (for USB-serial chips: WCH for CH340, Silicon Labs for CP210x, FTDI for FT232).",
+    "Install the driver or app from the device's maker.",
+    {
+     "if": "mcu|printer",
+     "t": "For boards with a USB-serial chip: WCH for CH340, Silicon Labs for CP210x, FTDI for FT232."
+    },
     "Restart the computer, then try again."
    ],
    "level": "Easy"

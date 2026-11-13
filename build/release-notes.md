@@ -10,10 +10,10 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 
 Each package has a *READ ME FIRST.txt*.
 
-<!-- release notes for 0.28.0-alpha: package.sh checks this line, so update the notes with every version -->
+<!-- release notes for 0.28.1-alpha: package.sh checks this line, so update the notes with every version -->
 ### New in {VERSION}
-- **Fixie works for any electronic device.** There's no product list any more: type what it is, tap how it's powered (mains, adapter, USB, batteries, built-in battery) and what it has (screen, sound, buttons, touch, wireless, USB, motor, fan, LEDs, a programmable board…), and Fixie picks the checks that fit. Categories such as Computer, Phone, Console, TV, Audio, Toy, Cordless tool, Lights and Electronics project fill in the usual answers.
-- **Fixie refuses dangerous devices outright.** Microwaves, ovens, toasters, kettles, heaters and anything else that heats from the mains, large appliances, high-voltage devices, house wiring and gas, big batteries and medical or life-safety devices get no repair steps at all, just why, and to take them to a qualified repairer.
+- **Fixie's steps fit the device far more closely.** Every step and fix was checked against every kind of device that can reach it, and about 30 mismatches fixed. 3D printers no longer get the hobby-board upload steps (they get stepper motor, driver, screen-cable and heater checks instead); "a programmable board" now means a hobby board you program yourself. Cordless tools get battery pack and charger checks instead of USB ones. PC fans no longer get carbon-brush or start-capacitor advice, desktop PCs aren't sent into their sealed power supply, and boards without a battery aren't told to wait for it to charge. Fixes now only show the lines that apply to your device, and Fixie asks how it's powered before going on.
+- **New tests**: no step or fix can ever be empty for a device, and a list of steps each kind of device must never be shown is checked on every build.
 
 Licensed under GPL-3.0-or-later.
 

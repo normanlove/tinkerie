@@ -518,7 +518,7 @@ APPS = [
     pairs=[("flashie", "Flashie's Create tab builds firmware code and explains it as it goes."), ("probie", "Run your code on a board and watch what it prints.")],
   ),
   dict(
-    id="fixie", needshort="Nothing: a multimeter helps", name="Fixie", ver="0.2.0-alpha", color="#f5b324", icon="fixie.svg",
+    id="fixie", needshort="Nothing: a multimeter helps", name="Fixie", ver="0.2.1-alpha", color="#f5b324", icon="fixie.svg",
     tagline="Something broken? Find out why, one check at a time.",
     short="A repair guide that takes you step by step from a broken device to the fault, with the tools to use and what to look for.",
     need="Nothing to start; a multimeter for most repairs",

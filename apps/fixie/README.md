@@ -1,4 +1,4 @@
-# Fixie 0.2.0-alpha — repair guide
+# Fixie 0.2.1-alpha — repair guide
 
 Part of **Tinkerie**, the free maker tools by **nrmluvdev**.
 
@@ -13,7 +13,7 @@ Fixie has no list of products to choose from, so it works for almost anything el
 - **What is it?** In your own words ("Bluetooth speaker", "LED desk lamp").
 - **Closest kind of thing**: a shortcut that fills in the usual answers below: Computer or laptop, Phone or tablet, Games console or controller, TV or display, Speaker/headphones/amp/radio, Toy or gadget, Cordless tool or battery pack, Lights and LEDs, Electronics project or board, Keyboard/mouse/remote, 3D printer or machine with motors, Household gadget, or Something else.
 - **How is it powered?** Mains, adapter, USB, swappable batteries, built-in rechargeable battery (all that apply).
-- **What does it have?** Screen, sound, buttons, touchscreen, wireless, USB, motor, cooling fan, LEDs, a programmable board, a low-voltage heater.
+- **What does it have?** Screen, sound, buttons, touchscreen, wireless, USB, motor, cooling fan, LED lighting, a hobby board you program yourself (Arduino, ESP32, Pico…), a low-voltage heater (3D printer hot end or bed).
 
 Only the symptoms and checks that fit are offered: no plug-fuse check on a phone, no picture checks without a screen. The symptoms: completely dead; turns on then off; won't charge; no picture; no sound; buttons or touch; motors and fans; low-voltage heaters; USB, Wi-Fi and Bluetooth; code won't upload; LEDs; overheating or burning; water damage; faults that come and go; trips the electricity.
 
@@ -52,7 +52,7 @@ The full word list is in `guide.py`; `fixie_test.go` checks it refuses these and
 
 ## For developers
 
-The guide is data: `web/guide.json`, built by `guide.py` (`python3 apps/fixie/guide.py apps/fixie/web/guide.json`). Steps have a title, why, what to do (lines can depend on the device's tags), tools, signs, an optional measurement, a question and answers that lead to other steps; results have the cause, fix, parts and difficulty. `fixie_test.go` follows every answer for every kind of device and every combination of power and features, and checks each path ends at a result with no loops, that every tool, sign and tag it names exists, and that the refusal list works.
+The guide is data: `web/guide.json`, built by `guide.py` (`python3 apps/fixie/guide.py apps/fixie/web/guide.json`). Steps have a title, why, what to do (lines can depend on the device's tags), tools, signs, an optional measurement, a question and answers that lead to other steps; results have the cause, fix, parts and difficulty. Lines in a step (and in a fix) can depend on the device: `iff("motor&mains&!printer", …)` (`|` is or, `&` is and, `!` is not). `fixie_test.go` follows every answer for every kind of device and every combination of power and features, and checks each path ends at a result with no loops, that no step or fix is ever empty for the device in front of it, that every tool, sign and tag it names exists, and that the refusal list works. `TestRelevance` lists steps each kind of device must never be shown (a 3D printer never gets the hobby-board upload steps, a cordless tool never gets USB charging checks, and so on).
 
 Fixie runs on port 47825 (see PORTING.md) and keeps its repair log in `nrmluvdev/Fixie/state.json` in the system's settings folder.
 
