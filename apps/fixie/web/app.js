@@ -213,7 +213,8 @@
   function startRepair(d, s) {
     const n = state.repairs.filter(r => devOf(r.profile).name === d.name).length;
     setCur({ id: "r" + Date.now().toString(36), mode, title: d.name + (n ? ` (${n + 1})` : ""), symptom: s.id,
-      profile: { name: pick.name.trim(), cat: pick.cat || "other", power: [...pick.power], has: [...pick.has] },
+      // a Board level section about a feature (Audio path, Video path…) means the device has it
+      profile: { name: pick.name.trim(), cat: pick.cat || "other", power: [...pick.power], has: [...new Set([...pick.has, ...(s.implies ? [s.implies] : [])])] },
       created: new Date().toISOString(), updated: new Date().toISOString(), status: "open",
       path: [{ id: resolve(s.start, d) }] });
     state.repairs.unshift(cur);
@@ -264,7 +265,7 @@
         ${s.tools ? `<div class="sect" data-help="Tools for this step"><h4>Tools</h4>${toolChips(s.tools, tags)}</div>` : ""}
         ${s.good || s.bad ? `<div class="sect"><h4>What to look for</h4><div class="gb">${s.good ? `<div class="g"><b>Good</b>${esc(s.good)}</div>` : ""}${s.bad ? `<div class="b"><b>Faulty</b>${esc(s.bad)}</div>` : ""}</div></div>` : ""}
         ${s.signs ? `<div class="sect" data-help="Signs for this step"><h4>What it looks like</h4>${signChips(s.signs, tags)}</div>` : ""}
-        ${s.pics ? `<div class="sect" data-help="Pictures for this step"><h4>Pictures</h4>${picsHTML(s.pics)}</div>` : ""}
+        ${s.pics && picsHTML(s.pics, tags) !== '<div class="pics"></div>' ? `<div class="sect" data-help="Pictures for this step"><h4>Pictures</h4>${picsHTML(s.pics, tags)}</div>` : ""}
         ${s.refs ? `<div class="sect" data-help="Reference for this step"><h4>Reference</h4>${refChips(s.refs)}</div>` : ""}
         ${s.apps ? `<div class="sect" data-help="Tinkerie apps for this step"><h4>Use Tinkerie</h4>${appsHTML(s.apps)}</div>` : ""}
         ${s.measure ? `<div class="sect"><h4>Your reading</h4>${measureHTML(s.measure, at)}</div>` : ""}
@@ -381,7 +382,8 @@
 
   // drawings (pics.js) and reference cards (refs.js)
   const picHTML = id => PICS[id] ? `<figure class="pic" data-pic="${id}" title="Click to enlarge">${PICS[id].svg}<figcaption><b>${esc(PICS[id].t)}</b><span>${esc(PICS[id].say || "")}</span></figcaption></figure>` : "";
-  const picsHTML = ids => `<div class="pics">${ids.map(picHTML).join("")}</div>`;
+  // a step's pictures: plain ids, or {if, pic} shown only when the device fits
+  const picsHTML = (list, tags) => `<div class="pics">${list.map(x => typeof x === "string" ? x : !tags || match(x.if, tags) ? x.pic : null).filter(Boolean).map(picHTML).join("")}</div>`;
   const refChips = ids => `<div class="chips">${ids.filter(id => REFS[id]).map(id => `<button class="chip" data-ref="${id}">${esc(REFS[id].t)}</button>`).join("")}</div>`;
   const refCard = id => `<div class="ref${REFS[id].pics ? " wide" : ""}" data-refcard="${id}"><h3>${esc(REFS[id].t)}</h3>${REFS[id].html()}${REFS[id].pics ? picsHTML(REFS[id].pics) : ""}</div>`;
   function wireRefs(root) { $$("[data-refcard]", root).forEach(c => REFS[c.dataset.refcard].wire(c)); }

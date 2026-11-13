@@ -218,14 +218,14 @@ board = dict(sections=[
   dict(id="power", name="Power input and protection", desc="DC jack or input, fuse, reverse-polarity diode, protection parts.", start="b.in.1"),
   dict(id="smps", name="Mains power supply", desc="The part of the board that turns mains into low voltage. Cold tests first, then a safe powered test.", start="b.smps.1", **{"for": "mains"}),
   dict(id="rails", name="Regulators and power rails", desc="The fixed voltages (5V, 3.3V, 1.8V…) the chips run on.", start="b.reg.1"),
-  dict(id="battery", name="Battery and charging", desc="Cells, protection board, charging chip.", start="b.bat.1", **{"for": "lipo|battery"}),
+  dict(id="battery", name="Battery and charging", desc="Cells, protection board, charging chip.", start="b.bat.1", **{"for": "lipo|powertool"}),
   dict(id="clock", name="Clock and reset", desc="Crystals and oscillators, reset and enable lines: without them nothing runs.", start="b.clk.1"),
   dict(id="cpu", name="Processor and memory", desc="Is the main chip running its program? Debug messages, activity, corrupted firmware.", start="b.cpu.1"),
   dict(id="bus", name="Data buses (I2C, SPI, UART)", desc="Chips talking to each other: decode the traffic and see who isn't answering.", start="b.bus.1"),
-  dict(id="audio", name="Audio path", desc="Follow a sound from input to speaker and find where it stops.", start="b.aud.1"),
-  dict(id="video", name="Video path", desc="Sync and picture signals: composite, VGA, and panels.", start="b.vid.1"),
+  dict(id="audio", name="Audio path", desc="Follow a sound from input to speaker and find where it stops.", start="b.aud.1", implies="audio"),
+  dict(id="video", name="Video path", desc="Sync and picture signals: composite, VGA, and panels.", start="b.vid.1", implies="video"),
   dict(id="outputs", name="Outputs and drivers", desc="Transistors, MOSFETs, relays and driver chips that switch motors, LEDs and loads.", start="b.out.1"),
-  dict(id="inputs", name="Buttons, keyboards and sensors", desc="Switch matrices, pull-ups, encoders and sensors.", start="b.inp.1"),
+  dict(id="inputs", name="Buttons, keyboards and sensors", desc="Switch matrices, pull-ups, encoders and sensors.", start="b.inp.1", implies="buttons"),
   dict(id="wiring", name="Connectors, cables and tracks", desc="Breaks between parts: cables, flex, vias and corroded tracks.", start="b.con.1"),
 ])
 
@@ -266,7 +266,7 @@ result("r.diodeopen", "An open protection diode", "The diode against reversed po
 result("r.tvs", "A shorted protection part", "A TVS diode or protection diode shorted to protect the rest from a spike or reversed power.",
   ["Remove it: if the short goes, that was it.", "Fit a new one of the same type and voltage before using it for real: it's what protects the rest.", "Fit a new fuse of the same rating."], "Medium", parts=["TVS or diode", "Fuse"], tools=["iron", "hotair"])
 result("r.fuseonly", "Just a blown fuse", "Nothing is shorted now: probably a one-off surge, or a fault that cleared.",
-  ["Fit the same rating of fuse, and power it from a current-limited supply (or dim bulb tester for mains) the first time.", "If it blows again, the fault comes on under power: measure the rails as it starts."], "Easy", parts=["Fuse"])
+  ["Fit the same rating of fuse.", iff("!mains", "Power it from a current-limited supply the first time."), iff("mains", "Power it through a dim bulb tester the first time."), "If it blows again, the fault comes on under power: measure the rails as it starts."], "Easy", parts=["Fuse"])
 
 # -- mains SMPS (cold tests, then a protected powered test)
 step("b.smps.1", "Cold tests on the power supply", "Most mains power supply faults show up with the power off: start here, it's safer.", [
@@ -283,7 +283,7 @@ step("b.smps.2", "Check the output side", "Faults on the low-voltage side make a
   ], "What did you find?",
   [("A shorted output diode", "r.schottky"), ("High-ESR output capacitors", "r.caps"), ("A shorted output (the fault is in what it feeds)", "b.reg.3"), ("All fine", "b.smps.3")],
   tools=["meter", "esr"], open=True, signs=["caps"])
-step("b.smps.3", "A protected powered test", "With the cold tests passed, power it through a dim bulb tester so a remaining fault can't do damage.", [
+step("b.smps.3", "A protected powered test", "With the cold tests passed, power the supply through a dim bulb tester so a remaining fault can't do damage.", [
     "Connect it through a dim bulb tester. Keep hands off the board; use clip leads on the low-voltage outputs only.",
     "Watch the bulb: a flash then dim is normal; bright and staying bright means a short is still there.",
     "Measure the outputs (low-voltage side only), and listen for ticking.",
@@ -366,7 +366,7 @@ result("r.reset", "Reset held low", "The reset supervisor or its pull-up holds t
 # -- processor and memory
 step("b.cpu.1", "Is the processor doing anything?", "With power, clock and reset right, look for signs of life.", [
     "Find a serial TX pin or debug header (often 3–4 pins marked TX, RX, GND, or unlabeled pads near the chip).",
-    "Connect a USB-serial adapter (TX of the board to RX of the adapter, grounds together) at the board's voltage, and power up.",
+    "Connect a USB-serial adapter (the board's TX to its RX, grounds together) at the board's voltage, and power up.",
     "Or capture several of the chip's pins with a logic analyser: any switching shows it's running.",
   ], "What did you see?",
   [("Boot messages that stop with an error", "r.bootlog"), ("Boot messages that repeat", "b.cpu.2"), ("Pins switching, but no messages", "b.bus.1"), ("Nothing at all", "r.firmware")],
@@ -425,7 +425,7 @@ result("r.baud", "Serial speed or level is wrong", "Garbled characters mean the 
 
 # -- audio
 step("b.aud.1", "Feed in a test tone", "Following a known signal through the circuit shows exactly where it stops.", [
-    "Play a 1kHz tone into the input (a phone app works), at a low volume.",
+    "Play a 1kHz tone into the input (a tone-generator app on a phone works), at a low volume.",
     "Put the scope's ground on the board's audio ground.",
     "Start at the input socket, then follow the signal: each coupling capacitor, each op-amp or transistor stage, the volume control, the amplifier chip, then the speaker.",
   ], "Where does the tone stop?",
@@ -460,7 +460,7 @@ step("b.vid.1", "Look for sync", "Every video signal carries timing pulses. If t
   ], "What do you see?",
   [("Sync is there at the right rate", "b.vid.2"), ("No sync at all", "b.vid.3"), ("Sync at an odd rate", "r.vidclock")],
   tools=["scope", "logic"], live=True, apps=[("scopie", "Composite: CH1, 20µs/div, trigger on the falling sync edge. VGA: 10µs/div on HSYNC."), ("probie", "VGA or digital sync: one channel each on HSYNC and VSYNC; the frequency shows in the measurement.")],
-  measure=dict(label="Horizontal sync rate", unit="kHz", src="scopie:freq", bands=[dict(lt=14, a=2, say="Unusual rate."), dict(lt=17, a=0, say="TV rate (composite).", ok=True), dict(lt=30, a=2, say="Unusual rate."), dict(lt=82, a=0, say="A normal VGA rate.", ok=True), dict(a=2, say="Unusual rate.")]))
+  measure=dict(label="Horizontal sync rate", unit="kHz", src="scopie:freq", bands=[dict(lt=14, a=2, say="Unusual rate."), dict(lt=17, a=0, say="Composite video rate.", ok=True), dict(lt=30, a=2, say="Unusual rate."), dict(lt=82, a=0, say="A normal VGA rate.", ok=True), dict(a=2, say="Unusual rate.")]))
 step("b.vid.2", "Check the picture levels", "With sync right, look at the picture part of the signal.", [
     "Composite: the picture rides above the sync, up to about 0.7V above black.",
     "VGA: each of R, G and B swings 0 to 0.7V; a missing colour channel means that colour's output stage.",
@@ -488,18 +488,21 @@ step("b.out.1", "Is the output being told to switch?", "Every driven output has 
   tools=["meter", "logic"], live=True, apps=[("probie", "One channel on the control pin; PWM outputs show their frequency and duty in the measurement.")])
 step("b.out.2", "Test the driver", "The control works, so the driver or the load has failed.", [
     "Power off. Test the transistor or MOSFET (Parts tests); test the relay's coil and contacts.",
-    "Check the flyback diode across motors and relay coils: when it fails, the driver fails with it.",
-    "Test the load itself (motor, LED, lamp) on its own.",
+    iff("motor|fan", "Check the flyback diode across motors and relay coils: when it fails, the driver fails with it."),
+    iff("!motor&!fan", "Check the flyback diode across any relay coil it drives: when it fails, the driver fails with it."),
+    "Test the load itself (whatever it switches) on its own.",
   ], "What failed?",
-  [("The transistor or MOSFET", "r.driver2"), ("The relay", "r.relay2"), ("The load itself", "r.motor"), ("Nothing found", "r.board")],
+  [("The transistor or MOSFET", "r.driver2"), ("The relay", "r.relay2"), ("The load itself", "r.motor", "motor|fan"), ("The load itself", "r.load", "!motor&!fan"), ("Nothing found", "r.board")],
   tools=["meter", "esr"], open=True)
 result("r.driver2", "A failed driver transistor or MOSFET", "It's shorted (output stuck on) or open (never switches).",
-  ["Replace it with the same part or an equivalent (Parts tests: transistor, MOSFET).", "Replace the flyback diode too if there is one.", "Find why it failed: a shorted motor or a missing diode kills the new one."], "Medium", parts=["Transistor or MOSFET", "Flyback diode"], tools=["iron"])
+  ["Replace it with the same part or an equivalent (Parts tests: transistor, MOSFET).", "Replace the flyback diode too if there is one.", "Find why it failed: a shorted load or a missing diode kills the new one."], "Medium", parts=["Transistor or MOSFET", "Flyback diode"], tools=["iron"])
+result("r.load", "The load has failed", "Whatever the driver switches (an LED, lamp, solenoid, relay coil or module) has failed.",
+  ["Test it on its own from a suitable supply.", "Replace it with the same type and rating."], "Easy")
 result("r.relay2", "A failed relay", "The coil is open, or the contacts are burnt or welded.",
   ["Replace it with the same coil voltage and contact rating."], "Medium", parts=["Relay"], tools=["iron"], salvage="Working relays from scrapped boards are worth keeping: test them first (Parts tests).")
 
 # -- inputs
-step("b.inp.1", "Watch the inputs", "Buttons and keyboards are read by scanning; sensors give a voltage or a digital signal.", [
+step("b.inp.1", "Watch the inputs", "Buttons are read directly or by scanning a matrix; sensors give a voltage or a digital signal.", [
     "Single buttons: measure the input pin while pressing: it should swing between its two levels (often pulled high, pressed = low).",
     "Keyboard matrices: the processor pulses each row in turn and reads the columns. Capture a row and a column while holding a key.",
     "Analog sensors and pots: measure the voltage at the processor's input as you change them.",
@@ -546,6 +549,7 @@ step("u.pw.1", "Measure the supply at your board", "Check the voltage where it's
   measure=dict(label="Supply at the board", unit="V", src="meterie", near=dict(label="What it should be", unit="V", lo=0.93, hi=1.07, ok=0, bad=2)))
 step("u.pw.2", "Follow the power from the source", "Find where it stops.", [
     "Measure at the supply itself, then at each point along the way: connector, switch, fuse, regulator in and out.",
+    iff("adapter", "Barrel plugs: check the adapter's polarity matches what your circuit expects (most are centre positive)."),
     "Breadboards: is the rail you're using actually connected? Wire jumper across the gap in split rails.",
     "Regulators: check the pinout. A 7805 is IN-GND-OUT; an AMS1117 is GND-OUT-IN: fitting one like the other is a very common mistake.",
   ], "Where does it stop?",
@@ -555,13 +559,14 @@ step("u.pw.3", "Measure the current it draws", "Too much current means a short o
     "Power it from a bench supply with the current limit set low (100–200mA to start), or put the meter in series on its current range.",
     "Compare with what you'd expect: a bare dev board draws 20–100mA.",
   ], "What does it draw?",
-  [("Hits the current limit or far too much", "u.hot.1"), ("Almost nothing", "u.wire.1"), ("About what I'd expect", "u.code.1")],
+  [("Hits the current limit or far too much", "u.hot.1"), ("Almost nothing", "u.wire.1"), ("About what I'd expect", "u.code.1", "mcu"), ("About what I'd expect", "u.sig.1", "!mcu")],
   tools=["benchpsu", "meter"], live=True,
   measure=dict(label="Current drawn", unit="mA", src="meterie", bands=[dict(lt=1, a=1, say="Almost nothing: something isn't connected."), dict(lt=500, a=2, say="Plausible for a small build: compare with what you expected.", ok=True), dict(a=0, say="A lot: look for a short or a reversed part.")]))
 step("u.pw.4", "Why is the voltage low?", "Low voltage at the board means the supply can't keep up, or something pulls it down.", [
-    "Disconnect parts of the circuit one at a time (motors, LEDs, modules) and watch the voltage.",
+    iff("motor|fan", "Disconnect parts of the circuit one at a time (motors, LEDs, modules) and watch the voltage."),
+    iff("!motor&!fan", "Disconnect parts of the circuit one at a time (LEDs, modules, displays) and watch the voltage."),
     "Long, thin wires drop voltage under load: measure at both ends of each.",
-    "USB ports give 500mA (USB 2) to 900mA (USB 3): motors and LED strips need their own supply.",
+    iff("usb|usbpow", "USB ports give 500mA (USB 2) to 900mA (USB 3): heavy loads need their own supply."),
   ], "What did you find?",
   [("One part pulls it down", "u.hot.1"), ("Thin or long wires", "r.weaksupply"), ("The supply can't give enough current", "r.weaksupply")],
   tools=["meter"], live=True)
@@ -584,7 +589,8 @@ step("u.hot.2", "Work out the regulator's heat", "A linear regulator burns off t
 step("u.hot.3", "Check the driver is switching fully", "A transistor or MOSFET that's only half on gets hot.", [
     "Measure the gate (MOSFET) or base current (transistor) drive: a MOSFET driven from 3.3V needs a 'logic-level' type.",
     "Measure the voltage across it while on: more than a few tenths of a volt at real current means it isn't fully on.",
-    "Motors and relays need a flyback diode across them.",
+    iff("motor|fan", "Motors and relays need a flyback diode across them."),
+    iff("!motor&!fan", "Relay coils need a flyback diode across them."),
   ], "What did you find?",
   [("Not a logic-level MOSFET", "r.logiclevel"), ("No flyback diode", "r.flyback"), ("It's switching fully", "r.heatsink")],
   tools=["meter", "scope"], live=True)
@@ -592,8 +598,8 @@ result("r.reghot", "The regulator is working too hard", "Too big a drop at too m
   ["Use a buck converter module instead: they waste very little.", "Or lower the input voltage, add a heatsink, or split the load."], "Easy", parts=["Buck converter module"])
 result("r.logiclevel", "The MOSFET isn't fully switched on", "Standard MOSFETs need about 10V on the gate; 3.3V or 5V leaves them half on.",
   ["Use a logic-level MOSFET (look for RDS(on) quoted at VGS = 2.5V or 4.5V), or drive the gate through a transistor or driver."], "Easy", parts=["Logic-level MOSFET"])
-result("r.flyback", "Missing flyback diode", "Motors and relay coils kick back a high voltage spike when switched off.",
-  ["Fit a diode (1N4148 for small relays, 1N400x or a Schottky for motors) across the coil or motor, band to the positive side."], "Easy", parts=["Diode"])
+result("r.flyback", "Missing flyback diode", "Relay coils and other inductive loads kick back a high voltage spike when switched off.",
+  ["Fit a diode across the coil, band to the positive side: a 1N4148 for small relays, a 1N400x or a Schottky for bigger coils.", iff("motor|fan", "DC motors need one too, across the motor's terminals.")], "Easy", parts=["Diode"])
 result("r.heatsink", "It needs a heatsink", "It's switching properly but carries enough current to heat up.",
   ["Add a heatsink, or use a part with a lower on-resistance."], "Easy", parts=["Heatsink"])
 
@@ -611,7 +617,7 @@ step("u.code.2", "Find where your code stops", "Print messages narrow it down.",
   tools=["serial"], apps=[("probie", "Serial tab: watch the prints as it starts.")])
 step("u.code.3", "Find why it resets", "A reset loop is a power dip (brownout), a crash, or a watchdog.", [
     "Read the first lines it prints after each restart: ESP32 and ESP8266 print the reset reason (brownout, panic, watchdog).",
-    "Watch the supply with a scope while it resets: a dip when a motor, radio or LEDs start is a brownout.",
+    "Watch the supply with a scope while it resets: a dip when something heavy switches on is a brownout.",
   ], "What's the reason?",
   [("Brownout, or the supply dips", "u.noise.1"), ("A crash or panic", "r.crash"), ("Watchdog", "r.watchdog")],
   tools=["serial", "scope"], live=True, apps=[("scopie", "CH1 on the 3.3V or 5V pin, single trigger on a falling edge just below the rail."), ("probie", "Serial tab at 115200 (74880 for ESP8266 boot messages).")])
@@ -657,7 +663,9 @@ result("r.convert", "The data is right, the conversion isn't", "The module sends
 step("u.wire.1", "Check your build against your design", "Go through every connection, one at a time, with the power off.", [
     "With your schematic or Wirie design open, beep out each connection from part to part, ticking them off.",
     "Then check neighbouring pins on each chip and header aren't shorted together.",
-    "Check pin numbering: board labels (D4, GPIO2) aren't the same as chip pin numbers.",
+    iff("mcu", "Check pin numbering: board labels (D4, GPIO2) aren't the same as chip pin numbers."),
+    iff("!mcu", "Check pin numbering against each part's datasheet, counting from pin 1."),
+    "On a breadboard, check each wire is in the row you think: the five holes in a row are joined, and the centre gap separates the two sides.",
   ], "What did you find?",
   [("A missing connection", "r.cable"), ("A short between pins", "r.solderbridge"), ("A wire on the wrong pin", "r.pinout"), ("All correct", "u.sig.1")],
   tools=["meter"], open=True, apps=[("wirie", "Open your design; follow each net in the PCB tab and beep it out."), ("meterie", "Continuity beep, so you can keep your eyes on the board.")])
@@ -681,18 +689,19 @@ result("r.sigmissing", "The signal isn't being made", "Nothing appears where the
 result("r.clipping", "The audio is clipping", "The signal is bigger than the stage can handle, or the stage isn't biased in the middle.",
   ["Lower the input level, or the gain.", "Check the stage's resting voltage is about half its supply (single-supply circuits).", "Check coupling capacitors are the right way round."], "Easy")
 
-step("u.noise.1", "Watch the supply when the load switches", "Motors, relays, radios and LED strips draw surges that pull the supply down or put spikes on it.", [
+step("u.noise.1", "Watch the supply when the load switches", "Loads that switch on hard draw surges that pull the supply down or put spikes on it.", [
     "Scope on your board's supply pin, trigger on a falling edge just below the supply, then switch the load on.",
     "Check each chip has a 100nF capacitor right next to its power pins, and there's a bigger one (100–1000µF) where the load's power enters.",
-    "Motors and relays: is there a flyback diode? Do they share a thin ground wire with your logic?",
+    iff("motor|fan", "Motors and relays: is there a flyback diode? Do they share a thin ground wire with your logic?"),
+    iff("!motor&!fan", "Relays: is there a flyback diode across each coil? Does the load share a thin ground wire with your logic?"),
   ], "What did you find?",
   [("The supply dips or spikes", "r.decouple"), ("No flyback diode", "r.flyback"), ("Shared, thin ground", "r.ground"), ("The supply is clean", "r.pickup")],
   tools=["scope"], live=True, apps=[("scopie", "CH1 on the supply, single trigger, 1ms/div to start; zoom in on the dip.")],
   measure=dict(label="Lowest supply voltage", unit="V", src="scopie:vmin", near=dict(label="Normal supply voltage", unit="V", lo=0.9, hi=1.1, ok=3, bad=0)))
 result("r.pickup", "Noise picked up on the signal wires", "The supply is clean, so interference gets in on the signals themselves.",
-  ["Keep signal wires short and away from motor and mains wires; twist each signal with a ground wire.", "Add pull-up or pull-down resistors to inputs that float.", "Filter slow signals (an RC filter) and average sensor readings in code."], "Easy")
+  ["Keep signal wires short and away from power wiring; twist each signal with a ground wire.", "Add pull-up or pull-down resistors to inputs that float.", "Filter slow signals (an RC filter) and average sensor readings in code."], "Easy")
 result("r.decouple", "Not enough decoupling", "The supply sags or spikes when the load switches.",
-  ["Add 100nF ceramic capacitors at every chip's power pins.", "Add bulk capacitance (100–1000µF) where the load's power comes in.", "Give motors and LED strips their own supply, joined to your logic only at ground."], "Easy", parts=["Capacitors"])
+  ["Add 100nF ceramic capacitors at every chip's power pins.", "Add bulk capacitance (100–1000µF) where the load's power comes in.", "Give heavy loads their own supply, joined to your logic only at ground."], "Easy", parts=["Capacitors"])
 result("r.ground", "Ground shared with a heavy load", "Load current through a shared ground wire shifts your logic's ground.",
   ["Run the load's ground straight back to the supply, and join logic ground at one point.", "Use thicker wire for load current."], "Easy")
 
@@ -743,7 +752,7 @@ stepPics = {
   "b.bus.2": (["wave-i2c", "i2c-pullups"], []),
   "b.bus.3": (["wave-i2c-edges", "i2c-pullups"], []),
   "b.aud.1": (["signal-trace", "wave-tone"], []),
-  "b.aud.2": (["opamp", "wave-tone"], ["pinouts"]),
+  "b.aud.2": (["opamp", "meter-dcv"], ["pinouts"]),
   "b.aud.3": (["meter-dcv"], []),
   "b.vid.1": (["wave-composite", "wave-vga"], ["pinouts"]),
   "b.vid.2": (["wave-composite", "wave-vga"], []),
@@ -773,13 +782,43 @@ stepPics = {
   "u.led.1": (["ws2812-hookup"], ["ohm"]),
   "up.1": (["usbpins"], []),
 }
+# What each drawing shows (kw: words, one of which the step it's on must
+# mention) and what the device must have for it to make sense (need: a
+# condition, as in the guide). fixie_test.go checks both, for every device.
+picInfo = {
+  "res": ("resistor|resistance|pull-up|ohm", ""), "ecap": ("capacitor|electrolytic|esr|polarity|backwards", ""), "ccap": ("capacitor|short", ""),
+  "diode": ("diode|band|rectif|backwards", ""), "led": ("led", ""), "bridge": ("bridge|rectifier", ""), "bjt": ("transistor", ""),
+  "mosfet": ("mosfet|transistor", ""), "reg": ("regulator|7805|ams1117|lm317|pinout", ""), "buck": ("switching|buck|enable", ""),
+  "crystal": ("crystal|clock", ""), "ic": ("chip|pin 1|part number", ""), "mcu": ("processor|microcontroller|chip|reset", ""),
+  "opamp": ("op-amp", ""), "timer555": ("555", ""), "opto": ("opto", ""), "fuse": ("fuse", ""), "relay": ("relay", ""),
+  "switch": ("switch|button|key", ""), "liion": ("cell|lithium", "lipo|battery|powertool"), "lcd1602": ("lcd|display", ""),
+  "dcjack": ("adapter|jack|plug|input connector", "adapter"), "usbpins": ("usb|cable", "usb|usbpow|phone|pc"),
+  "meter-dcv": ("measure|voltage|rail", ""), "meter-diode": ("diode", ""), "meter-res": ("resistance|resistor", ""),
+  "meter-continuity": ("continuity|beep", ""), "meter-current": ("current|draws", ""), "scope-probe": ("scope|×10 probe|probe", ""),
+  "logic-i2c": ("logic analyser|capture|i2c|sda", ""), "serial-hookup": ("serial|boot messages|tx", ""),
+  "inject-short": ("short|inject|warm", ""), "signal-trace": ("tone|signal", ""), "key-matrix": ("matrix|keyboard|row", "buttons|input|pc"),
+  "driver-mosfet": ("mosfet|driver|gate|flyback|transistor", ""), "breadboard": ("breadboard", ""), "i2c-pullups": ("pull-up|i2c|sda", ""),
+  "ws2812-hookup": ("ws2812|addressable|led", "lights"), "decoupling": ("decoupling|100nf|capacitor", ""),
+  "smps-map": ("power supply|mains|supply", "mains"), "cell-pack": ("cell|pack", "lipo|battery|powertool"),
+  "wave-crystal": ("crystal|clock", ""), "wave-switching": ("switching|buck", ""), "wave-i2c-edges": ("pull-up|edges", ""),
+  "wave-i2c": ("i2c|nak|address", ""), "wave-uart": ("serial|uart|baud|boot messages", ""), "wave-reset": ("reset", ""),
+  "wave-composite": ("composite|video|sync", ""), "wave-vga": ("vga|sync", ""), "wave-pwm": ("pwm|duty|control signal", ""),
+  "wave-servo": ("servo", "motor"), "wave-brownout": ("dip|brownout|resets|restart|surge", ""), "wave-noise": ("noise|noisy|ringing", ""),
+  "wave-tone": ("tone|clipp", ""), "bulb": ("dim bulb", "mains"),
+}
+picInfo = {k: dict(kw=v[0].split("|"), **({"need": v[1]} if v[1] else {})) for k, v in picInfo.items()}
+def picEntry(x):
+    # a picture shown only when the device's needs are met: from picInfo, or ("id", "cond")
+    if isinstance(x, tuple): return {"if": x[1], "pic": x[0]}
+    need = picInfo.get(x, {}).get("need")
+    return {"if": need, "pic": x} if need else x
 for sid, (pics, refs) in stepPics.items():
     assert sid in steps, sid
-    if pics: steps[sid]["pics"] = pics
+    if pics: steps[sid]["pics"] = [picEntry(x) for x in pics]
     if refs: steps[sid]["refs"] = refs
 partPics = {"res": "res", "ecap": "ecap", "ccap": "ccap", "diode": "diode", "zener": "diode", "led": "led", "bridge": "bridge", "bjt": "bjt", "mosfet": "mosfet",
             "reg": "reg", "buck": "buck", "crystal": "crystal", "ic": "ic", "mcu": "mcu", "opamp": "opamp", "opto": "opto", "fuse": "fuse", "relay": "relay",
-            "switch": "switch", "conn": "usbpins", "liion": "liion", "display": "lcd1602", "tvs": "ccap"}
+            "switch": "switch", "conn": "usbpins", "liion": "liion", "display": "lcd1602"}
 testPics = {("res", 0): "meter-res", ("diode", 0): "meter-diode", ("led", 0): "meter-diode", ("bridge", 0): "meter-diode", ("bjt", 0): "meter-diode",
             ("mosfet", 0): "meter-diode", ("reg", 0): "meter-dcv", ("buck", 1): "wave-switching", ("crystal", 0): "wave-crystal", ("fuse", 0): "meter-continuity",
             ("switch", 0): "meter-continuity", ("conn", 0): "meter-continuity", ("ccap", 0): "inject-short", ("mcu", 0): "serial-hookup", ("opamp", 0): "wave-tone", ("motor", 1): "meter-current"}

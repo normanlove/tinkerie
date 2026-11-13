@@ -10,13 +10,10 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 
 Each package has a *READ ME FIRST.txt*.
 
-<!-- release notes for 0.30.0-alpha: package.sh checks this line, so update the notes with every version -->
+<!-- release notes for 0.30.1-alpha: package.sh checks this line, so update the notes with every version -->
 ### New in {VERSION}
-- **Fixie shows you what to look for.** Board level, My build and Parts tests steps now have drawings (click to enlarge): 55 of them.
-  - **The parts**, with their pins labelled: colour-banded and SMD resistors, electrolytic and ceramic capacitors, diodes, LEDs, bridge rectifiers, transistors, MOSFETs, regulators (with their different pinouts side by side), buck converters, crystals, logic chips and microcontrollers (finding pin 1), op-amps, 555s, optocouplers, fuses, relays, buttons, lithium cells, character LCDs, barrel plugs and USB.
-  - **How to connect**: measuring a voltage, diode tests, resistance with a lifted leg, continuity, current in series, a scope probe on a crystal, a logic analyser on I2C, a serial adapter for boot messages, injecting current to find a short, following a test tone, keyboard matrix scanning, MOSFET drivers, breadboard rails, I2C pull-ups, decoupling, LED strips, the inside of a mains power supply.
-  - **Good and faulty signals side by side**: crystals, switching regulators, I2C ACK and NAK, weak pull-ups, serial bytes, reset lines, composite video and VGA sync, PWM, servo pulses, brownouts, noise and clipping.
-- **Reference cards and calculators** on the Parts tests tab and from each step: resistor colour codes, SMD resistor markings (including EIA-96), capacitor markings, common pinouts, what board labels (R, C, Q, U, Y…) mean, finding pin 1, rail voltages, and Ohm's law, LED resistor and regulator heat calculators.
+- **Fixie checked against every device you can describe.** All three guides were walked for every kind of device with every combination of power and features (952,320 descriptions), checking that every path ends at a fix, no step is empty, and no word or picture mentions something the device doesn't have. Over 100 mismatches were fixed: steps now fit builds without a hobby board, battery checks only appear for battery devices, motor and flyback advice only where there's a motor, and the audio, video and keyboard sections assume the device has them.
+- **Pictures match their steps.** Each drawing is checked against what its step says; a few that didn't fit were moved or removed (a TVS diode no longer shows a capacitor).
 
 Licensed under GPL-3.0-or-later.
 

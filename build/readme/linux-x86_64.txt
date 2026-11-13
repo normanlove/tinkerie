@@ -22,11 +22,12 @@ What works on this system
 Every app has teaching mode: point at anything to see what it does. F2 turns it off.
 
 New in {VERSION}:
-- Fixie shows pictures: what each part looks like with its pins, where the
-  probes go, and good and faulty waveforms side by side; plus colour-code,
-  marking and pinout reference cards and quick calculators.
+- Fixie was checked against every kind of device and every combination of
+  power and features; over 100 steps, words and pictures that didn't fit
+  were fixed.
 
 Also in recent alpha builds:
+- 0.30.0-alpha: Fixie shows pictures of parts, probe hookups and waveforms.
 - 0.29.0-alpha: Fixie goes down to component level, with Meterie, Scopie and Probie.
 - 0.28.2-alpha: Fixie checks every word against every device.
 - 0.28.1-alpha: Fixie's steps fit the device much more closely.

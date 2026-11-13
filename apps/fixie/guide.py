@@ -955,6 +955,6 @@ safety = [
 import os as _os
 exec(open(_os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "guide_more.py"), encoding="utf-8").read())
 
-guide = dict(version=3, board=board, build=build, parts=parts, power=power, features=features, derived=derived, categories=categories, danger=danger, legacy=legacy, symptoms=symptoms, steps=steps, tools=tools, signs=signs, safety=safety)
+guide = dict(version=3, board=board, build=build, parts=parts, picInfo=picInfo, power=power, features=features, derived=derived, categories=categories, danger=danger, legacy=legacy, symptoms=symptoms, steps=steps, tools=tools, signs=signs, safety=safety)
 json.dump(guide, open(sys.argv[1], "w"), ensure_ascii=False, indent=1)
 print(len(steps), "steps", sum(1 for s in steps.values() if s.get("result")), "results")

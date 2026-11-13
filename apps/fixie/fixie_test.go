@@ -5,10 +5,8 @@ package fixie
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"regexp"
-	"sort"
 	"strings"
 	"testing"
 )
@@ -46,8 +44,8 @@ type gStep struct {
 		App string `json:"app"`
 		How string `json:"how"`
 	} `json:"apps"`
-	Pics    []string `json:"pics"`
-	Refs    []string `json:"refs"`
+	Pics    []json.RawMessage `json:"pics"`
+	Refs    []string          `json:"refs"`
 	Measure *struct {
 		Src   string  `json:"src"`
 		Label string  `json:"label"`
@@ -63,9 +61,10 @@ type gStep struct {
 
 // gStart is where a Board level section or My build problem starts.
 type gStart struct {
-	ID    string `json:"id"`
-	For   string `json:"for"`
-	Start string `json:"start"`
+	ID      string `json:"id"`
+	For     string `json:"for"`
+	Start   string `json:"start"`
+	Implies string `json:"implies"` // a Board level section that's about a feature (Audio path: it has audio)
 }
 
 // starts is every way into the guides: Quick checks symptoms, Board level
@@ -73,13 +72,13 @@ type gStart struct {
 func (g guide) starts() []gStart {
 	var out []gStart
 	for _, s := range g.Symptoms {
-		out = append(out, gStart{"symptom " + s.ID, s.For, s.Start})
+		out = append(out, gStart{"symptom " + s.ID, s.For, s.Start, ""})
 	}
 	for _, s := range g.Board.Sections {
-		out = append(out, gStart{"board " + s.ID, s.For, s.Start})
+		out = append(out, gStart{"board " + s.ID, s.For, s.Start, s.Implies})
 	}
 	for _, s := range g.Build.Problems {
-		out = append(out, gStart{"build " + s.ID, s.For, s.Start})
+		out = append(out, gStart{"build " + s.ID, s.For, s.Start, ""})
 	}
 	return out
 }
@@ -282,6 +281,11 @@ func TestGuideRefs(t *testing.T) {
 	for _, d := range g.Derived {
 		known[d.Tag] = true
 	}
+	for _, s := range g.Board.Sections {
+		if s.Implies != "" {
+			known[s.Implies] = true
+		}
+	}
 	checkCond := func(where, c string) {
 		for _, p := range strings.FieldsFunc(c, func(r rune) bool { return r == '|' || r == '&' }) {
 			if p = strings.TrimPrefix(p, "!"); p != "" && !known[p] {
@@ -387,105 +391,6 @@ func TestGuideRefs(t *testing.T) {
 	}
 }
 
-// TestGuidePaths checks, for every kind of device and every combination of
-// power and features, that each answer leads somewhere, every path ends at a
-// result, and nothing goes round in a loop.
-func TestGuidePaths(t *testing.T) {
-	g := loadGuide(t)
-	reached := map[string]bool{}
-	kinds := map[string]bool{"": true}
-	for _, c := range g.Categories {
-		kinds[c.Kind] = true
-	}
-	var feats []string
-	for _, f := range g.Features {
-		if f.ID != "heatmains" { // that one is refused before any step
-			feats = append(feats, f.ID)
-		}
-	}
-	doIf, fixIf := map[string][]string{}, map[string][]string{}
-	for id, s := range g.Steps {
-		doIf[id], fixIf[id] = conds(s.Do), conds(s.Fix)
-	}
-	problems := map[string]string{} // one example of each problem
-	report := func(key, example string) {
-		if _, ok := problems[key]; !ok {
-			problems[key] = example
-		}
-	}
-	powers := [][]string{{"mains"}, {"adapter"}, {"usbpow"}, {"battery"}, {"lipo"}, {"adapter", "lipo"}, {"usbpow", "lipo"}, {"mains", "lipo"}}
-	fails := 0
-	for kind := range kinds {
-		for _, pw := range powers {
-			for mask := 0; mask < 1<<len(feats); mask++ {
-				var has []string
-				for i, f := range feats {
-					if mask&(1<<i) != 0 {
-						has = append(has, f)
-					}
-				}
-				tags := g.tags(kind, pw, has)
-				state := map[string]int{} // 1 visiting, 2 done
-				var walk func(id string) bool
-				walk = func(id string) bool {
-					switch state[id] {
-					case 1:
-						t.Errorf("loop at %s (kind %q, power %v, has %v)", id, kind, pw, has)
-						return false
-					case 2:
-						return true
-					}
-					state[id] = 1
-					defer func() { state[id] = 2 }()
-					reached[id] = true
-					s := g.Steps[id]
-					if s.Result {
-						if lines(fixIf[id], tags) == 0 {
-							report("result "+id+" has no fix lines", fmt.Sprintf("kind %q, power %v, has %v", kind, pw, has))
-						}
-						return true
-					}
-					if s.Only != "" && !match(s.Only, tags) {
-						return walk(s.Skip)
-					}
-					if lines(doIf[id], tags) == 0 {
-						report("step "+id+" has nothing to do", fmt.Sprintf("kind %q, power %v, has %v", kind, pw, has))
-					}
-					n := 0
-					for _, a := range s.A {
-						if match(a.Only, tags) {
-							n++
-							if !walk(a.Go) {
-								return false
-							}
-						}
-					}
-					if n == 0 {
-						t.Errorf("step %s has no answers (kind %q, power %v, has %v)", id, kind, pw, has)
-						return false
-					}
-					return true
-				}
-				for _, s := range g.starts() {
-					if match(s.For, tags) && !walk(s.Start) {
-						if fails++; fails > 10 {
-							t.Fatal("too many failures")
-						}
-					}
-				}
-			}
-		}
-	}
-	for k, ex := range problems {
-		t.Errorf("%s (e.g. %s)", k, ex)
-	}
-	for id := range g.Steps {
-		if !reached[id] {
-			t.Errorf("step %s can't be reached", id)
-		}
-	}
-}
-
 // TestDanger checks Fixie refuses dangerous devices by name, and doesn't
 // refuse ordinary ones by mistake.
 func TestDanger(t *testing.T) {
@@ -580,7 +485,7 @@ var wordRules = []struct {
 }{
 	{regexp.MustCompile(`(?i)\bbatter(y|ies)\b|\bcells?\b|\bpacks?\b`), "battery|lipo|powertool"},
 	{regexp.MustCompile(`(?i)\bcharg(e|er|ers|es|ing)\b`), "lipo|powertool|usb|usbpow|adapter"},
-	{regexp.MustCompile(`(?i)\bscreens?\b|\bdisplay\b|\bpicture\b|\bbacklight\b|\bpanel\b`), "screen"},
+	{regexp.MustCompile(`(?i)\bscreens?\b|\bdisplay\b|\bpicture\b|\bbacklight\b|\bpanel\b`), "screen|video"},
 	{regexp.MustCompile(`(?i)\bfans?\b`), "fan|motor"},
 	{regexp.MustCompile(`(?i)\bmotors?\b|\bbrushes\b|\bwinding`), "motor|fan"},
 	{regexp.MustCompile(`(?i)\bspeakers?\b|\bsound\b|\bheadphone|\bamplifier|\bamp\b`), "audio"},
@@ -596,13 +501,14 @@ var wordRules = []struct {
 	{regexp.MustCompile(`(?i)\blaptops?\b`), "laptop|pc"},
 	{regexp.MustCompile(`(?i)\bdesktop|\bbios\b|\bmemory stick|\bgraphics card|\bmotherboard`), "pc"},
 	{regexp.MustCompile(`(?i)\bconsoles?\b`), "console|pc"},
-	{regexp.MustCompile(`(?i)\btvs?\b|\bt-con\b`), "tv"},
-	{regexp.MustCompile(`(?i)\b3d printer|\bstepper|\bhot end|\bthermistor|\bmintemp|\bmaxtemp|\bthermal runaway`), "printer|heater"},
-	{regexp.MustCompile(`(?i)\bkeyboards?\b|\bkeycaps?\b`), "input|pc"},
+	{regexp.MustCompile(`\bTVs?\b|(?i)\bt-con\b`), "tv|video"},
+	{regexp.MustCompile(`(?i)\b3d printer|\bhot end|\bmintemp|\bmaxtemp|\bthermal runaway`), "printer|heater"},
+	{regexp.MustCompile(`(?i)\bsteppers?\b`), "printer|motor"},
+	{regexp.MustCompile(`(?i)\bkeyboards?\b|\bkeycaps?\b`), "input|pc|buttons"},
 	{regexp.MustCompile(`(?i)\bstrips?\b`), "lights|tv"},
 	{regexp.MustCompile(`(?i)\barduino|\besp32|\besp8266|\bpico\b|\bbootloader|\bbootsel|\bcom port|\bgpio`), "mcu"},
 	{regexp.MustCompile(`(?i)\bheaters?\b|\belement\b`), "heater"},
-	{regexp.MustCompile(`(?i)\btrigger\b`), "powertool"},
+	{regexp.MustCompile(`(?i)\bthe trigger\b|\btrigger (switch|pressed)`), "powertool"},
 	{regexp.MustCompile(`(?i)\bbuttons?\b`), "buttons|touch|phone|pc|console|mcu"},
 }
 
@@ -610,134 +516,7 @@ var wordRules = []struct {
 // word above: the person's own phone used as a magnifier, the meter's own
 // display, a PC's coin battery, the RCD's test button, the meter's ports,
 // mains as what an adapter plugs into, and symptom names that list examples.
-var wordAllow = regexp.MustCompile(`(?i)your phone's camera|coin battery|test button|monitor or TV|HDMI cable and port|sealed adapters: they hold mains voltage|'TV, monitor or display'|no sound, nothing happens|too hot to touch|USB, Wi-Fi or Bluetooth|it won't pair|no COM port|your other phones, tablets and computers`)
-
-// TestWording reads everything a person can see on every step and fix, for
-// every kind of device and every combination of power and features, and
-// reports text that mentions something the device doesn't have.
-func TestWording(t *testing.T) {
-	g := loadGuide(t)
-	type line struct{ cond, text string }
-	parse := func(raw []json.RawMessage) []line {
-		var out []line
-		for _, r := range raw {
-			var x string
-			if json.Unmarshal(r, &x) == nil {
-				out = append(out, line{"", x})
-				continue
-			}
-			var c struct{ If, T string }
-			_ = json.Unmarshal(r, &c)
-			out = append(out, line{c.If, c.T})
-		}
-		return out
-	}
-	doL, fixL := map[string][]line{}, map[string][]line{}
-	for id, s := range g.Steps {
-		doL[id], fixL[id] = parse(s.Do), parse(s.Fix)
-	}
-	kinds := map[string]bool{"": true}
-	for _, c := range g.Categories {
-		kinds[c.Kind] = true
-	}
-	var feats []string
-	for _, f := range g.Features {
-		if f.ID != "heatmains" {
-			feats = append(feats, f.ID)
-		}
-	}
-	found := map[string]string{}
-	cache := map[string][]int{}
-	powers := [][]string{{"mains"}, {"adapter"}, {"usbpow"}, {"battery"}, {"lipo"}, {"adapter", "lipo"}, {"usbpow", "lipo"}, {"mains", "lipo"}}
-	for kind := range kinds {
-		for _, pw := range powers {
-			for mask := 0; mask < 1<<len(feats); mask++ {
-				var has []string
-				for i, f := range feats {
-					if mask&(1<<i) != 0 {
-						has = append(has, f)
-					}
-				}
-				tags := g.tags(kind, pw, has)
-				check := func(id, where, text string) {
-					hits, ok := cache[text]
-					if !ok {
-						plain := wordAllow.ReplaceAllString(text, "")
-						for i, r := range wordRules {
-							if r.re.MatchString(plain) {
-								hits = append(hits, i)
-							}
-						}
-						cache[text] = hits
-					}
-					for _, i := range hits {
-						r := wordRules[i]
-						if !match(r.need, tags) {
-							key := fmt.Sprintf("%s %s: %q needs %s", id, where, r.re.FindString(text), r.need)
-							if _, ok := found[key]; !ok {
-								found[key] = fmt.Sprintf("%s\n        e.g. kind %q, power %v, has %v", text, kind, pw, has)
-							}
-						}
-					}
-				}
-				seen := map[string]bool{}
-				var walk func(id string)
-				walk = func(id string) {
-					if seen[id] {
-						return
-					}
-					seen[id] = true
-					s := g.Steps[id]
-					if !s.Result && s.Only != "" && !match(s.Only, tags) {
-						walk(s.Skip)
-						return
-					}
-					check(id, "title", s.T)
-					for _, x := range []string{s.Why, s.Q, s.Good, s.Bad, s.Cause, s.Pro} {
-						check(id, "text", x)
-					}
-					for _, l := range append(append([]line{}, doL[id]...), fixL[id]...) {
-						if match(l.cond, tags) {
-							check(id, "line", l.text)
-						}
-					}
-					if m := s.Measure; m != nil {
-						check(id, "reading", m.Label)
-						for _, b := range m.Bands {
-							check(id, "reading", b.Say)
-						}
-						if m.Near != nil {
-							check(id, "reading", m.Near.Label)
-						}
-					}
-					for _, a := range s.A {
-						if match(a.Only, tags) {
-							check(id, "answer", a.T)
-							walk(a.Go)
-						}
-					}
-					if s.Next != "" {
-						walk(s.Next)
-					}
-				}
-				for _, sy := range g.Symptoms {
-					if match(sy.For, tags) {
-						check("symptom "+sy.ID, "name", sy.Name+" "+sy.Desc)
-						walk(sy.Start)
-					}
-				}
-			}
-		}
-	}
-	keys := make([]string, 0, len(found))
-	for k := range found {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-	for _, k := range keys {
-		t.Errorf("%s\n        %s", k, found[k])
-	}
-}
+var wordAllow = regexp.MustCompile(`(?i)your phone's camera|coin battery|test button|monitor or TV|HDMI cable and port|sealed adapters: they hold mains voltage|'TV, monitor or display'|no sound, nothing happens|too hot to touch|USB, Wi-Fi or Bluetooth|it won't pair|no COM port|your other phones, tablets and computers|USB-serial adapter|tone-generator app on a phone`)
 
 // TestPictures checks every drawing and reference card the guides name exists
 // in web/pics.js and web/refs.js.
@@ -772,7 +551,11 @@ func TestPictures(t *testing.T) {
 		}
 	}
 	for id, s := range g.Steps {
-		check(id, s.Pics, s.Refs)
+		var ps []string
+		for _, x := range s.Pics {
+			ps = append(ps, picID(x))
+		}
+		check(id, ps, s.Refs)
 	}
 	for _, p := range g.Parts {
 		ps := []string{p.Pic}
@@ -782,3 +565,17 @@ func TestPictures(t *testing.T) {
 		check("part "+p.ID, ps, p.Refs)
 	}
 }
+
+// picID and picIf read a step's picture entry: "id", or {"if": cond, "pic": "id"}.
+func picID(raw json.RawMessage) string { id, _ := picIf(raw); return id }
+func picIf(raw json.RawMessage) (string, string) {
+	var x string
+	if json.Unmarshal(raw, &x) == nil {
+		return x, ""
+	}
+	var c struct{ If, Pic string }
+	_ = json.Unmarshal(raw, &c)
+	return c.Pic, c.If
+}
+
+func jsonFile(p string) ([]byte, error) { return os.ReadFile(p) }

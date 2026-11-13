@@ -24,7 +24,7 @@ import (
 )
 
 // Version is the suite version shown in the launcher.
-const Version = "0.30.0-alpha"
+const Version = "0.30.1-alpha"
 
 // App describes one tile in the launcher.
 type App struct {
@@ -47,7 +47,7 @@ var Apps = []App{
 	{"meterie", "Meterie", "PC multimeter: HoldPeak, UNI-T, OWON, Brymen, Fluke…", "0.8.2-alpha", "meterie.png", "", false},
 	{"probie", "Probie", "Serial monitor and logic analyser that explains captures in plain words: its own, and Scopie's and Meterie's", "0.8.2-alpha", "probie.svg", "", false},
 	{"codie", "Codie", "Code explainer: what each line of code does and why", "0.5.0-alpha", "codie.svg", "", false},
-	{"fixie", "Fixie", "Repair guide: quick checks, board-level fault finding and your own builds, using Meterie, Scopie and Probie", "0.4.0-alpha", "fixie.svg", "", false},
+	{"fixie", "Fixie", "Repair guide: quick checks, board-level fault finding and your own builds, using Meterie, Scopie and Probie", "0.4.1-alpha", "fixie.svg", "", false},
 }
 
 // What each app can't do yet on this system (see PORTING.md).
