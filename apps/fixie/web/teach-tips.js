@@ -4,7 +4,13 @@ window.TEACH = {
   intro: "Point at any button, tab or box in Fixie to learn what it does.",
   tips: {
     // top bar
-    "Repair tab|Repair": ["Repair", "The step-by-step guide. Pick what you're fixing and what it's doing, then Fixie takes you through one check at a time until it reaches the likely fault."],
+    "Repair tab|Quick checks": ["Quick checks", "The quick step-by-step guide. Describe what you're fixing and what it's doing, then Fixie takes you through one check at a time until it reaches the likely fault."],
+    "Board level tab|Board level": ["Board level", "Component-level fault finding for repairing and reusing old tech. Pick a section of the board (or start from the beginning) and Fixie takes you through measuring and testing the parts, using Meterie, Scopie and Probie."],
+    "My build tab|My build": ["My build", "Troubleshooting for circuits you've made yourself: power, wiring against your design, code, I2C/SPI/serial, signals, noise, motors and LEDs."],
+    "Parts tests tab|Parts tests": ["Parts tests", "How to test each kind of part: resistors, capacitors, diodes, transistors, MOSFETs, regulators, crystals, chips, relays, cells and more. Readings can come straight from Meterie or Scopie, and parts worth saving from scrap are marked."],
+    "Tinkerie apps for this step": ["Use Tinkerie", "The apps this step uses, and how to set each one up. Open starts the app (or brings it to the front)."],
+    "Reading from another app": ["Use a live reading", "Fills the reading in from Meterie (your meter), Scopie (a measurement on the chosen channel) or Probie (a logic channel's frequency or duty). The app must be open and measuring; Fixie converts the units for you."],
+    "Part test": ["Part test", "Click to open: what the part is, how it fails, how to test it, what to replace it with and whether it's worth saving from scrap."],
     "Tools tab|Tools": ["Tools", "Every tool the guide mentions: what it's for, roughly what it costs and how to use it. Tick the ones you have."],
     "Signs tab|What to look for": ["What to look for", "Pictures and descriptions of failed parts: bulging capacitors, burnt parts, corrosion, cracked joints, blown fuses and swollen batteries."],
     "Safety tab|Safety": ["Safety", "How to work safely with mains, big capacitors, lithium batteries and soldering, and the things you should never open at home."],

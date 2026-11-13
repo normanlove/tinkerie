@@ -116,7 +116,7 @@ symptoms = [dict(id=i, name=n, desc=d, **({"for": f} if f else {}), start=s) for
 
 # ---------------------------------------------------------------- steps
 steps = {}
-def step(id, t, why, do, q, a, tools=(), good=None, bad=None, open=False, live=False, only=None, skip=None, measure=None, signs=()):
+def step(id, t, why, do, q, a, tools=(), good=None, bad=None, open=False, live=False, only=None, skip=None, measure=None, signs=(), apps=()):
     s = dict(t=t, why=why, do=do, q=q, a=[dict(zip(("t", "go"), x[:2]), **({"only": x[2]} if len(x) > 2 else {})) for x in a])
     if tools: s["tools"] = list(tools)
     if good: s["good"] = good
@@ -126,16 +126,18 @@ def step(id, t, why, do, q, a, tools=(), good=None, bad=None, open=False, live=F
     if only: s["only"] = only; s["skip"] = skip
     if measure: s["measure"] = measure
     if signs: s["signs"] = list(signs)
+    if apps: s["apps"] = [dict(app=x[0], how=x[1]) for x in apps]
     assert id not in steps, id
     steps[id] = s
 def iff(cond, text): return {"if": cond, "t": text}
 
-def result(id, t, cause, fix, level, parts=(), tools=(), next=None, pro=None):
+def result(id, t, cause, fix, level, parts=(), tools=(), next=None, pro=None, salvage=None):
     r = dict(result=True, t=t, cause=cause, fix=fix, level=level)
     if parts: r["parts"] = list(parts)
     if tools: r["tools"] = list(tools)
     if next: r["next"] = next
     if pro: r["pro"] = pro
+    if salvage: r["salvage"] = salvage
     assert id not in steps, id
     steps[id] = r
 
@@ -949,6 +951,10 @@ safety = [
     "If parts would cost more than a replacement, a repair shop or recycling may be the better choice."]),
 ]
 
-guide = dict(version=2, power=power, features=features, derived=derived, categories=categories, danger=danger, legacy=legacy, symptoms=symptoms, steps=steps, tools=tools, signs=signs, safety=safety)
+# the component-level guides (Board level, My build) and the parts tests
+import os as _os
+exec(open(_os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "guide_more.py"), encoding="utf-8").read())
+
+guide = dict(version=3, board=board, build=build, parts=parts, power=power, features=features, derived=derived, categories=categories, danger=danger, legacy=legacy, symptoms=symptoms, steps=steps, tools=tools, signs=signs, safety=safety)
 json.dump(guide, open(sys.argv[1], "w"), ensure_ascii=False, indent=1)
 print(len(steps), "steps", sum(1 for s in steps.values() if s.get("result")), "results")

@@ -26,6 +26,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -36,7 +37,7 @@ var webFS embed.FS
 
 const (
 	appName     = "Fixie"
-	appVersion  = "0.2.2-alpha"
+	appVersion  = "0.3.0-alpha"
 	appAuthor   = "nrmluvdev"
 	defaultPort = 47825 // Tinkerie ports: see PORTING.md
 	maxRepairs  = 4 << 20
@@ -219,6 +220,33 @@ func (s *server) routes() http.Handler {
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Cache-Control", "no-store")
 		_, _ = w.Write(b)
+	})
+	// Open another Tinkerie app (Meterie, Scopie, Probie, Flashie, Wirie) for a step.
+	mux.HandleFunc("/api/open-app", func(w http.ResponseWriter, r *http.Request) {
+		var req struct{ App string }
+		if r.Method != http.MethodPost || json.NewDecoder(io.LimitReader(r.Body, 1024)).Decode(&req) != nil || !suiteApps[req.App] {
+			http.Error(w, "unknown app", 400)
+			return
+		}
+		if err := openSuiteApp(req.App); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		writeJSON(w, map[string]bool{"ok": true})
+	})
+	// Read a live value from another app: Meterie's meter reading, a Scopie
+	// measurement or a Probie logic channel's frequency or duty cycle.
+	mux.HandleFunc("/api/peek", func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query()
+		ch, _ := strconv.Atoi(q.Get("ch"))
+		res, err := peek(q.Get("src"), q.Get("m"), ch)
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusServiceUnavailable)
+			_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+			return
+		}
+		writeJSON(w, res)
 	})
 	mux.HandleFunc("/api/activate", func(w http.ResponseWriter, r *http.Request) {
 		s.mu.Lock()

@@ -1,10 +1,21 @@
-# Fixie 0.2.2-alpha — repair guide
+# Fixie 0.3.0-alpha — repair guide
 
 Part of **Tinkerie**, the free maker tools by **nrmluvdev**.
 
-Fixie takes you step by step through finding what's wrong with a broken electronic device. Describe what you're fixing and say what it's doing, and Fixie asks you to look, measure and test one thing at a time, easiest first. Each step says what to do and why, which tools to use, and what a good and a bad result look like. Each answer leads to the next check, until Fixie reaches the likely fault, how hard it is to fix, and the parts and tools you'll need.
+Fixie takes you step by step through finding what's wrong with a broken electronic device, down to the failed part, so old tech can be repaired and reused instead of becoming e-waste. It also troubleshoots circuits you've built yourself. Describe what you're fixing and say what it's doing, and Fixie asks you to look, measure and test one thing at a time, easiest first. Each step says what to do and why, which tools to use, and what a good and a bad result look like. Each answer leads to the next check, until Fixie reaches the likely fault, how hard it is to fix, and the parts and tools you'll need.
 
 Fixie never uses the internet. Repairs are saved on this computer.
+
+## The guides
+
+- **Quick checks**: for any device. Describe it (how it's powered, what it has) and say what it's doing; Fixie goes through the easy checks first.
+- **Board level**: component-level fault finding for repairing old tech. Pick a section of the board, or start from the beginning: power input and protection, mains power supply (cold tests, then a dim bulb tester), regulators and rails (finding a shorted part by injecting current), battery and charging, clock and reset, processor and memory (boot messages, corrupted firmware), data buses (decoding I2C, SPI and UART to see who doesn't answer), audio (following a test tone), video (sync and levels), outputs and drivers, inputs and keyboard matrices, and connectors and tracks. Results say what's worth salvaging when a board can't be saved.
+- **My build**: troubleshooting your own projects: power and current draw, parts fitted backwards, regulator pinouts, wiring against your design, code that won't run or keeps resetting, I2C/SPI/serial parts that don't answer, signals, noise and decoupling, motors, servos and steppers, and addressable LEDs.
+- **Parts tests**: how to test 25 kinds of part (out of the circuit, in it, and powered), what to replace them with, and whether they're worth saving from scrap.
+
+## Working with the rest of Tinkerie
+
+Steps say which Tinkerie app to use and how to set it up, with a button that opens it: Meterie (your multimeter), Scopie (your oscilloscope), Probie (logic analyser and serial monitor), Flashie (firmware) and Wirie (your design). Where a step needs a reading, **Use Meterie's reading**, **Use Scopie's frequency** (or peak-to-peak, minimum…) on a chosen channel, or **Use Probie's frequency/duty cycle** on a chosen logic channel fills it in, converted to the step's units, and Fixie judges it. Fixie reads Meterie through its suite API (port 47823), Scopie through its status stream (47831) and Probie through its logic measurement (47822); the apps must be open and measuring.
 
 ## Describing the device
 
@@ -52,7 +63,7 @@ The full word list is in `guide.py`; `fixie_test.go` checks it refuses these and
 
 ## For developers
 
-The guide is data: `web/guide.json`, built by `guide.py` (`python3 apps/fixie/guide.py apps/fixie/web/guide.json`). Steps have a title, why, what to do (lines can depend on the device's tags), tools, signs, an optional measurement, a question and answers that lead to other steps; results have the cause, fix, parts and difficulty. Lines in a step (and in a fix) can depend on the device: `iff("motor&mains&!printer", …)` (`|` is or, `&` is and, `!` is not). `fixie_test.go` follows every answer for every kind of device and every combination of power and features, and checks each path ends at a result with no loops, that no step or fix is ever empty for the device in front of it, that every tool, sign and tag it names exists, and that the refusal list works. `TestWording` reads every word a person can see (titles, explanations, instructions, questions, answers, readings, causes and fixes) for every kind of device and every combination of power and features, and fails if text mentions something the device doesn't have: a battery, a screen, a fan, USB, mains, a phone, a printer and so on. Tool and sign chips on a step are filtered the same way. `TestRelevance` lists steps each kind of device must never be shown (a 3D printer never gets the hobby-board upload steps, a cordless tool never gets USB charging checks, and so on).
+The guide is data: `web/guide.json`, built by `guide.py` (Quick checks, devices, tools, signs, safety) and `guide_more.py` (Board level, My build, Parts tests) (`python3 apps/fixie/guide.py apps/fixie/web/guide.json`). Steps have a title, why, what to do (lines can depend on the device's tags), tools, signs, an optional measurement, a question and answers that lead to other steps; results have the cause, fix, parts and difficulty. Lines in a step (and in a fix) can depend on the device: `iff("motor&mains&!printer", …)` (`|` is or, `&` is and, `!` is not). `fixie_test.go` follows every answer from every symptom, board section and build problem, for every kind of device and every combination of power and features, and checks each path ends at a result with no loops, that no step or fix is ever empty for the device in front of it, that every tool, sign and tag it names exists, and that the refusal list works. `TestWording` reads every word a person can see (titles, explanations, instructions, questions, answers, readings, causes and fixes) for every kind of device and every combination of power and features, and fails if text mentions something the device doesn't have: a battery, a screen, a fan, USB, mains, a phone, a printer and so on. Tool and sign chips on a step are filtered the same way. `TestRelevance` lists steps each kind of device must never be shown (a 3D printer never gets the hobby-board upload steps, a cordless tool never gets USB charging checks, and so on).
 
 Fixie runs on port 47825 (see PORTING.md) and keeps its repair log in `nrmluvdev/Fixie/state.json` in the system's settings folder.
 

@@ -1,5 +1,959 @@
 {
- "version": 2,
+ "version": 3,
+ "board": {
+  "sections": [
+   {
+    "id": "start",
+    "name": "Start from the beginning",
+    "desc": "Not sure where the fault is? Fixie goes round the board in order: look, power in, rails, clock and reset, then the rest.",
+    "start": "b.vis.1"
+   },
+   {
+    "id": "power",
+    "name": "Power input and protection",
+    "desc": "DC jack or input, fuse, reverse-polarity diode, protection parts.",
+    "start": "b.in.1"
+   },
+   {
+    "id": "smps",
+    "name": "Mains power supply",
+    "desc": "The part of the board that turns mains into low voltage. Cold tests first, then a safe powered test.",
+    "start": "b.smps.1",
+    "for": "mains"
+   },
+   {
+    "id": "rails",
+    "name": "Regulators and power rails",
+    "desc": "The fixed voltages (5V, 3.3V, 1.8V…) the chips run on.",
+    "start": "b.reg.1"
+   },
+   {
+    "id": "battery",
+    "name": "Battery and charging",
+    "desc": "Cells, protection board, charging chip.",
+    "start": "b.bat.1",
+    "for": "lipo|battery"
+   },
+   {
+    "id": "clock",
+    "name": "Clock and reset",
+    "desc": "Crystals and oscillators, reset and enable lines: without them nothing runs.",
+    "start": "b.clk.1"
+   },
+   {
+    "id": "cpu",
+    "name": "Processor and memory",
+    "desc": "Is the main chip running its program? Debug messages, activity, corrupted firmware.",
+    "start": "b.cpu.1"
+   },
+   {
+    "id": "bus",
+    "name": "Data buses (I2C, SPI, UART)",
+    "desc": "Chips talking to each other: decode the traffic and see who isn't answering.",
+    "start": "b.bus.1"
+   },
+   {
+    "id": "audio",
+    "name": "Audio path",
+    "desc": "Follow a sound from input to speaker and find where it stops.",
+    "start": "b.aud.1"
+   },
+   {
+    "id": "video",
+    "name": "Video path",
+    "desc": "Sync and picture signals: composite, VGA, and panels.",
+    "start": "b.vid.1"
+   },
+   {
+    "id": "outputs",
+    "name": "Outputs and drivers",
+    "desc": "Transistors, MOSFETs, relays and driver chips that switch motors, LEDs and loads.",
+    "start": "b.out.1"
+   },
+   {
+    "id": "inputs",
+    "name": "Buttons, keyboards and sensors",
+    "desc": "Switch matrices, pull-ups, encoders and sensors.",
+    "start": "b.inp.1"
+   },
+   {
+    "id": "wiring",
+    "name": "Connectors, cables and tracks",
+    "desc": "Breaks between parts: cables, flex, vias and corroded tracks.",
+    "start": "b.con.1"
+   }
+  ]
+ },
+ "build": {
+  "problems": [
+   {
+    "id": "power",
+    "name": "Nothing happens, or it won't power up",
+    "desc": "No LEDs, no activity, or the supply cuts out.",
+    "start": "u.pw.1"
+   },
+   {
+    "id": "hot",
+    "name": "A part gets hot, or smelt of burning",
+    "desc": "Something's warm, hot, or let out the magic smoke.",
+    "start": "u.hot.1"
+   },
+   {
+    "id": "code",
+    "name": "The code doesn't run, or it keeps resetting",
+    "desc": "Uploads, but does nothing, freezes, or restarts.",
+    "start": "u.code.1",
+    "for": "mcu"
+   },
+   {
+    "id": "upload",
+    "name": "It won't upload, or the computer can't see it",
+    "desc": "No port, upload errors.",
+    "start": "up.1",
+    "for": "mcu&usb|mcu&usbpow"
+   },
+   {
+    "id": "bus",
+    "name": "An I2C, SPI or serial part doesn't respond",
+    "desc": "Sensor not found, display blank, garbled serial.",
+    "start": "u.bus.1",
+    "for": "mcu"
+   },
+   {
+    "id": "wiring",
+    "name": "I think something's wired wrong",
+    "desc": "Check your build against your design, connection by connection.",
+    "start": "u.wire.1"
+   },
+   {
+    "id": "signal",
+    "name": "A signal isn't right (PWM, clock, audio, video)",
+    "desc": "Wrong frequency, wrong level, noisy, missing.",
+    "start": "u.sig.1"
+   },
+   {
+    "id": "noise",
+    "name": "It glitches when a motor, relay or LEDs switch",
+    "desc": "Resets, flicker or random readings when something turns on.",
+    "start": "u.noise.1"
+   },
+   {
+    "id": "motor",
+    "name": "A motor, servo or stepper misbehaves",
+    "desc": "Won't move, jitters, buzzes or skips.",
+    "start": "u.mot.1",
+    "for": "motor"
+   },
+   {
+    "id": "leds",
+    "name": "Addressable LEDs (WS2812, NeoPixel) misbehave",
+    "desc": "Wrong colours, flicker, only the first few work.",
+    "start": "u.led.1",
+    "for": "lights"
+   }
+  ]
+ },
+ "parts": [
+  {
+   "id": "res",
+   "name": "Resistor",
+   "group": "Passive",
+   "what": "Small cylinders with coloured bands (through-hole), or black chips marked with a number code like 103 (10kΩ) or 4701 (4.7kΩ).",
+   "fails": [
+    "Goes open (infinite resistance) or high after overheating: often looks burnt or cracked.",
+    "Rarely shorts. High-value resistors (over 100kΩ) in power supplies drift high with age."
+   ],
+   "tests": [
+    {
+     "t": "Out of the circuit (most accurate)",
+     "do": [
+      "Lift one leg (or remove it) so nothing else is in parallel.",
+      "Meter on resistance (Ω). Touch the probes to each end, keeping fingers off the metal."
+     ],
+     "good": "Within its tolerance of the marked value (usually 1% or 5%).",
+     "bad": "Open (OL), or far from the marked value.",
+     "measure": {
+      "label": "Resistance you measured",
+      "unit": "Ω",
+      "src": "meterie",
+      "near": {
+       "label": "Marked value",
+       "unit": "Ω",
+       "lo": 0.95,
+       "hi": 1.05
+      }
+     }
+    },
+    {
+     "t": "In the circuit",
+     "do": [
+      "Power off, capacitors discharged. Measure across it in place."
+     ],
+     "good": "Equal to or lower than the marked value (other parts in parallel can only lower it).",
+     "bad": "Higher than the marked value: it's definitely faulty."
+    }
+   ],
+   "replace": "Same value, same power rating or higher (size is a clue: 1/4W is about 6mm long), same tolerance.",
+   "salvage": "Not worth it: resistors are cheap. Keep a kit instead."
+  },
+  {
+   "id": "pot",
+   "name": "Potentiometer or trimmer",
+   "group": "Passive",
+   "what": "A knob or slider (volume, tone), or a small trimmer adjusted with a screwdriver. Three pins: two ends and the wiper.",
+   "fails": [
+    "Dirty or worn track: crackles, jumps or dead spots as it turns.",
+    "Open track: no change over part of its travel."
+   ],
+   "tests": [
+    {
+     "t": "Sweep the wiper",
+     "do": [
+      "Power off. Meter on resistance between the middle pin and one end.",
+      "Turn it slowly from one end to the other while watching the reading."
+     ],
+     "good": "The reading changes smoothly from near 0 to the full value.",
+     "bad": "Jumps, flickers to OL, or doesn't change.",
+     "app": {
+      "app": "meterie",
+      "how": "Meterie's graph shows a jump or dead spot as you turn it much better than the display can."
+     }
+    }
+   ],
+   "replace": "Same value and taper (a letter: A is log for volume, B is linear), same shaft and pin spacing. Try contact cleaner first.",
+   "salvage": "Yes, if they're smooth: knobs, pots and switches from old audio gear are useful."
+  },
+  {
+   "id": "ecap",
+   "name": "Electrolytic capacitor",
+   "group": "Passive",
+   "what": "A can with a stripe marking the negative leg, rated in µF and volts. Common in power supplies and audio.",
+   "fails": [
+    "Dries out with age and heat: capacitance drops and ESR rises, often with no visible sign.",
+    "Bulges at the top, leaks brown crust, or vents. Can short."
+   ],
+   "tests": [
+    {
+     "t": "Look first",
+     "do": [
+      "Tops should be flat, with no crust on the board under them."
+     ],
+     "good": "Flat top, clean base.",
+     "bad": "Domed top, crust, or pushed up off the board."
+    },
+    {
+     "t": "ESR (in the circuit, power off)",
+     "do": [
+      "Discharge it, then measure with an ESR meter or component tester."
+     ],
+     "good": "ESR at or below the chart for its µF and voltage (often under 1Ω for 100µF+).",
+     "bad": "ESR several times the chart value, even if the µF reads fine."
+    },
+    {
+     "t": "Capacitance (out of the circuit)",
+     "do": [
+      "Discharge it. Meter on capacitance, red probe to the + leg."
+     ],
+     "good": "Within about 20% of the marked value.",
+     "bad": "Well below the marked value, or reading as a short.",
+     "measure": {
+      "label": "Capacitance you measured",
+      "unit": "µF",
+      "src": "meterie",
+      "near": {
+       "label": "Marked value",
+       "unit": "µF",
+       "lo": 0.8,
+       "hi": 1.25
+      }
+     }
+    }
+   ],
+   "replace": "Same µF, the same or higher voltage, 105°C, and low-ESR in power supplies. Fit it the right way round.",
+   "salvage": "No: old electrolytics are the part most likely to fail. Replace rather than reuse."
+  },
+  {
+   "id": "ccap",
+   "name": "Ceramic or film capacitor",
+   "group": "Passive",
+   "what": "Small beige or brown chips (surface-mount), or blue/yellow blobs and boxes. Used for decoupling and filtering.",
+   "fails": [
+    "Tiny ceramic chips crack and short, pulling a power rail down: the most common cause of a shorted rail.",
+    "Film capacitors across the mains (X2) crack and burn with age."
+   ],
+   "tests": [
+    {
+     "t": "Find a shorted one",
+     "do": [
+      "Power off. Resistance across it: a short reads near 0Ω, but so does everything else on that rail.",
+      "If the rail is shorted, inject a little current into it (see Board level: find the short): the shorted capacitor gets warm."
+     ],
+     "good": "Not shorted, and stays cool when current is injected.",
+     "bad": "Short, and the warm spot is on it."
+    }
+   ],
+   "replace": "Same capacitance and voltage or higher; for X2 or Y capacitors across the mains, only the same safety rating."
+  },
+  {
+   "id": "diode",
+   "name": "Diode",
+   "group": "Semiconductors",
+   "what": "A small cylinder with a band at one end (the cathode), or a surface-mount part marked with a line.",
+   "fails": [
+    "Shorts (reads close to 0V both ways), especially rectifiers after a surge.",
+    "Goes open (OL both ways). Schottky diodes leak when hot."
+   ],
+   "tests": [
+    {
+     "t": "Diode test (in or out of the circuit, power off)",
+     "do": [
+      "Meter on diode test. Red probe on the end without the band, black on the band.",
+      "Then swap the probes."
+     ],
+     "good": "About 0.5–0.7V one way (0.15–0.4V for Schottky), OL the other way.",
+     "bad": "Close to 0V both ways (shorted) or OL both ways (open).",
+     "measure": {
+      "label": "Forward reading",
+      "unit": "V",
+      "src": "meterie",
+      "bands": [
+       {
+        "lt": 0.08,
+        "a": 1,
+        "say": "Shorted."
+       },
+       {
+        "lt": 0.9,
+        "a": 0,
+        "say": "Normal forward drop.",
+        "ok": true
+       },
+       {
+        "a": 1,
+        "say": "Too high, or open."
+       }
+      ]
+     }
+    }
+   ],
+   "replace": "Same type (rectifier, fast, Schottky, signal) with the same or higher current and voltage rating."
+  },
+  {
+   "id": "zener",
+   "name": "Zener diode",
+   "group": "Semiconductors",
+   "what": "Looks like a diode, but sets a voltage: marked with it (like 5V1, or a code).",
+   "fails": [
+    "Shorts after being overloaded; or the voltage drifts."
+   ],
+   "tests": [
+    {
+     "t": "Diode test",
+     "do": [
+      "As for a diode: one way only should conduct."
+     ],
+     "good": "About 0.7V one way, OL the other (a meter can't show the zener voltage).",
+     "bad": "Shorted both ways."
+    },
+    {
+     "t": "Zener voltage (powered, in the circuit)",
+     "do": [
+      "Measure across it with the circuit running."
+     ],
+     "good": "Close to its marked voltage.",
+     "bad": "Far from it, or 0V.",
+     "measure": {
+      "label": "Voltage across it",
+      "unit": "V",
+      "src": "meterie",
+      "near": {
+       "label": "Its marked voltage",
+       "unit": "V",
+       "lo": 0.93,
+       "hi": 1.07
+      }
+     }
+    }
+   ],
+   "replace": "Same voltage and power rating."
+  },
+  {
+   "id": "led",
+   "name": "LED",
+   "group": "Semiconductors",
+   "what": "Light-emitting diode: the longer leg (or the side without the flat) is +.",
+   "fails": [
+    "Goes open, dims, or one colour of an RGB LED dies. In strips, one dead LED can stop the rest."
+   ],
+   "tests": [
+    {
+     "t": "Diode test",
+     "do": [
+      "Meter on diode test, red to + (the longer leg). Many meters light the LED faintly."
+     ],
+     "good": "It glows faintly, or reads about 1.6–3.2V one way.",
+     "bad": "OL both ways, or no glow with a meter that lights others."
+    }
+   ],
+   "replace": "Same colour, size and forward voltage. Keep the resistor that sets its current.",
+   "salvage": "Yes: through-hole LEDs from old boards are fine to reuse after a quick test."
+  },
+  {
+   "id": "bridge",
+   "name": "Bridge rectifier",
+   "group": "Semiconductors",
+   "what": "Four diodes in one block, marked ~ ~ + −, or four separate diodes in a square near a power input.",
+   "fails": [
+    "One or more diodes short after a surge, blowing the fuse."
+   ],
+   "tests": [
+    {
+     "t": "Test all four diodes",
+     "do": [
+      "Diode test from each ~ pin to + (red on ~), and from − to each ~ (red on −).",
+      "Then reverse each one."
+     ],
+     "good": "About 0.5V forward on all four, OL in reverse.",
+     "bad": "Any one near 0V both ways (shorted)."
+    }
+   ],
+   "replace": "Same current and voltage rating or higher."
+  },
+  {
+   "id": "bjt",
+   "name": "Transistor (BJT)",
+   "group": "Semiconductors",
+   "what": "Three-legged black part (TO-92) or a surface-mount chip marked with a code: NPN or PNP, pins collector, base, emitter.",
+   "fails": [
+    "Collector-emitter short (the most common), or an open junction."
+   ],
+   "tests": [
+    {
+     "t": "Two diode tests (power off)",
+     "do": [
+      "Find the pinout from its number (look it up; a component tester works it out for you).",
+      "NPN: red on base, black on collector, then on emitter: both about 0.6V. Reverse: OL. PNP: the same with black on the base.",
+      "Collector to emitter: OL both ways."
+     ],
+     "good": "Both base junctions about 0.5–0.7V one way and OL the other; collector-emitter OL.",
+     "bad": "Any junction near 0V, or collector-emitter shorted."
+    }
+   ],
+   "replace": "Same part number, or one with the same type (NPN/PNP), pinout, and at least the same voltage, current and gain."
+  },
+  {
+   "id": "mosfet",
+   "name": "MOSFET",
+   "group": "Semiconductors",
+   "what": "A power transistor (TO-220, DPAK, or small SOT-23): pins gate, drain, source. Switches motors, heaters, LEDs and power supplies.",
+   "fails": [
+    "Drain-source short (stuck on), often with a cracked case or a burnt mark.",
+    "Gate damaged by static or overvoltage."
+   ],
+   "tests": [
+    {
+     "t": "Diode test (out of the circuit is best)",
+     "do": [
+      "Short all three legs briefly to discharge the gate.",
+      "N-channel: red on source, black on drain: about 0.4–0.7V (the built-in diode). Reverse: OL.",
+      "Gate to the other two: OL both ways.",
+      "To check it switches: touch red to gate and black to source for a moment, then measure drain-source again: it should now conduct."
+     ],
+     "good": "Body diode reads normally, no short, gate OL, and it switches on when the gate is charged.",
+     "bad": "Drain-source near 0V both ways, or the gate isn't OL."
+    }
+   ],
+   "replace": "Same part, or with the same or higher voltage and current, the same or lower on-resistance, a logic-level gate if it's driven from a microcontroller, and the same pinout."
+  },
+  {
+   "id": "reg",
+   "name": "Linear voltage regulator",
+   "group": "Power",
+   "what": "Three-legged part (78xx, LM1117, AMS1117, LM317) or small surface-mount chip turning a higher voltage into a fixed one.",
+   "fails": [
+    "Output missing or wrong, overheating, or shorted input to output. Pinouts differ between types: wrong orientation is common in builds."
+   ],
+   "tests": [
+    {
+     "t": "Powered: input, output, ground",
+     "do": [
+      "Look up the pinout from its number (78xx is IN-GND-OUT; AMS1117 is GND-OUT-IN).",
+      "Measure input to ground and output to ground with the circuit on."
+     ],
+     "good": "Input at least 1–2V above the output (less for LDOs), output at its rated voltage.",
+     "bad": "Input fine but output missing or low: the regulator, or something shorting the output. Unplug the load to tell which.",
+     "measure": {
+      "label": "Output voltage",
+      "unit": "V",
+      "src": "meterie",
+      "near": {
+       "label": "Its rated output",
+       "unit": "V",
+       "lo": 0.95,
+       "hi": 1.05
+      }
+     }
+    }
+   ],
+   "replace": "Same output voltage, pinout and current, and the same or lower dropout. Check the output capacitor the datasheet asks for.",
+   "salvage": "Yes: 78xx and LM317 regulators are worth keeping."
+  },
+  {
+   "id": "buck",
+   "name": "Switching regulator (buck or boost)",
+   "group": "Power",
+   "what": "A chip with an inductor (a small coil, often a black block marked 4R7, 100…) and a diode nearby; turns one DC voltage into another efficiently.",
+   "fails": [
+    "No output (failed chip, open inductor, enable pin held off), or output shorted.",
+    "Dried input or output capacitors make it whine, drop out or reset loads."
+   ],
+   "tests": [
+    {
+     "t": "Powered checks",
+     "do": [
+      "Input voltage present at the chip.",
+      "Enable (EN) pin high (above about 1.2V; check its datasheet).",
+      "Output at its rated voltage."
+     ],
+     "good": "All present and right.",
+     "bad": "Input present but no output, with enable high."
+    },
+    {
+     "t": "Switching node (with a scope)",
+     "do": [
+      "Scope probe on the pad between the chip and the inductor, ground clip short."
+     ],
+     "good": "A square wave of about the input voltage, at a few hundred kHz to a few MHz.",
+     "bad": "Flat line: the chip isn't switching.",
+     "app": {
+      "app": "scopie",
+      "how": "Set the timebase to about 1µs/div and trigger on CH1's rising edge; turn on the Frequency and Peak-to-peak measurements."
+     }
+    }
+   ],
+   "replace": "Same chip; or a ready-made buck module of the right voltage and current as a bodge.",
+   "salvage": "Yes: buck and boost modules from dead gadgets are handy for projects."
+  },
+  {
+   "id": "crystal",
+   "name": "Crystal or resonator",
+   "group": "Timing",
+   "what": "A metal can (HC-49), or a small surface-mount box, marked with its frequency (8.000, 16.000, 32.768…). Usually next to the processor with two small capacitors.",
+   "fails": [
+    "Cracked by a drop; stops oscillating; or the circuit's capacitors fail. Without a clock, a processor does nothing."
+   ],
+   "tests": [
+    {
+     "t": "Oscillating? (powered, with a scope)",
+     "do": [
+      "Use a ×10 probe (×1 probes load it enough to stop it).",
+      "Probe the crystal's output pin (often marked XOUT, XTAL2 or OSC_OUT), not the input."
+     ],
+     "good": "A sine or rounded square wave at the marked frequency.",
+     "bad": "Flat line, or a frequency far from the marking.",
+     "measure": {
+      "label": "Frequency",
+      "unit": "MHz",
+      "src": "scopie:freq",
+      "near": {
+       "label": "Marked frequency",
+       "unit": "MHz",
+       "lo": 0.995,
+       "hi": 1.005
+      }
+     },
+     "app": {
+      "app": "scopie",
+      "how": "×10 probe, timebase so a few cycles fill the screen (about 50ns/div for 16MHz), AC or DC coupling, turn on Frequency."
+     }
+    }
+   ],
+   "replace": "Same frequency and type; keep the two load capacitors."
+  },
+  {
+   "id": "ic",
+   "name": "Logic chip (74xx, 4000)",
+   "group": "Chips",
+   "what": "Black chips with 14 or 16 pins and numbers like 74HC04, 74LS138, CD4017.",
+   "fails": [
+    "Inputs or outputs damaged by static or overvoltage: an output stuck high or low."
+   ],
+   "tests": [
+    {
+     "t": "Powered: power, inputs, outputs",
+     "do": [
+      "Find the pinout in its datasheet. Check VCC (usually pin 14 or 16) and GND (pin 7 or 8).",
+      "Watch an input and the output it drives: does the output follow the logic it should?"
+     ],
+     "good": "Power present, and outputs follow their inputs as the datasheet says.",
+     "bad": "An output stuck while its inputs change, or a chip that gets hot.",
+     "app": {
+      "app": "probie",
+      "how": "Clip one channel to each input and the output, capture, and compare: Probie shows which signals change together."
+     }
+    }
+   ],
+   "replace": "Same part number; the family letters matter (HC, HCT, LS have different input levels).",
+   "salvage": "Yes, in sockets: old 74xx and 4000 chips are useful for projects and learning."
+  },
+  {
+   "id": "mcu",
+   "name": "Microcontroller or processor",
+   "group": "Chips",
+   "what": "The main chip that runs the device's program: an Atmel/Microchip, STM32, ESP, or a custom chip.",
+   "fails": [
+    "Rarely the first thing to fail. Usually it's missing power, clock or reset, or its program (in flash) is corrupted."
+   ],
+   "tests": [
+    {
+     "t": "Is it alive? (powered)",
+     "do": [
+      "Every power pin at the right voltage (VCC, VDD, VDDA, AVCC).",
+      "Clock running (see crystal).",
+      "Reset pin at its 'run' level (usually high).",
+      "Activity on its pins, or messages on its serial pins."
+     ],
+     "good": "Power, clock and reset all right, and pins toggling.",
+     "bad": "All three right but no activity at all: a corrupt program or a failed chip.",
+     "app": {
+      "app": "probie",
+      "how": "Capture the serial TX pin (Serial tab at 115200 first), or several I/O pins on the Logic tab to see whether it's doing anything."
+     }
+    }
+   ],
+   "replace": "Same chip, programmed with the device's firmware (from a backup or the maker): usually a job for the maker or a specialist.",
+   "salvage": "Development boards: yes. Chips soldered on old boards: rarely worth removing."
+  },
+  {
+   "id": "opamp",
+   "name": "Op-amp",
+   "group": "Chips",
+   "what": "8-pin chips like TL072, NE5532, LM358: in audio, sensor and filter circuits.",
+   "fails": [
+    "Output stuck at one supply rail, or noisy. Audio op-amps fail after a supply fault."
+   ],
+   "tests": [
+    {
+     "t": "Powered checks",
+     "do": [
+      "Supply pins (often 8 and 4) at the expected voltages.",
+      "With no signal, outputs (pins 1 and 7 on dual op-amps) usually sit in the middle: 0V on a ± supply, half the supply on a single one."
+     ],
+     "good": "Outputs at their resting level, and a test tone passes through.",
+     "bad": "An output stuck at a supply rail.",
+     "app": {
+      "app": "scopie",
+      "how": "Feed a test tone in and compare the input and output pins on CH1 and CH2."
+     }
+    }
+   ],
+   "replace": "Same part, or a pin-compatible op-amp that works on the same supply."
+  },
+  {
+   "id": "opto",
+   "name": "Optocoupler",
+   "group": "Chips",
+   "what": "A 4- or 6-pin chip (PC817 and similar) that passes a signal across an isolation gap with an LED and a sensor. In power supplies it carries the voltage feedback.",
+   "fails": [
+    "The LED inside wears out: a power supply's output drifts high or it cycles."
+   ],
+   "tests": [
+    {
+     "t": "Two tests (out of the circuit)",
+     "do": [
+      "Diode test across the LED pins (1 and 2): about 1.1V one way.",
+      "Light the LED through a 1kΩ resistor from 5V and measure the output pins (4 to 3) on resistance: it should drop sharply."
+     ],
+     "good": "LED conducts one way, and the output switches when the LED is lit.",
+     "bad": "LED open, or the output doesn't change."
+    }
+   ],
+   "replace": "Same part (the current transfer ratio matters in power supplies)."
+  },
+  {
+   "id": "fuse",
+   "name": "Fuse or polyfuse",
+   "group": "Protection",
+   "what": "Glass or ceramic tubes, small surface-mount fuses (marked F), or green/yellow polyfuses (resettable).",
+   "fails": [
+    "Blows because something after it drew too much current. Polyfuses go high-resistance and recover when cool."
+   ],
+   "tests": [
+    {
+     "t": "Continuity (power off)",
+     "do": [
+      "Meter on continuity or low ohms across it."
+     ],
+     "good": "A beep: under 1Ω (polyfuses: a few ohms at most).",
+     "bad": "OL: blown.",
+     "measure": {
+      "label": "Resistance",
+      "unit": "Ω",
+      "src": "meterie",
+      "bands": [
+       {
+        "lt": 5,
+        "a": 0,
+        "say": "Good.",
+        "ok": true
+       },
+       {
+        "a": 1,
+        "say": "Blown or tripped."
+       }
+      ]
+     }
+    }
+   ],
+   "replace": "Same current, voltage and speed (fast or slow-blow). Never bigger. Find why it blew before powering up."
+  },
+  {
+   "id": "tvs",
+   "name": "Protection diode, TVS or varistor",
+   "group": "Protection",
+   "what": "Small diodes or discs right at an input (USB, DC jack, mains) that clamp spikes.",
+   "fails": [
+    "Shorts after a spike to protect everything else: the input then reads as a dead short."
+   ],
+   "tests": [
+    {
+     "t": "Short check (power off)",
+     "do": [
+      "Diode test or resistance across it. Lift one end if the reading could be something else."
+     ],
+     "good": "Not shorted (a TVS reads like a diode or OL).",
+     "bad": "Close to 0Ω both ways."
+    }
+   ],
+   "replace": "Same type and voltage. A device often still works with it removed, but put a new one in before using it for real."
+  },
+  {
+   "id": "relay",
+   "name": "Relay",
+   "group": "Switching",
+   "what": "A box (often blue or black) that clicks: a coil moves a switch. Pins: coil, common, normally open (NO), normally closed (NC).",
+   "fails": [
+    "Coil open; contacts burnt, so they don't pass current even when they click; contacts welded shut."
+   ],
+   "tests": [
+    {
+     "t": "Coil and contacts",
+     "do": [
+      "Coil resistance: tens to hundreds of ohms (the rating is on the case).",
+      "Common to NC: should beep; common to NO: OL.",
+      "Power the coil at its rated voltage: it clicks and the two swap. Check the contacts carry current, not just beep."
+     ],
+     "good": "Coil reads normally, it clicks, and the contacts swap cleanly.",
+     "bad": "Coil OL, no click, or contacts that don't swap or stay closed."
+    }
+   ],
+   "replace": "Same coil voltage, the same or higher contact rating, same footprint.",
+   "salvage": "Yes: relays from old appliances and boards are handy, after a test."
+  },
+  {
+   "id": "switch",
+   "name": "Switch or button",
+   "group": "Switching",
+   "what": "Tactile buttons, slide and toggle switches, microswitches, keyboard switches.",
+   "fails": [
+    "Dirty or worn contacts: works sometimes, or bounces. Broken internal spring."
+   ],
+   "tests": [
+    {
+     "t": "Continuity while pressing",
+     "do": [
+      "Power off. Continuity across the switch (small 4-leg buttons: try across the corners)."
+     ],
+     "good": "Beeps only while pressed, crisply.",
+     "bad": "Never beeps, beeps all the time, or crackles.",
+     "app": {
+      "app": "meterie",
+      "how": "Meterie's continuity mode with the graph shows a crackly contact as a ragged line."
+     }
+    }
+   ],
+   "replace": "Same size and action; contact cleaner first.",
+   "salvage": "Yes: switches, buttons and keyboard switches are worth keeping."
+  },
+  {
+   "id": "conn",
+   "name": "Connector, cable or ribbon",
+   "group": "Wiring",
+   "what": "Plugs and sockets, wire harnesses, and flat ribbon or flex cables.",
+   "fails": [
+    "Broken wire inside the sheath, cracked flex cable, corroded or loose contacts, cracked solder joints on the socket."
+   ],
+   "tests": [
+    {
+     "t": "End-to-end continuity",
+     "do": [
+      "Power off. Continuity from each pin at one end to the matching pin at the other.",
+      "Flex the cable while it beeps: the beep must not break.",
+      "Check neighbouring pins aren't joined."
+     ],
+     "good": "Every wire beeps, steadily, and no two are joined.",
+     "bad": "A wire that's OL or cuts in and out.",
+     "app": {
+      "app": "meterie",
+      "how": "Meterie's continuity beep and graph catch a break that only opens when the cable bends."
+     }
+    }
+   ],
+   "replace": "Same connector type and pitch; ribbon cables by width, pitch and length.",
+   "salvage": "Yes: cables, connectors and ribbon cables are some of the most reusable parts."
+  },
+  {
+   "id": "speaker",
+   "name": "Speaker or buzzer",
+   "group": "Output",
+   "what": "Speakers (marked 4Ω or 8Ω), piezo buzzers and magnetic buzzers.",
+   "fails": [
+    "Open voice coil, torn cone, rubbing coil (buzzes)."
+   ],
+   "tests": [
+    {
+     "t": "Resistance (out of the circuit)",
+     "do": [
+      "Unplug one wire. Meter on resistance."
+     ],
+     "good": "A speaker reads a bit under its marking (8Ω reads about 6–7.5Ω); a magnetic buzzer tens of ohms.",
+     "bad": "OL (open coil) or near 0.",
+     "measure": {
+      "label": "Resistance",
+      "unit": "Ω",
+      "src": "meterie",
+      "bands": [
+       {
+        "lt": 1,
+        "a": 1,
+        "say": "Shorted."
+       },
+       {
+        "lt": 40,
+        "a": 0,
+        "say": "Normal for a speaker.",
+        "ok": true
+       },
+       {
+        "a": 1,
+        "say": "Open coil."
+       }
+      ]
+     }
+    }
+   ],
+   "replace": "Same impedance (Ω), same or higher power, and a size that fits.",
+   "salvage": "Yes: speakers from old TVs and toys are fine for projects."
+  },
+  {
+   "id": "motor",
+   "name": "DC motor",
+   "group": "Output",
+   "what": "Small brushed motors in toys, fans, drives and tools.",
+   "fails": [
+    "Worn brushes, open winding, seized bearing, a shorted winding that draws too much current."
+   ],
+   "tests": [
+    {
+     "t": "Resistance and spin",
+     "do": [
+      "Power off. Resistance across its terminals while turning it slowly by hand."
+     ],
+     "good": "A few ohms that stays fairly steady as it turns.",
+     "bad": "OL at some positions (worn brushes or a dead segment) or 0Ω (shorted)."
+    },
+    {
+     "t": "Current draw (powered)",
+     "do": [
+      "Run it from a bench supply at its voltage and watch the current with no load."
+     ],
+     "good": "Small and steady current that drops once it's up to speed.",
+     "bad": "High current and little speed: a shorted winding or tight bearing."
+    }
+   ],
+   "replace": "Same voltage, size, shaft and speed.",
+   "salvage": "Yes: motors, gears and fans from old printers and toys are classic project parts."
+  },
+  {
+   "id": "liion",
+   "name": "Lithium-ion cell (18650 and others)",
+   "group": "Power",
+   "what": "Cylindrical cells (18650, 21700) in laptop and tool packs, or flat pouch cells.",
+   "fails": [
+    "Loses capacity with age; self-discharges when faulty; swells (pouch cells). A cell left below 2.5V can be damaged inside."
+   ],
+   "tests": [
+    {
+     "t": "Voltage, then capacity",
+     "do": [
+      "Measure each cell: 3.0–4.2V is the normal range.",
+      "Below 2.5V: don't charge it unless you have a charger with a recovery mode; below 1.5V, recycle it.",
+      "Charge fully, wait a week, and measure again: a cell that's dropped more than 0.1V self-discharges and must not be used.",
+      "A capacity tester shows what's left: below about 70% of its rating isn't worth keeping."
+     ],
+     "good": "3.0–4.2V, holds its charge, and decent capacity.",
+     "bad": "Below 2.5V, a big drop over a week, swelling, or very low capacity.",
+     "measure": {
+      "label": "Cell voltage",
+      "unit": "V",
+      "src": "meterie",
+      "bands": [
+       {
+        "lt": 1.5,
+        "a": 1,
+        "say": "Recycle it."
+       },
+       {
+        "lt": 2.5,
+        "a": 1,
+        "say": "Over-discharged: only with a recovery charger, if at all."
+       },
+       {
+        "lt": 4.25,
+        "a": 0,
+        "say": "Normal range.",
+        "ok": true
+       },
+       {
+        "a": 1,
+        "say": "Over-charged: don't use it."
+       }
+      ]
+     }
+    }
+   ],
+   "replace": "Same chemistry and size, from a reputable maker; matched cells in packs.",
+   "salvage": "Yes, with care: good cells from laptop packs power many projects. Always use a protection board (BMS)."
+  },
+  {
+   "id": "display",
+   "name": "LCD or display module",
+   "group": "Output",
+   "what": "Character LCDs (16×2), small graphic LCDs and OLEDs, LED segment displays.",
+   "fails": [
+    "No backlight, missing segments or lines (connections), contrast set wrong, or a dead driver chip."
+   ],
+   "tests": [
+    {
+     "t": "Powered checks",
+     "do": [
+      "Power pins at the right voltage.",
+      "Character LCDs: turn the contrast trimmer slowly: a row of blocks should appear.",
+      "Backlight pins (A and K): about 3–4V across a working backlight.",
+      "Data pins: watch them while the device writes to the display."
+     ],
+     "good": "Blocks appear with contrast, backlight lights, data pins toggle.",
+     "bad": "Nothing with power and contrast right: the module; data pins quiet: the device isn't writing.",
+     "app": {
+      "app": "probie",
+      "how": "Capture the display's data or I2C/SPI pins to see whether the device is sending to it."
+     }
+    }
+   ],
+   "replace": "Same model; many character LCDs are interchangeable.",
+   "salvage": "Yes: displays from old gadgets are great for projects, after checking the pinout."
+  }
+ ],
  "power": [
   {
    "id": "mains",
@@ -4337,6 +5291,2623 @@
     "Note down everything you've checked so far: it saves them time."
    ],
    "level": "Pro"
+  },
+  "b.vis.1": {
+   "t": "Look over the whole board",
+   "why": "Many faults are visible: a few minutes with a light and magnifier saves hours of measuring.",
+   "do": [
+    {
+     "if": "hv",
+     "t": "Unplug it, wait a few minutes, and check the big capacitors are discharged before touching anything."
+    },
+    {
+     "if": "lipo",
+     "t": "Disconnect the battery first."
+    },
+    "Photograph both sides of the board: useful later, and for asking for help.",
+    "Look under a bright light, at an angle, with a magnifier: burnt or cracked parts, bulging capacitors, corrosion, cracked joints, damaged tracks, missing parts.",
+    "Note the part numbers of the main chips: their datasheets show the pins to measure."
+   ],
+   "q": "What did you see?",
+   "a": [
+    {
+     "t": "Burnt, cracked or bulging parts",
+     "go": "r.burnt"
+    },
+    {
+     "t": "Corrosion",
+     "go": "w.3"
+    },
+    {
+     "t": "Cracked solder joints",
+     "go": "r.joint"
+    },
+    {
+     "t": "A loose or damaged cable",
+     "go": "b.con.1"
+    },
+    {
+     "t": "Nothing obvious",
+     "go": "b.in.1"
+    }
+   ],
+   "tools": [
+    "torch",
+    "magnifier",
+    "screwdrivers",
+    "spudger"
+   ],
+   "open": true,
+   "signs": [
+    "caps",
+    "burnt",
+    "corrosion",
+    "joint",
+    "connector"
+   ]
+  },
+  "b.in.1": {
+   "t": "Measure the power coming in",
+   "why": "Start at the input: everything else depends on it.",
+   "do": [
+    {
+     "if": "mains",
+     "t": "For a mains board, measure the low-voltage outputs of its power supply instead (never the mains side). If they're missing, go to the Mains power supply section."
+    },
+    {
+     "if": "!mains",
+     "t": "Power it as normal. Measure the voltage on the input connector, black probe on its ground."
+    }
+   ],
+   "q": "Is the input voltage there?",
+   "a": [
+    {
+     "t": "Yes",
+     "go": "b.in.2"
+    },
+    {
+     "t": "No, it's missing at the connector",
+     "go": "r.supply",
+     "only": "!mains"
+    },
+    {
+     "t": "No: a mains board's supply gives nothing",
+     "go": "b.smps.1",
+     "only": "mains"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "live": true,
+   "measure": {
+    "label": "Input voltage",
+    "unit": "V",
+    "src": "meterie",
+    "near": {
+     "label": "What it should be",
+     "unit": "V",
+     "lo": 0.9,
+     "hi": 1.15,
+     "ok": 0,
+     "bad": 1
+    }
+   },
+   "apps": [
+    {
+     "app": "meterie",
+     "how": "DC volts. Watch the graph while you wiggle the plug: a dip shows a loose socket."
+    }
+   ]
+  },
+  "b.in.2": {
+   "t": "Follow it past the protection",
+   "why": "Just inside the input there's usually a fuse, a diode against reversed power, and a clamp. Any can stop or short the power.",
+   "do": [
+    "Measure on the far side of each part in turn: the fuse (or polyfuse), then the diode.",
+    "A diode drops about 0.3–0.7V; a fuse should drop almost nothing."
+   ],
+   "q": "Where does the voltage stop?",
+   "a": [
+    {
+     "t": "After the fuse: it's blown or tripped",
+     "go": "b.in.3"
+    },
+    {
+     "t": "After the diode: it's open",
+     "go": "r.diodeopen"
+    },
+    {
+     "t": "It gets through, but the voltage is pulled low",
+     "go": "b.reg.3"
+    },
+    {
+     "t": "It all gets through",
+     "go": "b.reg.1"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "live": true,
+   "signs": [
+    "fuse"
+   ],
+   "apps": [
+    {
+     "app": "meterie",
+     "how": "DC volts; move the red probe along the path, keeping the black on ground."
+    }
+   ]
+  },
+  "b.in.3": {
+   "t": "Why did the fuse blow?",
+   "why": "A fuse blows because something after it drew too much: find that before fitting a new one.",
+   "do": [
+    "Power off. Measure resistance from the far side of the fuse to ground.",
+    "Under about 10Ω: something is shorted. Check the protection diode or TVS and the input capacitors first: they're the commonest culprits."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "A shorted protection diode or TVS",
+     "go": "r.tvs"
+    },
+    {
+     "t": "A shorted capacitor",
+     "go": "r.short"
+    },
+    {
+     "t": "Shorted, but I can't find where",
+     "go": "b.reg.3"
+    },
+    {
+     "t": "Not shorted",
+     "go": "r.fuseonly"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "open": true,
+   "measure": {
+    "label": "Resistance to ground",
+    "unit": "Ω",
+    "src": "meterie",
+    "bands": [
+     {
+      "lt": 10,
+      "a": 2,
+      "say": "That's a short."
+     },
+     {
+      "a": 3,
+      "say": "Not shorted.",
+      "ok": true
+     }
+    ]
+   }
+  },
+  "r.diodeopen": {
+   "result": true,
+   "t": "An open protection diode",
+   "cause": "The diode against reversed power has failed open.",
+   "fix": [
+    "Replace it with the same type, or one with the same or higher current and the same or lower voltage drop (a Schottky in, Schottky out)."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Diode"
+   ],
+   "tools": [
+    "iron"
+   ]
+  },
+  "r.tvs": {
+   "result": true,
+   "t": "A shorted protection part",
+   "cause": "A TVS diode or protection diode shorted to protect the rest from a spike or reversed power.",
+   "fix": [
+    "Remove it: if the short goes, that was it.",
+    "Fit a new one of the same type and voltage before using it for real: it's what protects the rest.",
+    "Fit a new fuse of the same rating."
+   ],
+   "level": "Medium",
+   "parts": [
+    "TVS or diode",
+    "Fuse"
+   ],
+   "tools": [
+    "iron",
+    "hotair"
+   ]
+  },
+  "r.fuseonly": {
+   "result": true,
+   "t": "Just a blown fuse",
+   "cause": "Nothing is shorted now: probably a one-off surge, or a fault that cleared.",
+   "fix": [
+    "Fit the same rating of fuse, and power it from a current-limited supply (or dim bulb tester for mains) the first time.",
+    "If it blows again, the fault comes on under power: measure the rails as it starts."
+   ],
+   "level": "Easy",
+   "parts": [
+    "Fuse"
+   ]
+  },
+  "b.smps.1": {
+   "t": "Cold tests on the power supply",
+   "why": "Most mains power supply faults show up with the power off: start here, it's safer.",
+   "do": [
+    "Unplugged. Wait, then measure across the big capacitor: below about 5V before you touch anything. Discharge it with a resistor if not.",
+    "Fuse: continuity. Bridge rectifier: four diode tests. The big switching MOSFET: drain-source not shorted.",
+    "Look for the startup resistors (high values like 470k–2M feeding the controller chip): they drift open with age, a common cause of a supply that's completely dead."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "A blown fuse and a shorted MOSFET or rectifier",
+     "go": "r.psufuse"
+    },
+    {
+     "t": "A startup resistor open or high",
+     "go": "r.startres"
+    },
+    {
+     "t": "Bulging or leaking capacitors",
+     "go": "r.caps"
+    },
+    {
+     "t": "All fine cold",
+     "go": "b.smps.2"
+    }
+   ],
+   "tools": [
+    "meter",
+    "discharge",
+    "esr"
+   ],
+   "open": true,
+   "signs": [
+    "fuse",
+    "caps",
+    "burnt"
+   ]
+  },
+  "b.smps.2": {
+   "t": "Check the output side",
+   "why": "Faults on the low-voltage side make a supply shut itself down: it ticks, chirps or cycles.",
+   "do": [
+    "Power off. Diode-test the output rectifier diodes (often a dual Schottky on a heatsink): a short is common.",
+    "ESR-test the output capacitors: dried ones cause cycling and noise.",
+    "Check each output for a short to ground."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "A shorted output diode",
+     "go": "r.schottky"
+    },
+    {
+     "t": "High-ESR output capacitors",
+     "go": "r.caps"
+    },
+    {
+     "t": "A shorted output (the fault is in what it feeds)",
+     "go": "b.reg.3"
+    },
+    {
+     "t": "All fine",
+     "go": "b.smps.3"
+    }
+   ],
+   "tools": [
+    "meter",
+    "esr"
+   ],
+   "open": true,
+   "signs": [
+    "caps"
+   ]
+  },
+  "b.smps.3": {
+   "t": "A protected powered test",
+   "why": "With the cold tests passed, power it through a dim bulb tester so a remaining fault can't do damage.",
+   "do": [
+    "Connect it through a dim bulb tester. Keep hands off the board; use clip leads on the low-voltage outputs only.",
+    "Watch the bulb: a flash then dim is normal; bright and staying bright means a short is still there.",
+    "Measure the outputs (low-voltage side only), and listen for ticking."
+   ],
+   "q": "What happens?",
+   "a": [
+    {
+     "t": "Outputs are right",
+     "go": "b.reg.1"
+    },
+    {
+     "t": "Bulb stays bright",
+     "go": "r.psufuse"
+    },
+    {
+     "t": "It ticks or the outputs pulse",
+     "go": "r.feedback"
+    },
+    {
+     "t": "Bulb dims but no output",
+     "go": "r.startres"
+    }
+   ],
+   "tools": [
+    "dimbulb",
+    "meter"
+   ],
+   "live": true,
+   "apps": [
+    {
+     "app": "meterie",
+     "how": "DC volts on the low-voltage output, with the graph running: pulsing outputs show as a saw-tooth."
+    }
+   ]
+  },
+  "r.startres": {
+   "result": true,
+   "t": "Startup resistors or controller supply",
+   "cause": "The controller chip never gets enough voltage to start, usually because its high-value startup resistors have drifted open, or its supply capacitor has dried out.",
+   "fix": [
+    "Measure the startup resistors out of the circuit and replace any that read high or open.",
+    "Replace the small electrolytic on the controller's supply pin (VCC/VDD): a very common fault.",
+    "If it still won't start, replace the controller chip."
+   ],
+   "level": "Hard",
+   "parts": [
+    "Resistors",
+    "Small electrolytic"
+   ],
+   "tools": [
+    "iron",
+    "meter",
+    "esr"
+   ],
+   "pro": "This is on the mains side of the board: work only with it unplugged and the big capacitor discharged."
+  },
+  "r.schottky": {
+   "result": true,
+   "t": "A shorted output diode",
+   "cause": "The rectifier on the low-voltage side has failed short, so the supply shuts down.",
+   "fix": [
+    "Replace it with the same part (or the same voltage and current, Schottky for Schottky).",
+    "Check the output capacitors too: they often failed first."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Schottky diode"
+   ],
+   "tools": [
+    "iron"
+   ]
+  },
+  "r.feedback": {
+   "result": true,
+   "t": "The supply's feedback or output stage",
+   "cause": "It starts, but cycles: the voltage feedback (optocoupler and TL431) or a dried output capacitor makes it shut down and restart.",
+   "fix": [
+    "Replace the output capacitors if not done.",
+    "Test the optocoupler and the TL431 reference (often a 3-leg part near the opto).",
+    "Check nothing on the outputs draws too much: disconnect the load and try again."
+   ],
+   "level": "Hard",
+   "parts": [
+    "Capacitors",
+    "Optocoupler",
+    "TL431"
+   ],
+   "tools": [
+    "esr",
+    "meter",
+    "iron"
+   ]
+  },
+  "b.reg.1": {
+   "t": "Measure every rail",
+   "why": "Each chip runs from a rail. A missing or low rail points straight at the fault.",
+   "do": [
+    "Find the rails: labels like 5V, 3V3, 1V8, VCC, test points, or the regulators' outputs (look up their pinouts).",
+    "Measure each with the device on, black probe on a solid ground."
+   ],
+   "q": "Are all the rails right?",
+   "a": [
+    {
+     "t": "All right",
+     "go": "b.clk.1"
+    },
+    {
+     "t": "One is missing (0V)",
+     "go": "b.reg.2"
+    },
+    {
+     "t": "One is low",
+     "go": "b.reg.3"
+    },
+    {
+     "t": "One is too high",
+     "go": "r.regulator"
+    }
+   ],
+   "tools": [
+    "meter",
+    "probes"
+   ],
+   "live": true,
+   "measure": {
+    "label": "Rail voltage",
+    "unit": "V",
+    "src": "meterie",
+    "near": {
+     "label": "What the rail should be",
+     "unit": "V",
+     "lo": 0.95,
+     "hi": 1.05,
+     "ok": 0,
+     "bad": 2
+    }
+   },
+   "apps": [
+    {
+     "app": "meterie",
+     "how": "DC volts. Use the min/max hold to catch a rail that dips at start-up."
+    }
+   ]
+  },
+  "b.reg.2": {
+   "t": "Find why a rail is missing",
+   "why": "Missing means the regulator isn't making it, or it's switched off.",
+   "do": [
+    "Measure the regulator's input: if that's missing, go back a step along the power path.",
+    "Switching regulators: is the enable pin high? Some rails are switched on by the processor: they stay off if it isn't running.",
+    "Power off and measure the rail to ground: a short makes the regulator shut down."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "No input to the regulator",
+     "go": "r.noinput"
+    },
+    {
+     "t": "Enable pin is low",
+     "go": "b.cpu.1"
+    },
+    {
+     "t": "The rail is shorted to ground",
+     "go": "b.reg.3"
+    },
+    {
+     "t": "Input and enable fine, no output",
+     "go": "r.regulator"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "live": true
+  },
+  "b.reg.3": {
+   "t": "Find the short",
+   "why": "A shorted part pulls a rail down and gets warm when power is pushed into it.",
+   "do": [
+    "Power off. Measure the rail to ground: compare with a similar rail; a few ohms or less is a short.",
+    "Feed the rail from a bench power supply at its voltage, current limit at 0.5–1A.",
+    "Find the warm part: thermal camera, a film of isopropyl alcohol that dries first, or freeze spray that melts first. Small ceramic capacitors are the usual cause."
+   ],
+   "q": "Did you find it?",
+   "a": [
+    {
+     "t": "Yes, a part gets warm",
+     "go": "r.short"
+    },
+    {
+     "t": "Shorted but nothing warms",
+     "go": "r.shortpro"
+    },
+    {
+     "t": "It's not shorted after all",
+     "go": "r.regulator"
+    }
+   ],
+   "tools": [
+    "meter",
+    "benchpsu",
+    "hotspot"
+   ],
+   "open": true,
+   "measure": {
+    "label": "Rail to ground",
+    "unit": "Ω",
+    "src": "meterie",
+    "bands": [
+     {
+      "lt": 5,
+      "a": 0,
+      "say": "Short."
+     },
+     {
+      "a": 2,
+      "say": "Not shorted.",
+      "ok": true
+     }
+    ]
+   }
+  },
+  "b.bat.1": {
+   "t": "Measure the battery and its protection",
+   "why": "Battery packs have a protection board that cuts the output when a cell goes too low or too high.",
+   "do": [
+    "Measure the pack at its output, then each cell (or cell group) directly.",
+    "Single cells: 3.0–4.2V is normal. A pack that reads 0V at its output with healthy cells has its protection tripped."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "Cells fine, output 0V",
+     "go": "r.bmstrip"
+    },
+    {
+     "t": "A cell or group much lower than the rest",
+     "go": "r.cellbad"
+    },
+    {
+     "t": "All cells very low",
+     "go": "b.bat.2"
+    },
+    {
+     "t": "All fine",
+     "go": "b.bat.2"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "measure": {
+    "label": "Lowest cell voltage",
+    "unit": "V",
+    "src": "meterie",
+    "bands": [
+     {
+      "lt": 2.5,
+      "a": 1,
+      "say": "Over-discharged."
+     },
+     {
+      "lt": 4.25,
+      "a": 3,
+      "say": "Normal range.",
+      "ok": true
+     },
+     {
+      "a": 1,
+      "say": "Too high."
+     }
+    ]
+   },
+   "apps": [
+    {
+     "app": "meterie",
+     "how": "DC volts on each cell in turn; note them in the step's notes."
+    }
+   ]
+  },
+  "b.bat.2": {
+   "t": "Check the charging circuit",
+   "why": "If the cells are fine, the charge chip or its sensing is next.",
+   "do": [
+    "With the charger connected, measure the charger's input on the board, then the battery voltage: it should slowly rise.",
+    "Look up the charge chip: check its status pin (it often drives the charge LED) and its temperature-sense pin (a missing thermistor stops charging)."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "Input present, battery doesn't rise",
+     "go": "r.chargeic"
+    },
+    {
+     "t": "Temperature sense open",
+     "go": "r.chargeic"
+    },
+    {
+     "t": "It charges",
+     "go": "r.gauge"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "live": true
+  },
+  "r.bmstrip": {
+   "result": true,
+   "t": "The pack's protection has tripped",
+   "cause": "The protection board cut the output after the pack went too low, or saw a short.",
+   "fix": [
+    "Connect the proper charger: many wake up a tripped pack.",
+    "If not, the board may need a brief connection to a charger at the pack's own voltage; only if you know Li-ion safety.",
+    "If cells are below 2.5V, see Parts tests: lithium-ion cell."
+   ],
+   "level": "Medium",
+   "tools": [
+    "meter"
+   ],
+   "salvage": "If the pack is done for, healthy cells can be reused in projects with a new protection board: test each one (Parts tests)."
+  },
+  "r.cellbad": {
+   "result": true,
+   "t": "One failing cell",
+   "cause": "One cell or group has lost capacity or self-discharges, and drags the whole pack down.",
+   "fix": [
+    "Replace the pack, or rebuild it with matched new cells (a spot welder is needed: never solder directly to cells)."
+   ],
+   "level": "Hard",
+   "parts": [
+    "Matched cells",
+    "Nickel strip"
+   ],
+   "salvage": "The other cells may be good: test each one before reusing it."
+  },
+  "b.clk.1": {
+   "t": "Is the clock running?",
+   "why": "A processor does nothing without its clock.",
+   "do": [
+    "Find the crystal or oscillator next to the main chip (a metal can or a small box marked with a frequency).",
+    "Use a ×10 probe on the output side (XOUT, XTAL2, OSC_OUT): ×1 probes can stop it."
+   ],
+   "q": "What does the scope show?",
+   "a": [
+    {
+     "t": "A clean wave at the marked frequency",
+     "go": "b.clk.2"
+    },
+    {
+     "t": "Flat line",
+     "go": "r.crystal"
+    },
+    {
+     "t": "A wave, but the wrong frequency",
+     "go": "r.crystal"
+    }
+   ],
+   "tools": [
+    "scope"
+   ],
+   "live": true,
+   "measure": {
+    "label": "Frequency",
+    "unit": "MHz",
+    "src": "scopie:freq",
+    "near": {
+     "label": "Marked frequency",
+     "unit": "MHz",
+     "lo": 0.995,
+     "hi": 1.005,
+     "ok": 0,
+     "bad": 2
+    }
+   },
+   "apps": [
+    {
+     "app": "scopie",
+     "how": "×10 probe, timebase so a few cycles fill the screen, trigger on CH1, turn on Frequency."
+    }
+   ]
+  },
+  "b.clk.2": {
+   "t": "Is reset released?",
+   "why": "If the reset or enable line is held, the chip waits forever. If it pulses, the chip keeps restarting.",
+   "do": [
+    "Find the reset pin (RESET, RST, NRST, often with a small capacitor and pull-up, or a 3-pin supervisor chip).",
+    "Measure it with the device on: most chips run when it's high.",
+    "Watch it over a few seconds with a scope or logic analyser: repeated pulses mean something keeps resetting it (a watchdog, or a supply dipping)."
+   ],
+   "q": "What does reset do?",
+   "a": [
+    {
+     "t": "High and steady (running)",
+     "go": "b.cpu.1"
+    },
+    {
+     "t": "Held low",
+     "go": "r.reset"
+    },
+    {
+     "t": "Pulses every so often",
+     "go": "b.cpu.2"
+    }
+   ],
+   "tools": [
+    "meter",
+    "scope",
+    "logic"
+   ],
+   "live": true,
+   "apps": [
+    {
+     "app": "probie",
+     "how": "Logic tab: one channel on the reset pin, capture several seconds at a low sample rate (10kHz) to see any pulses."
+    },
+    {
+     "app": "scopie",
+     "how": "Slow timebase (500ms/div), roll mode, CH1 on reset."
+    }
+   ]
+  },
+  "r.crystal": {
+   "result": true,
+   "t": "The clock isn't running",
+   "cause": "The crystal, its two small capacitors, or the chip's oscillator has failed.",
+   "fix": [
+    "Reflow the crystal's joints (they crack in dropped devices).",
+    "Replace the crystal with the same frequency and type, and check the two load capacitors.",
+    "If it still doesn't run, the processor's oscillator may have failed."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Crystal",
+    "Load capacitors"
+   ],
+   "tools": [
+    "iron",
+    "scope"
+   ]
+  },
+  "r.reset": {
+   "result": true,
+   "t": "Reset held low",
+   "cause": "The reset supervisor or its pull-up holds the chip in reset, usually because it sees a low supply, or the supervisor has failed.",
+   "fix": [
+    "Check the supply the supervisor watches is at its full voltage.",
+    "Check the pull-up resistor and the reset capacitor (a shorted capacitor holds reset low).",
+    "Replace the supervisor chip if its input is fine but its output is low."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Supervisor chip",
+    "Capacitor"
+   ],
+   "tools": [
+    "meter",
+    "iron"
+   ]
+  },
+  "b.cpu.1": {
+   "t": "Is the processor doing anything?",
+   "why": "With power, clock and reset right, look for signs of life.",
+   "do": [
+    "Find a serial TX pin or debug header (often 3–4 pins marked TX, RX, GND, or unlabeled pads near the chip).",
+    "Connect a USB-serial adapter (TX of the board to RX of the adapter, grounds together) at the board's voltage, and power up.",
+    "Or capture several of the chip's pins with a logic analyser: any switching shows it's running."
+   ],
+   "q": "What did you see?",
+   "a": [
+    {
+     "t": "Boot messages that stop with an error",
+     "go": "r.bootlog"
+    },
+    {
+     "t": "Boot messages that repeat",
+     "go": "b.cpu.2"
+    },
+    {
+     "t": "Pins switching, but no messages",
+     "go": "b.bus.1"
+    },
+    {
+     "t": "Nothing at all",
+     "go": "r.firmware"
+    }
+   ],
+   "tools": [
+    "serial",
+    "logic"
+   ],
+   "live": true,
+   "apps": [
+    {
+     "app": "probie",
+     "how": "Serial tab: pick the adapter's port, try 115200 then 9600; Explain describes errors in plain words. Logic tab: 4–8 channels on the chip's pins, 1MHz sample rate."
+    }
+   ]
+  },
+  "b.cpu.2": {
+   "t": "Find why it keeps restarting",
+   "why": "A boot loop is usually power dipping when something switches on, or a watchdog firing.",
+   "do": [
+    "Watch the main rail with a scope (or Meterie's min/max) during start-up: a dip at the moment it restarts points at the supply.",
+    "Read the boot messages: many chips print the reset reason (brownout, watchdog)."
+   ],
+   "q": "What's the cause?",
+   "a": [
+    {
+     "t": "The rail dips",
+     "go": "r.weakrail"
+    },
+    {
+     "t": "A watchdog or crash message",
+     "go": "r.firmware"
+    },
+    {
+     "t": "Can't tell",
+     "go": "r.board"
+    }
+   ],
+   "tools": [
+    "scope",
+    "serial"
+   ],
+   "live": true,
+   "apps": [
+    {
+     "app": "scopie",
+     "how": "CH1 on the main rail, single trigger on a falling edge set just below the rail voltage."
+    },
+    {
+     "app": "probie",
+     "how": "Serial tab: the reset reason is usually near the start of the boot messages."
+    }
+   ]
+  },
+  "r.bootlog": {
+   "result": true,
+   "t": "The boot messages show the fault",
+   "cause": "The processor runs, and is telling you where it stops.",
+   "fix": [
+    "Note the last lines before it stops: a missing part on a bus, a memory test failure, a storage error.",
+    "Search for that message with the device's model: others often know it.",
+    "Use Probie's Explain to turn the error into plain words."
+   ],
+   "level": "Medium",
+   "tools": [
+    "serial"
+   ]
+  },
+  "r.firmware": {
+   "result": true,
+   "t": "Corrupted or missing program",
+   "cause": "Power, clock and reset are fine, but the program in flash memory is damaged, or the chip has failed.",
+   "fix": [
+    "Back up whatever is on the flash chip first with a programmer.",
+    "Reflash with the maker's firmware or a backup from an identical device.",
+    "If it still doesn't run, the processor (or the flash chip) has failed."
+   ],
+   "level": "Hard",
+   "tools": [
+    "programmer"
+   ],
+   "salvage": "If it can't be revived, the rest of the board often isn't: but displays, motors, connectors and power parts usually are."
+  },
+  "r.weakrail": {
+   "result": true,
+   "t": "The supply dips under load",
+   "cause": "The rail sags when something starts, and the processor resets: dried capacitors or a weak regulator.",
+   "fix": [
+    "Replace electrolytic capacitors on that rail and at the regulator.",
+    "Check the regulator's input holds up too.",
+    "Add bulk capacitance near whatever draws the surge, if it's a design weakness."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Capacitors"
+   ],
+   "tools": [
+    "esr",
+    "iron"
+   ]
+  },
+  "b.bus.1": {
+   "t": "Capture the bus",
+   "why": "Chips talk over a few shared wires. Decoding the traffic shows which part isn't answering.",
+   "do": [
+    "Identify the bus: I2C has SDA and SCL (two wires with pull-up resistors); SPI has CLK, MOSI, MISO and a chip-select per device; UART has TX and RX.",
+    "Clip the logic analyser's ground to the board's ground and one channel to each wire.",
+    "Capture during start-up, when the processor talks to everything."
+   ],
+   "q": "What does the decoder show?",
+   "a": [
+    {
+     "t": "I2C: an address gets NAK (no answer)",
+     "go": "b.bus.2"
+    },
+    {
+     "t": "I2C: lines stay low, or no clean edges",
+     "go": "b.bus.3"
+    },
+    {
+     "t": "SPI: data out, but nothing comes back",
+     "go": "r.spidev"
+    },
+    {
+     "t": "UART: garbage characters",
+     "go": "r.baud"
+    },
+    {
+     "t": "All the traffic looks normal",
+     "go": "b.out.1"
+    }
+   ],
+   "tools": [
+    "logic"
+   ],
+   "live": true,
+   "apps": [
+    {
+     "app": "probie",
+     "how": "Logic tab: add the I2C, SPI or UART decoder; sample rate at least 4× the bus speed (2MHz for 400kHz I2C). Explain summarises who answered."
+    }
+   ]
+  },
+  "b.bus.2": {
+   "t": "Why doesn't that chip answer?",
+   "why": "A NAK means nobody answered at that address: the chip has no power, isn't connected, or has failed.",
+   "do": [
+    "Find the chip with that address (its datasheet lists it).",
+    "Check its power pins and ground.",
+    "Check continuity from SDA and SCL on the processor to the same pins on the chip."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "No power at the chip",
+     "go": "r.chippower"
+    },
+    {
+     "t": "A break in SDA or SCL",
+     "go": "r.trace"
+    },
+    {
+     "t": "Power and wiring fine",
+     "go": "r.busdev"
+    }
+   ],
+   "tools": [
+    "meter",
+    "logic"
+   ]
+  },
+  "b.bus.3": {
+   "t": "Check the pull-ups",
+   "why": "I2C lines are pulled high by resistors and pulled low by the chips. A shorted chip or missing pull-up stops the whole bus.",
+   "do": [
+    "With the device on and idle, both SDA and SCL should read close to the supply voltage.",
+    "If one is stuck low, power off and disconnect or lift chips one at a time until it frees: the last one removed is the culprit.",
+    "Slow, rounded rising edges on a scope mean the pull-ups are too weak (or missing)."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "A chip holds the line low",
+     "go": "r.busdev"
+    },
+    {
+     "t": "Pull-up resistor missing or open",
+     "go": "r.pullup"
+    },
+    {
+     "t": "Lines idle high, edges are clean",
+     "go": "r.board"
+    }
+   ],
+   "tools": [
+    "meter",
+    "scope"
+   ],
+   "live": true,
+   "measure": {
+    "label": "SDA or SCL when idle",
+    "unit": "V",
+    "src": "meterie",
+    "near": {
+     "label": "Supply voltage",
+     "unit": "V",
+     "lo": 0.85,
+     "hi": 1.05,
+     "ok": 2,
+     "bad": 0
+    }
+   },
+   "apps": [
+    {
+     "app": "scopie",
+     "how": "CH1 on SDA, CH2 on SCL, about 2µs/div: edges should rise quickly and square."
+    }
+   ]
+  },
+  "r.chippower": {
+   "result": true,
+   "t": "The chip has no power",
+   "cause": "Its supply pin is dead, so it can't answer.",
+   "fix": [
+    "Follow its supply pin back to the rail it comes from: a broken track, a missing ferrite bead or resistor in series, or a rail that's switched off.",
+    "If the whole rail is missing, go to the Regulators and rails section."
+   ],
+   "level": "Medium",
+   "tools": [
+    "meter"
+   ]
+  },
+  "r.nocontrol": {
+   "result": true,
+   "t": "Nothing is telling it to switch",
+   "cause": "The control signal never changes, so the fault is before the driver.",
+   "fix": [
+    "Check continuity from the processor's pin to the driver's input (resistors in between too).",
+    "If the processor isn't running at all, go to the Processor and memory section."
+   ],
+   "level": "Medium",
+   "tools": [
+    "meter",
+    "logic"
+   ]
+  },
+  "r.noinput": {
+   "result": true,
+   "t": "The regulator gets no input",
+   "cause": "Power stops somewhere between the input and this regulator.",
+   "fix": [
+    "Follow its input pin back towards the power input, measuring at each part: a fuse, a diode, a switch, a ferrite or a broken track.",
+    "The Power input and protection section goes through the usual parts."
+   ],
+   "level": "Medium",
+   "tools": [
+    "meter"
+   ]
+  },
+  "r.busdev": {
+   "result": true,
+   "t": "A chip on the bus has failed",
+   "cause": "It doesn't answer, or holds the bus.",
+   "fix": [
+    "Reflow its joints first.",
+    "Replace it with the same part (and the same address variant)."
+   ],
+   "level": "Hard",
+   "parts": [
+    "The chip"
+   ],
+   "tools": [
+    "hotair",
+    "iron"
+   ]
+  },
+  "r.pullup": {
+   "result": true,
+   "t": "Missing or open pull-up",
+   "cause": "Without its pull-up, the line can't return high.",
+   "fix": [
+    "Replace the resistor (usually 2.2k–10k to the supply)."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Resistor"
+   ],
+   "tools": [
+    "iron"
+   ]
+  },
+  "r.spidev": {
+   "result": true,
+   "t": "An SPI chip doesn't answer",
+   "cause": "Its chip-select, power, or the chip itself.",
+   "fix": [
+    "Check its chip-select line goes low when it's addressed, and its power.",
+    "Check MISO continuity back to the processor.",
+    "Replace the chip (memory chips: back up and reprogram)."
+   ],
+   "level": "Hard",
+   "tools": [
+    "logic",
+    "programmer"
+   ]
+  },
+  "r.baud": {
+   "result": true,
+   "t": "Serial speed or level is wrong",
+   "cause": "Garbled characters mean the speed doesn't match, or the voltage levels don't (RS-232 vs logic level).",
+   "fix": [
+    "Measure one bit's width in the capture: 1 ÷ width = the baud rate.",
+    "RS-232 swings to ±5–12V; logic-level serial is 0–3.3V or 0–5V: a level converter (MAX232 type) may have failed."
+   ],
+   "level": "Medium",
+   "tools": [
+    "logic"
+   ]
+  },
+  "b.aud.1": {
+   "t": "Feed in a test tone",
+   "why": "Following a known signal through the circuit shows exactly where it stops.",
+   "do": [
+    "Play a 1kHz tone into the input (a phone app works), at a low volume.",
+    "Put the scope's ground on the board's audio ground.",
+    "Start at the input socket, then follow the signal: each coupling capacitor, each op-amp or transistor stage, the volume control, the amplifier chip, then the speaker."
+   ],
+   "q": "Where does the tone stop?",
+   "a": [
+    {
+     "t": "At a capacitor (there on one side, not the other)",
+     "go": "r.couplecap"
+    },
+    {
+     "t": "At an op-amp or transistor stage",
+     "go": "b.aud.2"
+    },
+    {
+     "t": "At the amplifier chip",
+     "go": "b.aud.3"
+    },
+    {
+     "t": "It reaches the speaker terminals",
+     "go": "r.speaker"
+    }
+   ],
+   "tools": [
+    "scope",
+    "signal"
+   ],
+   "live": true,
+   "measure": {
+    "label": "Signal at this point",
+    "unit": "mV",
+    "src": "scopie:vpp",
+    "bands": [
+     {
+      "lt": 5,
+      "a": 1,
+      "say": "Practically nothing: the signal stops before here."
+     },
+     {
+      "a": 3,
+      "say": "Signal present.",
+      "ok": true
+     }
+    ]
+   },
+   "apps": [
+    {
+     "app": "scopie",
+     "how": "CH1, about 500µs/div, AC coupling, Peak-to-peak on. Move the probe along the path."
+    }
+   ]
+  },
+  "b.aud.2": {
+   "t": "Check the stage's power and bias",
+   "why": "Every amplifying stage needs its supply, and sits at a resting voltage with no signal.",
+   "do": [
+    "Measure the op-amp's supply pins, or the transistor's collector and emitter.",
+    "With no signal, op-amp outputs rest mid-way (0V on a ± supply, half the supply on a single one)."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "Supply missing",
+     "go": "b.reg.1"
+    },
+    {
+     "t": "Output stuck at a supply rail",
+     "go": "r.opamp"
+    },
+    {
+     "t": "Supply and bias right",
+     "go": "r.couplecap"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "live": true
+  },
+  "b.aud.3": {
+   "t": "Check the amplifier chip",
+   "why": "Amplifier chips need power, and many have a mute or standby pin the processor controls.",
+   "do": [
+    "Supply pins at the right voltage.",
+    "Find the MUTE, STBY or SD pin in the datasheet: is it in the 'play' state?",
+    "With no signal, measure DC across the speaker terminals: more than about 50mV means a faulty output stage."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "Muted or in standby",
+     "go": "r.mute"
+    },
+    {
+     "t": "DC at the speaker",
+     "go": "r.amp"
+    },
+    {
+     "t": "Supply missing",
+     "go": "b.reg.1"
+    },
+    {
+     "t": "All right, still no sound",
+     "go": "r.amp"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "live": true
+  },
+  "r.couplecap": {
+   "result": true,
+   "t": "A failed coupling capacitor",
+   "cause": "Small electrolytics between stages dry out and stop passing the signal: very common in old audio.",
+   "fix": [
+    "Replace the electrolytics in the signal path (a 'recap'), same µF and voltage or higher.",
+    "Film capacitors are a good replacement for small values."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Capacitors"
+   ],
+   "tools": [
+    "iron",
+    "esr"
+   ]
+  },
+  "r.opamp": {
+   "result": true,
+   "t": "A failed op-amp stage",
+   "cause": "The op-amp's output is stuck.",
+   "fix": [
+    "Replace the op-amp with the same or a pin-compatible part.",
+    "Check its supply rails are both present first."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Op-amp"
+   ],
+   "tools": [
+    "iron"
+   ]
+  },
+  "r.mute": {
+   "result": true,
+   "t": "The amplifier is muted",
+   "cause": "The mute or standby pin keeps it silent: usually the processor holding it, or a fault the processor detected.",
+   "fix": [
+    "Follow the mute pin back to what drives it.",
+    "Check the processor is running (Processor and memory).",
+    "Briefly tying it to the 'play' level shows whether the amplifier works."
+   ],
+   "level": "Medium",
+   "tools": [
+    "meter",
+    "logic"
+   ]
+  },
+  "b.vid.1": {
+   "t": "Look for sync",
+   "why": "Every video signal carries timing pulses. If they're there, the video circuit is running.",
+   "do": [
+    "Composite video (yellow socket): about 1V peak to peak, with sync pulses every 64µs (15.6–15.7kHz).",
+    "VGA: separate horizontal sync (about 31.5kHz for 640×480) and vertical sync (50–75Hz), on pins 13 and 14.",
+    "Probe the output socket first, then back towards the video chip."
+   ],
+   "q": "What do you see?",
+   "a": [
+    {
+     "t": "Sync is there at the right rate",
+     "go": "b.vid.2"
+    },
+    {
+     "t": "No sync at all",
+     "go": "b.vid.3"
+    },
+    {
+     "t": "Sync at an odd rate",
+     "go": "r.vidclock"
+    }
+   ],
+   "tools": [
+    "scope",
+    "logic"
+   ],
+   "live": true,
+   "measure": {
+    "label": "Horizontal sync rate",
+    "unit": "kHz",
+    "src": "scopie:freq",
+    "bands": [
+     {
+      "lt": 14,
+      "a": 2,
+      "say": "Unusual rate."
+     },
+     {
+      "lt": 17,
+      "a": 0,
+      "say": "TV rate (composite).",
+      "ok": true
+     },
+     {
+      "lt": 30,
+      "a": 2,
+      "say": "Unusual rate."
+     },
+     {
+      "lt": 82,
+      "a": 0,
+      "say": "A normal VGA rate.",
+      "ok": true
+     },
+     {
+      "a": 2,
+      "say": "Unusual rate."
+     }
+    ]
+   },
+   "apps": [
+    {
+     "app": "scopie",
+     "how": "Composite: CH1, 20µs/div, trigger on the falling sync edge. VGA: 10µs/div on HSYNC."
+    },
+    {
+     "app": "probie",
+     "how": "VGA or digital sync: one channel each on HSYNC and VSYNC; the frequency shows in the measurement."
+    }
+   ]
+  },
+  "b.vid.2": {
+   "t": "Check the picture levels",
+   "why": "With sync right, look at the picture part of the signal.",
+   "do": [
+    "Composite: the picture rides above the sync, up to about 0.7V above black.",
+    "VGA: each of R, G and B swings 0 to 0.7V; a missing colour channel means that colour's output stage.",
+    "Check the 75Ω terminations and output resistors in the path."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "One colour or the picture part is missing",
+     "go": "r.vidout"
+    },
+    {
+     "t": "Levels right: the fault's in the screen or cable",
+     "go": "b.con.1"
+    }
+   ],
+   "tools": [
+    "scope"
+   ],
+   "live": true,
+   "apps": [
+    {
+     "app": "scopie",
+     "how": "CH1 on each colour pin in turn at 10µs/div; turn on Peak-to-peak."
+    }
+   ]
+  },
+  "b.vid.3": {
+   "t": "Check the video chip's supply and clock",
+   "why": "No sync means the video chip isn't running.",
+   "do": [
+    "Measure its supply pins, and look for its own clock (often a separate crystal: 14.318MHz, 17.734MHz, 25.175MHz…).",
+    "Check it's out of reset or enabled."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "Supply missing",
+     "go": "b.reg.1"
+    },
+    {
+     "t": "Its clock is dead",
+     "go": "r.crystal"
+    },
+    {
+     "t": "Supply and clock fine",
+     "go": "r.vidout"
+    }
+   ],
+   "tools": [
+    "meter",
+    "scope"
+   ],
+   "live": true
+  },
+  "r.vidclock": {
+   "result": true,
+   "t": "Video timing is wrong",
+   "cause": "The video chip's clock is off, or it's set to a mode the display can't show.",
+   "fix": [
+    "Check the video crystal's frequency.",
+    "Some devices switch PAL/NTSC with a jumper or setting: check it."
+   ],
+   "level": "Medium",
+   "tools": [
+    "scope"
+   ]
+  },
+  "r.vidout": {
+   "result": true,
+   "t": "A failed video output stage",
+   "cause": "The output transistor, buffer chip, or a resistor in the path has failed.",
+   "fix": [
+    "Follow the missing signal back to the first point it's present, and test the parts between (Parts tests).",
+    "Replace the failed transistor, resistor or buffer."
+   ],
+   "level": "Medium",
+   "tools": [
+    "scope",
+    "meter",
+    "iron"
+   ]
+  },
+  "b.out.1": {
+   "t": "Is the output being told to switch?",
+   "why": "Every driven output has a control signal. Check that first: it tells you whether the fault is before or after the driver.",
+   "do": [
+    "Find the driver (a transistor, MOSFET, driver chip, or relay) for the thing that doesn't work.",
+    "Watch its control input (transistor base, MOSFET gate, chip's IN pin) while you ask the device to switch it."
+   ],
+   "q": "Does the control signal change?",
+   "a": [
+    {
+     "t": "Yes, but the output doesn't follow",
+     "go": "b.out.2"
+    },
+    {
+     "t": "No, the control stays still",
+     "go": "r.nocontrol"
+    }
+   ],
+   "tools": [
+    "meter",
+    "logic"
+   ],
+   "live": true,
+   "apps": [
+    {
+     "app": "probie",
+     "how": "One channel on the control pin; PWM outputs show their frequency and duty in the measurement."
+    }
+   ]
+  },
+  "b.out.2": {
+   "t": "Test the driver",
+   "why": "The control works, so the driver or the load has failed.",
+   "do": [
+    "Power off. Test the transistor or MOSFET (Parts tests); test the relay's coil and contacts.",
+    "Check the flyback diode across motors and relay coils: when it fails, the driver fails with it.",
+    "Test the load itself (motor, LED, lamp) on its own."
+   ],
+   "q": "What failed?",
+   "a": [
+    {
+     "t": "The transistor or MOSFET",
+     "go": "r.driver2"
+    },
+    {
+     "t": "The relay",
+     "go": "r.relay2"
+    },
+    {
+     "t": "The load itself",
+     "go": "r.motor"
+    },
+    {
+     "t": "Nothing found",
+     "go": "r.board"
+    }
+   ],
+   "tools": [
+    "meter",
+    "esr"
+   ],
+   "open": true
+  },
+  "r.driver2": {
+   "result": true,
+   "t": "A failed driver transistor or MOSFET",
+   "cause": "It's shorted (output stuck on) or open (never switches).",
+   "fix": [
+    "Replace it with the same part or an equivalent (Parts tests: transistor, MOSFET).",
+    "Replace the flyback diode too if there is one.",
+    "Find why it failed: a shorted motor or a missing diode kills the new one."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Transistor or MOSFET",
+    "Flyback diode"
+   ],
+   "tools": [
+    "iron"
+   ]
+  },
+  "r.relay2": {
+   "result": true,
+   "t": "A failed relay",
+   "cause": "The coil is open, or the contacts are burnt or welded.",
+   "fix": [
+    "Replace it with the same coil voltage and contact rating."
+   ],
+   "level": "Medium",
+   "parts": [
+    "Relay"
+   ],
+   "tools": [
+    "iron"
+   ],
+   "salvage": "Working relays from scrapped boards are worth keeping: test them first (Parts tests)."
+  },
+  "b.inp.1": {
+   "t": "Watch the inputs",
+   "why": "Buttons and keyboards are read by scanning; sensors give a voltage or a digital signal.",
+   "do": [
+    "Single buttons: measure the input pin while pressing: it should swing between its two levels (often pulled high, pressed = low).",
+    "Keyboard matrices: the processor pulses each row in turn and reads the columns. Capture a row and a column while holding a key.",
+    "Analog sensors and pots: measure the voltage at the processor's input as you change them."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "The input never changes",
+     "go": "b.inp.2"
+    },
+    {
+     "t": "It changes but the device ignores it",
+     "go": "r.board"
+    },
+    {
+     "t": "Rows aren't being scanned",
+     "go": "b.cpu.1"
+    }
+   ],
+   "tools": [
+    "meter",
+    "logic"
+   ],
+   "live": true,
+   "apps": [
+    {
+     "app": "probie",
+     "how": "Logic tab: one channel per row and column, 100kHz sample rate, capture while holding a key: the pressed key joins its row and column."
+    }
+   ]
+  },
+  "b.inp.2": {
+   "t": "Test the switch and its path",
+   "why": "The switch, its pull-up, or the track to the processor.",
+   "do": [
+    "Power off. Continuity across the switch while pressing.",
+    "Check the pull-up resistor (often 10k).",
+    "Continuity from the switch to the processor's pin."
+   ],
+   "q": "What failed?",
+   "a": [
+    {
+     "t": "The switch",
+     "go": "r.button"
+    },
+    {
+     "t": "The pull-up",
+     "go": "r.pullup"
+    },
+    {
+     "t": "A track",
+     "go": "r.trace"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "open": true
+  },
+  "b.con.1": {
+   "t": "Beep out the connections",
+   "why": "Breaks in cables, flex, tracks and vias stop signals and power reaching where they're needed.",
+   "do": [
+    "Power off. Continuity from each pin of the connector to where it goes on each board.",
+    "Flex cables: look for creases and cracks; bend them gently while beeping.",
+    "Vias (small plated holes) corrode through after a spill: beep from one side of the board to the other."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "A broken wire or flex",
+     "go": "r.cable"
+    },
+    {
+     "t": "A broken track or via",
+     "go": "r.trace"
+    },
+    {
+     "t": "Corroded contacts",
+     "go": "r.connector"
+    },
+    {
+     "t": "All connected",
+     "go": "r.board"
+    }
+   ],
+   "tools": [
+    "meter",
+    "magnifier"
+   ],
+   "open": true,
+   "signs": [
+    "connector",
+    "trace",
+    "corrosion"
+   ],
+   "apps": [
+    {
+     "app": "meterie",
+     "how": "Continuity with the graph: a break that only opens when bent shows as a gap."
+    }
+   ]
+  },
+  "u.pw.1": {
+   "t": "Measure the supply at your board",
+   "why": "Check the voltage where it's used, not just at the supply.",
+   "do": [
+    "Power it on. Measure across the supply pins of your main board or chip (VCC/5V/3V3 to GND).",
+    "On a breadboard, measure the power rails at both ends: long breadboards split their rails in the middle."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "The right voltage",
+     "go": "u.pw.3"
+    },
+    {
+     "t": "Nothing",
+     "go": "u.pw.2"
+    },
+    {
+     "t": "Much lower than it should be",
+     "go": "u.pw.4"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "live": true,
+   "measure": {
+    "label": "Supply at the board",
+    "unit": "V",
+    "src": "meterie",
+    "near": {
+     "label": "What it should be",
+     "unit": "V",
+     "lo": 0.93,
+     "hi": 1.07,
+     "ok": 0,
+     "bad": 2
+    }
+   },
+   "apps": [
+    {
+     "app": "meterie",
+     "how": "DC volts; the min/max hold catches a supply that drops when it starts."
+    }
+   ]
+  },
+  "u.pw.2": {
+   "t": "Follow the power from the source",
+   "why": "Find where it stops.",
+   "do": [
+    "Measure at the supply itself, then at each point along the way: connector, switch, fuse, regulator in and out.",
+    "Breadboards: is the rail you're using actually connected? Wire jumper across the gap in split rails.",
+    "Regulators: check the pinout. A 7805 is IN-GND-OUT; an AMS1117 is GND-OUT-IN: fitting one like the other is a very common mistake."
+   ],
+   "q": "Where does it stop?",
+   "a": [
+    {
+     "t": "At the supply: it gives nothing",
+     "go": "r.supply"
+    },
+    {
+     "t": "At a regulator: wrong pinout or way round",
+     "go": "r.pinout"
+    },
+    {
+     "t": "At a connector, switch or wire",
+     "go": "r.cable"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "live": true
+  },
+  "u.pw.3": {
+   "t": "Measure the current it draws",
+   "why": "Too much current means a short or a part in backwards; none at all means something's open.",
+   "do": [
+    "Power it from a bench supply with the current limit set low (100–200mA to start), or put the meter in series on its current range.",
+    "Compare with what you'd expect: a bare dev board draws 20–100mA."
+   ],
+   "q": "What does it draw?",
+   "a": [
+    {
+     "t": "Hits the current limit or far too much",
+     "go": "u.hot.1"
+    },
+    {
+     "t": "Almost nothing",
+     "go": "u.wire.1"
+    },
+    {
+     "t": "About what I'd expect",
+     "go": "u.code.1"
+    }
+   ],
+   "tools": [
+    "benchpsu",
+    "meter"
+   ],
+   "live": true,
+   "measure": {
+    "label": "Current drawn",
+    "unit": "mA",
+    "src": "meterie",
+    "bands": [
+     {
+      "lt": 1,
+      "a": 1,
+      "say": "Almost nothing: something isn't connected."
+     },
+     {
+      "lt": 500,
+      "a": 2,
+      "say": "Plausible for a small build: compare with what you expected.",
+      "ok": true
+     },
+     {
+      "a": 0,
+      "say": "A lot: look for a short or a reversed part."
+     }
+    ]
+   }
+  },
+  "u.pw.4": {
+   "t": "Why is the voltage low?",
+   "why": "Low voltage at the board means the supply can't keep up, or something pulls it down.",
+   "do": [
+    "Disconnect parts of the circuit one at a time (motors, LEDs, modules) and watch the voltage.",
+    "Long, thin wires drop voltage under load: measure at both ends of each.",
+    "USB ports give 500mA (USB 2) to 900mA (USB 3): motors and LED strips need their own supply."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "One part pulls it down",
+     "go": "u.hot.1"
+    },
+    {
+     "t": "Thin or long wires",
+     "go": "r.weaksupply"
+    },
+    {
+     "t": "The supply can't give enough current",
+     "go": "r.weaksupply"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "live": true
+  },
+  "r.pinout": {
+   "result": true,
+   "t": "A part fitted the wrong way, or the wrong pinout",
+   "cause": "Regulators, transistors and chips with the same package often have different pinouts.",
+   "fix": [
+    "Check the datasheet's pinout against your wiring, with the part's flat face or notch matched to the drawing.",
+    "Test the part after a power-up the wrong way: regulators and chips often survive, but not always (Parts tests)."
+   ],
+   "level": "Easy",
+   "tools": [
+    "meter"
+   ]
+  },
+  "u.hot.1": {
+   "t": "Find the hot part, carefully",
+   "why": "A hot part is either shorted, fitted backwards, or working too hard.",
+   "do": [
+    "Power off at once if anything smells or smokes.",
+    "Power it from a current-limited supply and feel for warmth with the back of a finger, or use a thermal camera.",
+    "Check orientation of everything with a polarity: electrolytic capacitors, diodes, LEDs, regulators, chips (pin 1 dot or notch)."
+   ],
+   "q": "What's hot?",
+   "a": [
+    {
+     "t": "A part fitted backwards",
+     "go": "r.pinout"
+    },
+    {
+     "t": "A regulator, but it's fitted right",
+     "go": "u.hot.2"
+    },
+    {
+     "t": "A chip or module",
+     "go": "u.wire.1"
+    },
+    {
+     "t": "A transistor or MOSFET driving a load",
+     "go": "u.hot.3"
+    }
+   ],
+   "tools": [
+    "benchpsu",
+    "hotspot"
+   ],
+   "live": true
+  },
+  "u.hot.2": {
+   "t": "Work out the regulator's heat",
+   "why": "A linear regulator burns off the difference as heat: (input − output) × current.",
+   "do": [
+    "Measure its input and output voltage, and the current through it.",
+    "Example: 12V in, 5V out at 200mA is (12 − 5) × 0.2 = 1.4W: too much for a small regulator without a heatsink (a bare TO-220 manages about 1W; SOT-223 well under 1W)."
+   ],
+   "q": "Is it working too hard?",
+   "a": [
+    {
+     "t": "Yes, more than it can shed",
+     "go": "r.reghot"
+    },
+    {
+     "t": "No, but it still overheats",
+     "go": "u.wire.1"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "live": true
+  },
+  "u.hot.3": {
+   "t": "Check the driver is switching fully",
+   "why": "A transistor or MOSFET that's only half on gets hot.",
+   "do": [
+    "Measure the gate (MOSFET) or base current (transistor) drive: a MOSFET driven from 3.3V needs a 'logic-level' type.",
+    "Measure the voltage across it while on: more than a few tenths of a volt at real current means it isn't fully on.",
+    "Motors and relays need a flyback diode across them."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "Not a logic-level MOSFET",
+     "go": "r.logiclevel"
+    },
+    {
+     "t": "No flyback diode",
+     "go": "r.flyback"
+    },
+    {
+     "t": "It's switching fully",
+     "go": "r.heatsink"
+    }
+   ],
+   "tools": [
+    "meter",
+    "scope"
+   ],
+   "live": true
+  },
+  "r.reghot": {
+   "result": true,
+   "t": "The regulator is working too hard",
+   "cause": "Too big a drop at too much current.",
+   "fix": [
+    "Use a buck converter module instead: they waste very little.",
+    "Or lower the input voltage, add a heatsink, or split the load."
+   ],
+   "level": "Easy",
+   "parts": [
+    "Buck converter module"
+   ]
+  },
+  "r.logiclevel": {
+   "result": true,
+   "t": "The MOSFET isn't fully switched on",
+   "cause": "Standard MOSFETs need about 10V on the gate; 3.3V or 5V leaves them half on.",
+   "fix": [
+    "Use a logic-level MOSFET (look for RDS(on) quoted at VGS = 2.5V or 4.5V), or drive the gate through a transistor or driver."
+   ],
+   "level": "Easy",
+   "parts": [
+    "Logic-level MOSFET"
+   ]
+  },
+  "r.flyback": {
+   "result": true,
+   "t": "Missing flyback diode",
+   "cause": "Motors and relay coils kick back a high voltage spike when switched off.",
+   "fix": [
+    "Fit a diode (1N4148 for small relays, 1N400x or a Schottky for motors) across the coil or motor, band to the positive side."
+   ],
+   "level": "Easy",
+   "parts": [
+    "Diode"
+   ]
+  },
+  "r.heatsink": {
+   "result": true,
+   "t": "It needs a heatsink",
+   "cause": "It's switching properly but carries enough current to heat up.",
+   "fix": [
+    "Add a heatsink, or use a part with a lower on-resistance."
+   ],
+   "level": "Easy",
+   "parts": [
+    "Heatsink"
+   ]
+  },
+  "u.code.1": {
+   "t": "Prove the board runs at all",
+   "why": "Before your code, check the board can run the simplest thing.",
+   "do": [
+    "Upload a blink sketch (or the board's 'hello world') and nothing else.",
+    "Add a print at the very start of your program, and open the serial monitor at the matching speed."
+   ],
+   "q": "What happens?",
+   "a": [
+    {
+     "t": "Blink works, my code doesn't",
+     "go": "u.code.2"
+    },
+    {
+     "t": "It resets over and over",
+     "go": "u.code.3"
+    },
+    {
+     "t": "Even blink doesn't run",
+     "go": "up.3"
+    }
+   ],
+   "tools": [
+    "serial"
+   ],
+   "apps": [
+    {
+     "app": "probie",
+     "how": "Serial tab at your sketch's speed: prints show how far it gets; Explain describes crash messages."
+    }
+   ]
+  },
+  "u.code.2": {
+   "t": "Find where your code stops",
+   "why": "Print messages narrow it down.",
+   "do": [
+    "Add a print before and after each part of your setup: the last message tells you where it stops.",
+    "Common stops: waiting for a sensor that isn't there (I2C begin), a library expecting different pins, a loop that never ends."
+   ],
+   "q": "Where does it stop?",
+   "a": [
+    {
+     "t": "At a sensor or module",
+     "go": "u.bus.1"
+    },
+    {
+     "t": "At pin setup or a library",
+     "go": "u.wire.1"
+    },
+    {
+     "t": "It crashes with a message",
+     "go": "r.crash"
+    }
+   ],
+   "tools": [
+    "serial"
+   ],
+   "apps": [
+    {
+     "app": "probie",
+     "how": "Serial tab: watch the prints as it starts."
+    }
+   ]
+  },
+  "u.code.3": {
+   "t": "Find why it resets",
+   "why": "A reset loop is a power dip (brownout), a crash, or a watchdog.",
+   "do": [
+    "Read the first lines it prints after each restart: ESP32 and ESP8266 print the reset reason (brownout, panic, watchdog).",
+    "Watch the supply with a scope while it resets: a dip when a motor, radio or LEDs start is a brownout."
+   ],
+   "q": "What's the reason?",
+   "a": [
+    {
+     "t": "Brownout, or the supply dips",
+     "go": "u.noise.1"
+    },
+    {
+     "t": "A crash or panic",
+     "go": "r.crash"
+    },
+    {
+     "t": "Watchdog",
+     "go": "r.watchdog"
+    }
+   ],
+   "tools": [
+    "serial",
+    "scope"
+   ],
+   "live": true,
+   "apps": [
+    {
+     "app": "scopie",
+     "how": "CH1 on the 3.3V or 5V pin, single trigger on a falling edge just below the rail."
+    },
+    {
+     "app": "probie",
+     "how": "Serial tab at 115200 (74880 for ESP8266 boot messages)."
+    }
+   ]
+  },
+  "r.crash": {
+   "result": true,
+   "t": "Your program crashes",
+   "cause": "A crash message (panic, exception, stack trace) shows where.",
+   "fix": [
+    "Decode the backtrace (the ESP exception decoder turns addresses into line numbers).",
+    "Common causes: an array written past its end, a null pointer, too little stack for a big local array, a library used before begin()."
+   ],
+   "level": "Medium"
+  },
+  "r.watchdog": {
+   "result": true,
+   "t": "The watchdog resets it",
+   "cause": "A loop runs too long without letting the system do its own work.",
+   "fix": [
+    "Add a short delay or yield() in long loops; never wait forever for a sensor.",
+    "On ESP32, avoid long blocking work in callbacks and interrupts."
+   ],
+   "level": "Easy"
+  },
+  "u.bus.1": {
+   "t": "Check the module is there",
+   "why": "Before the data, check the module answers at all.",
+   "do": [
+    "I2C: run an I2C scanner sketch. It lists every address that answers.",
+    "Check the module's power and ground, and that SDA and SCL go to the right pins for your board (they differ between boards)."
+   ],
+   "q": "What did the scanner find?",
+   "a": [
+    {
+     "t": "Nothing at all",
+     "go": "u.bus.2"
+    },
+    {
+     "t": "A different address from my code",
+     "go": "r.i2caddr"
+    },
+    {
+     "t": "The right address, but readings are wrong",
+     "go": "u.bus.3"
+    },
+    {
+     "t": "It's SPI or serial, not I2C",
+     "go": "u.bus.4"
+    }
+   ],
+   "tools": [
+    "serial",
+    "logic"
+   ],
+   "apps": [
+    {
+     "app": "probie",
+     "how": "Logic tab: SDA and SCL on two channels with the I2C decoder; NAK after the address means nothing answered."
+    }
+   ]
+  },
+  "u.bus.2": {
+   "t": "Why doesn't anything answer?",
+   "why": "Usually wiring, pull-ups or voltage.",
+   "do": [
+    "SDA and SCL swapped is the commonest mistake.",
+    "I2C needs pull-up resistors (2.2k–10k to the supply). Many modules include them; a bare chip doesn't.",
+    "Measure SDA and SCL with everything idle: both should sit near the supply voltage.",
+    "A 5V module on a 3.3V board may need a level shifter."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "Swapped or wrong pins",
+     "go": "r.pinout"
+    },
+    {
+     "t": "No pull-ups",
+     "go": "r.pullup"
+    },
+    {
+     "t": "Voltage mismatch",
+     "go": "r.levels"
+    },
+    {
+     "t": "All right",
+     "go": "r.busdev"
+    }
+   ],
+   "tools": [
+    "meter",
+    "logic"
+   ],
+   "live": true,
+   "measure": {
+    "label": "SDA or SCL when idle",
+    "unit": "V",
+    "src": "meterie",
+    "near": {
+     "label": "Supply voltage",
+     "unit": "V",
+     "lo": 0.85,
+     "hi": 1.05,
+     "ok": 3,
+     "bad": 1
+    }
+   }
+  },
+  "u.bus.3": {
+   "t": "Look at the data",
+   "why": "It answers, so look at what it's saying.",
+   "do": [
+    "Capture a reading with the logic analyser and the bus decoder: compare the bytes with the datasheet.",
+    "Check your code reads the right registers, in the right order, and converts them as the datasheet says (byte order, signed values, scale)."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "The data looks right: my conversion is wrong",
+     "go": "r.convert"
+    },
+    {
+     "t": "The data is wrong or noisy",
+     "go": "u.noise.1"
+    }
+   ],
+   "tools": [
+    "logic"
+   ],
+   "apps": [
+    {
+     "app": "probie",
+     "how": "Logic tab with the I2C or SPI decoder; Explain lists each read and write."
+    }
+   ]
+  },
+  "u.bus.4": {
+   "t": "Check SPI or serial",
+   "why": "SPI needs the right mode and chip-select; serial needs matching speed and crossed wires.",
+   "do": [
+    "SPI: check chip-select goes low around each transfer, and the clock mode (0–3) matches the datasheet.",
+    "Serial: TX goes to RX and RX to TX; both sides at the same speed and voltage."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "Chip-select or mode wrong",
+     "go": "r.spidev"
+    },
+    {
+     "t": "TX and RX not crossed",
+     "go": "r.pinout"
+    },
+    {
+     "t": "Speed mismatch: garbled text",
+     "go": "r.baud"
+    }
+   ],
+   "tools": [
+    "logic"
+   ],
+   "apps": [
+    {
+     "app": "probie",
+     "how": "Logic tab: SPI decoder (set the mode) or UART decoder; it can measure the bit width to find the baud rate."
+    }
+   ]
+  },
+  "r.i2caddr": {
+   "result": true,
+   "t": "The address in your code is wrong",
+   "cause": "Many modules have two possible addresses, set by a pin or solder jumper.",
+   "fix": [
+    "Use the address the scanner found, or change the module's address pin to match your code."
+   ],
+   "level": "Easy"
+  },
+  "r.levels": {
+   "result": true,
+   "t": "Voltage levels don't match",
+   "cause": "3.3V boards can be damaged by 5V signals, and may not read 3.3V as high on 5V parts.",
+   "fix": [
+    "Use a level shifter, or run the module at 3.3V if it supports it."
+   ],
+   "level": "Easy",
+   "parts": [
+    "Level shifter"
+   ]
+  },
+  "r.convert": {
+   "result": true,
+   "t": "The data is right, the conversion isn't",
+   "cause": "The module sends good data; the code reads it wrongly.",
+   "fix": [
+    "Check byte order (high byte first?), signed values, and the scale factor in the datasheet.",
+    "Try the library's example sketch to compare."
+   ],
+   "level": "Easy"
+  },
+  "u.wire.1": {
+   "t": "Check your build against your design",
+   "why": "Go through every connection, one at a time, with the power off.",
+   "do": [
+    "With your schematic or Wirie design open, beep out each connection from part to part, ticking them off.",
+    "Then check neighbouring pins on each chip and header aren't shorted together.",
+    "Check pin numbering: board labels (D4, GPIO2) aren't the same as chip pin numbers."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "A missing connection",
+     "go": "r.cable"
+    },
+    {
+     "t": "A short between pins",
+     "go": "r.solderbridge"
+    },
+    {
+     "t": "A wire on the wrong pin",
+     "go": "r.pinout"
+    },
+    {
+     "t": "All correct",
+     "go": "u.sig.1"
+    }
+   ],
+   "tools": [
+    "meter"
+   ],
+   "open": true,
+   "apps": [
+    {
+     "app": "wirie",
+     "how": "Open your design; follow each net in the PCB tab and beep it out."
+    },
+    {
+     "app": "meterie",
+     "how": "Continuity beep, so you can keep your eyes on the board."
+    }
+   ]
+  },
+  "r.solderbridge": {
+   "result": true,
+   "t": "A solder bridge or short",
+   "cause": "Solder or a stray strand joins two pins.",
+   "fix": [
+    "Remove it with solder wick and flux, then check again with the meter.",
+    "Look under a magnifier at every fine-pitch joint."
+   ],
+   "level": "Easy",
+   "tools": [
+    "wick",
+    "flux",
+    "magnifier"
+   ]
+  },
+  "u.sig.1": {
+   "t": "Look at the signal",
+   "why": "A scope or logic analyser shows exactly what the signal does, not what you hope it does.",
+   "do": [
+    "Ground clip to your circuit's ground, probe on the signal.",
+    "Check it's there, its voltage levels, its frequency or timing, and its shape (clean edges, no ringing or noise)."
+   ],
+   "q": "What's wrong with it?",
+   "a": [
+    {
+     "t": "It's missing",
+     "go": "r.sigmissing"
+    },
+    {
+     "t": "Wrong frequency or timing",
+     "go": "u.sig.2"
+    },
+    {
+     "t": "Wrong voltage level",
+     "go": "r.levels"
+    },
+    {
+     "t": "Noisy or ringing",
+     "go": "u.noise.1"
+    },
+    {
+     "t": "Audio: distorted or clipped",
+     "go": "r.clipping"
+    }
+   ],
+   "tools": [
+    "scope",
+    "logic"
+   ],
+   "live": true,
+   "measure": {
+    "label": "Frequency",
+    "unit": "Hz",
+    "src": "scopie:freq",
+    "near": {
+     "label": "Frequency you expect",
+     "unit": "Hz",
+     "lo": 0.98,
+     "hi": 1.02,
+     "bad": 1
+    }
+   },
+   "apps": [
+    {
+     "app": "scopie",
+     "how": "Autoset, then turn on Frequency, Peak-to-peak and Duty cycle."
+    },
+    {
+     "app": "probie",
+     "how": "Digital signals: the measurement shows frequency and duty cycle."
+    }
+   ]
+  },
+  "u.sig.2": {
+   "t": "Check the timing",
+   "why": "Wrong frequency usually comes from settings, not hardware.",
+   "do": [
+    "PWM: check the frequency and resolution settings in your code (servos want 50Hz, 1–2ms pulses).",
+    "Clocks: the board's clock setting in your software (8MHz vs 16MHz boards run everything at the wrong speed).",
+    "Video: sync timing must match the standard exactly."
+   ],
+   "q": "Fixed?",
+   "a": [
+    {
+     "t": "Yes",
+     "go": "r.settings"
+    },
+    {
+     "t": "No",
+     "go": "r.board"
+    }
+   ],
+   "tools": [
+    "logic"
+   ],
+   "apps": [
+    {
+     "app": "probie",
+     "how": "Measure the pulse width and frequency on the Logic tab."
+    }
+   ]
+  },
+  "r.sigmissing": {
+   "result": true,
+   "t": "The signal isn't being made",
+   "cause": "Nothing appears where the signal should be.",
+   "fix": [
+    "Check the pin in your code is set as an output, and is the pin you've wired (board labels differ from chip numbers).",
+    "Probe right at the chip's pin: if it's there, follow the wire; if not, it's the code or pin setup.",
+    "Beep out the wiring against your design (I think something's wired wrong)."
+   ],
+   "level": "Easy",
+   "tools": [
+    "scope",
+    "logic"
+   ]
+  },
+  "r.clipping": {
+   "result": true,
+   "t": "The audio is clipping",
+   "cause": "The signal is bigger than the stage can handle, or the stage isn't biased in the middle.",
+   "fix": [
+    "Lower the input level, or the gain.",
+    "Check the stage's resting voltage is about half its supply (single-supply circuits).",
+    "Check coupling capacitors are the right way round."
+   ],
+   "level": "Easy"
+  },
+  "u.noise.1": {
+   "t": "Watch the supply when the load switches",
+   "why": "Motors, relays, radios and LED strips draw surges that pull the supply down or put spikes on it.",
+   "do": [
+    "Scope on your board's supply pin, trigger on a falling edge just below the supply, then switch the load on.",
+    "Check each chip has a 100nF capacitor right next to its power pins, and there's a bigger one (100–1000µF) where the load's power enters.",
+    "Motors and relays: is there a flyback diode? Do they share a thin ground wire with your logic?"
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "The supply dips or spikes",
+     "go": "r.decouple"
+    },
+    {
+     "t": "No flyback diode",
+     "go": "r.flyback"
+    },
+    {
+     "t": "Shared, thin ground",
+     "go": "r.ground"
+    },
+    {
+     "t": "The supply is clean",
+     "go": "r.pickup"
+    }
+   ],
+   "tools": [
+    "scope"
+   ],
+   "live": true,
+   "measure": {
+    "label": "Lowest supply voltage",
+    "unit": "V",
+    "src": "scopie:vmin",
+    "near": {
+     "label": "Normal supply voltage",
+     "unit": "V",
+     "lo": 0.9,
+     "hi": 1.1,
+     "ok": 3,
+     "bad": 0
+    }
+   },
+   "apps": [
+    {
+     "app": "scopie",
+     "how": "CH1 on the supply, single trigger, 1ms/div to start; zoom in on the dip."
+    }
+   ]
+  },
+  "r.pickup": {
+   "result": true,
+   "t": "Noise picked up on the signal wires",
+   "cause": "The supply is clean, so interference gets in on the signals themselves.",
+   "fix": [
+    "Keep signal wires short and away from motor and mains wires; twist each signal with a ground wire.",
+    "Add pull-up or pull-down resistors to inputs that float.",
+    "Filter slow signals (an RC filter) and average sensor readings in code."
+   ],
+   "level": "Easy"
+  },
+  "r.decouple": {
+   "result": true,
+   "t": "Not enough decoupling",
+   "cause": "The supply sags or spikes when the load switches.",
+   "fix": [
+    "Add 100nF ceramic capacitors at every chip's power pins.",
+    "Add bulk capacitance (100–1000µF) where the load's power comes in.",
+    "Give motors and LED strips their own supply, joined to your logic only at ground."
+   ],
+   "level": "Easy",
+   "parts": [
+    "Capacitors"
+   ]
+  },
+  "r.ground": {
+   "result": true,
+   "t": "Ground shared with a heavy load",
+   "cause": "Load current through a shared ground wire shifts your logic's ground.",
+   "fix": [
+    "Run the load's ground straight back to the supply, and join logic ground at one point.",
+    "Use thicker wire for load current."
+   ],
+   "level": "Easy"
+  },
+  "u.mot.1": {
+   "t": "Check the motor's supply and driver",
+   "why": "Motors need far more current than a board pin can give: always through a driver.",
+   "do": [
+    "Measure the motor supply while it tries to move: does it sag?",
+    "Driver boards: check enable pins and that its logic supply is there.",
+    "Steppers: find the two coil pairs (each pair reads a few ohms; different pairs read OL) and wire each pair to one driver output.",
+    "Servos: they need 50Hz pulses, 1–2ms wide, and their own 5–6V supply."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "Supply sags",
+     "go": "r.weaksupply"
+    },
+    {
+     "t": "Stepper coils wired wrong",
+     "go": "r.pinout"
+    },
+    {
+     "t": "Servo signal wrong",
+     "go": "u.sig.2"
+    },
+    {
+     "t": "All right",
+     "go": "u.mot.2"
+    }
+   ],
+   "tools": [
+    "meter",
+    "logic"
+   ],
+   "live": true,
+   "measure": {
+    "label": "Servo pulse frequency",
+    "unit": "Hz",
+    "src": "probie:freq",
+    "near": {
+     "label": "Expected (50Hz for servos)",
+     "unit": "Hz",
+     "lo": 0.9,
+     "hi": 1.1,
+     "ok": 3,
+     "bad": 2
+    }
+   },
+   "apps": [
+    {
+     "app": "probie",
+     "how": "Servo signal: the measurement should show about 50Hz and 5–10% duty."
+    }
+   ]
+  },
+  "u.mot.2": {
+   "t": "Check the driver's settings",
+   "why": "Stepper drivers have a current limit; too low skips, too high overheats.",
+   "do": [
+    "Set the driver's current limit (Vref) for your motor's rated current, from the driver's datasheet.",
+    "Check microstepping jumpers match your code.",
+    "Too fast acceleration makes steppers stall: start slower."
+   ],
+   "q": "Fixed?",
+   "a": [
+    {
+     "t": "Yes",
+     "go": "r.settings"
+    },
+    {
+     "t": "No",
+     "go": "r.stepper"
+    }
+   ],
+   "tools": [
+    "meter"
+   ]
+  },
+  "u.led.1": {
+   "t": "Check data level, resistor and power",
+   "why": "Addressable LEDs are fussy about their data signal and their supply.",
+   "do": [
+    "Data voltage: a 3.3V board driving 5V LEDs often works badly. Use a level shifter (74AHCT125), or power the first LED a little lower.",
+    "Fit a 300–500Ω resistor in the data line at the first LED, and a 1000µF capacitor across the supply.",
+    "Join the LED supply's ground to the board's ground.",
+    "Check the colour order (RGB vs GRB) and LED type in your code."
+   ],
+   "q": "What did you find?",
+   "a": [
+    {
+     "t": "Data level too low",
+     "go": "r.levels"
+    },
+    {
+     "t": "Colours swapped",
+     "go": "r.settings"
+    },
+    {
+     "t": "Only the first few work",
+     "go": "r.ledjoint"
+    },
+    {
+     "t": "Flicker or wrong colours at the far end",
+     "go": "r.voltdrop"
+    }
+   ],
+   "tools": [
+    "scope"
+   ],
+   "live": true,
+   "apps": [
+    {
+     "app": "scopie",
+     "how": "CH1 on the data line at the first LED, 1µs/div: pulses should be clean and reach near the LED supply voltage."
+    }
+   ]
   }
  },
  "tools": [
@@ -4630,6 +8201,85 @@
     "Never short a big capacitor with a screwdriver."
    ],
    "for": "hv"
+  },
+  {
+   "id": "logic",
+   "name": "Logic analyser",
+   "starter": false,
+   "cost": "£10–£30",
+   "why": "Records several digital signals at once and decodes them: I2C, SPI, UART, keyboard scans, sync pulses.",
+   "how": [
+    "Clip ground first, then one channel per signal.",
+    "Set the sample rate at least 4× the fastest signal (a 400kHz I2C bus needs 2MHz or more).",
+    "Add a decoder for the bus, then read the bytes it shows: addresses, ACK or NAK, data."
+   ],
+   "app": "probie",
+   "appWhy": "Probie runs cheap USB logic analysers, decodes the common buses and explains captures in plain words."
+  },
+  {
+   "id": "esr",
+   "name": "Component tester or ESR meter",
+   "starter": false,
+   "cost": "£15–£40",
+   "why": "Identifies and measures transistors, diodes and capacitors, and measures capacitors' ESR, which a multimeter can't.",
+   "how": [
+    "Discharge capacitors before testing them.",
+    "Most testers work out an unknown part's pins for you: clip all three leads and press test.",
+    "High ESR (compared with the chart on the tester) means a dried-out capacitor even when its µF reads fine."
+   ]
+  },
+  {
+   "id": "dimbulb",
+   "name": "Dim bulb tester",
+   "starter": false,
+   "cost": "£10 (DIY, in a proper enclosure)",
+   "why": "A filament lamp in series with a mains device limits the current, so a fault can't blow parts or fuses while you test.",
+   "how": [
+    "Build it only in a closed, earthed enclosure, or buy one.",
+    "Use an old-style filament bulb (40–100W), not LED.",
+    "Bright and stays bright: still a short. Flashes then dims: it starts normally."
+   ],
+   "for": "mains"
+  },
+  {
+   "id": "signal",
+   "name": "Signal source",
+   "starter": false,
+   "cost": "Free–£30",
+   "why": "A known test tone or signal to feed into a circuit, so you can follow it through with a scope.",
+   "how": [
+    "A phone's headphone output playing a 1kHz test tone (free apps) works for audio.",
+    "A cheap function generator, or a microcontroller's PWM pin, gives square waves.",
+    "Keep the level low: about 0.5V for audio inputs."
+   ]
+  },
+  {
+   "id": "serial",
+   "name": "USB-serial adapter",
+   "starter": false,
+   "cost": "£3–£8",
+   "why": "Lets a computer read the debug messages many boards print at start-up, and talk to serial devices.",
+   "how": [
+    "Connect its GND to the board's ground, its RX to the board's TX.",
+    "Check the board's voltage first: most need a 3.3V adapter; 5V can damage them.",
+    "Try common speeds: 115200, 9600, 57600, 74880 (ESP8266 boot messages)."
+   ],
+   "app": "probie",
+   "appWhy": "Probie's Serial tab shows and explains what the board prints."
+  },
+  {
+   "id": "programmer",
+   "name": "Chip programmer",
+   "starter": false,
+   "cost": "£5–£20",
+   "why": "Reads, backs up and rewrites memory chips and microcontrollers when a corrupted program is the fault.",
+   "how": [
+    "Always read and save a backup before writing anything.",
+    "SPI flash chips: a CH341A programmer with a clip (check the chip's voltage: many are 1.8V or 3.3V).",
+    "Microcontrollers: the maker's programmer (ST-Link, USBasp, a Pico running debugprobe)."
+   ],
+   "app": "flashie",
+   "appWhy": "Flashie writes firmware to ESP32, Pico, Arduino and STM32 boards."
   }
  ],
  "signs": [

@@ -7,6 +7,8 @@ package fixie
 import (
 	"fmt"
 	"os"
+	"os/exec"
+	"syscall"
 
 	"tinkerie/shared/appwindow"
 )
@@ -17,3 +19,6 @@ func fatal(msg string) {
 }
 
 func openAppWindow(url, profile string) error { return appwindow.Open(url, profile) }
+
+// detach lets an app started for a step outlive Fixie.
+func detach(cmd *exec.Cmd) { cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true} }

@@ -16,7 +16,10 @@
     <div><b>Fixie</b><small>Repair guide</small></div>
   </div>
   <nav class="tabs" role="tablist" aria-label="Sections">
-    <button role="tab" data-tab="repair" aria-selected="true" data-help="Repair tab">Repair</button>
+    <button role="tab" data-tab="repair" aria-selected="true" data-help="Repair tab">Quick checks</button>
+    <button role="tab" data-tab="board" data-help="Board level tab">Board level</button>
+    <button role="tab" data-tab="build" data-help="My build tab">My build</button>
+    <button role="tab" data-tab="parts" data-help="Parts tests tab">Parts tests</button>
     <button role="tab" data-tab="tools" data-help="Tools tab">Tools</button>
     <button role="tab" data-tab="signs" data-help="Signs tab">What to look for</button>
     <button role="tab" data-tab="safety" data-help="Safety tab">Safety</button>
@@ -30,7 +33,10 @@
 </header>
 
 <main>
-  <section class="view" id="v-repair" aria-label="Repair"></section>
+  <section class="view" id="v-repair" aria-label="Quick checks"></section>
+  <section class="view" id="v-board" hidden aria-label="Board level"></section>
+  <section class="view" id="v-build" hidden aria-label="My build"></section>
+  <section class="view" id="v-parts" hidden aria-label="Parts tests"></section>
   <section class="view" id="v-tools" hidden aria-label="Tools"></section>
   <section class="view" id="v-signs" hidden aria-label="What to look for"></section>
   <section class="view" id="v-safety" hidden aria-label="Safety"></section>

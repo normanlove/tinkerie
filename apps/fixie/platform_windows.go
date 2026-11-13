@@ -63,3 +63,9 @@ func openAppWindow(url, profile string) error {
 	cmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: 0x08000000}
 	return cmd.Start()
 }
+
+// detach lets an app started for a step outlive Fixie.
+func detach(cmd *exec.Cmd) {
+	const createNewProcessGroup = 0x00000200
+	cmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: createNewProcessGroup}
+}

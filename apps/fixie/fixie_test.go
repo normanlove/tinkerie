@@ -25,24 +25,29 @@ type gBand struct {
 	Say string   `json:"say"`
 }
 type gStep struct {
-	Result  bool              `json:"result"`
-	T       string            `json:"t"`
-	Why     string            `json:"why"`
-	Good    string            `json:"good"`
-	Bad     string            `json:"bad"`
-	Cause   string            `json:"cause"`
-	Pro     string            `json:"pro"`
-	Do      []json.RawMessage `json:"do"`
-	Q       string            `json:"q"`
-	A       []gAnswer         `json:"a"`
-	Tools   []string          `json:"tools"`
-	Signs   []string          `json:"signs"`
-	Open    bool              `json:"open"`
-	Only    string            `json:"only"`
-	Skip    string            `json:"skip"`
-	Next    string            `json:"next"`
-	Fix     []json.RawMessage `json:"fix"`
+	Result bool              `json:"result"`
+	T      string            `json:"t"`
+	Why    string            `json:"why"`
+	Good   string            `json:"good"`
+	Bad    string            `json:"bad"`
+	Cause  string            `json:"cause"`
+	Pro    string            `json:"pro"`
+	Do     []json.RawMessage `json:"do"`
+	Q      string            `json:"q"`
+	A      []gAnswer         `json:"a"`
+	Tools  []string          `json:"tools"`
+	Signs  []string          `json:"signs"`
+	Open   bool              `json:"open"`
+	Only   string            `json:"only"`
+	Skip   string            `json:"skip"`
+	Next   string            `json:"next"`
+	Fix    []json.RawMessage `json:"fix"`
+	Apps   []struct {
+		App string `json:"app"`
+		How string `json:"how"`
+	} `json:"apps"`
 	Measure *struct {
+		Src   string  `json:"src"`
 		Label string  `json:"label"`
 		Bands []gBand `json:"bands"`
 		Near  *struct {
@@ -53,6 +58,34 @@ type gStep struct {
 		Calc string `json:"calc"`
 	} `json:"measure"`
 }
+
+// gStart is where a Board level section or My build problem starts.
+type gStart struct {
+	ID    string `json:"id"`
+	For   string `json:"for"`
+	Start string `json:"start"`
+}
+
+// starts is every way into the guides: Quick checks symptoms, Board level
+// sections and My build problems.
+func (g guide) starts() []gStart {
+	var out []gStart
+	for _, s := range g.Symptoms {
+		out = append(out, gStart{"symptom " + s.ID, s.For, s.Start})
+	}
+	for _, s := range g.Board.Sections {
+		out = append(out, gStart{"board " + s.ID, s.For, s.Start})
+	}
+	for _, s := range g.Build.Problems {
+		out = append(out, gStart{"build " + s.ID, s.For, s.Start})
+	}
+	return out
+}
+
+// validSrc: where a reading can come from.
+var validSrc = regexp.MustCompile(`^(meterie|scopie:(freq|period|vpp|vmax|vmin|mean|rms|acrms|amp|duty|pwidth|rise)|probie:(freq|duty))$`)
+var validApp = map[string]bool{"meterie": true, "scopie": true, "probie": true, "flashie": true, "wirie": true}
+
 type guide struct {
 	Power      []struct{ ID string } `json:"power"`
 	Features   []struct{ ID string } `json:"features"`
@@ -83,6 +116,23 @@ type guide struct {
 		For   string `json:"for"`
 		Start string `json:"start"`
 	} `json:"symptoms"`
+	Board struct {
+		Sections []gStart `json:"sections"`
+	} `json:"board"`
+	Build struct {
+		Problems []gStart `json:"problems"`
+	} `json:"build"`
+	Parts []struct {
+		ID    string `json:"id"`
+		Tests []struct {
+			App *struct {
+				App string `json:"app"`
+			} `json:"app"`
+			Measure *struct {
+				Src string `json:"src"`
+			} `json:"measure"`
+		} `json:"tests"`
+	} `json:"parts"`
 	Steps map[string]gStep `json:"steps"`
 	Tools []struct {
 		ID  string `json:"id"`
@@ -237,6 +287,22 @@ func TestGuideRefs(t *testing.T) {
 	for _, x := range g.Tools {
 		checkCond("tool "+x.ID, x.For)
 	}
+	for _, st := range g.starts() {
+		checkCond(st.ID, st.For)
+		if _, ok := g.Steps[st.Start]; !ok {
+			t.Errorf("%s starts at missing step %s", st.ID, st.Start)
+		}
+	}
+	for _, p := range g.Parts {
+		for _, x := range p.Tests {
+			if x.App != nil && !validApp[x.App.App] {
+				t.Errorf("part %s: unknown app %q", p.ID, x.App.App)
+			}
+			if x.Measure != nil && x.Measure.Src != "" && !validSrc.MatchString(x.Measure.Src) {
+				t.Errorf("part %s: bad reading source %q", p.ID, x.Measure.Src)
+			}
+		}
+	}
 	for _, x := range g.Signs {
 		checkCond("sign "+x.ID, x.For)
 	}
@@ -292,7 +358,15 @@ func TestGuideRefs(t *testing.T) {
 				checkCond(id+" do", c.If)
 			}
 		}
+		for _, a := range s.Apps {
+			if !validApp[a.App] || a.How == "" {
+				t.Errorf("%s: bad app link %q", id, a.App)
+			}
+		}
 		if m := s.Measure; m != nil {
+			if m.Src != "" && !validSrc.MatchString(m.Src) {
+				t.Errorf("%s: bad reading source %q", id, m.Src)
+			}
 			for _, b := range m.Bands {
 				if b.A < 0 || b.A >= len(s.A) {
 					t.Errorf("%s: band answer %d out of range", id, b.A)
@@ -387,7 +461,7 @@ func TestGuidePaths(t *testing.T) {
 					}
 					return true
 				}
-				for _, s := range g.Symptoms {
+				for _, s := range g.starts() {
 					if match(s.For, tags) && !walk(s.Start) {
 						if fails++; fails > 10 {
 							t.Fatal("too many failures")

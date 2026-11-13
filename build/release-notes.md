@@ -10,12 +10,13 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 
 Each package has a *READ ME FIRST.txt*.
 
-<!-- release notes for 0.28.2-alpha: package.sh checks this line, so update the notes with every version -->
+<!-- release notes for 0.29.0-alpha: package.sh checks this line, so update the notes with every version -->
 ### New in {VERSION}
-- **Fixie: a deeper check of every word.** A new automatic check reads everything a person can see (titles, explanations, instructions, questions, answers, readings, causes and fixes) for every kind of device and every combination of power and features (about 240,000), and flags text that mentions something the device doesn't have. It found about 70 real mismatches, all fixed: for example charger and battery advice for mains-only devices, "power button" steps for devices without one, phone and laptop wording on other devices, USB checks for adapter-powered ones, TV and laptop backlight wording on every screen, mains warnings on low-voltage devices, and the upload symptom offered for boards with no USB.
-- **Where answers lead**: 5 fixes. "It starts now" after reseating memory no longer says the switch is faulty; a healthy battery that does charge now points to a wrong battery reading (not a worn battery); a board with no power LED gets its power measured before hunting for a short; "Neither" became "None of these" on a four-way question; devices without a fan that run hotter go to a look for failing parts.
-- **Tool and picture chips** on each step only show what fits the device (no USB power meter for a mains adapter, no swollen-battery picture for a device with no battery).
-- The wording check runs on every build, so these can't come back.
+- **Fixie goes down to component level**, for repairing and reusing old tech instead of throwing it away, and for your own builds. Three guides now: **Quick checks** (the describe-any-device guide), **Board level** and **My build**, plus a **Parts tests** tab.
+- **Board level**: pick a section of the board or start from the beginning: power input and protection, mains power supply (cold tests, then a dim bulb tester), regulators and rails (find a shorted part by injecting current), battery and charging, clock and reset, processor and memory (boot messages, corrupted firmware), data buses (decode I2C, SPI and UART to see which chip doesn't answer), audio (follow a test tone to where it stops), video (sync and levels), outputs and drivers, inputs and keyboard matrices, connectors and tracks. Salvage notes say what's worth keeping when a board can't be saved.
+- **My build**: power and current draw, parts fitted backwards, regulator pinouts, wiring against your design, code that won't run or resets, I2C/SPI/serial parts that don't answer, signals, noise and decoupling, motors, servos and steppers, addressable LEDs.
+- **Parts tests**: 25 kinds of part, from resistors and capacitors to MOSFETs, crystals, microcontrollers, relays and lithium cells: how they fail, how to test them out of the circuit, in it and powered, what to replace them with, and whether they're worth saving from scrap.
+- **Works with the rest of Tinkerie**: steps say which app to use and how to set it up, and open it for you (Meterie, Scopie, Probie, Flashie, Wirie). A reading can be filled straight from Meterie's meter, a Scopie measurement on a chosen channel, or a Probie logic channel's frequency or duty cycle, converted to the step's units and judged.
 
 Licensed under GPL-3.0-or-later.
 

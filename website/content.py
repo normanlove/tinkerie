@@ -518,23 +518,25 @@ APPS = [
     pairs=[("flashie", "Flashie's Create tab builds firmware code and explains it as it goes."), ("probie", "Run your code on a board and watch what it prints.")],
   ),
   dict(
-    id="fixie", needshort="Nothing: a multimeter helps", name="Fixie", ver="0.2.2-alpha", color="#f5b324", icon="fixie.svg",
-    tagline="Something broken? Find out why, one check at a time.",
-    short="A repair guide that takes you step by step from a broken device to the fault, with the tools to use and what to look for.",
+    id="fixie", needshort="Nothing: a multimeter helps", name="Fixie", ver="0.3.0-alpha", color="#f5b324", icon="fixie.svg",
+    tagline="Find the fault, down to the part. Keep it out of e-waste.",
+    short="A repair guide down to component level: quick checks, board-level fault finding for old tech, and troubleshooting your own builds, with Meterie, Scopie and Probie doing the measuring.",
     need="Nothing to start; a multimeter for most repairs",
     plain=("In plain words",
            "The TV has sound but no picture, the controller won't charge, the speaker went quiet. Say what it is, how it's powered and what it has, then what it's doing, and Fixie "
            "takes you through it one check at a time, easiest first: what to do, which tools to use, what a good and a bad result look like. "
            "Type in your meter reading and it tells you which it is. Each answer leads to the next check, until it reaches the likely fault, "
            "how hard it is to fix and the parts you'll need. It only asks you to open things up when it has to, and tells you how to do it safely."),
-    chips=["Works for almost any device", "15 symptoms", "Over 130 steps", "Reads your meter readings", "Tools guide", "Pictures of failed parts", "Safety first", "Repair log and reports"],
+    chips=["Component level", "Board sections", "Your own builds", "25 parts tests", "Live readings from Meterie, Scopie and Probie", "15 symptoms", "Over 130 steps", "Reads your meter readings", "Tools guide", "Pictures of failed parts", "Safety first", "Repair log and reports"],
     firsts=[
-      ("Describe it", "Type what it is, tap how it's powered and what it has. Categories like Computer or Toy fill in the usual answers."),
+      ("Pick a guide", "Quick checks for any device, Board level to find the failed part, or My build for your own projects."),
       ("Say what it's doing", "Dead, won't charge, no picture, no sound, overheating, got wet, cuts out, trips the electricity…"),
       ("Follow the steps", "Each step says what to do, which tools to use and what to look for. Type in your readings."),
       ("Fix it", "The likely fault, how hard it is, the parts you need, and a report to keep or take to a repair shop."),
     ],
     shots=[
+      ("fixie-board", "Board level: measure each rail, with the reading taken straight from Meterie and judged for you."),
+      ("fixie-parts", "Parts tests: how each part fails and how to test it, out of the circuit, in it and powered."),
       ("fixie-describe", "Describe what you're fixing: how it's powered and what it has. No product list to search."),
       ("fixie-measure", "Type in a reading, and Fixie says whether it's good and which answer it points to."),
       ("fixie-step", "Each step: what to do, the tools, what it looks like, and a safety check before opening anything up."),
@@ -543,6 +545,25 @@ APPS = [
       ("fixie-tools", "The tools guide: what each one is for, how to use it, and a starter kit."),
     ],
     features=[
+      ("Board level", "Find the failed part, and keep old tech going.", [
+        "Thirteen sections of a board: start from the beginning, or go to the power input, mains power supply, regulators and rails, battery and charging, clock and reset, processor and memory, data buses, audio, video, outputs, inputs, or wiring",
+        "Component-level steps: diode-test the rectifier, find the shorted capacitor by injecting current, check the crystal is oscillating, read the boot messages, decode the I2C bus to see which chip doesn't answer, follow a test tone to where it stops",
+        "Mains power supplies: cold tests first, then a dim bulb tester; startup resistors, output diodes and feedback",
+        "Salvage notes: what's worth saving from a board that can't be revived",
+      ]),
+      ("My build", "Troubleshooting your own projects.", [
+        "Power, current draw and regulator pinouts; wiring against your design (opens Wirie); code that won't run or keeps resetting",
+        "I2C, SPI and serial parts that don't answer: addresses, pull-ups, levels, baud rates",
+        "Signals, noise and decoupling, motors, servos and steppers, addressable LEDs",
+      ]),
+      ("Works with Tinkerie", "Your instruments, in the steps.", [
+        "Each step says which app to use and how to set it up, and opens it for you: Meterie, Scopie, Probie, Flashie or Wirie",
+        "Fill a reading straight from Meterie's meter, a Scopie measurement (frequency, peak-to-peak, minimum…) or a Probie logic channel (frequency, duty cycle), converted to the step's units and judged",
+      ]),
+      ("Parts tests", "How to test each kind of part.", [
+        "25 parts: resistors, pots, capacitors, diodes, zeners, LEDs, bridge rectifiers, transistors, MOSFETs, regulators, buck converters, crystals, logic chips, microcontrollers, op-amps, optocouplers, fuses, protection parts, relays, switches, connectors, speakers, motors, lithium cells and displays",
+        "Out of the circuit, in it and powered; what to replace it with; whether it's worth saving from scrap",
+      ]),
       ("Step by step", "From symptom to fault.", [
         "Easy checks first: the socket, the charger, the batteries, the lead",
         "Each step says what to do, why, which tools to use, and what a good and a bad result look like",
