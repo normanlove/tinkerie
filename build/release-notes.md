@@ -10,10 +10,12 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 
 Each package has a *READ ME FIRST.txt*.
 
-<!-- release notes for 0.28.1-alpha: package.sh checks this line, so update the notes with every version -->
+<!-- release notes for 0.28.2-alpha: package.sh checks this line, so update the notes with every version -->
 ### New in {VERSION}
-- **Fixie's steps fit the device far more closely.** Every step and fix was checked against every kind of device that can reach it, and about 30 mismatches fixed. 3D printers no longer get the hobby-board upload steps (they get stepper motor, driver, screen-cable and heater checks instead); "a programmable board" now means a hobby board you program yourself. Cordless tools get battery pack and charger checks instead of USB ones. PC fans no longer get carbon-brush or start-capacitor advice, desktop PCs aren't sent into their sealed power supply, and boards without a battery aren't told to wait for it to charge. Fixes now only show the lines that apply to your device, and Fixie asks how it's powered before going on.
-- **New tests**: no step or fix can ever be empty for a device, and a list of steps each kind of device must never be shown is checked on every build.
+- **Fixie: a deeper check of every word.** A new automatic check reads everything a person can see (titles, explanations, instructions, questions, answers, readings, causes and fixes) for every kind of device and every combination of power and features (about 240,000), and flags text that mentions something the device doesn't have. It found about 70 real mismatches, all fixed: for example charger and battery advice for mains-only devices, "power button" steps for devices without one, phone and laptop wording on other devices, USB checks for adapter-powered ones, TV and laptop backlight wording on every screen, mains warnings on low-voltage devices, and the upload symptom offered for boards with no USB.
+- **Where answers lead**: 5 fixes. "It starts now" after reseating memory no longer says the switch is faulty; a healthy battery that does charge now points to a wrong battery reading (not a worn battery); a board with no power LED gets its power measured before hunting for a short; "Neither" became "None of these" on a four-way question; devices without a fan that run hotter go to a look for failing parts.
+- **Tool and picture chips** on each step only show what fits the device (no USB power meter for a mains adapter, no swollen-battery picture for a device with no battery).
+- The wording check runs on every build, so these can't come back.
 
 Licensed under GPL-3.0-or-later.
 

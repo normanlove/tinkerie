@@ -1,4 +1,4 @@
-# Fixie 0.2.1-alpha — repair guide
+# Fixie 0.2.2-alpha — repair guide
 
 Part of **Tinkerie**, the free maker tools by **nrmluvdev**.
 
@@ -52,7 +52,7 @@ The full word list is in `guide.py`; `fixie_test.go` checks it refuses these and
 
 ## For developers
 
-The guide is data: `web/guide.json`, built by `guide.py` (`python3 apps/fixie/guide.py apps/fixie/web/guide.json`). Steps have a title, why, what to do (lines can depend on the device's tags), tools, signs, an optional measurement, a question and answers that lead to other steps; results have the cause, fix, parts and difficulty. Lines in a step (and in a fix) can depend on the device: `iff("motor&mains&!printer", …)` (`|` is or, `&` is and, `!` is not). `fixie_test.go` follows every answer for every kind of device and every combination of power and features, and checks each path ends at a result with no loops, that no step or fix is ever empty for the device in front of it, that every tool, sign and tag it names exists, and that the refusal list works. `TestRelevance` lists steps each kind of device must never be shown (a 3D printer never gets the hobby-board upload steps, a cordless tool never gets USB charging checks, and so on).
+The guide is data: `web/guide.json`, built by `guide.py` (`python3 apps/fixie/guide.py apps/fixie/web/guide.json`). Steps have a title, why, what to do (lines can depend on the device's tags), tools, signs, an optional measurement, a question and answers that lead to other steps; results have the cause, fix, parts and difficulty. Lines in a step (and in a fix) can depend on the device: `iff("motor&mains&!printer", …)` (`|` is or, `&` is and, `!` is not). `fixie_test.go` follows every answer for every kind of device and every combination of power and features, and checks each path ends at a result with no loops, that no step or fix is ever empty for the device in front of it, that every tool, sign and tag it names exists, and that the refusal list works. `TestWording` reads every word a person can see (titles, explanations, instructions, questions, answers, readings, causes and fixes) for every kind of device and every combination of power and features, and fails if text mentions something the device doesn't have: a battery, a screen, a fan, USB, mains, a phone, a printer and so on. Tool and sign chips on a step are filtered the same way. `TestRelevance` lists steps each kind of device must never be shown (a 3D printer never gets the hobby-board upload steps, a cordless tool never gets USB charging checks, and so on).
 
 Fixie runs on port 47825 (see PORTING.md) and keeps its repair log in `nrmluvdev/Fixie/state.json` in the system's settings folder.
 

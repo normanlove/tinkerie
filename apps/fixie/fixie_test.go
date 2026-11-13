@@ -8,11 +8,13 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"sort"
 	"strings"
 	"testing"
 )
 
 type gAnswer struct {
+	// (answers' text is checked by TestWording)
 	T    string `json:"t"`
 	Go   string `json:"go"`
 	Only string `json:"only"`
@@ -25,6 +27,11 @@ type gBand struct {
 type gStep struct {
 	Result  bool              `json:"result"`
 	T       string            `json:"t"`
+	Why     string            `json:"why"`
+	Good    string            `json:"good"`
+	Bad     string            `json:"bad"`
+	Cause   string            `json:"cause"`
+	Pro     string            `json:"pro"`
 	Do      []json.RawMessage `json:"do"`
 	Q       string            `json:"q"`
 	A       []gAnswer         `json:"a"`
@@ -39,8 +46,9 @@ type gStep struct {
 		Label string  `json:"label"`
 		Bands []gBand `json:"bands"`
 		Near  *struct {
-			Ok  int `json:"ok"`
-			Bad int `json:"bad"`
+			Label string `json:"label"`
+			Ok    int    `json:"ok"`
+			Bad   int    `json:"bad"`
 		} `json:"near"`
 		Calc string `json:"calc"`
 	} `json:"measure"`
@@ -70,15 +78,19 @@ type guide struct {
 	} `json:"legacy"`
 	Symptoms []struct {
 		ID    string `json:"id"`
+		Name  string `json:"name"`
+		Desc  string `json:"desc"`
 		For   string `json:"for"`
 		Start string `json:"start"`
 	} `json:"symptoms"`
 	Steps map[string]gStep `json:"steps"`
 	Tools []struct {
-		ID string `json:"id"`
+		ID  string `json:"id"`
+		For string `json:"for"`
 	} `json:"tools"`
 	Signs []struct {
-		ID string `json:"id"`
+		ID  string `json:"id"`
+		For string `json:"for"`
 	} `json:"signs"`
 }
 
@@ -221,6 +233,12 @@ func TestGuideRefs(t *testing.T) {
 				t.Errorf("%s: unknown tag %q", where, p)
 			}
 		}
+	}
+	for _, x := range g.Tools {
+		checkCond("tool "+x.ID, x.For)
+	}
+	for _, x := range g.Signs {
+		checkCond("sign "+x.ID, x.For)
 	}
 	for _, s := range g.Symptoms {
 		checkCond("symptom "+s.ID, s.For)
@@ -471,5 +489,173 @@ func TestRelevance(t *testing.T) {
 				walk(sy.Start)
 			}
 		}
+	}
+}
+
+// wordRules: words in what a person reads, and the device answers they only
+// make sense with ("a|b" any of, as in the guide). A line that mentions a
+// battery shown for a device with no battery is a mistake, and so on.
+var wordRules = []struct {
+	re   *regexp.Regexp
+	need string
+}{
+	{regexp.MustCompile(`(?i)\bbatter(y|ies)\b|\bcells?\b|\bpacks?\b`), "battery|lipo|powertool"},
+	{regexp.MustCompile(`(?i)\bcharg(e|er|ers|es|ing)\b`), "lipo|powertool|usb|usbpow|adapter"},
+	{regexp.MustCompile(`(?i)\bscreens?\b|\bdisplay\b|\bpicture\b|\bbacklight\b|\bpanel\b`), "screen"},
+	{regexp.MustCompile(`(?i)\bfans?\b`), "fan|motor"},
+	{regexp.MustCompile(`(?i)\bmotors?\b|\bbrushes\b|\bwinding`), "motor|fan"},
+	{regexp.MustCompile(`(?i)\bspeakers?\b|\bsound\b|\bheadphone|\bamplifier|\bamp\b`), "audio"},
+	{regexp.MustCompile(`(?i)\bvolume\b`), "audio|phone"},
+	{regexp.MustCompile(`(?i)\btouchscreen|\btouch (layer|panel|sensor|surface|controls)`), "touch"},
+	{regexp.MustCompile(`(?i)\bbluetooth\b|\bwi-?fi\b|\bpairing\b|\bwireless`), "wireless|phone"},
+	{regexp.MustCompile(`(?i)\busb\b`), "usb|usbpow|phone|pc|mcu|printer"},
+	{regexp.MustCompile(`(?i)\bports?\b`), "usb|usbpow|lipo|phone|pc|mcu|printer"},
+	{regexp.MustCompile(`(?i)\bwall socket`), "mains|adapter"},
+	{regexp.MustCompile(`(?i)\bmains\b|\bplug fuse|\blive and neutral|\bearth pin|\brcd\b|\bfuse box`), "mains"},
+	{regexp.MustCompile(`(?i)\badapter\b`), "adapter|usbpow|usb|lipo|mains"},
+	{regexp.MustCompile(`(?i)\b(i?phones?|android)\b`), "phone"},
+	{regexp.MustCompile(`(?i)\blaptops?\b`), "laptop|pc"},
+	{regexp.MustCompile(`(?i)\bdesktop|\bbios\b|\bmemory stick|\bgraphics card|\bmotherboard`), "pc"},
+	{regexp.MustCompile(`(?i)\bconsoles?\b`), "console|pc"},
+	{regexp.MustCompile(`(?i)\btvs?\b|\bt-con\b`), "tv"},
+	{regexp.MustCompile(`(?i)\b3d printer|\bstepper|\bhot end|\bthermistor|\bmintemp|\bmaxtemp|\bthermal runaway`), "printer|heater"},
+	{regexp.MustCompile(`(?i)\bkeyboards?\b|\bkeycaps?\b`), "input|pc"},
+	{regexp.MustCompile(`(?i)\bstrips?\b`), "lights|tv"},
+	{regexp.MustCompile(`(?i)\barduino|\besp32|\besp8266|\bpico\b|\bbootloader|\bbootsel|\bcom port|\bgpio`), "mcu"},
+	{regexp.MustCompile(`(?i)\bheaters?\b|\belement\b`), "heater"},
+	{regexp.MustCompile(`(?i)\btrigger\b`), "powertool"},
+	{regexp.MustCompile(`(?i)\bbuttons?\b`), "buttons|touch|phone|pc|console|mcu"},
+}
+
+// wordAllow: phrases that are fine for any device, though they contain a
+// word above: the person's own phone used as a magnifier, the meter's own
+// display, a PC's coin battery, the RCD's test button, the meter's ports,
+// mains as what an adapter plugs into, and symptom names that list examples.
+var wordAllow = regexp.MustCompile(`(?i)your phone's camera|coin battery|test button|monitor or TV|HDMI cable and port|sealed adapters: they hold mains voltage|'TV, monitor or display'|no sound, nothing happens|too hot to touch|USB, Wi-Fi or Bluetooth|it won't pair|no COM port|your other phones, tablets and computers`)
+
+// TestWording reads everything a person can see on every step and fix, for
+// every kind of device and every combination of power and features, and
+// reports text that mentions something the device doesn't have.
+func TestWording(t *testing.T) {
+	g := loadGuide(t)
+	type line struct{ cond, text string }
+	parse := func(raw []json.RawMessage) []line {
+		var out []line
+		for _, r := range raw {
+			var x string
+			if json.Unmarshal(r, &x) == nil {
+				out = append(out, line{"", x})
+				continue
+			}
+			var c struct{ If, T string }
+			_ = json.Unmarshal(r, &c)
+			out = append(out, line{c.If, c.T})
+		}
+		return out
+	}
+	doL, fixL := map[string][]line{}, map[string][]line{}
+	for id, s := range g.Steps {
+		doL[id], fixL[id] = parse(s.Do), parse(s.Fix)
+	}
+	kinds := map[string]bool{"": true}
+	for _, c := range g.Categories {
+		kinds[c.Kind] = true
+	}
+	var feats []string
+	for _, f := range g.Features {
+		if f.ID != "heatmains" {
+			feats = append(feats, f.ID)
+		}
+	}
+	found := map[string]string{}
+	cache := map[string][]int{}
+	powers := [][]string{{"mains"}, {"adapter"}, {"usbpow"}, {"battery"}, {"lipo"}, {"adapter", "lipo"}, {"usbpow", "lipo"}, {"mains", "lipo"}}
+	for kind := range kinds {
+		for _, pw := range powers {
+			for mask := 0; mask < 1<<len(feats); mask++ {
+				var has []string
+				for i, f := range feats {
+					if mask&(1<<i) != 0 {
+						has = append(has, f)
+					}
+				}
+				tags := g.tags(kind, pw, has)
+				check := func(id, where, text string) {
+					hits, ok := cache[text]
+					if !ok {
+						plain := wordAllow.ReplaceAllString(text, "")
+						for i, r := range wordRules {
+							if r.re.MatchString(plain) {
+								hits = append(hits, i)
+							}
+						}
+						cache[text] = hits
+					}
+					for _, i := range hits {
+						r := wordRules[i]
+						if !match(r.need, tags) {
+							key := fmt.Sprintf("%s %s: %q needs %s", id, where, r.re.FindString(text), r.need)
+							if _, ok := found[key]; !ok {
+								found[key] = fmt.Sprintf("%s\n        e.g. kind %q, power %v, has %v", text, kind, pw, has)
+							}
+						}
+					}
+				}
+				seen := map[string]bool{}
+				var walk func(id string)
+				walk = func(id string) {
+					if seen[id] {
+						return
+					}
+					seen[id] = true
+					s := g.Steps[id]
+					if !s.Result && s.Only != "" && !match(s.Only, tags) {
+						walk(s.Skip)
+						return
+					}
+					check(id, "title", s.T)
+					for _, x := range []string{s.Why, s.Q, s.Good, s.Bad, s.Cause, s.Pro} {
+						check(id, "text", x)
+					}
+					for _, l := range append(append([]line{}, doL[id]...), fixL[id]...) {
+						if match(l.cond, tags) {
+							check(id, "line", l.text)
+						}
+					}
+					if m := s.Measure; m != nil {
+						check(id, "reading", m.Label)
+						for _, b := range m.Bands {
+							check(id, "reading", b.Say)
+						}
+						if m.Near != nil {
+							check(id, "reading", m.Near.Label)
+						}
+					}
+					for _, a := range s.A {
+						if match(a.Only, tags) {
+							check(id, "answer", a.T)
+							walk(a.Go)
+						}
+					}
+					if s.Next != "" {
+						walk(s.Next)
+					}
+				}
+				for _, sy := range g.Symptoms {
+					if match(sy.For, tags) {
+						check("symptom "+sy.ID, "name", sy.Name+" "+sy.Desc)
+						walk(sy.Start)
+					}
+				}
+			}
+		}
+	}
+	keys := make([]string, 0, len(found))
+	for k := range found {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		t.Errorf("%s\n        %s", k, found[k])
 	}
 }

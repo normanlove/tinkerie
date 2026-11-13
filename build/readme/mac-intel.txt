@@ -21,11 +21,11 @@ What works on this system
 Every app has teaching mode: point at anything to see what it does. F2 turns it off.
 
 New in {VERSION}:
-- Fixie's steps now fit the device much more closely: a 3D printer no longer
-  gets hobby-board upload steps, cordless tools get pack and charger checks,
-  and every step was checked against every kind of device.
+- Fixie: a second, deeper check of every word against every kind of device;
+  about 70 more wording fixes and 5 fixes to where answers lead.
 
 Also in recent alpha builds:
+- 0.28.1-alpha: Fixie's steps fit the device much more closely.
 - 0.28.0-alpha: Fixie works for any device and refuses dangerous ones.
 - 0.27.0-alpha: New app: Fixie, the repair guide.
 - 0.26.0-alpha: Wirie solders castellated modules (Pico, XIAO...) flat.

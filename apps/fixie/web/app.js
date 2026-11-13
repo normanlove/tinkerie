@@ -206,8 +206,9 @@
   function doLines(s, tags) {
     return (s.do || []).map(x => typeof x === "string" ? x : match(x.if, tags) ? x.t : null).filter(Boolean);
   }
-  const toolChips = ids => `<div class="chips">${ids.map(id => TOOL[id] ? `<button class="chip ${state.have.includes(id) ? "have" : TOOL[id].starter ? "" : "missing"}" data-tool="${id}" title="${esc(TOOL[id].why)}">${esc(TOOL[id].name)}</button>` : "").join("")}</div>`;
-  const signChips = ids => `<div class="chips">${ids.map(id => SIGN[id] ? `<button class="chip" data-sign="${id}">${esc(SIGN[id].name)}</button>` : "").join("")}</div>`;
+  // a step's tool and sign chips: only the ones that fit this device
+  const toolChips = (ids, tags) => `<div class="chips">${ids.filter(id => !tags || !TOOL[id] || match(TOOL[id].for, tags)).map(id => TOOL[id] ? `<button class="chip ${state.have.includes(id) ? "have" : TOOL[id].starter ? "" : "missing"}" data-tool="${id}" title="${esc(TOOL[id].why)}">${esc(TOOL[id].name)}</button>` : "").join("")}</div>`;
+  const signChips = (ids, tags) => `<div class="chips">${ids.filter(id => !tags || !SIGN[id] || match(SIGN[id].for, tags)).map(id => SIGN[id] ? `<button class="chip" data-sign="${id}">${esc(SIGN[id].name)}</button>` : "").join("")}</div>`;
 
   function renderStep(v) {
     const d = devOf(cur.profile), tags = tagsOf(d), at = here(cur), s = G.steps[at.id];
@@ -239,9 +240,9 @@
           <label data-help="Safety check"><input type="checkbox" id="safe" ${at.safe ? "checked" : ""}> ${tags.has("hv") ? "It's unplugged, and I've checked the big capacitors are discharged" : tags.has("mains") ? "It's unplugged at the wall" : "The battery is disconnected"}${s.live ? " (I'll reconnect power only to measure)" : ""}</label></div></div>` : ""}
         ${s.live ? `<div class="callout warn"><span class="ic">!</span><div><b>You'll measure with the power on</b>Use fine probes so they can't slip and short two pins. Keep one hand away from the board, and touch only the probe handles.${tags.has("mains") ? " Stay well clear of the mains side of the power supply." : ""}</div></div>` : ""}
         <div class="sect"><h4>What to do</h4><ol class="do">${lines.map(l => `<li>${esc(l)}</li>`).join("")}</ol></div>
-        ${s.tools ? `<div class="sect" data-help="Tools for this step"><h4>Tools</h4>${toolChips(s.tools)}</div>` : ""}
+        ${s.tools ? `<div class="sect" data-help="Tools for this step"><h4>Tools</h4>${toolChips(s.tools, tags)}</div>` : ""}
         ${s.good || s.bad ? `<div class="sect"><h4>What to look for</h4><div class="gb">${s.good ? `<div class="g"><b>Good</b>${esc(s.good)}</div>` : ""}${s.bad ? `<div class="b"><b>Faulty</b>${esc(s.bad)}</div>` : ""}</div></div>` : ""}
-        ${s.signs ? `<div class="sect" data-help="Signs for this step"><h4>What it looks like</h4>${signChips(s.signs)}</div>` : ""}
+        ${s.signs ? `<div class="sect" data-help="Signs for this step"><h4>What it looks like</h4>${signChips(s.signs, tags)}</div>` : ""}
         ${s.measure ? `<div class="sect"><h4>Your reading</h4>${measureHTML(s.measure, at)}</div>` : ""}
         <div class="ask"><h3>${esc(s.q)}</h3><div class="answers" data-help="Answers">${answers.map(([a, i], k) =>
           `<button class="answer${at.answer === i ? " chosen" : ""}" data-a="${i}" ${gated ? "disabled" : ""}><kbd>${k + 1}</kbd>${esc(a.t)}</button>`).join("")}</div>
@@ -330,7 +331,7 @@
       ${s.pro ? `<div class="callout warn"><span class="ic">!</span><div><b>Worth knowing</b>${esc(s.pro)}</div></div>` : ""}
       <div class="sect"><h4>How to fix it</h4><ol class="do">${doLines({ do: s.fix }, tagsOf(d)).map(f => `<li>${esc(f)}</li>`).join("")}</ol></div>
       ${s.parts ? `<div class="sect"><h4>Parts you may need</h4><ul class="plain">${s.parts.map(p => `<li>${esc(p)}</li>`).join("")}</ul></div>` : ""}
-      ${s.tools ? `<div class="sect"><h4>Tools</h4>${toolChips(s.tools)}</div>` : ""}
+      ${s.tools ? `<div class="sect"><h4>Tools</h4>${toolChips(s.tools, tagsOf(d))}</div>` : ""}
       <div class="sect notes"><h4>Notes</h4><textarea id="note" placeholder="What you replaced, where you bought it, what it cost…" data-help="Step notes">${esc(at.note || "")}</textarea></div>
       <div class="done-row">
         <button class="btn primary" id="fixed" data-help="Fixed it">Fixed it</button>

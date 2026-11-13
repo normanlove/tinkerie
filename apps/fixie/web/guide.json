@@ -755,7 +755,7 @@
   },
   {
    "id": "buttons",
-   "name": "Buttons, keys or the touchscreen don't respond",
+   "name": "Buttons, keys or touch don't respond",
    "desc": "Something you press doesn't do anything, or does the wrong thing.",
    "for": "buttons|touch",
    "start": "bt.1"
@@ -785,7 +785,7 @@
    "id": "upload",
    "name": "The computer can't see the board, or code won't upload",
    "desc": "No COM port, upload errors, or it won't run your code.",
-   "for": "mcu",
+   "for": "mcu&usb|mcu&usbpow",
    "start": "up.1"
   },
   {
@@ -824,15 +824,23 @@
  "steps": {
   "dead.1": {
    "t": "Rule out the power source",
-   "why": "Most 'dead' devices aren't: the socket, lead, charger or batteries are the problem far more often than the device itself.",
+   "why": "Most 'dead' devices aren't: whatever powers them is the problem far more often than the device itself.",
    "do": [
     {
      "if": "mains|adapter",
-     "t": "Plug it into a different wall socket that you know works (try a lamp in it first). Skip extension leads and power strips for now."
+     "t": "Plug it into a different wall socket that you know works (try a lamp in it first). Skip extension leads for now."
     },
     {
-     "if": "adapter|usbpow|lipo&!powertool",
-     "t": "Try a different charger, adapter or USB cable that you know works with another device."
+     "if": "adapter",
+     "t": "Try a different adapter with the same voltage, plug and polarity, if you have one."
+    },
+    {
+     "if": "usbpow|usb",
+     "t": "Try a different USB charger and cable that you know work with another device."
+    },
+    {
+     "if": "lipo&!usbpow&!usb&!adapter&!powertool",
+     "t": "Try a different charger that you know works."
     },
     {
      "if": "powertool",
@@ -840,7 +848,7 @@
     },
     {
      "if": "usbpow",
-     "t": "Try a different USB port, ideally one on the back of a computer or a phone charger rather than a hub."
+     "t": "Try a different USB port, ideally one on the back of a computer or a USB wall charger rather than a hub."
     },
     {
      "if": "battery",
@@ -977,7 +985,7 @@
     "meter",
     "usbmeter"
    ],
-   "good": "Within about 10% of the label (a 5V USB charger: 4.75–5.25V).",
+   "good": "Within about 10% of the label (5V: 4.75–5.25V; 12V: about 11–13V).",
    "bad": "0V, far too low, or a reading that keeps changing.",
    "only": "adapter|usbpow|lipo&usb",
    "skip": "dead.4",
@@ -1007,8 +1015,12 @@
      "t": "Then unplug the charger and hold the power button for 30 seconds, and try again. Some laptops have a small battery-reset hole underneath."
     },
     {
-     "if": "lipo&!phone&!laptop",
+     "if": "lipo&buttons&!phone&!laptop",
      "t": "Then hold the power button for 15–30 seconds; some gadgets also have a small reset hole."
+    },
+    {
+     "if": "lipo&!buttons&!phone&!laptop",
+     "t": "Then look for a small reset hole, and press it with a paper clip."
     }
    ],
    "q": "What does the meter show?",
@@ -1051,8 +1063,8 @@
    }
   },
   "dead.port": {
-   "t": "Inspect and clean the USB or charging port",
-   "why": "Lint and dirt pack into USB and charging ports until the plug can't reach the contacts, and sockets work loose.",
+   "t": "Inspect and clean the port",
+   "why": "Lint and dirt build up in ports until the plug can't reach the contacts, and sockets work loose.",
    "do": [
     "Shine a torch into the port and look with a magnifier or your phone's camera zoomed in.",
     "Scrape out lint with a wooden toothpick or a plastic pick. Never use metal: the pins short easily.",
@@ -1145,7 +1157,7 @@
     "screwdrivers"
    ],
    "good": "The fuse and each wire beep steadily (close to 0Ω).",
-   "bad": "No beep (OL on the display), or a beep that cuts in and out as you bend the lead.",
+   "bad": "No beep (OL on the meter), or a beep that cuts in and out as you bend the lead.",
    "signs": [
     "fuse"
    ]
@@ -1269,7 +1281,11 @@
    "why": "Boards turn the input into a few fixed voltages ('rails'), such as 5V, 3.3V and 1.8V. A missing rail points straight at the fault.",
    "do": [
     "Find test points or parts marked 5V, 3V3, VCC or VBAT, or the regulators (small 3- or 5-legged parts near the power input). A board diagram or service manual helps a lot.",
-    "Put the black probe on ground: a metal shield, a USB socket's shell or a screw hole. Not on the mains side of a power supply: that ground is live.",
+    "Put the black probe on ground: a metal shield, the metal shell of a socket, or a screw hole.",
+    {
+     "if": "mains",
+     "t": "Never use the mains side of a power supply as ground: that 'ground' is live."
+    },
     {
      "if": "pc",
      "t": "On a PC power supply you can check it on its own: link the green wire to a black one on the 24-pin plug and it starts. Yellow should be 12V, red 5V, orange 3.3V, purple 5V standby."
@@ -1359,7 +1375,7 @@
    }
   },
   "dead.9": {
-   "t": "Check the power button and start-up",
+   "t": "Check it's being switched on",
    "why": "With power present, the next step is whether it's being told to start.",
    "do": [
     {
@@ -1391,8 +1407,19 @@
    "q": "What happened?",
    "a": [
     {
-     "t": "It starts now",
-     "go": "r.button"
+     "t": "The power switch doesn't close when pressed",
+     "go": "r.button",
+     "only": "buttons"
+    },
+    {
+     "t": "It started once the switch was bypassed",
+     "go": "r.button",
+     "only": "desktop"
+    },
+    {
+     "t": "It started after reseating the memory or cards",
+     "go": "r.ram",
+     "only": "pc"
     },
     {
      "t": "It beeps or flashes a pattern",
@@ -1431,7 +1458,7 @@
      "go": "so.2"
     },
     {
-     "t": "When it's working hard (games, motor load, loud)",
+     "t": "When it's working hard (busy, heavy load, loud)",
      "go": "so.3"
     },
     {
@@ -1456,7 +1483,7 @@
     },
     {
      "if": "pc|console",
-     "t": "Thermal paste dries out after four or five years in laptops and consoles."
+     "t": "Thermal paste dries out after four or five years."
     },
     {
      "if": "printer",
@@ -1490,15 +1517,23 @@
   },
   "so.3": {
    "t": "Check the power holds up under load",
-   "why": "A tired battery, a weak adapter or a small power supply can't keep up when the device works hard.",
+   "why": "A tired or undersized power source can't keep up when the device works hard.",
    "do": [
     {
      "if": "usbpow|usb",
      "t": "Measure the supply while it's working hard: a USB power meter in line shows the voltage dropping."
     },
     {
-     "if": "!usbpow&!usb",
-     "t": "Measure the supply while it's working hard: the meter across the battery or the power input."
+     "if": "battery|lipo&!usbpow&!usb",
+     "t": "Measure the battery while it's working hard, with the meter across its terminals."
+    },
+    {
+     "if": "mains&!usbpow&!usb&!battery&!lipo",
+     "t": "Measure the power supply's low-voltage output on the board while it's working hard: never the mains side."
+    },
+    {
+     "if": "adapter&!mains&!usbpow&!usb&!battery&!lipo",
+     "t": "Measure the power input on the board while it's working hard."
     },
     {
      "if": "laptop",
@@ -1526,7 +1561,7 @@
    ]
   },
   "so.4": {
-   "t": "Look for failing capacitors and batteries",
+   "t": "Look for failing parts",
    "why": "These two are the classic reasons for a start-and-stop loop.",
    "do": [
     {
@@ -1551,7 +1586,7 @@
      "go": "dead.8"
     },
     {
-     "t": "Neither",
+     "t": "None of these",
      "go": "r.board"
     }
    ],
@@ -1567,7 +1602,7 @@
    ]
   },
   "ch.1": {
-   "t": "Try a known-good charger and cable",
+   "t": "Try a known-good charger",
    "why": "Cables fail far more often than devices. A cheap or worn cable may charge some devices and not others.",
    "do": [
     {
@@ -1576,7 +1611,7 @@
     },
     {
      "if": "phone|sound",
-     "t": "If it can charge wirelessly, try that: if wireless works and the cable doesn't, the port is the problem."
+     "t": "If it can charge on a charging pad, try that: if the pad works and the cable doesn't, the port is the problem."
     },
     {
      "if": "powertool",
@@ -1586,11 +1621,11 @@
    "q": "What happened?",
    "a": [
     {
-     "t": "It charges with the other charger or cable",
+     "t": "It charges with another charger, cable or pack",
      "go": "r.supply"
     },
     {
-     "t": "Wireless works, the cable doesn't",
+     "t": "The pad works, the cable doesn't",
      "go": "dead.port",
      "only": "phone|sound"
     },
@@ -1608,7 +1643,7 @@
    "why": "How much current it takes tells you which part of the charging path has stopped.",
    "do": [
     "Plug a USB power meter between the charger and the device and watch the current for a minute.",
-    "Normal charging is usually 0.5–3A. Phones slow right down near full."
+    "Normal charging is usually 0.5–3A, slowing right down near full."
    ],
    "q": "What does it show?",
    "a": [
@@ -1748,8 +1783,8 @@
    "q": "Does the battery voltage rise while charging?",
    "a": [
     {
-     "t": "Yes, slowly",
-     "go": "r.battery"
+     "t": "Yes, it rises",
+     "go": "r.gauge"
     },
     {
      "t": "No",
@@ -1837,7 +1872,7 @@
   },
   "dp.3": {
    "t": "Check the backlight",
-   "why": "One dead LED in a TV's backlight strip stops the whole strip, and laptops have a small backlight fuse.",
+   "why": "Backlights fail on their own: one dead LED can put out a whole row, and many boards have a small backlight fuse.",
    "do": [
     {
      "if": "tv",
@@ -1845,7 +1880,7 @@
     },
     {
      "if": "laptop|phone",
-     "t": "Laptops and phones: look for a small fuse near the display connector on the board, and check it on continuity."
+     "t": "Look for a small fuse near the display connector on the board, and check it on continuity."
     },
     {
      "if": "tv",
@@ -1977,12 +2012,12 @@
   },
   "snd.1": {
    "t": "Rule out settings and sources",
-   "why": "Most sound faults are a setting, a cable or Bluetooth connected to something else.",
+   "why": "Most sound faults are a setting, or a cable.",
    "do": [
-    "Check the volume and mute, and that the right output is chosen (computers and phones switch outputs on their own).",
+    "Check the volume and mute, and that the right output is chosen (many devices switch outputs on their own).",
     {
      "if": "wireless",
-     "t": "Turn Bluetooth off on other phones and computers nearby: it may be connected to one of them."
+     "t": "Turn Bluetooth off on your other phones, tablets and computers nearby: it may be connected to one of them."
     },
     "Try a different source and cable.",
     "If it has a headphone socket, plug headphones in and out a few times: a stuck switch inside it mutes the speakers."
@@ -2112,7 +2147,7 @@
    "t": "Clean the button",
    "why": "Dirt, sticky drinks and skin oil stop buttons making contact.",
    "do": [
-    "Switch it off, and unplug it from any charger or power.",
+    "Switch it off and disconnect its power.",
     {
      "if": "battery",
      "t": "Take out the batteries."
@@ -2145,12 +2180,25 @@
    ]
   },
   "bt.2": {
-   "t": "Check the touchscreen",
-   "why": "Touch problems are often the screen protector, the charger or the software.",
+   "t": "Check the touch controls",
+   "why": "Touch problems are often dirt, a cover over the surface, the power supply or the software.",
    "do": [
-    "Take off the case and screen protector, clean the screen, and restart.",
-    "Try it on battery with the charger unplugged: a poor charger can make touch go wild.",
-    "If the screen was replaced recently, cheap replacements often have poor touch."
+    {
+     "if": "screen",
+     "t": "Take off the case and screen protector, clean the screen, and restart."
+    },
+    {
+     "if": "!screen",
+     "t": "Clean the touch surface, take off any cover or sticker over it, and restart."
+    },
+    {
+     "if": "lipo",
+     "t": "Try it with the charger unplugged: a poor charger can make touch go wild."
+    },
+    {
+     "if": "screen",
+     "t": "If the screen was replaced recently, cheap replacements often have poor touch."
+    }
    ],
    "q": "What happened?",
    "a": [
@@ -2160,7 +2208,8 @@
     },
     {
      "t": "It only misbehaves on the charger",
-     "go": "r.weaksupply"
+     "go": "r.weaksupply",
+     "only": "lipo"
     },
     {
      "t": "Touch is still dead or jumpy",
@@ -2174,7 +2223,7 @@
    "t": "Test the switch with a meter",
    "why": "Find out whether the switch itself closes.",
    "do": [
-    "Unplugged or battery disconnected, put the meter on continuity across the switch's legs.",
+    "With all power disconnected, put the meter on continuity across the switch's legs.",
     "It should beep only while you press it. Small square 4-leg switches have their legs joined in pairs, so try across corners."
    ],
    "q": "Does it beep when pressed, and not when released?",
@@ -2252,8 +2301,12 @@
      "t": "Cooling fans: measure across the fan plug's red and black wires (usually 12V or 5V) while the device is on."
     },
     {
-     "if": "motor&!mains",
-     "t": "Battery and low-voltage motors: measure across the motor's two terminals with the trigger or switch on."
+     "if": "motor&!mains&!powertool",
+     "t": "Low-voltage motors: measure across the motor's two terminals with its switch on."
+    },
+    {
+     "if": "powertool",
+     "t": "Measure across the motor's two terminals with the trigger pressed."
     },
     {
      "if": "motor&mains&!printer",
@@ -2354,7 +2407,11 @@
     },
     {
      "if": "fan",
-     "t": "Cooling fans: check the fan's plug is fully on its header, and that the fan isn't turned off in the BIOS, firmware or fan settings."
+     "t": "Cooling fans: check the fan's plug is fully on its header, and that the fan isn't turned off in the device's settings."
+    },
+    {
+     "if": "pc&fan",
+     "t": "On a computer, check the fan isn't set to off or 0% in the BIOS fan settings."
     },
     {
      "if": "printer",
@@ -2494,7 +2551,11 @@
    "do": [
     "MINTEMP means the temperature sensor reads impossibly cold: an open sensor wire. MAXTEMP means impossibly hot: a shorted sensor.",
     "A common sensor is a 100k thermistor: unplug it and measure about 100kΩ at room temperature (it falls as it warms).",
-    "'Heating failed' or 'thermal runaway' means it didn't heat as expected: a loose sensor, a failing heater, or a fan blowing on the nozzle.",
+    "'Heating failed' or 'thermal runaway' means it didn't heat as expected: a loose sensor or a failing heater.",
+    {
+     "if": "fan",
+     "t": "A cooling fan pointed at the nozzle can cause it too: fit a fan duct or a silicone sock."
+    },
     "Check the crimped connectors on the heater and sensor wires: they work loose and burn."
    ],
    "q": "Which error?",
@@ -2525,15 +2586,15 @@
    "a": [
     {
      "t": "USB to a computer",
-     "go": "cn.1",
-     "only": "usb"
+     "go": "cn.1"
     },
     {
      "t": "Wi-Fi or Bluetooth",
-     "go": "cn.3",
-     "only": "wireless"
+     "go": "cn.3"
     }
-   ]
+   ],
+   "only": "usb&wireless",
+   "skip": "cn.1"
   },
   "cn.1": {
    "t": "Try another cable, port and computer",
@@ -2555,7 +2616,9 @@
    ],
    "tools": [
     "cable"
-   ]
+   ],
+   "only": "usb|usbpow",
+   "skip": "cn.3"
   },
   "cn.2": {
    "t": "See whether the computer notices it at all",
@@ -2650,7 +2713,7 @@
     },
     {
      "t": "The power LED is off",
-     "go": "dead.8"
+     "go": "dead.7"
     },
     {
      "t": "The LED is on, but there's still no port",
@@ -2751,7 +2814,13 @@
     },
     {
      "t": "It's just hotter than it used to be",
-     "go": "so.2"
+     "go": "so.2",
+     "only": "fan"
+    },
+    {
+     "t": "It's just hotter than it used to be",
+     "go": "so.4",
+     "only": "!fan"
     }
    ],
    "signs": [
@@ -2800,7 +2869,7 @@
    ]
   },
   "w.1": {
-   "t": "Switch it off and stop it charging",
+   "t": "Switch it off and disconnect the power",
    "why": "Water itself does little harm. Electricity flowing through it is what causes corrosion and shorts.",
    "do": [
     "Switch it off and unplug it. Don't try to see if it still works.",
@@ -2821,7 +2890,7 @@
   },
   "w.2": {
    "t": "Open it up",
-   "why": "A connected battery keeps corrosion going even when it's 'off'.",
+   "why": "Liquid trapped inside keeps corroding it: it needs opening up to dry and clean.",
    "do": [
     {
      "if": "lipo",
@@ -2847,7 +2916,11 @@
    "why": "Isopropyl alcohol shifts the residue and dries quickly.",
    "do": [
     "Scrub every wet area with 99% isopropyl alcohol and a soft brush (a toothbrush is fine), especially connectors and the pins of chips.",
-    "An ultrasonic cleaner does a better job, but take speakers, microphones and buzzers out first.",
+    "An ultrasonic cleaner does a better job.",
+    {
+     "if": "audio",
+     "t": "Take speakers, microphones and buzzers out before an ultrasonic clean."
+    },
     "Let it dry for at least a day somewhere warm.",
     "Look under a magnifier for parts or tracks that have been eaten away."
    ],
@@ -2877,7 +2950,7 @@
    "why": "Test carefully: a short that's left can do more damage.",
    "do": [
     "If you can, power it from a bench power supply with a low current limit first.",
-    "Test every function: screen, sound, buttons, charging."
+    "Test everything it does, one thing at a time."
    ],
    "q": "How is it?",
    "a": [
@@ -2947,7 +3020,7 @@
    "t": "Test the lead and socket",
    "why": "Leads break inside next to the plugs, where they bend the most.",
    "do": [
-    "Unplugged, set the meter to continuity and bend the lead along its length while it beeps: a crackle or a gap is a break.",
+    "Unplugged, set the meter to continuity and bend the lead along its length while it beeps: if the beep cuts out, that's the break.",
     "Check the socket on the device: wobbly sockets have cracked solder joints underneath."
    ],
    "q": "Where's the fault?",
@@ -3033,7 +3106,7 @@
     "Meterie can log the supply voltage over hours and show any dips.",
     {
      "if": "mcu|printer",
-     "t": "Probie can record what the board prints over serial (USB) while it runs: errors often show there."
+     "t": "Probie can record what the board prints over its serial connection while it runs: errors often show there."
     }
    ],
    "q": "What did the log show?",
@@ -3078,7 +3151,11 @@
    "why": "A short inside the power supply makes the fuse blow straight away.",
    "do": [
     "Unplugged, with its power switch on, measure resistance between the live and neutral pins of the plug.",
-    "Motors read a few ohms to a few hundred ohms: that's normal. Electronics with a power supply should read high (thousands of ohms, often climbing as the capacitor charges).",
+    {
+     "if": "motor",
+     "t": "Motors read a few ohms to a few hundred ohms: that's normal."
+    },
+    "Electronics with a power supply should read high: thousands of ohms, often climbing as its capacitors fill.",
     "Inside, look for a split or burnt disc (a varistor or 'MOV') and burnt X-capacitors near the mains input.",
     "Test the bridge rectifier (four diodes, or a square block with ~ + − marks) and the switching transistor on the meter's diode test."
    ],
@@ -3108,7 +3185,7 @@
   },
   "tr.3": {
    "t": "Test the insulation to earth",
-   "why": "Leakage to the earth wire usually comes from a failing heating element, a damaged lead or water inside.",
+   "why": "Leakage to the earth wire usually comes from a failing part, a damaged lead or water inside.",
    "do": [
     "Unplugged, with its switch on, measure from live and neutral (one at a time) to the earth pin.",
     "A multimeter should read open (OL) or many megohms. An insulation tester at 500V is the proper test."
@@ -3148,10 +3225,25 @@
   "r.supply": {
    "result": true,
    "t": "The power source was the problem",
-   "cause": "The socket, lead, charger or batteries, not the device.",
+   "cause": "Whatever powers it was at fault, not the device itself.",
    "fix": [
-    "Keep using the supply that works.",
-    "Replace the faulty charger or lead with one that matches: same voltage, same plug, the same or more current, and from a reputable maker."
+    "Keep using the power that works.",
+    {
+     "if": "mains",
+     "t": "If a wall socket was at fault, have it checked by an electrician."
+    },
+    {
+     "if": "adapter|usbpow|usb|lipo&!powertool",
+     "t": "Replace the faulty charger, adapter or lead with one that matches: same voltage, same plug, the same or more current, and from a reputable maker."
+    },
+    {
+     "if": "battery",
+     "t": "Use fresh batteries of the right type."
+    },
+    {
+     "if": "powertool",
+     "t": "Replace the faulty pack or charger with one made for the tool."
+    }
    ],
    "level": "Easy",
    "parts": [
@@ -3417,11 +3509,11 @@
   },
   "r.button": {
    "result": true,
-   "t": "A faulty switch or button",
+   "t": "A faulty switch",
    "cause": "The switch contacts have worn or got dirty.",
    "fix": [
     "Spray contact cleaner into it and work it many times.",
-    "Replace it with the same type: small tactile buttons are cheap and sold by size (6×6mm, 12×12mm…).",
+    "Replace it with the same type: small tactile switches are cheap and sold by size (6×6mm, 12×12mm…).",
     {
      "if": "mains",
      "t": "Mains switches must be replaced with one rated for the same voltage and current."
@@ -3494,7 +3586,7 @@
   "r.weaksupply": {
    "result": true,
    "t": "Not enough power",
-   "cause": "The supply or battery can't keep up when the device works hard.",
+   "cause": "Its power source can't keep up when the device works hard.",
    "fix": [
     {
      "if": "mains|adapter|usbpow|usb",
@@ -3559,6 +3651,23 @@
     "spudger"
    ]
   },
+  "r.gauge": {
+   "result": true,
+   "t": "It is charging: the battery reading is wrong",
+   "cause": "The battery is healthy and takes charge, so the charge figure or light is what's wrong.",
+   "fix": [
+    {
+     "if": "phone|laptop",
+     "t": "Charge it fully, use it until it switches off, then charge it fully again without stopping: this resets the battery reading."
+    },
+    {
+     "if": "!phone&!laptop",
+     "t": "Charge it fully, then use it until it switches off, once or twice: many gadgets relearn their battery this way."
+    },
+    "If the light or reading still looks wrong, the battery's gauge chip or the charge light may have failed: a new battery is often the easiest fix."
+   ],
+   "level": "Easy"
+  },
   "r.chargeic": {
    "result": true,
    "t": "The charging circuit has failed",
@@ -3577,7 +3686,7 @@
   "r.backlight": {
    "result": true,
    "t": "Dead backlight LEDs or fuse",
-   "cause": "One failed LED stops a whole strip; laptops and phones have a backlight fuse.",
+   "cause": "Backlight LEDs fail on their own, and one failed LED can put out a whole row; some boards have a backlight fuse.",
    "fix": [
     {
      "if": "tv",
@@ -3623,7 +3732,7 @@
   "r.panel": {
    "result": true,
    "t": "The screen itself has failed",
-   "cause": "The panel (or its touch layer) is damaged.",
+   "cause": "The screen panel is damaged.",
    "fix": [
     "Replace the screen with one for your exact model.",
     {
@@ -3647,9 +3756,17 @@
   "r.digitizer": {
    "result": true,
    "t": "The touch layer has failed",
-   "cause": "On most modern phones the touch layer is part of the screen.",
+   "cause": "The touch sensor itself has failed, or its cable.",
    "fix": [
-    "Replace the screen assembly for your exact model."
+    "Reseat the touch sensor's ribbon cable first.",
+    {
+     "if": "screen",
+     "t": "On most touchscreens the touch layer is part of the screen: replace the screen assembly for your exact model."
+    },
+    {
+     "if": "!screen",
+     "t": "Replace the touch pad or sensor for your exact model."
+    }
    ],
    "level": "Medium",
    "parts": [
@@ -3693,7 +3810,7 @@
    "t": "The monitor is the problem",
    "cause": "The computer works on another monitor, so its own screen is fine.",
    "fix": [
-    "Start a new repair for the monitor itself, as a TV, monitor or display.",
+    "Start a new repair for the monitor itself (the closest kind is 'TV, monitor or display').",
     "Check its cable and input setting first."
    ],
    "level": "Easy"
@@ -3958,11 +4075,11 @@
    "cause": "Something is leaking current to the metal frame or earth: dangerous.",
    "fix": [
     "Don't use it.",
-    "Replace the faulty part (a heater, a motor or a damaged lead).",
+    "Replace the faulty part, or the damaged lead.",
     "Have it safety-tested (a PAT test) before using it again."
    ],
    "level": "Pro",
-   "pro": "Earth faults on mains appliances are a shock risk: a qualified electrician or appliance repairer should test it."
+   "pro": "Earth faults are a shock risk: a qualified electrician or appliance repairer should test it."
   },
   "r.heatdriver": {
    "result": true,
@@ -4377,7 +4494,8 @@
    "how": [
     "Plug it between the charger and the device.",
     "USB-C models also show the fast-charging protocol."
-   ]
+   ],
+   "for": "usb|usbpow"
   },
   {
    "id": "benchpsu",
@@ -4443,7 +4561,8 @@
    "why": "Softens the glue on phones and tablets.",
    "how": [
     "About 80°C for a few minutes, then a suction cup and picks."
-   ]
+   ],
+   "for": "phone|sound"
   },
   {
    "id": "ledtester",
@@ -4453,7 +4572,8 @@
    "why": "Lights each LED in a TV backlight strip, which a meter can't.",
    "how": [
     "Touch its probes across one LED at a time."
-   ]
+   ],
+   "for": "tv"
   },
   {
    "id": "contact",
@@ -4473,7 +4593,8 @@
    "why": "Plug fuses (3A, 5A, 13A) and glass fuses.",
    "how": [
     "Always replace with the same rating and type (fast or slow-blow)."
-   ]
+   ],
+   "for": "mains|adapter"
   },
   {
    "id": "crimper",
@@ -4483,7 +4604,8 @@
    "why": "For connectors and thermal fuses that shouldn't be soldered.",
    "how": [
     "Use the right size of crimp for the wire."
-   ]
+   ],
+   "for": "mains|heater|printer|powertool"
   },
   {
    "id": "insulation",
@@ -4493,7 +4615,8 @@
    "why": "Tests mains appliances at high voltage for leakage to earth.",
    "how": [
     "A multimeter test is a rough check only: a PAT test is the proper one."
-   ]
+   ],
+   "for": "mains"
   },
   {
    "id": "discharge",
@@ -4505,7 +4628,8 @@
     "A 1–10kΩ resistor rated 5W or more, with insulated leads and clips. Hold it across the capacitor's legs for several seconds.",
     "Then measure: under about 5V is safe to touch.",
     "Never short a big capacitor with a screwdriver."
-   ]
+   ],
+   "for": "hv"
   }
  ],
  "signs": [
@@ -4549,7 +4673,8 @@
    "name": "A swollen battery",
    "look": "A lithium battery that is puffy, rounded or bent instead of flat. A case or screen that is pushed apart.",
    "means": "A failing battery: a fire risk.",
-   "fix": "Stop charging it. Remove carefully and recycle."
+   "fix": "Stop charging it. Remove carefully and recycle.",
+   "for": "lipo|powertool"
   },
   {
    "id": "connector",
@@ -4577,7 +4702,8 @@
    "name": "Dust and hair",
    "look": "Grey felt across heatsink fins, fluff round fans, hair wound round motor shafts.",
    "means": "Overheating, shutdowns, a noisy or slow fan or motor.",
-   "fix": "Blow out with compressed air, clean the shaft."
+   "fix": "Blow out with compressed air, clean the shaft.",
+   "for": "fan|motor"
   }
  ],
  "safety": [
