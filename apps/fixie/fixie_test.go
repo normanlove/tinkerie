@@ -6,6 +6,7 @@ package fixie
 import (
 	"encoding/json"
 	"os"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -44,11 +45,28 @@ type gStep struct {
 	} `json:"measure"`
 }
 type guide struct {
-	Devices []struct {
-		ID     string   `json:"id"`
-		Tags   []string `json:"tags"`
-		NoOpen bool     `json:"noopen"`
-	} `json:"devices"`
+	Power      []struct{ ID string } `json:"power"`
+	Features   []struct{ ID string } `json:"features"`
+	Categories []struct {
+		ID    string   `json:"id"`
+		Kind  string   `json:"kind"`
+		Power []string `json:"power"`
+		Has   []string `json:"has"`
+	} `json:"categories"`
+	Derived []struct {
+		Tag  string   `json:"tag"`
+		All  []string `json:"all"`
+		None []string `json:"none"`
+	} `json:"derived"`
+	Danger []struct {
+		ID    string   `json:"id"`
+		Words []string `json:"words"`
+	} `json:"danger"`
+	Legacy map[string]struct {
+		Cat   string   `json:"cat"`
+		Power []string `json:"power"`
+		Has   []string `json:"has"`
+	} `json:"legacy"`
 	Symptoms []struct {
 		ID    string `json:"id"`
 		For   string `json:"for"`
@@ -61,6 +79,55 @@ type guide struct {
 	Signs []struct {
 		ID string `json:"id"`
 	} `json:"signs"`
+}
+
+// tags for a described device, as the window works them out
+func (g guide) tags(kind string, power, has []string) map[string]bool {
+	t := map[string]bool{}
+	if kind != "" {
+		t[kind] = true
+	}
+	for _, x := range power {
+		t[x] = true
+	}
+	for _, x := range has {
+		t[x] = true
+	}
+	for _, d := range g.Derived {
+		ok := true
+		for _, a := range d.All {
+			ok = ok && t[a]
+		}
+		for _, n := range d.None {
+			ok = ok && !t[n]
+		}
+		if ok {
+			t[d.Tag] = true
+		}
+	}
+	return t
+}
+
+// norm and dangerous are the same tests as the window's (app.js).
+var nonWord = regexp.MustCompile(`[^a-z0-9]+`)
+
+func norm(s string) string {
+	return " " + strings.TrimSpace(nonWord.ReplaceAllString(strings.ToLower(s), " ")) + " "
+}
+
+func (g guide) dangerous(name string) string {
+	n := norm(name)
+	for _, d := range g.Danger {
+		for _, w := range d.Words {
+			w = strings.TrimSpace(norm(w))
+			for _, end := range []string{"", "s", "es"} {
+				if strings.Contains(n, " "+w+end+" ") {
+					return d.ID
+				}
+			}
+		}
+	}
+	return ""
 }
 
 // match is the same test as the window's: "a|b" is any of them, "!a" is not.
@@ -101,11 +168,22 @@ func TestGuideRefs(t *testing.T) {
 	for _, x := range g.Signs {
 		signs[x.ID] = true
 	}
-	for _, d := range g.Devices {
-		known[d.ID] = true
-		for _, tg := range d.Tags {
-			known[tg] = true
+	for _, x := range g.Power {
+		known[x.ID] = true
+	}
+	for _, x := range g.Features {
+		known[x.ID] = true
+	}
+	for _, c := range g.Categories {
+		known[c.Kind] = true
+		for _, x := range append(append([]string{}, c.Power...), c.Has...) {
+			if !known[x] {
+				t.Errorf("category %s: unknown answer %q", c.ID, x)
+			}
 		}
+	}
+	for _, d := range g.Derived {
+		known[d.Tag] = true
 	}
 	checkCond := func(where, c string) {
 		for _, p := range strings.Split(c, "|") {
@@ -182,58 +260,109 @@ func TestGuideRefs(t *testing.T) {
 	}
 }
 
-// TestGuidePaths follows every answer, for every device and the symptoms it
-// offers, and checks each path ends at a result without going round in a loop.
+// TestGuidePaths checks, for every kind of device and every combination of
+// power and features, that each answer leads somewhere, every path ends at a
+// result, and nothing goes round in a loop.
 func TestGuidePaths(t *testing.T) {
 	g := loadGuide(t)
 	reached := map[string]bool{}
-	for _, d := range g.Devices {
-		tags := map[string]bool{d.ID: true}
-		for _, tg := range d.Tags {
-			tags[tg] = true
+	kinds := map[string]bool{"": true}
+	for _, c := range g.Categories {
+		kinds[c.Kind] = true
+	}
+	var feats []string
+	for _, f := range g.Features {
+		if f.ID != "heatmains" { // that one is refused before any step
+			feats = append(feats, f.ID)
 		}
-		var walk func(id string, path []string)
-		walk = func(id string, path []string) {
-			for _, p := range path {
-				if p == id {
-					t.Errorf("%s: loop %s → %s", d.ID, strings.Join(path, " → "), id)
-					return
+	}
+	powers := [][]string{{}, {"mains"}, {"adapter"}, {"usbpow"}, {"battery"}, {"lipo"}, {"adapter", "lipo"}, {"usbpow", "lipo"}, {"mains", "lipo"}}
+	fails := 0
+	for kind := range kinds {
+		for _, pw := range powers {
+			for mask := 0; mask < 1<<len(feats); mask++ {
+				var has []string
+				for i, f := range feats {
+					if mask&(1<<i) != 0 {
+						has = append(has, f)
+					}
 				}
-			}
-			path = append(path, id)
-			s := g.Steps[id]
-			reached[id] = true
-			if s.Result {
-				return
-			}
-			if s.Only != "" && !match(s.Only, tags) {
-				walk(s.Skip, path)
-				return
-			}
-			if s.Open && d.NoOpen {
-				walk("r.pro", path)
-				return
-			}
-			n := 0
-			for _, a := range s.A {
-				if match(a.Only, tags) {
-					n++
-					walk(a.Go, path)
+				tags := g.tags(kind, pw, has)
+				state := map[string]int{} // 1 visiting, 2 done
+				var walk func(id string) bool
+				walk = func(id string) bool {
+					switch state[id] {
+					case 1:
+						t.Errorf("loop at %s (kind %q, power %v, has %v)", id, kind, pw, has)
+						return false
+					case 2:
+						return true
+					}
+					state[id] = 1
+					defer func() { state[id] = 2 }()
+					reached[id] = true
+					s := g.Steps[id]
+					if s.Result {
+						return true
+					}
+					if s.Only != "" && !match(s.Only, tags) {
+						return walk(s.Skip)
+					}
+					n := 0
+					for _, a := range s.A {
+						if match(a.Only, tags) {
+							n++
+							if !walk(a.Go) {
+								return false
+							}
+						}
+					}
+					if n == 0 {
+						t.Errorf("step %s has no answers (kind %q, power %v, has %v)", id, kind, pw, has)
+						return false
+					}
+					return true
 				}
-			}
-			if n == 0 {
-				t.Errorf("%s: step %s has no answers for this device", d.ID, id)
-			}
-		}
-		for _, s := range g.Symptoms {
-			if match(s.For, tags) {
-				walk(s.Start, nil)
+				for _, s := range g.Symptoms {
+					if match(s.For, tags) && !walk(s.Start) {
+						if fails++; fails > 10 {
+							t.Fatal("too many failures")
+						}
+					}
+				}
 			}
 		}
 	}
 	for id := range g.Steps {
 		if !reached[id] {
-			t.Errorf("step %s can't be reached from any device and symptom", id)
+			t.Errorf("step %s can't be reached", id)
+		}
+	}
+}
+
+// TestDanger checks Fixie refuses dangerous devices by name, and doesn't
+// refuse ordinary ones by mistake.
+func TestDanger(t *testing.T) {
+	g := loadGuide(t)
+	for _, n := range []string{"Microwave", "toaster", "Breville kettle", "Dyson hair dryer", "air-fryer", "Old CRT telly", "e-bike battery", "Smoke alarm",
+		"electric oven", "space heaters", "washing machine", "camera flash", "tumble dryer", "hair straighteners", "Fan heater", "vape", "gas boiler", "soldering iron"} {
+		if g.dangerous(n) == "" {
+			t.Errorf("%q should be refused", n)
+		}
+	}
+	for _, n := range []string{"Bluetooth speaker", "PS5 controller", "3D printer heated bed", "wireless charger", "Iron Man toy", "LED strip", "Raspberry Pi Pico",
+		"electric toothbrush", "evening lamp", "gas sensor project", "laptop", "TV", "drone", "game boy", "Cordless drill", "desk fan", "headphones", "keyboard"} {
+		if d := g.dangerous(n); d != "" {
+			t.Errorf("%q refused as %s", n, d)
+		}
+	}
+	for id, l := range g.Legacy {
+		known := false
+		for _, c := range g.Categories {
+			known = known || c.ID == l.Cat
+		}
+		if !known {
+			t.Errorf("legacy %s: unknown category %s", id, l.Cat)
 		}
 	}
 }

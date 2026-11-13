@@ -20,7 +20,7 @@
   let state = { repairs: [], have: [] };
   let cur = null;                  // the open repair
   let tab = "repair", serverOK = true, saveTimer = 0;
-  const TOOL = {}, SIGN = {}, DEV = {}, SYM = {};
+  const TOOL = {}, SIGN = {}, CAT = {}, SYM = {};
 
   // ------------------------------------------------------------ start-up
   Promise.all([fetch("guide.json").then(r => r.json()), api("/api/state").catch(() => { serverOK = false; return null; }), api("/api/info").catch(() => null)])
@@ -28,10 +28,12 @@
       G = g;
       for (const t of G.tools) TOOL[t.id] = t;
       for (const s of G.signs) SIGN[s.id] = s;
-      for (const d of G.devices) DEV[d.id] = d;
+      for (const c of G.categories) CAT[c.id] = c;
       for (const s of G.symptoms) SYM[s.id] = s;
       if (!st || Array.isArray(st)) { try { st = JSON.parse(local.get("state") || "null"); } catch { st = null; } }
       if (st && st.repairs) state = { repairs: st.repairs || [], have: st.have || [] };
+      // repairs saved before Fixie asked about the device carry the old device's id
+      for (const r of state.repairs) if (!r.profile) { const l = G.legacy[r.device] || { cat: "other", power: [], has: [] }; r.profile = { name: r.title, cat: l.cat, power: [...l.power], has: [...l.has] }; }
       if (info) $("#ver").textContent = `Fixie ${info.version}`;
       const open = state.repairs.find(r => r.id === local.get("open") && r.status === "open");
       cur = open || null;
@@ -57,7 +59,27 @@
   }
 
   // ------------------------------------------------------------ the guide's rules
-  const tagsOf = d => new Set([d.id, ...d.tags]);
+  const tagsOf = d => new Set(d.tags);
+  // a described device: its category (a shortcut only), how it's powered and what it has
+  function profileTags(p) {
+    const t = new Set([...(p.power || []), ...(p.has || [])]), c = CAT[p.cat];
+    if (c && c.kind) t.add(c.kind);
+    for (const d of G.derived) if (d.all.every(x => t.has(x)) && !(d.none || []).some(x => t.has(x))) t.add(d.tag);
+    return t;
+  }
+  // Fixie refuses dangerous devices outright, by name or by answer (heating from the
+  // mains). The same test is in fixie_test.go.
+  const norm = s => " " + String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim() + " ";
+  function dangerOf(p) {
+    const n = norm(p.name);
+    for (const d of G.danger) for (const w of d.words) { const k = norm(w).trim(); if (["", "s", "es"].some(e => n.includes(" " + k + e + " "))) return d; }
+    if ((p.has || []).includes("heatmains")) return G.danger.find(d => d.id === "heat");
+    return null;
+  }
+  function devOf(p) {
+    const c = CAT[p.cat] || CAT.other;
+    return { id: c.id, name: (p.name || "").trim() || c.name, tags: [...profileTags(p)], open: c.open, danger: dangerOf(p) };
+  }
   // "a|b" is any of them; "!a" is not a
   const match = (cond, tags) => !cond || cond.split("|").some(c => c[0] === "!" ? !tags.has(c.slice(1)) : tags.has(c));
   // where a step really leads for this device: steps that don't apply are skipped,
@@ -68,7 +90,6 @@
       const s = G.steps[id];
       if (!s) return id;
       if (!s.result && s.only && !match(s.only, tags)) { id = s.skip; continue; }
-      if (!s.result && s.open && dev.noopen) return "r.pro";
       return id;
     }
     return id;
@@ -88,7 +109,7 @@
   }
   function renderAll() { renderRepair(); renderTools(); renderSigns(); renderSafety(); renderLog(); save(); }
 
-  $("#newRepair").onclick = () => { cur = null; pick = { dev: null }; save(); showTab("repair"); };
+  $("#newRepair").onclick = () => { cur = null; pick = newPick(); save(); showTab("repair"); };
   $("#saveReport").onclick = () => {
     const r = cur || state.repairs[0];
     if (!r) return toastPop("Nothing to save yet", "Start a repair first: the report lists every step, answer, reading and note.");
@@ -96,49 +117,82 @@
   };
 
   // ------------------------------------------------------------ repair tab
-  let pick = { dev: null };
+  const newPick = () => ({ name: "", cat: null, power: [], has: [], stage: "describe" });
+  let pick = newPick();
   function renderRepair() {
     const v = $("#v-repair");
-    if (!cur) return pick.dev ? renderSymptoms(v) : renderDevices(v);
+    if (!cur) return pick.stage === "symptom" ? renderSymptoms(v) : renderDescribe(v);
     renderStep(v);
   }
 
-  function renderDevices(v) {
-    const last = state.repairs.find(r => r.status === "open");
-    const groups = [...new Set(G.devices.map(d => d.group))];
-    v.innerHTML = `<div class="wrap">
-      ${last ? `<div class="resume">Carry on with <b>${esc(last.title)}</b>, at “${esc(stepTitle(last))}”. <button class="btn sm" id="resume" data-help="Resume repair">Carry on</button></div>` : ""}
+  const stopHTML = (d, extra = "") => `<div class="stopcard" role="alert"><div class="callout danger" style="margin:0"><span class="ic">!</span><div>
+    <b style="font-size:17px">Fixie can't help with this</b><p style="margin:6px 0"><b>${esc(d.t)}.</b> ${esc(d.why)}</p>
+    <p>For your safety Fixie gives no repair steps for these at all. Take it to the maker or a qualified repairer, or recycle it.</p>
+    <p style="margin-top:6px;color:var(--muted)">If it's sparking, smoking or burning: switch it off at the wall only if that's safe to reach, keep away from it, and call the fire service.</p>${extra}</div></div></div>`;
+  const dangerList = () => `<ul class="plain">${G.danger.map(d => `<li><b>${esc(d.t)}</b>: ${esc(d.why)}</li>`).join("")}</ul>`;
+
+  function renderDescribe(v) {
+    const last = state.repairs.find(r => r.status === "open" && !devOf(r.profile).danger);
+    const chip = (kind, x, on, hint) => `<button class="chip toggle${on ? " on" : ""}" data-${kind}="${x.id}" aria-pressed="${on}"${hint ? ` title="${esc(hint)}"` : ""}>${esc(x.name)}</button>`;
+    v.innerHTML = `<div class="wrap describe">
+      ${last ? `<div class="resume"><span>Carry on with <b>${esc(last.title)}</b>, at “${esc(stepTitle(last))}”.</span><button class="btn sm" id="resume" data-help="Resume repair">Carry on</button></div>` : ""}
       <h2 class="h">What are you fixing?</h2>
-      <p class="lead">Fixie takes you through it one check at a time: what to do, which tools to use, and what a good and a bad result look like. Start with the easy checks; it only asks you to open things up when it's needed.</p>
-      ${groups.map(g => `<div class="grp-h">${esc(g)}</div><div class="grid" data-help="Pick a device">${G.devices.filter(d => d.group === g).map(d =>
-        `<button class="card-btn" data-dev="${d.id}">${ART.device(d.id)}<span><b>${esc(d.name)}</b>${d.noopen ? `<small>Outside checks only</small>` : ""}</span></button>`).join("")}</div>`).join("")}
+      <p class="lead">Describe it in a few taps. Fixie picks the checks from how it's powered and what it has, so it works for almost anything electronic, not just a list of products.</p>
+      <label class="namefield" data-help="Device name">What is it?<input id="dName" maxlength="80" autocomplete="off" placeholder="For example: Bluetooth speaker, games controller, LED desk lamp" value="${esc(pick.name)}"></label>
+      <div id="dStop"></div>
+      <div id="dRest">
+        <div class="grp-h">Closest kind of thing <span class="dim">(fills in the usual answers below)</span></div>
+        <div class="grid cats" data-help="Closest kind">${G.categories.map(c => `<button class="card-btn${pick.cat === c.id ? " on" : ""}" data-cat="${c.id}">${ART.device(c.id)}<span><b>${esc(c.name)}</b></span></button>`).join("")}</div>
+        <div class="grp-h">How is it powered? <span class="dim">(all that apply)</span></div>
+        <div class="chips big" data-help="How it's powered">${G.power.map(x => chip("pw", x, pick.power.includes(x.id), x.hint)).join("")}</div>
+        <div class="grp-h">What does it have? <span class="dim">(all that apply)</span></div>
+        <div class="chips big" data-help="What it has">${G.features.map(x => chip("ft", x, pick.has.includes(x.id))).join("")}</div>
+        <div class="navrow"><button class="btn primary" id="dNext" data-help="Next: symptoms">Next: what's it doing?</button></div>
+      </div>
+      <details class="nohelp" data-help="Not covered"><summary>What Fixie won't help with</summary>${dangerList()}</details>
       <div class="callout info"><span class="ic">i</span><div><b>New to repairs?</b>Read the Safety tab first, and check the Tools tab for the few tools that cover most jobs.</div></div>
     </div>`;
-    $$("[data-dev]", v).forEach(b => b.onclick = () => { pick.dev = b.dataset.dev; renderRepair(); });
+    const check = () => {
+      const d = dangerOf(pick), byName = dangerOf({ name: pick.name });
+      $("#dStop", v).innerHTML = d ? stopHTML(d, byName ? "" : `<p style="margin-top:6px">Ticked by mistake? Untick “Heats things up from the mains” below.</p>`) : "";
+      $("#dRest", v).hidden = !!byName;
+      $("#dNext", v).disabled = !!d;
+    };
+    $("#dName", v).oninput = e => { pick.name = e.target.value; check(); };
+    $$("[data-cat]", v).forEach(b => b.onclick = () => {
+      const c = CAT[b.dataset.cat]; pick.cat = c.id; pick.power = [...c.power]; pick.has = [...c.has];
+      renderDescribe(v); $("#dName", v).focus();
+    });
+    const toggle = (list, id) => list.includes(id) ? list.filter(x => x !== id) : [...list, id];
+    $$("[data-pw]", v).forEach(b => b.onclick = () => { pick.power = toggle(pick.power, b.dataset.pw); b.classList.toggle("on"); b.setAttribute("aria-pressed", b.classList.contains("on")); });
+    $$("[data-ft]", v).forEach(b => b.onclick = () => { pick.has = toggle(pick.has, b.dataset.ft); b.classList.toggle("on"); b.setAttribute("aria-pressed", b.classList.contains("on")); check(); });
+    $("#dNext", v).onclick = () => { if (dangerOf(pick)) return check(); pick.stage = "symptom"; renderRepair(); };
     if (last) $("#resume").onclick = () => { cur = last; save(); renderRepair(); };
+    check();
   }
 
   function renderSymptoms(v) {
-    const d = DEV[pick.dev];
+    const d = devOf(pick);
+    if (d.danger) { pick.stage = "describe"; return renderDescribe(v); }
     v.innerHTML = `<div class="wrap">
-      <div class="crumbs"><button id="back">← All devices</button><span>${esc(d.name)}</span></div>
+      <div class="crumbs"><button id="back">← Change the description</button><span>${esc(d.name)}</span></div>
       <h2 class="h">What's it doing?</h2>
       <p class="lead">Pick the closest. If several fit, start with the first one in this list.</p>
-      ${d.noopen ? `<div class="callout danger"><span class="ic">!</span><div><b>Don't open it</b>${esc(d.open)}</div></div>` : ""}
       <div class="grid sym" style="margin-top:12px" data-help="Pick a symptom">${symptomsFor(d).map(s =>
         `<button class="card-btn" data-sym="${s.id}"><span><b>${esc(s.name)}</b><small>${esc(s.desc)}</small></span></button>`).join("")}</div>
     </div>`;
-    $("#back").onclick = () => { pick.dev = null; renderRepair(); };
+    $("#back").onclick = () => { pick.stage = "describe"; renderRepair(); };
     $$("[data-sym]", v).forEach(b => b.onclick = () => startRepair(d, SYM[b.dataset.sym]));
   }
 
   function startRepair(d, s) {
-    const n = state.repairs.filter(r => r.device === d.id).length;
-    cur = { id: "r" + Date.now().toString(36), title: d.name + (n ? ` (${n + 1})` : ""), device: d.id, symptom: s.id,
+    const n = state.repairs.filter(r => devOf(r.profile).name === d.name).length;
+    cur = { id: "r" + Date.now().toString(36), title: d.name + (n ? ` (${n + 1})` : ""), symptom: s.id,
+      profile: { name: pick.name.trim(), cat: pick.cat || "other", power: [...pick.power], has: [...pick.has] },
       created: new Date().toISOString(), updated: new Date().toISOString(), status: "open",
       path: [{ id: resolve(s.start, d) }] };
     state.repairs.unshift(cur);
-    pick.dev = null; save(); renderRepair(); renderLog();
+    pick = newPick(); save(); renderRepair(); renderLog();
   }
 
   const here = r => r.path[r.path.length - 1];
@@ -152,15 +206,21 @@
   const signChips = ids => `<div class="chips">${ids.map(id => SIGN[id] ? `<button class="chip" data-sign="${id}">${esc(SIGN[id].name)}</button>` : "").join("")}</div>`;
 
   function renderStep(v) {
-    const d = DEV[cur.device], tags = tagsOf(d), at = here(cur), s = G.steps[at.id];
+    const d = devOf(cur.profile), tags = tagsOf(d), at = here(cur), s = G.steps[at.id];
     const num = cur.path.length;
+    if (d.danger) {
+      v.innerHTML = `<div class="wrap">${stopHTML(d.danger, `<div class="navrow"><button class="btn" id="dDel">Delete this repair</button></div>`)}</div>`;
+      $("#dDel", v).onclick = () => { state.repairs = state.repairs.filter(r => r !== cur); cur = null; save(); renderRepair(); renderLog(); };
+      return;
+    }
     const side = `<aside class="side">
       <div class="box"><h4>This repair</h4><input class="title-in" id="rTitle" value="${esc(cur.title)}" aria-label="Repair name" data-help="Repair name">
-        <p style="margin-top:6px;color:var(--muted);font-size:12.5px">${esc(d.name)} · ${esc(SYM[cur.symptom].name)}</p></div>
+        <p style="margin-top:6px;color:var(--muted);font-size:12.5px">${esc(SYM[cur.symptom].name)}</p>
+        <p style="margin-top:4px;color:var(--muted);font-size:12.5px">${esc([...(cur.profile.power || []).map(x => (G.power.find(p => p.id === x) || {}).name), ...(cur.profile.has || []).map(x => (G.features.find(f => f.id === x) || {}).name)].filter(Boolean).join(" · "))}</p></div>
       <div class="box" data-help="Your path"><h4>Your path</h4><ol class="trail">${cur.path.map((p, i) => {
         const st = G.steps[p.id], a = st && st.a && p.answer != null ? st.a[p.answer] : null;
         return `<li class="${i === cur.path.length - 1 ? "cur" : ""}"><button data-goto="${i}">${esc(st ? st.t : p.id)}</button>${a ? `<small>${esc(a.t)}${p.value != null && p.value !== "" ? ` · ${esc(p.value)} ${esc((st.measure || {}).unit || "")}` : ""}</small>` : ""}</li>`; }).join("")}</ol></div>
-      ${d.open ? `<div class="box"><h4>Opening a ${esc(d.name.split(",")[0].toLowerCase())}</h4><p style="font-size:13px">${esc(d.open)}</p></div>` : ""}
+      ${d.open ? `<div class="box"><h4>Opening it up</h4><p style="font-size:13px">${esc(d.open)}</p></div>` : ""}
     </aside>`;
     let body;
     if (s.result) body = resultHTML(s, d, at);
@@ -171,7 +231,7 @@
       body = `<article class="step">
         <div class="kicker">Step ${num} · ${esc(SYM[cur.symptom].name)}</div>
         <h2>${esc(s.t)}</h2><p class="why">${esc(s.why || "")}</p>
-        ${gate ? `<div class="callout danger"><span class="ic">!</span><div><b>This step is inside the ${esc(d.name.toLowerCase())}</b>${tags.has("hv") ? "Unplug it at the wall and leave it a few minutes. Big capacitors can stay charged: check them with the meter (see Safety) before you touch anything." : tags.has("mains") ? "Unplug it at the wall: switching it off isn't enough." : "Disconnect the battery before touching the board."}
+        ${gate ? `<div class="callout danger"><span class="ic">!</span><div><b>This step is inside it</b>${tags.has("hv") ? "Unplug it at the wall and leave it a few minutes. Big capacitors can stay charged: check them with the meter (see Safety) before you touch anything." : tags.has("mains") ? "Unplug it at the wall: switching it off isn't enough." : "Disconnect the battery before touching the board."}
           <label data-help="Safety check"><input type="checkbox" id="safe" ${at.safe ? "checked" : ""}> ${tags.has("hv") ? "It's unplugged, and I've checked the big capacitors are discharged" : tags.has("mains") ? "It's unplugged at the wall" : "The battery is disconnected"}${s.live ? " (I'll reconnect power only to measure)" : ""}</label></div></div>` : ""}
         ${s.live ? `<div class="callout warn"><span class="ic">!</span><div><b>You'll measure with the power on</b>Use fine probes so they can't slip and short two pins. Keep one hand away from the board, and touch only the probe handles.${tags.has("mains") ? " Stay well clear of the mains side of the power supply." : ""}</div></div>` : ""}
         <div class="sect"><h4>What to do</h4><ol class="do">${lines.map(l => `<li>${esc(l)}</li>`).join("")}</ol></div>
@@ -251,7 +311,7 @@
   function choose(i) {
     const at = here(cur), s = G.steps[at.id], a = s.a[i];
     at.answer = i;
-    cur.path.push({ id: resolve(a.go, DEV[cur.device]) });
+    cur.path.push({ id: resolve(a.go, devOf(cur.profile)) });
     touch(); renderRepair(); $("#v-repair").scrollTop = 0;
   }
   function back() {
@@ -264,7 +324,6 @@
       <h2>${esc(s.t)}<span class="level ${s.level}" title="How hard the fix is">${esc(s.level)}</span></h2>
       <p class="cause">${esc(s.cause)}</p>
       ${s.pro ? `<div class="callout warn"><span class="ic">!</span><div><b>Worth knowing</b>${esc(s.pro)}</div></div>` : ""}
-      ${d.noopen && cur.path.length > 1 ? `<div class="callout danger"><span class="ic">!</span><div><b>The next check is inside the ${esc(d.name.toLowerCase())}</b>${esc(d.open)}</div></div>` : ""}
       <div class="sect"><h4>How to fix it</h4><ol class="do">${s.fix.map(f => `<li>${esc(f)}</li>`).join("")}</ol></div>
       ${s.parts ? `<div class="sect"><h4>Parts you may need</h4><ul class="plain">${s.parts.map(p => `<li>${esc(p)}</li>`).join("")}</ul></div>` : ""}
       ${s.tools ? `<div class="sect"><h4>Tools</h4>${toolChips(s.tools)}</div>` : ""}
@@ -337,8 +396,9 @@
   function renderSafety() {
     const ic = { danger: "!", warn: "!", info: "i" };
     $("#v-safety").innerHTML = `<div class="wrap safety"><h2 class="h">Safety</h2>
-      <p class="lead">Most repairs are safe with a few habits. A few things should never be opened at home.</p>
-      <div class="cards">${G.safety.map(x => `<div class="ref ${x.level}"><h3><span class="callout ${x.level}" style="border:0;padding:0;margin:0;background:none"><span class="ic">${ic[x.level]}</span></span>${esc(x.t)}</h3>
+      <p class="lead">Most repairs are safe with a few habits. Some things should never be opened at home, and Fixie won't give repair steps for them.</p>
+      <div class="cards"><div class="ref danger" style="grid-column:1/-1"><h3><span class="callout danger" style="border:0;padding:0;margin:0;background:none"><span class="ic">!</span></span>Fixie won't help with these</h3>${dangerList()}
+        <p style="color:var(--muted)">Take them to the maker or a qualified repairer, or recycle them.</p></div>${G.safety.map(x => `<div class="ref ${x.level}"><h3><span class="callout ${x.level}" style="border:0;padding:0;margin:0;background:none"><span class="ic">${ic[x.level]}</span></span>${esc(x.t)}</h3>
         <ul class="plain">${x.points.map(p => `<li>${esc(p)}</li>`).join("")}</ul></div>`).join("")}</div></div>`;
   }
 
@@ -348,10 +408,10 @@
     $("#nLog").textContent = state.repairs.length || "";
     if (!state.repairs.length) { v.innerHTML = `<div class="wrap"><h2 class="h">My repairs</h2><div class="empty" style="margin-top:14px">No repairs yet. Press New repair to start one: each one is saved here as you go.</div></div>`; return; }
     v.innerHTML = `<div class="wrap"><h2 class="h">My repairs</h2><p class="lead">Every repair you start is saved on this computer, with each step, answer, reading and note.</p>
-      ${state.repairs.map(r => { const d = DEV[r.device], s = SYM[r.symptom];
-        return `<div class="logrow"><span style="width:30px;color:var(--accent)" class="card-btn" aria-hidden="true">${ART.device(r.device)}</span>
+      ${state.repairs.map(r => { const d = devOf(r.profile), s = SYM[r.symptom];
+        return `<div class="logrow"><span style="width:30px;color:var(--accent)" class="card-btn" aria-hidden="true">${ART.device(d.id)}</span>
           <div class="main"><b>${esc(r.title)}</b> <span class="status ${r.status === "fixed" ? "fixed" : r.status === "stopped" ? "gaveup" : ""}">${r.status === "fixed" ? "Fixed" : r.status === "stopped" ? "Stopped" : "In progress"}</span>
-          <small>${esc(d ? d.name : r.device)} · ${esc(s ? s.name : r.symptom)} · ${new Date(r.updated).toLocaleString()}</small><small>At: ${esc(stepTitle(r))} (${r.path.length} step${r.path.length > 1 ? "s" : ""})</small></div>
+          <small>${d.danger ? "Not covered · " : ""}${esc(d.name)} · ${esc(s ? s.name : r.symptom)} · ${new Date(r.updated).toLocaleString()}</small><small>${d.danger ? "Fixie won't give repair steps for this, for safety." : `At: ${esc(stepTitle(r))} (${r.path.length} step${r.path.length > 1 ? "s" : ""})`}</small></div>
           <button class="btn sm" data-open="${r.id}" data-help="Open repair">Open</button><button class="btn sm ghost" data-rep="${r.id}" title="Save the repair report">Report</button><button class="btn sm ghost danger" data-del="${r.id}" data-help="Delete repair">Delete</button></div>`; }).join("")}</div>`;
     $$("[data-open]", v).forEach(b => b.onclick = () => { cur = state.repairs.find(r => r.id === b.dataset.open); save(); showTab("repair"); });
     $$("[data-rep]", v).forEach(b => b.onclick = () => { const r = state.repairs.find(x => x.id === b.dataset.rep); download(fileName(r) + ".md", report(r)); });
@@ -366,7 +426,8 @@
   // ------------------------------------------------------------ report
   const fileName = r => "Fixie - " + r.title.replace(/[\\/:*?"<>|]+/g, "-");
   function report(r) {
-    const d = DEV[r.device], tags = tagsOf(d);
+    const d = devOf(r.profile), tags = tagsOf(d);
+    if (d.danger) return `# ${r.title}\n\nFixie can't help with this. ${d.danger.t}: ${d.danger.why}\n\nTake it to the maker or a qualified repairer, or recycle it.\n\n---\nMade with Fixie (Tinkerie) by nrmluvdev\n`;
     let t = `# ${r.title}\n\n${d.name}: ${SYM[r.symptom].name}\n\nStarted ${new Date(r.created).toLocaleString()} · ${r.status === "fixed" ? "Fixed" : r.status === "stopped" ? "Stopped" : "In progress"}\n`;
     r.path.forEach((p, i) => {
       const s = G.steps[p.id]; if (!s) return;

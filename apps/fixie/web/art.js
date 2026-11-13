@@ -24,7 +24,11 @@ window.ART = (() => {
     keyboard: '<rect x="2.5" y="6" width="19" height="12" rx="1.5"/><path d="M6 10h.01M9 10h.01M12 10h.01M15 10h.01M18 10h.01M6 14h.01M18 14h.01M9 14h6"/>',
     microwave: '<rect x="2.5" y="5" width="19" height="14" rx="1.5"/><rect x="5" y="8" width="10" height="8" rx="1"/><path d="M18 8.5v.01M18 11v.01M18 13.5h.01"/>',
   };
-  const device = id => ic(icons[id] || icons.diy);
+  // the categories use the closest drawing
+  Object.assign(icons, { computer: icons.laptop, console: icons.controller, screen: icons.tv, tool: icons.powertool, project: icons.diy,
+    input: icons.keyboard, machine: icons.printer3d, household: icons.motorhome,
+    other: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17h.01"/>' });
+  const device = id => ic(icons[id] || icons.other);
 
   // ---- sign drawings: 300×130, good on the left, faulty on the right
   const frame = (good, bad) => `<svg viewBox="0 0 300 130" role="img" aria-label="Good and faulty examples">

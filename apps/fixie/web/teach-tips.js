@@ -13,7 +13,12 @@ window.TEACH = {
     "Save the repair report|Save report|Report": ["Save report", "Saves the repair as a text file: every step, your answers, readings and notes, and the fault and fix it found. Handy for a repair shop, or a parts order."],
     "Teaching tips (F2)": ["Teaching tips", "Turns these explanations on or off. The F2 key does the same."],
     // picking
-    "Pick a device": ["What are you fixing?", "Pick the closest kind of device. Fixie uses it to choose the checks that apply: how it's powered, whether it has a screen, a battery, a motor or a heater, and whether it's safe to open."],
+    "Device name": ["What is it?", "Type what you're fixing, in your own words. It names the repair, and Fixie checks it against the things it won't help with for safety (microwaves, ovens, toasters, heaters and so on)."],
+    "Closest kind": ["Closest kind of thing", "A shortcut: picking one fills in the usual power and features below, which you can then change. If nothing fits, pick Something else."],
+    "How it's powered": ["How it's powered", "Pick every way it gets power. This decides which power checks Fixie gives you: socket and fuse for mains, output voltage for adapters, current for USB, cells for batteries, battery health for built-in batteries."],
+    "What it has": ["What it has", "Pick everything it has. Fixie only offers the symptoms and checks that fit: no picture checks without a screen, no motor checks without a motor."],
+    "Next: symptoms|Next: what's it doing?": ["Next", "Goes on to choose what's wrong with it."],
+    "Not covered|What Fixie won't help with": ["What Fixie won't help with", "For safety, Fixie gives no repair steps for microwaves, anything that heats from the mains, large appliances, high-voltage devices, house wiring and gas, big batteries, and medical or life-safety devices."],
     "Pick a symptom": ["What's it doing?", "Pick the problem that fits best. Only the symptoms that apply to this kind of device are shown."],
     "Resume repair|Carry on": ["Carry on", "Opens the repair you were last working on, at the step you'd reached."],
     // the step

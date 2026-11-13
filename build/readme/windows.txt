@@ -12,11 +12,12 @@ Everything, in every app. Every app has teaching mode: point at anything to see 
 F2 turns it off.
 
 New in {VERSION}:
-- New app: Fixie, the repair guide. Pick a broken device and what it's doing,
-  and it takes you step by step to the fault: what to do, which tools to use,
-  and what a good and a bad result look like.
+- Fixie works for any device: describe it (how it's powered, what it has)
+  instead of picking from a list. It refuses dangerous devices outright:
+  microwaves, ovens, toasters, kettles, heaters and the like.
 
 Also in recent alpha builds:
+- 0.27.0-alpha: New app: Fixie, the repair guide.
 - 0.26.0-alpha: Wirie solders castellated modules (Pico, XIAO...) flat.
 - 0.25.0-alpha: Makie's cases make room for parts that stick out past the board.
 - 0.24.0-alpha: Codie's What it does tab.

@@ -518,23 +518,24 @@ APPS = [
     pairs=[("flashie", "Flashie's Create tab builds firmware code and explains it as it goes."), ("probie", "Run your code on a board and watch what it prints.")],
   ),
   dict(
-    id="fixie", needshort="Nothing: a multimeter helps", name="Fixie", ver="0.1.0-alpha", color="#f5b324", icon="fixie.svg",
+    id="fixie", needshort="Nothing: a multimeter helps", name="Fixie", ver="0.2.0-alpha", color="#f5b324", icon="fixie.svg",
     tagline="Something broken? Find out why, one check at a time.",
     short="A repair guide that takes you step by step from a broken device to the fault, with the tools to use and what to look for.",
     need="Nothing to start; a multimeter for most repairs",
     plain=("In plain words",
-           "Your kettle won't heat, the TV has sound but no picture, the controller won't charge. Pick what it is and what it's doing, and Fixie "
+           "The TV has sound but no picture, the controller won't charge, the speaker went quiet. Say what it is, how it's powered and what it has, then what it's doing, and Fixie "
            "takes you through it one check at a time, easiest first: what to do, which tools to use, what a good and a bad result look like. "
            "Type in your meter reading and it tells you which it is. Each answer leads to the next check, until it reaches the likely fault, "
            "how hard it is to fix and the parts you'll need. It only asks you to open things up when it has to, and tells you how to do it safely."),
-    chips=["19 kinds of device", "15 symptoms", "Over 130 steps", "Reads your meter readings", "Tools guide", "Pictures of failed parts", "Safety first", "Repair log and reports"],
+    chips=["Works for almost any device", "15 symptoms", "Over 130 steps", "Reads your meter readings", "Tools guide", "Pictures of failed parts", "Safety first", "Repair log and reports"],
     firsts=[
-      ("Pick a device", "Phones, laptops, consoles, TVs, kettles, fans, power tools, LED strips, 3D printers, Arduino boards and more."),
+      ("Describe it", "Type what it is, tap how it's powered and what it has. Categories like Computer or Toy fill in the usual answers."),
       ("Say what it's doing", "Dead, won't charge, no picture, no sound, overheating, got wet, cuts out, trips the electricity…"),
       ("Follow the steps", "Each step says what to do, which tools to use and what to look for. Type in your readings."),
       ("Fix it", "The likely fault, how hard it is, the parts you need, and a report to keep or take to a repair shop."),
     ],
     shots=[
+      ("fixie-describe", "Describe what you're fixing: how it's powered and what it has. No product list to search."),
       ("fixie-measure", "Type in a reading, and Fixie says whether it's good and which answer it points to."),
       ("fixie-step", "Each step: what to do, the tools, what it looks like, and a safety check before opening anything up."),
       ("fixie-result", "The likely fault, how hard the fix is, the parts and tools, with your notes."),
@@ -545,22 +546,20 @@ APPS = [
       ("Step by step", "From symptom to fault.", [
         "Easy checks first: the socket, the charger, the batteries, the lead",
         "Each step says what to do, why, which tools to use, and what a good and a bad result look like",
-        "Steps that don't apply to your device are skipped (no mains checks on a phone, no battery checks on a kettle)",
+        "Steps that don't apply to your device are skipped (no mains checks on a phone, no picture checks without a screen)",
         "Type in your meter reading: Fixie compares it with what it should be and highlights the matching answer",
         "Works out what a heating element should read from its voltage and power",
         "Go back to any step and choose differently",
       ]),
-      ("What it covers", "19 kinds of device, 15 symptoms.", [
-        "Phones, tablets, laptops, desktop PCs, consoles, controllers, remotes, keyboards and mice",
-        "TVs, monitors, amplifiers, radios, headphones and Bluetooth speakers",
-        "Kettles, toasters, irons, fans, blenders, vacuums, washing machines, toys",
-        "Cordless tools and battery packs, LED lamps and strips, 3D printers, Arduino, ESP32 and Pico projects",
+      ("What it covers", "Almost anything electronic.", [
+        "No list of products: you describe it by how it's powered (mains, adapter, USB, batteries, built-in battery) and what it has (screen, sound, buttons, touch, wireless, USB, motor, fan, LEDs, a programmable board…)",
+        "Categories such as Computer, Phone, Console, TV, Audio, Toy, Cordless tool, Lights, Electronics project and Household gadget fill in the usual answers",
         "Dead, cuts out, won't charge, no picture, no sound, buttons, motors, heating, USB and wireless, uploads, LEDs, overheating, water damage, faults that come and go, tripping the electricity",
       ]),
       ("Safety first", "It tells you when to stop.", [
         "A safety check before every step inside something that runs from the mains or has a lithium battery",
         "A warning before any measurement with the power on",
-        "Microwaves get outside checks only: their capacitor can kill even unplugged",
+        "Refuses outright, with no repair steps, anything dangerous: microwaves, ovens, toasters, kettles, heaters and anything else that heats from the mains, large appliances, high-voltage devices (CRTs, camera flashes), house wiring and gas, big batteries (e-bikes, scooters, cars) and medical or life-safety devices",
         "A Safety tab on mains, big capacitors, lithium batteries, soldering and static",
         "Each fix says how hard it is, and when a repair shop is the better choice",
       ]),

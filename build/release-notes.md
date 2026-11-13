@@ -10,9 +10,10 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 
 Each package has a *READ ME FIRST.txt*.
 
-<!-- release notes for 0.27.0-alpha: package.sh checks this line, so update the notes with every version -->
+<!-- release notes for 0.28.0-alpha: package.sh checks this line, so update the notes with every version -->
 ### New in {VERSION}
-- **New app: Fixie, the repair guide.** Pick what you're fixing (19 kinds of device, from phones, laptops and consoles to kettles, power tools, LED strips and 3D printers) and what it's doing (dead, won't charge, no picture, no sound, overheating, got wet, cuts out and more), and Fixie takes you through it one check at a time, easiest first. Each step says what to do, which tools to use and what a good and a bad result look like; type in your meter reading and it tells you which. It ends at the likely fault, how hard the fix is and the parts you need. Also: a tools guide with a starter kit, pictures of failed parts, safety advice (with a safety check before any step inside mains or lithium-battery devices), and a repair log with reports.
+- **Fixie works for any electronic device.** There's no product list any more: type what it is, tap how it's powered (mains, adapter, USB, batteries, built-in battery) and what it has (screen, sound, buttons, touch, wireless, USB, motor, fan, LEDs, a programmable board…), and Fixie picks the checks that fit. Categories such as Computer, Phone, Console, TV, Audio, Toy, Cordless tool, Lights and Electronics project fill in the usual answers.
+- **Fixie refuses dangerous devices outright.** Microwaves, ovens, toasters, kettles, heaters and anything else that heats from the mains, large appliances, high-voltage devices, house wiring and gas, big batteries and medical or life-safety devices get no repair steps at all, just why, and to take them to a qualified repairer.
 
 Licensed under GPL-3.0-or-later.
 

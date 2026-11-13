@@ -2,51 +2,97 @@
 # after changing it (fixie_test.go checks every path through the guide). Created by nrmluvdev.
 import json, sys
 
-# ---------------------------------------------------------------- devices
-# tags: power (mains, adapter, usbpow, battery, lipo), parts (screen, audio,
-# buttons, touch, wireless, usb, motor, fan, heater, storage, mcu, lights, led),
-# danger (hv = big capacitors inside), kinds (pc, glued)
-D = [
-  ("phone", "Phone or tablet", "Portable", "lipo usb screen audio touch buttons wireless glued",
-   "Phones and tablets are glued shut. Warm the edge of the back or screen to about 80°C (a hair dryer or heat pad), lift it with a suction cup and slide plastic picks round the edge. Disconnect the battery connector first, before anything else.", None),
-  ("laptop", "Laptop", "Computers", "lipo adapter screen audio buttons touch usb wireless fan storage pc",
-   "Most laptops open from the bottom: remove every screw (some hide under rubber feet or stickers), then prise the base off with a plastic pick. Unplug the battery before touching the board.", None),
-  ("desktop", "Desktop PC", "Computers", "mains hv usb audio fan storage pc",
-   "Side panel off; everything inside is modular. The power supply box holds mains voltage: never open the power supply itself unless you know mains repair.", None),
-  ("console", "Games console", "Computers", "mains hv usb wireless fan storage pc audio",
-   "Consoles use security screws (often Torx T8/T9 or tri-point) and warranty stickers. The built-in power supply holds mains voltage.", None),
-  ("controller", "Game controller", "Portable", "lipo usb buttons wireless audio",
-   "Usually Torx or Phillips screws, sometimes under the grips' covers or stickers, then clips. Unplug the battery first.", None),
-  ("remote", "Remote control", "Portable", "battery buttons led",
-   "Most snap apart: work a plastic pick round the seam. Some have one screw under the battery cover.", None),
-  ("tv", "TV or monitor", "Screens and sound", "mains hv screen audio buttons lights",
-   "Lay it face down on something soft. The back comes off with screws and clips. The power supply board holds mains voltage and big capacitors: unplug it and leave it a few minutes before touching anything.", None),
-  ("audio", "Amplifier, stereo or radio", "Screens and sound", "mains hv audio buttons",
-   "Screws round the case. Amplifiers have big filter capacitors that stay charged after unplugging: discharge them before working inside.", None),
-  ("earbuds", "Headphones, earbuds or Bluetooth speaker", "Screens and sound", "lipo usb audio wireless buttons glued",
-   "Small and usually glued or ultrasonically welded. Prise the seam gently with a thin plastic pick; mind the tiny battery and its fine wires.", None),
-  ("heater", "Kettle, toaster, iron or hair dryer", "Home", "mains heater buttons",
-   "Often tamper-proof screws (Torx with a pin, or oval-head). The element runs straight from the mains, so it must be unplugged before you open it.", None),
-  ("motorhome", "Fan, blender, vacuum or mixer", "Home", "mains motor buttons",
-   "Screws, often hidden under feet or labels. Fans and blenders run their motors straight from the mains: unplug before opening.", None),
-  ("washer", "Washing machine, dishwasher or fridge", "Home", "mains motor heater buttons hv",
-   "Big appliances: switch off at the wall and pull the plug. Water may be inside. Many faults (door locks, pumps, filters) can be reached from the front or back panels.", None),
-  ("powertool", "Cordless tool or battery pack", "Tools and making", "lipo motor buttons",
-   "Screws round the body. Battery packs hold a lot of energy even when 'flat': never short the terminals, and keep them away from metal tools.", None),
-  ("lights", "LED lamp, LED strip or fairy lights", "Tools and making", "adapter lights led",
-   "Strips need no opening. Lamps with a built-in driver run from the mains: unplug first, and treat the driver as live.", None),
-  ("diy", "Arduino, ESP32, Pico or DIY project", "Tools and making", "usbpow usb mcu led",
-   "Nothing to open: unplug USB and anything else powering it before changing wiring.", None),
-  ("printer3d", "3D printer", "Tools and making", "mains hv motor heater fan screen mcu usb",
-   "Switch off and unplug at the wall. The power supply has mains terminals, often with no cover: keep fingers and tools away from them.", None),
-  ("toy", "Battery toy or gadget", "Home", "battery buttons motor led audio",
-   "Usually small Phillips screws. Check for one under the battery cover or under stickers.", None),
-  ("keyboard", "Keyboard or mouse", "Computers", "usbpow usb buttons wireless led",
-   "Keycaps pull off with a keycap puller. Mice usually have screws under the gliding pads.", None),
-  ("microwave", "Microwave oven", "Home", "mains hv heater motor fan buttons",
-   "Do not open a microwave. Its high-voltage capacitor can hold a lethal charge long after it's unplugged, and its magnetron runs at over 2000V. Fixie only takes you through the checks you can do from the outside.", "noopen"),
+# ---------------------------------------------------------------- describing the device
+# Fixie doesn't use a list of products: you describe what you're fixing (how it's
+# powered and what it has), and the steps follow from that. Categories are only
+# shortcuts that fill in the usual answers, which you can change.
+power = [
+  ("mains", "Plugs straight into the wall", "Its power supply is inside it."),
+  ("adapter", "A separate adapter or power brick", "A plug-in adapter with a round or special plug."),
+  ("usbpow", "Powered by USB", "From a USB charger, computer or power bank."),
+  ("battery", "Batteries you can swap", "AA, AAA, 9V, coin cells…"),
+  ("lipo", "A built-in rechargeable battery", "Charges up; the battery is inside."),
 ]
-devices = [dict(id=i, name=n, group=g, tags=t.split(), open=o, **({"noopen": True} if x == "noopen" else {})) for i, n, g, t, o, x in D]
+power = [dict(id=i, name=n, hint=h) for i, n, h in power]
+features = [
+  ("screen", "A screen or display"), ("audio", "Speakers or sound"), ("buttons", "Buttons, keys or switches"),
+  ("touch", "A touchscreen"), ("wireless", "Wi-Fi or Bluetooth"), ("usb", "Connects to a computer by USB"),
+  ("motor", "A motor"), ("fan", "A cooling fan"), ("lights", "LED lights or LED strip"),
+  ("mcu", "A programmable board (Arduino, ESP32, Pico…)"),
+  ("heater", "A low-voltage heater (3D printer hot end or bed)"),
+  ("heatmains", "Heats things up from the mains (toaster, kettle, iron, heater…)"),
+]
+features = [dict(id=i, name=n) for i, n in features]
+# tags worked out from the answers: all of "all", none of "none"
+derived = [dict(tag="hv", all=["mains"]), dict(tag="laptop", all=["pc", "lipo"]), dict(tag="desktop", all=["pc", "mains"], none=["lipo"])]
+
+C = [
+  ("computer", "Computer or laptop", "pc", "mains", "screen audio usb wireless fan buttons",
+   "Laptops usually open from the bottom: remove every screw (some hide under rubber feet or stickers), then prise the base off with a plastic pick, and unplug the battery before touching the board. Desktop PCs: the side panel comes off, but never open the power supply box itself."),
+  ("phone", "Phone or tablet", "phone", "lipo", "screen audio touch buttons wireless usb",
+   "Phones and tablets are glued shut. Warm the edge to about 80°C (a hair dryer or heat pad), lift with a suction cup and slide plastic picks round. Disconnect the battery connector first, before anything else."),
+  ("console", "Games console or controller", "console", "mains", "usb wireless fan audio buttons",
+   "Consoles and controllers use security screws (often Torx or tri-point), some under stickers or grips, then clips. Unplug the battery in controllers first; a console's built-in power supply holds mains voltage."),
+  ("screen", "TV, monitor or display", "tv", "mains", "screen audio buttons",
+   "Lay it face down on something soft. The back comes off with screws and clips. The power board holds mains voltage and big capacitors: unplug it and leave it a few minutes before touching anything."),
+  ("audio", "Speaker, headphones, amp or radio", "sound", "lipo", "audio wireless buttons usb",
+   "Small speakers and earbuds are usually glued or welded: prise the seam gently with a thin plastic pick and mind the battery wires. Amplifiers have big capacitors that stay charged after unplugging."),
+  ("toy", "Toy or gadget", "toy", "battery", "buttons motor audio lights",
+   "Usually small Phillips screws: check under the battery cover and stickers. Some snap apart with a plastic pick round the seam."),
+  ("tool", "Cordless tool or battery pack", "powertool", "lipo", "motor buttons",
+   "Screws round the body. Battery packs hold a lot of energy even when 'flat': never short the terminals, and keep them away from metal tools."),
+  ("lights", "Lights and LEDs", "", "adapter", "lights",
+   "LED strips need no opening. Lamps with a built-in driver run from the mains: unplug first."),
+  ("project", "Electronics project or board", "", "usbpow", "mcu usb",
+   "Nothing to open: unplug USB and anything else powering it before changing wiring."),
+  ("input", "Keyboard, mouse or remote", "", "usbpow", "buttons usb",
+   "Keycaps pull off with a keycap puller. Mice have screws under the gliding pads; remotes snap apart at the seam."),
+  ("machine", "3D printer or machine with motors", "", "mains", "motor fan screen mcu usb heater",
+   "Switch off and unplug at the wall. The power supply has mains terminals, often with no cover: keep fingers and tools away from them."),
+  ("household", "Household gadget (fan, vacuum, shaver…)", "", "mains", "motor buttons",
+   "Screws, often hidden under feet or labels. Unplug before opening; mains motors are wired straight to the mains."),
+  ("other", "Something else", "", "", "", None),
+]
+categories = [dict(id=i, name=n, kind=k, power=p.split(), has=h.split(), open=o) for i, n, k, p, h, o in C]
+
+# ---------------------------------------------------------------- what Fixie won't help with
+# Checked against whatever the person types as the device's name, and against
+# their answers (anything that heats from the mains). There is no way round it.
+danger = [
+  dict(id="microwave", t="Microwave ovens", why="A microwave's high-voltage capacitor can hold a lethal charge long after it's unplugged, and its magnetron runs at over 2000 volts.",
+       words=["microwave", "magnetron"]),
+  dict(id="heat", t="Anything that heats from the mains", why="Ovens, toasters, kettles, heaters, irons and the like pass large mains currents through bare elements. A mistake can mean a fatal shock or a house fire.",
+       words=["oven", "toaster", "toastie maker", "sandwich maker", "waffle maker", "cooker", "hob", "stove", "grill", "air fryer", "airfryer", "deep fryer", "fryer", "kettle",
+              "coffee machine", "coffee maker", "espresso", "slow cooker", "rice cooker", "pressure cooker", "instant pot", "bread maker", "breadmaker", "food warmer", "hot plate", "hotplate",
+              "induction hob", "induction cooker", "heater", "space heater", "radiator", "electric fire", "storage heater", "immersion", "electric shower", "boiler", "hair dryer", "hairdryer", "blow dryer",
+              "hair straightener", "straighteners", "curling iron", "curling tongs", "hot brush", "steam iron", "clothes iron", "flat iron", "ironing", "garment steamer", "steamer",
+              "electric blanket", "heated blanket", "heat gun", "soldering iron", "soldering station", "hot air station", "glue gun", "sous vide", "dehydrator", "vape", "e-cigarette", "ecig", "e-cig", "popcorn maker",
+              "electric grill", "panini", "griddle", "heated blanket", "heated towel rail", "towel rail", "plate warmer", "bottle warmer"]),
+  dict(id="white", t="Large household appliances", why="Washing machines, dishwashers, dryers, fridges and freezers combine mains power with water, heavy moving parts or pressurised refrigerant.",
+       words=["washing machine", "washer", "dishwasher", "tumble dryer", "dryer", "fridge", "freezer", "refrigerator", "air conditioner", "air conditioning", "aircon", "heat pump", "dehumidifier", "ice maker", "wine cooler"]),
+  dict(id="hv", t="High-voltage devices", why="These store or make thousands of volts: enough to kill, even when switched off.",
+       words=["crt", "cathode ray", "tube tv", "tube television", "camera flash", "flashgun", "flash gun", "disposable camera", "neon", "bug zapper", "fly zapper", "insect killer",
+              "taser", "stun gun", "plasma ball", "tesla coil", "ignition coil", "hid ballast", "xenon", "x-ray", "xray", "electric fence", "fence energiser", "ozone generator", "laser cutter", "laser engraver", "welder", "spot welder"]),
+  dict(id="house", t="Anything wired into the house, or gas", why="Fixed wiring and gas work must be done by a qualified electrician or gas engineer, by law in many countries.",
+       words=["fuse box", "consumer unit", "light switch", "wall socket", "mains socket", "plug socket", "house wiring", "ceiling light", "light fitting", "doorbell transformer", "extractor fan", "gas boiler", "gas hob", "gas fire", "gas cooker", "gas heater", "thermostat wiring"]),
+  dict(id="bigbatt", t="Big batteries", why="E-bike, scooter and car batteries hold enough energy to start fires that are very hard to put out; car and mobility batteries can explode or leak acid.",
+       words=["e-bike", "ebike", "electric bike", "e-scooter", "escooter", "electric scooter", "hoverboard", "electric car", "ev", "car battery", "mobility scooter", "power station", "powerwall",
+              "home battery", "solar inverter", "inverter", "ups", "uninterruptible", "golf cart", "electric motorbike"]),
+  dict(id="life", t="Medical and life-safety devices", why="If one of these fails after a home repair, someone could be hurt. They must be repaired or replaced by the maker.",
+       words=["pacemaker", "defibrillator", "cpap", "oxygen concentrator", "insulin pump", "hearing aid", "medical", "nebuliser", "nebulizer", "smoke alarm", "smoke detector",
+              "carbon monoxide", "co alarm", "co detector", "fire alarm", "stairlift", "hoist"]),
+]
+# old saved repairs (from before Fixie asked about the device) and what they become
+legacy = {
+  "phone": ["phone", "lipo", "screen audio touch buttons wireless usb"], "laptop": ["computer", "lipo adapter", "screen audio buttons touch usb wireless fan"],
+  "desktop": ["computer", "mains", "usb audio fan"], "console": ["console", "mains", "usb wireless fan audio"], "controller": ["console", "lipo usb", "buttons wireless audio"],
+  "remote": ["input", "battery", "buttons"], "tv": ["screen", "mains", "screen audio buttons lights"], "audio": ["audio", "mains", "audio buttons"],
+  "earbuds": ["audio", "lipo usb", "audio wireless buttons"], "motorhome": ["household", "mains", "motor buttons"], "powertool": ["tool", "lipo", "motor buttons"],
+  "lights": ["lights", "adapter", "lights"], "diy": ["project", "usbpow", "usb mcu"], "printer3d": ["machine", "mains", "motor heater fan screen mcu usb"],
+  "toy": ["toy", "battery", "buttons motor audio"], "keyboard": ["input", "usbpow", "usb buttons wireless"],
+  "heater": ["other", "mains", "heatmains"], "washer": ["other", "mains", "motor heatmains"], "microwave": ["other", "mains", "heatmains"],
+}
+legacy = {k: dict(cat=c, power=p.split(), has=h.split()) for k, (c, p, h) in legacy.items()}
 
 # ---------------------------------------------------------------- symptoms
 S = [
@@ -57,7 +103,7 @@ S = [
   ("sound", "No sound, or it hums, crackles or distorts", "Speakers silent, one side out, or sound is noisy.", "audio", "snd.1"),
   ("buttons", "Buttons, keys or the touchscreen don't respond", "Something you press doesn't do anything, or does the wrong thing.", "buttons|touch", "bt.1"),
   ("motor", "A motor or fan won't spin, or is noisy", "Hums, grinds, or doesn't turn.", "motor|fan", "m.1"),
-  ("heat", "Doesn't heat up, or won't stop heating", "Element stays cold, or it overheats or won't switch off.", "heater", "h.1"),
+  ("heat", "Its heater doesn't heat, or won't stop", "A 3D printer hot end or bed stays cold, overheats, or shows a heating error.", "heater", "h.1"),
   ("connect", "Won't connect: USB, Wi-Fi or Bluetooth", "The computer doesn't see it, or it won't pair.", "usb|wireless", "cn.1"),
   ("upload", "The computer can't see the board, or code won't upload", "No COM port, upload errors, or it won't run your code.", "mcu", "up.1"),
   ("lights", "LEDs flicker, part is out, or colours are wrong", "Some LEDs dark, wrong colours, dim at one end.", "lights", "l.1"),
@@ -419,18 +465,18 @@ step("m.4", "Test the switch, speed control and thermal fuse", "Something before
   tools=["meter"], open=True)
 
 # ---- heating
-step("h.1", "Check the obvious first", "Heaters have safety switches that stop them working when something isn't quite right.", [
-    iff("heater", "Kettles: sit it squarely on its base and close the lid. Toasters: the lever should latch down. Irons: check the temperature dial isn't on 'off'."),
+step("h.1", "Check the obvious first", "Heaters are watched by safety checks that stop them when something isn't right.", [
     iff("mcu", "3D printers show an error (thermal runaway, MINTEMP, MAXTEMP, heating failed). Note exactly what it says."),
+    "Check the heater's and sensor's plugs are pushed fully home and not scorched.",
   ], "What's happening?",
-  [("It shows an error message", "h.4", "mcu"), ("It won't stop heating", "r.relay"), ("It stays cold", "h.2")])
+  [("It shows an error message", "h.4", "mcu"), ("It won't stop heating", "r.relay"), ("It stays cold", "h.2")], signs=["melted"])
 
 step("h.2", "Test the heating element", "The element is just a wire with a known resistance, so a meter tells you if it's broken.", [
-    "Unplug it and measure across the element's two terminals.",
-    "The expected resistance is the voltage squared divided by the power: 230V and 2000W is 230×230÷2000 ≈ 26Ω. Fixie works it out below.",
-    "Also measure from each terminal to the metal case or earth: that must read open (OL).",
+    "Switch off, unplug the heater's wires from the board, and measure across them.",
+    "The expected resistance is the voltage squared divided by the power: a 24V 40W heater is 24×24÷40 ≈ 14Ω. Fixie works it out below.",
+    "Also measure from each terminal to the metal block or frame: that must read open (OL).",
   ], "What does the element read?",
-  [("Open (OL): broken", "r.element"), ("About what it should", "h.3"), ("A low reading to the metal case", "r.elementearth")],
+  [("Open (OL): broken", "r.element"), ("About what it should", "h.3"), ("A low reading to the metal block", "r.elementearth")],
   tools=["meter"], open=True,
   measure=dict(label="Element resistance", unit="Ω", calc="element"))
 
@@ -697,12 +743,12 @@ result("r.runcap", "A failed start capacitor", "Fans need a capacitor to start t
   ["Replace it with a motor run capacitor of the same µF value and at least the same voltage (marked on it, often 450V AC)."], "Easy", parts=["Run capacitor"], tools=["screwdrivers"])
 result("r.thermalfuse", "A blown thermal fuse", "It blew because something got too hot.",
   ["Find out why first: a blocked vent, a seized motor or a stuck thermostat.", "Replace it with the same temperature and current rating. Crimp it, or solder quickly with a heatsink clip: heat from the iron can blow a new one."], "Medium", parts=["Thermal fuse"], tools=["iron", "crimper"])
-result("r.relay", "A stuck relay or thermostat", "The switch that cuts the power has welded shut.",
-  ["Unplug it. Replace the relay or thermostat with the same rating.", "This is a safety fault: don't use it until it's fixed."], "Medium", parts=["Relay or thermostat"])
+result("r.relay", "The heater is stuck on", "The part that switches the heater (a MOSFET on the board, or a relay) has failed shorted, so the heater gets full power all the time.",
+  ["Switch it off at the wall now, and don't use it until it's fixed: a heater stuck on is a fire risk.", "Replace the heater's MOSFET or relay, or the control board. Many 3D printer owners add an external MOSFET board.", "Make sure the firmware's thermal runaway protection is turned on."], "Hard", parts=["MOSFET, relay or control board"], pro="If you're not sure, a heater stuck on is worth taking to someone who is.")
 result("r.element", "A broken heating element", "The element's wire has burnt through.",
-  ["Replace the element (or the whole appliance if the element is part of it, like most kettles)."], "Medium", parts=["Heating element"])
-result("r.elementearth", "Leakage to earth", "The element or wiring is leaking current to the metal case: dangerous.",
-  ["Don't use it.", "Replace the element, or the damaged lead.", "Have it safety-tested (a PAT test) before using it again."], "Pro", pro="Earth faults on mains appliances are a shock risk: a qualified electrician or appliance repairer should test it.")
+  ["Replace the heater with one of the same voltage and power (it's printed on it or in the machine's manual)."], "Medium", parts=["Heating element"])
+result("r.elementearth", "Leakage to earth", "Something is leaking current to the metal frame or earth: dangerous.",
+  ["Don't use it.", "Replace the faulty part (a heater, a motor or a damaged lead).", "Have it safety-tested (a PAT test) before using it again."], "Pro", pro="Earth faults on mains appliances are a shock risk: a qualified electrician or appliance repairer should test it.")
 result("r.thermostat", "A faulty thermostat", "It isn't switching on.", ["Replace the thermostat with the same temperature and rating."], "Medium", parts=["Thermostat"])
 result("r.thermistor", "A faulty temperature sensor", "The sensor wire is broken or shorted, or the sensor has failed.",
   ["Check the wire along its length and the plug on the board.", "Replace the thermistor with the same type (the printer's firmware expects a particular one, often a 100k NTC 3950)."], "Easy", parts=["Thermistor"], tools=["screwdrivers"])
@@ -813,11 +859,6 @@ safety = [
     "If you must measure with it on, keep one hand in your pocket and use probes with shrouded tips.",
     "Never fit a bigger fuse, and never bridge a fuse with wire or foil.",
     "After a mains repair, check the earth wire is connected and nothing bare can be touched. A PAT test is the proper check."]),
-  dict(id="stop", t="Leave these to a professional", level="danger", points=[
-    "Microwave ovens: the high-voltage capacitor can kill even when unplugged.",
-    "Old CRT TVs and monitors: the tube holds thousands of volts for days.",
-    "Camera flashes and disposable cameras: a capacitor that gives a painful, dangerous shock.",
-    "Anything wired into the house (cookers, boilers, electric showers)."]),
   dict(id="lithium", t="Lithium batteries", level="warn", points=[
     "Disconnect the battery before anything else when you open a device.",
     "Never puncture, bend or crush one. Use plastic tools near it.",
@@ -841,6 +882,6 @@ safety = [
     "If parts would cost more than a replacement, a repair shop or recycling may be the better choice."]),
 ]
 
-guide = dict(version=1, devices=devices, symptoms=symptoms, steps=steps, tools=tools, signs=signs, safety=safety)
+guide = dict(version=2, power=power, features=features, derived=derived, categories=categories, danger=danger, legacy=legacy, symptoms=symptoms, steps=steps, tools=tools, signs=signs, safety=safety)
 json.dump(guide, open(sys.argv[1], "w"), ensure_ascii=False, indent=1)
 print(len(steps), "steps", sum(1 for s in steps.values() if s.get("result")), "results")
