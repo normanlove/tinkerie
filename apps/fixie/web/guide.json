@@ -182,7 +182,8 @@
        "lo": 0.95,
        "hi": 1.05
       }
-     }
+     },
+     "pic": "meter-res"
     },
     {
      "t": "In the circuit",
@@ -194,7 +195,12 @@
     }
    ],
    "replace": "Same value, same power rating or higher (size is a clue: 1/4W is about 6mm long), same tolerance.",
-   "salvage": "Not worth it: resistors are cheap. Keep a kit instead."
+   "salvage": "Not worth it: resistors are cheap. Keep a kit instead.",
+   "pic": "res",
+   "refs": [
+    "colour",
+    "smd"
+   ]
   },
   {
    "id": "pot",
@@ -270,7 +276,11 @@
     }
    ],
    "replace": "Same µF, the same or higher voltage, 105°C, and low-ESR in power supplies. Fit it the right way round.",
-   "salvage": "No: old electrolytics are the part most likely to fail. Replace rather than reuse."
+   "salvage": "No: old electrolytics are the part most likely to fail. Replace rather than reuse.",
+   "pic": "ecap",
+   "refs": [
+    "cap"
+   ]
   },
   {
    "id": "ccap",
@@ -289,10 +299,15 @@
       "If the rail is shorted, inject a little current into it (see Board level: find the short): the shorted capacitor gets warm."
      ],
      "good": "Not shorted, and stays cool when current is injected.",
-     "bad": "Short, and the warm spot is on it."
+     "bad": "Short, and the warm spot is on it.",
+     "pic": "inject-short"
     }
    ],
-   "replace": "Same capacitance and voltage or higher; for X2 or Y capacitors across the mains, only the same safety rating."
+   "replace": "Same capacitance and voltage or higher; for X2 or Y capacitors across the mains, only the same safety rating.",
+   "pic": "ccap",
+   "refs": [
+    "cap"
+   ]
   },
   {
    "id": "diode",
@@ -333,10 +348,12 @@
         "say": "Too high, or open."
        }
       ]
-     }
+     },
+     "pic": "meter-diode"
     }
    ],
-   "replace": "Same type (rectifier, fast, Schottky, signal) with the same or higher current and voltage rating."
+   "replace": "Same type (rectifier, fast, Schottky, signal) with the same or higher current and voltage rating.",
+   "pic": "diode"
   },
   {
    "id": "zener",
@@ -375,7 +392,8 @@
      }
     }
    ],
-   "replace": "Same voltage and power rating."
+   "replace": "Same voltage and power rating.",
+   "pic": "diode"
   },
   {
    "id": "led",
@@ -392,11 +410,16 @@
       "Meter on diode test, red to + (the longer leg). Many meters light the LED faintly."
      ],
      "good": "It glows faintly, or reads about 1.6–3.2V one way.",
-     "bad": "OL both ways, or no glow with a meter that lights others."
+     "bad": "OL both ways, or no glow with a meter that lights others.",
+     "pic": "meter-diode"
     }
    ],
    "replace": "Same colour, size and forward voltage. Keep the resistor that sets its current.",
-   "salvage": "Yes: through-hole LEDs from old boards are fine to reuse after a quick test."
+   "salvage": "Yes: through-hole LEDs from old boards are fine to reuse after a quick test.",
+   "pic": "led",
+   "refs": [
+    "ohm"
+   ]
   },
   {
    "id": "bridge",
@@ -414,10 +437,12 @@
       "Then reverse each one."
      ],
      "good": "About 0.5V forward on all four, OL in reverse.",
-     "bad": "Any one near 0V both ways (shorted)."
+     "bad": "Any one near 0V both ways (shorted).",
+     "pic": "meter-diode"
     }
    ],
-   "replace": "Same current and voltage rating or higher."
+   "replace": "Same current and voltage rating or higher.",
+   "pic": "bridge"
   },
   {
    "id": "bjt",
@@ -436,10 +461,15 @@
       "Collector to emitter: OL both ways."
      ],
      "good": "Both base junctions about 0.5–0.7V one way and OL the other; collector-emitter OL.",
-     "bad": "Any junction near 0V, or collector-emitter shorted."
+     "bad": "Any junction near 0V, or collector-emitter shorted.",
+     "pic": "meter-diode"
     }
    ],
-   "replace": "Same part number, or one with the same type (NPN/PNP), pinout, and at least the same voltage, current and gain."
+   "replace": "Same part number, or one with the same type (NPN/PNP), pinout, and at least the same voltage, current and gain.",
+   "pic": "bjt",
+   "refs": [
+    "pinouts"
+   ]
   },
   {
    "id": "mosfet",
@@ -460,10 +490,15 @@
       "To check it switches: touch red to gate and black to source for a moment, then measure drain-source again: it should now conduct."
      ],
      "good": "Body diode reads normally, no short, gate OL, and it switches on when the gate is charged.",
-     "bad": "Drain-source near 0V both ways, or the gate isn't OL."
+     "bad": "Drain-source near 0V both ways, or the gate isn't OL.",
+     "pic": "meter-diode"
     }
    ],
-   "replace": "Same part, or with the same or higher voltage and current, the same or lower on-resistance, a logic-level gate if it's driven from a microcontroller, and the same pinout."
+   "replace": "Same part, or with the same or higher voltage and current, the same or lower on-resistance, a logic-level gate if it's driven from a microcontroller, and the same pinout.",
+   "pic": "mosfet",
+   "refs": [
+    "pinouts"
+   ]
   },
   {
    "id": "reg",
@@ -492,11 +527,16 @@
        "lo": 0.95,
        "hi": 1.05
       }
-     }
+     },
+     "pic": "meter-dcv"
     }
    ],
    "replace": "Same output voltage, pinout and current, and the same or lower dropout. Check the output capacitor the datasheet asks for.",
-   "salvage": "Yes: 78xx and LM317 regulators are worth keeping."
+   "salvage": "Yes: 78xx and LM317 regulators are worth keeping.",
+   "pic": "reg",
+   "refs": [
+    "pinouts"
+   ]
   },
   {
    "id": "buck",
@@ -528,11 +568,13 @@
      "app": {
       "app": "scopie",
       "how": "Set the timebase to about 1µs/div and trigger on CH1's rising edge; turn on the Frequency and Peak-to-peak measurements."
-     }
+     },
+     "pic": "wave-switching"
     }
    ],
    "replace": "Same chip; or a ready-made buck module of the right voltage and current as a bodge.",
-   "salvage": "Yes: buck and boost modules from dead gadgets are handy for projects."
+   "salvage": "Yes: buck and boost modules from dead gadgets are handy for projects.",
+   "pic": "buck"
   },
   {
    "id": "crystal",
@@ -565,10 +607,12 @@
      "app": {
       "app": "scopie",
       "how": "×10 probe, timebase so a few cycles fill the screen (about 50ns/div for 16MHz), AC or DC coupling, turn on Frequency."
-     }
+     },
+     "pic": "wave-crystal"
     }
    ],
-   "replace": "Same frequency and type; keep the two load capacitors."
+   "replace": "Same frequency and type; keep the two load capacitors.",
+   "pic": "crystal"
   },
   {
    "id": "ic",
@@ -594,7 +638,12 @@
     }
    ],
    "replace": "Same part number; the family letters matter (HC, HCT, LS have different input levels).",
-   "salvage": "Yes, in sockets: old 74xx and 4000 chips are useful for projects and learning."
+   "salvage": "Yes, in sockets: old 74xx and 4000 chips are useful for projects and learning.",
+   "pic": "ic",
+   "refs": [
+    "pin1",
+    "pinouts"
+   ]
   },
   {
    "id": "mcu",
@@ -618,11 +667,16 @@
      "app": {
       "app": "probie",
       "how": "Capture the serial TX pin (Serial tab at 115200 first), or several I/O pins on the Logic tab to see whether it's doing anything."
-     }
+     },
+     "pic": "serial-hookup"
     }
    ],
    "replace": "Same chip, programmed with the device's firmware (from a backup or the maker): usually a job for the maker or a specialist.",
-   "salvage": "Development boards: yes. Chips soldered on old boards: rarely worth removing."
+   "salvage": "Development boards: yes. Chips soldered on old boards: rarely worth removing.",
+   "pic": "mcu",
+   "refs": [
+    "pin1"
+   ]
   },
   {
    "id": "opamp",
@@ -644,10 +698,15 @@
      "app": {
       "app": "scopie",
       "how": "Feed a test tone in and compare the input and output pins on CH1 and CH2."
-     }
+     },
+     "pic": "wave-tone"
     }
    ],
-   "replace": "Same part, or a pin-compatible op-amp that works on the same supply."
+   "replace": "Same part, or a pin-compatible op-amp that works on the same supply.",
+   "pic": "opamp",
+   "refs": [
+    "pinouts"
+   ]
   },
   {
    "id": "opto",
@@ -668,7 +727,11 @@
      "bad": "LED open, or the output doesn't change."
     }
    ],
-   "replace": "Same part (the current transfer ratio matters in power supplies)."
+   "replace": "Same part (the current transfer ratio matters in power supplies).",
+   "pic": "opto",
+   "refs": [
+    "pinouts"
+   ]
   },
   {
    "id": "fuse",
@@ -702,10 +765,12 @@
         "say": "Blown or tripped."
        }
       ]
-     }
+     },
+     "pic": "meter-continuity"
     }
    ],
-   "replace": "Same current, voltage and speed (fast or slow-blow). Never bigger. Find why it blew before powering up."
+   "replace": "Same current, voltage and speed (fast or slow-blow). Never bigger. Find why it blew before powering up.",
+   "pic": "fuse"
   },
   {
    "id": "tvs",
@@ -725,7 +790,8 @@
      "bad": "Close to 0Ω both ways."
     }
    ],
-   "replace": "Same type and voltage. A device often still works with it removed, but put a new one in before using it for real."
+   "replace": "Same type and voltage. A device often still works with it removed, but put a new one in before using it for real.",
+   "pic": "ccap"
   },
   {
    "id": "relay",
@@ -748,7 +814,8 @@
     }
    ],
    "replace": "Same coil voltage, the same or higher contact rating, same footprint.",
-   "salvage": "Yes: relays from old appliances and boards are handy, after a test."
+   "salvage": "Yes: relays from old appliances and boards are handy, after a test.",
+   "pic": "relay"
   },
   {
    "id": "switch",
@@ -769,11 +836,13 @@
      "app": {
       "app": "meterie",
       "how": "Meterie's continuity mode with the graph shows a crackly contact as a ragged line."
-     }
+     },
+     "pic": "meter-continuity"
     }
    ],
    "replace": "Same size and action; contact cleaner first.",
-   "salvage": "Yes: switches, buttons and keyboard switches are worth keeping."
+   "salvage": "Yes: switches, buttons and keyboard switches are worth keeping.",
+   "pic": "switch"
   },
   {
    "id": "conn",
@@ -796,11 +865,13 @@
      "app": {
       "app": "meterie",
       "how": "Meterie's continuity beep and graph catch a break that only opens when the cable bends."
-     }
+     },
+     "pic": "meter-continuity"
     }
    ],
    "replace": "Same connector type and pitch; ribbon cables by width, pitch and length.",
-   "salvage": "Yes: cables, connectors and ribbon cables are some of the most reusable parts."
+   "salvage": "Yes: cables, connectors and ribbon cables are some of the most reusable parts.",
+   "pic": "usbpins"
   },
   {
    "id": "speaker",
@@ -868,7 +939,8 @@
       "Run it from a bench supply at its voltage and watch the current with no load."
      ],
      "good": "Small and steady current that drops once it's up to speed.",
-     "bad": "High current and little speed: a shorted winding or tight bearing."
+     "bad": "High current and little speed: a shorted winding or tight bearing.",
+     "pic": "meter-current"
     }
    ],
    "replace": "Same voltage, size, shaft and speed.",
@@ -923,7 +995,8 @@
     }
    ],
    "replace": "Same chemistry and size, from a reputable maker; matched cells in packs.",
-   "salvage": "Yes, with care: good cells from laptop packs power many projects. Always use a protection board (BMS)."
+   "salvage": "Yes, with care: good cells from laptop packs power many projects. Always use a protection board (BMS).",
+   "pic": "liion"
   },
   {
    "id": "display",
@@ -951,7 +1024,8 @@
     }
    ],
    "replace": "Same model; many character LCDs are interchangeable.",
-   "salvage": "Yes: displays from old gadgets are great for projects, after checking the pinout."
+   "salvage": "Yes: displays from old gadgets are great for projects, after checking the pinout.",
+   "pic": "lcd1602"
   }
  ],
  "power": [
@@ -3649,6 +3723,9 @@
    ],
    "tools": [
     "cable"
+   ],
+   "pics": [
+    "usbpins"
    ]
   },
   "up.2": {
@@ -5344,6 +5421,14 @@
     "corrosion",
     "joint",
     "connector"
+   ],
+   "pics": [
+    "ic",
+    "mcu"
+   ],
+   "refs": [
+    "labels",
+    "pin1"
    ]
   },
   "b.in.1": {
@@ -5398,6 +5483,10 @@
      "app": "meterie",
      "how": "DC volts. Watch the graph while you wiggle the plug: a dip shows a loose socket."
     }
+   ],
+   "pics": [
+    "meter-dcv",
+    "dcjack"
    ]
   },
   "b.in.2": {
@@ -5438,6 +5527,14 @@
      "app": "meterie",
      "how": "DC volts; move the red probe along the path, keeping the black on ground."
     }
+   ],
+   "pics": [
+    "meter-dcv",
+    "diode",
+    "fuse"
+   ],
+   "refs": [
+    "labels"
    ]
   },
   "b.in.3": {
@@ -5486,7 +5583,11 @@
       "ok": true
      }
     ]
-   }
+   },
+   "pics": [
+    "inject-short",
+    "ccap"
+   ]
   },
   "r.diodeopen": {
    "result": true,
@@ -5572,6 +5673,15 @@
     "fuse",
     "caps",
     "burnt"
+   ],
+   "pics": [
+    "smps-map",
+    "bridge",
+    "meter-diode",
+    "mosfet"
+   ],
+   "refs": [
+    "pinouts"
    ]
   },
   "b.smps.2": {
@@ -5608,6 +5718,11 @@
    "open": true,
    "signs": [
     "caps"
+   ],
+   "pics": [
+    "smps-map",
+    "meter-diode",
+    "ecap"
    ]
   },
   "b.smps.3": {
@@ -5647,6 +5762,10 @@
      "app": "meterie",
      "how": "DC volts on the low-voltage output, with the graph running: pulsing outputs show as a saw-tooth."
     }
+   ],
+   "pics": [
+    "bulb",
+    "smps-map"
    ]
   },
   "r.startres": {
@@ -5756,6 +5875,14 @@
      "app": "meterie",
      "how": "DC volts. Use the min/max hold to catch a rail that dips at start-up."
     }
+   ],
+   "pics": [
+    "meter-dcv",
+    "reg"
+   ],
+   "refs": [
+    "rails",
+    "pinouts"
    ]
   },
   "b.reg.2": {
@@ -5788,7 +5915,15 @@
    "tools": [
     "meter"
    ],
-   "live": true
+   "live": true,
+   "pics": [
+    "buck",
+    "wave-switching",
+    "reg"
+   ],
+   "refs": [
+    "pinouts"
+   ]
   },
   "b.reg.3": {
    "t": "Find the short",
@@ -5835,7 +5970,11 @@
       "ok": true
      }
     ]
-   }
+   },
+   "pics": [
+    "inject-short",
+    "ccap"
+   ]
   },
   "b.bat.1": {
    "t": "Measure the battery and its protection",
@@ -5893,6 +6032,10 @@
      "app": "meterie",
      "how": "DC volts on each cell in turn; note them in the step's notes."
     }
+   ],
+   "pics": [
+    "cell-pack",
+    "liion"
    ]
   },
   "b.bat.2": {
@@ -5920,7 +6063,10 @@
    "tools": [
     "meter"
    ],
-   "live": true
+   "live": true,
+   "pics": [
+    "cell-pack"
+   ]
   },
   "r.bmstrip": {
    "result": true,
@@ -5995,6 +6141,11 @@
      "app": "scopie",
      "how": "×10 probe, timebase so a few cycles fill the screen, trigger on CH1, turn on Frequency."
     }
+   ],
+   "pics": [
+    "scope-probe",
+    "wave-crystal",
+    "crystal"
    ]
   },
   "b.clk.2": {
@@ -6035,6 +6186,13 @@
      "app": "scopie",
      "how": "Slow timebase (500ms/div), roll mode, CH1 on reset."
     }
+   ],
+   "pics": [
+    "wave-reset",
+    "mcu"
+   ],
+   "refs": [
+    "pin1"
    ]
   },
   "r.crystal": {
@@ -6112,6 +6270,11 @@
      "app": "probie",
      "how": "Serial tab: pick the adapter's port, try 115200 then 9600; Explain describes errors in plain words. Logic tab: 4–8 channels on the chip's pins, 1MHz sample rate."
     }
+   ],
+   "pics": [
+    "serial-hookup",
+    "wave-uart",
+    "logic-i2c"
    ]
   },
   "b.cpu.2": {
@@ -6150,6 +6313,10 @@
      "app": "probie",
      "how": "Serial tab: the reset reason is usually near the start of the boot messages."
     }
+   ],
+   "pics": [
+    "wave-brownout",
+    "serial-hookup"
    ]
   },
   "r.bootlog": {
@@ -6239,6 +6406,11 @@
      "app": "probie",
      "how": "Logic tab: add the I2C, SPI or UART decoder; sample rate at least 4× the bus speed (2MHz for 400kHz I2C). Explain summarises who answered."
     }
+   ],
+   "pics": [
+    "logic-i2c",
+    "wave-i2c",
+    "wave-uart"
    ]
   },
   "b.bus.2": {
@@ -6267,6 +6439,10 @@
    "tools": [
     "meter",
     "logic"
+   ],
+   "pics": [
+    "wave-i2c",
+    "i2c-pullups"
    ]
   },
   "b.bus.3": {
@@ -6315,6 +6491,10 @@
      "app": "scopie",
      "how": "CH1 on SDA, CH2 on SCL, about 2µs/div: edges should rise quickly and square."
     }
+   ],
+   "pics": [
+    "wave-i2c-edges",
+    "i2c-pullups"
    ]
   },
   "r.chippower": {
@@ -6471,6 +6651,10 @@
      "app": "scopie",
      "how": "CH1, about 500µs/div, AC coupling, Peak-to-peak on. Move the probe along the path."
     }
+   ],
+   "pics": [
+    "signal-trace",
+    "wave-tone"
    ]
   },
   "b.aud.2": {
@@ -6498,7 +6682,14 @@
    "tools": [
     "meter"
    ],
-   "live": true
+   "live": true,
+   "pics": [
+    "opamp",
+    "wave-tone"
+   ],
+   "refs": [
+    "pinouts"
+   ]
   },
   "b.aud.3": {
    "t": "Check the amplifier chip",
@@ -6530,7 +6721,10 @@
    "tools": [
     "meter"
    ],
-   "live": true
+   "live": true,
+   "pics": [
+    "meter-dcv"
+   ]
   },
   "r.couplecap": {
    "result": true,
@@ -6650,6 +6844,13 @@
      "app": "probie",
      "how": "VGA or digital sync: one channel each on HSYNC and VSYNC; the frequency shows in the measurement."
     }
+   ],
+   "pics": [
+    "wave-composite",
+    "wave-vga"
+   ],
+   "refs": [
+    "pinouts"
    ]
   },
   "b.vid.2": {
@@ -6680,6 +6881,10 @@
      "app": "scopie",
      "how": "CH1 on each colour pin in turn at 10µs/div; turn on Peak-to-peak."
     }
+   ],
+   "pics": [
+    "wave-composite",
+    "wave-vga"
    ]
   },
   "b.vid.3": {
@@ -6708,7 +6913,11 @@
     "meter",
     "scope"
    ],
-   "live": true
+   "live": true,
+   "pics": [
+    "crystal",
+    "wave-crystal"
+   ]
   },
   "r.vidclock": {
    "result": true,
@@ -6766,6 +6975,10 @@
      "app": "probie",
      "how": "One channel on the control pin; PWM outputs show their frequency and duty in the measurement."
     }
+   ],
+   "pics": [
+    "driver-mosfet",
+    "wave-pwm"
    ]
   },
   "b.out.2": {
@@ -6799,7 +7012,15 @@
     "meter",
     "esr"
    ],
-   "open": true
+   "open": true,
+   "pics": [
+    "mosfet",
+    "relay",
+    "meter-diode"
+   ],
+   "refs": [
+    "pinouts"
+   ]
   },
   "r.driver2": {
    "result": true,
@@ -6868,6 +7089,10 @@
      "app": "probie",
      "how": "Logic tab: one channel per row and column, 100kHz sample rate, capture while holding a key: the pressed key joins its row and column."
     }
+   ],
+   "pics": [
+    "key-matrix",
+    "switch"
    ]
   },
   "b.inp.2": {
@@ -6896,7 +7121,11 @@
    "tools": [
     "meter"
    ],
-   "open": true
+   "open": true,
+   "pics": [
+    "switch",
+    "meter-continuity"
+   ]
   },
   "b.con.1": {
    "t": "Beep out the connections",
@@ -6940,6 +7169,10 @@
      "app": "meterie",
      "how": "Continuity with the graph: a break that only opens when bent shows as a gap."
     }
+   ],
+   "pics": [
+    "meter-continuity",
+    "usbpins"
    ]
   },
   "u.pw.1": {
@@ -6986,6 +7219,13 @@
      "app": "meterie",
      "how": "DC volts; the min/max hold catches a supply that drops when it starts."
     }
+   ],
+   "pics": [
+    "meter-dcv",
+    "breadboard"
+   ],
+   "refs": [
+    "rails"
    ]
   },
   "u.pw.2": {
@@ -7014,7 +7254,15 @@
    "tools": [
     "meter"
    ],
-   "live": true
+   "live": true,
+   "pics": [
+    "reg",
+    "breadboard",
+    "dcjack"
+   ],
+   "refs": [
+    "pinouts"
+   ]
   },
   "u.pw.3": {
    "t": "Measure the current it draws",
@@ -7064,7 +7312,13 @@
       "say": "A lot: look for a short or a reversed part."
      }
     ]
-   }
+   },
+   "pics": [
+    "meter-current"
+   ],
+   "refs": [
+    "ohm"
+   ]
   },
   "u.pw.4": {
    "t": "Why is the voltage low?",
@@ -7092,7 +7346,14 @@
    "tools": [
     "meter"
    ],
-   "live": true
+   "live": true,
+   "pics": [
+    "meter-dcv",
+    "usbpins"
+   ],
+   "refs": [
+    "ohm"
+   ]
   },
   "r.pinout": {
    "result": true,
@@ -7138,7 +7399,17 @@
     "benchpsu",
     "hotspot"
    ],
-   "live": true
+   "live": true,
+   "pics": [
+    "ecap",
+    "diode",
+    "led",
+    "ic"
+   ],
+   "refs": [
+    "pin1",
+    "pinouts"
+   ]
   },
   "u.hot.2": {
    "t": "Work out the regulator's heat",
@@ -7161,7 +7432,13 @@
    "tools": [
     "meter"
    ],
-   "live": true
+   "live": true,
+   "pics": [
+    "reg"
+   ],
+   "refs": [
+    "ohm"
+   ]
   },
   "u.hot.3": {
    "t": "Check the driver is switching fully",
@@ -7190,7 +7467,14 @@
     "meter",
     "scope"
    ],
-   "live": true
+   "live": true,
+   "pics": [
+    "driver-mosfet",
+    "mosfet"
+   ],
+   "refs": [
+    "pinouts"
+   ]
   },
   "r.reghot": {
    "result": true,
@@ -7341,6 +7625,10 @@
      "app": "probie",
      "how": "Serial tab at 115200 (74880 for ESP8266 boot messages)."
     }
+   ],
+   "pics": [
+    "wave-brownout",
+    "serial-hookup"
    ]
   },
   "r.crash": {
@@ -7398,6 +7686,10 @@
      "app": "probie",
      "how": "Logic tab: SDA and SCL on two channels with the I2C decoder; NAK after the address means nothing answered."
     }
+   ],
+   "pics": [
+    "logic-i2c",
+    "wave-i2c"
    ]
   },
   "u.bus.2": {
@@ -7445,7 +7737,11 @@
      "ok": 3,
      "bad": 1
     }
-   }
+   },
+   "pics": [
+    "i2c-pullups",
+    "wave-i2c-edges"
+   ]
   },
   "u.bus.3": {
    "t": "Look at the data",
@@ -7473,6 +7769,9 @@
      "app": "probie",
      "how": "Logic tab with the I2C or SPI decoder; Explain lists each read and write."
     }
+   ],
+   "pics": [
+    "wave-i2c"
    ]
   },
   "u.bus.4": {
@@ -7505,6 +7804,10 @@
      "app": "probie",
      "how": "Logic tab: SPI decoder (set the mode) or UART decoder; it can measure the bit width to find the baud rate."
     }
+   ],
+   "pics": [
+    "serial-hookup",
+    "wave-uart"
    ]
   },
   "r.i2caddr": {
@@ -7578,6 +7881,14 @@
      "app": "meterie",
      "how": "Continuity beep, so you can keep your eyes on the board."
     }
+   ],
+   "pics": [
+    "meter-continuity",
+    "breadboard"
+   ],
+   "refs": [
+    "pin1",
+    "pinouts"
    ]
   },
   "r.solderbridge": {
@@ -7651,6 +7962,11 @@
      "app": "probie",
      "how": "Digital signals: the measurement shows frequency and duty cycle."
     }
+   ],
+   "pics": [
+    "wave-noise",
+    "wave-pwm",
+    "wave-tone"
    ]
   },
   "u.sig.2": {
@@ -7680,6 +7996,10 @@
      "app": "probie",
      "how": "Measure the pulse width and frequency on the Logic tab."
     }
+   ],
+   "pics": [
+    "wave-servo",
+    "wave-pwm"
    ]
   },
   "r.sigmissing": {
@@ -7757,6 +8077,11 @@
      "app": "scopie",
      "how": "CH1 on the supply, single trigger, 1ms/div to start; zoom in on the dip."
     }
+   ],
+   "pics": [
+    "wave-brownout",
+    "decoupling",
+    "driver-mosfet"
    ]
   },
   "r.pickup": {
@@ -7845,6 +8170,10 @@
      "app": "probie",
      "how": "Servo signal: the measurement should show about 50Hz and 5–10% duty."
     }
+   ],
+   "pics": [
+    "wave-servo",
+    "driver-mosfet"
    ]
   },
   "u.mot.2": {
@@ -7907,6 +8236,12 @@
      "app": "scopie",
      "how": "CH1 on the data line at the first LED, 1µs/div: pulses should be clean and reach near the LED supply voltage."
     }
+   ],
+   "pics": [
+    "ws2812-hookup"
+   ],
+   "refs": [
+    "ohm"
    ]
   }
  },

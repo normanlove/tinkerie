@@ -10,13 +10,13 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 
 Each package has a *READ ME FIRST.txt*.
 
-<!-- release notes for 0.29.0-alpha: package.sh checks this line, so update the notes with every version -->
+<!-- release notes for 0.30.0-alpha: package.sh checks this line, so update the notes with every version -->
 ### New in {VERSION}
-- **Fixie goes down to component level**, for repairing and reusing old tech instead of throwing it away, and for your own builds. Three guides now: **Quick checks** (the describe-any-device guide), **Board level** and **My build**, plus a **Parts tests** tab.
-- **Board level**: pick a section of the board or start from the beginning: power input and protection, mains power supply (cold tests, then a dim bulb tester), regulators and rails (find a shorted part by injecting current), battery and charging, clock and reset, processor and memory (boot messages, corrupted firmware), data buses (decode I2C, SPI and UART to see which chip doesn't answer), audio (follow a test tone to where it stops), video (sync and levels), outputs and drivers, inputs and keyboard matrices, connectors and tracks. Salvage notes say what's worth keeping when a board can't be saved.
-- **My build**: power and current draw, parts fitted backwards, regulator pinouts, wiring against your design, code that won't run or resets, I2C/SPI/serial parts that don't answer, signals, noise and decoupling, motors, servos and steppers, addressable LEDs.
-- **Parts tests**: 25 kinds of part, from resistors and capacitors to MOSFETs, crystals, microcontrollers, relays and lithium cells: how they fail, how to test them out of the circuit, in it and powered, what to replace them with, and whether they're worth saving from scrap.
-- **Works with the rest of Tinkerie**: steps say which app to use and how to set it up, and open it for you (Meterie, Scopie, Probie, Flashie, Wirie). A reading can be filled straight from Meterie's meter, a Scopie measurement on a chosen channel, or a Probie logic channel's frequency or duty cycle, converted to the step's units and judged.
+- **Fixie shows you what to look for.** Board level, My build and Parts tests steps now have drawings (click to enlarge): 55 of them.
+  - **The parts**, with their pins labelled: colour-banded and SMD resistors, electrolytic and ceramic capacitors, diodes, LEDs, bridge rectifiers, transistors, MOSFETs, regulators (with their different pinouts side by side), buck converters, crystals, logic chips and microcontrollers (finding pin 1), op-amps, 555s, optocouplers, fuses, relays, buttons, lithium cells, character LCDs, barrel plugs and USB.
+  - **How to connect**: measuring a voltage, diode tests, resistance with a lifted leg, continuity, current in series, a scope probe on a crystal, a logic analyser on I2C, a serial adapter for boot messages, injecting current to find a short, following a test tone, keyboard matrix scanning, MOSFET drivers, breadboard rails, I2C pull-ups, decoupling, LED strips, the inside of a mains power supply.
+  - **Good and faulty signals side by side**: crystals, switching regulators, I2C ACK and NAK, weak pull-ups, serial bytes, reset lines, composite video and VGA sync, PWM, servo pulses, brownouts, noise and clipping.
+- **Reference cards and calculators** on the Parts tests tab and from each step: resistor colour codes, SMD resistor markings (including EIA-96), capacitor markings, common pinouts, what board labels (R, C, Q, U, Y…) mean, finding pin 1, rail voltages, and Ohm's law, LED resistor and regulator heat calculators.
 
 Licensed under GPL-3.0-or-later.
 

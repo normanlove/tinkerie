@@ -22,11 +22,12 @@ What works on this system
 Every app has teaching mode: point at anything to see what it does. F2 turns it off.
 
 New in {VERSION}:
-- Fixie goes down to component level: Board level (find the failed part in
-  old tech), My build (your own projects) and Parts tests, with steps that
-  open Meterie, Scopie and Probie and take readings straight from them.
+- Fixie shows pictures: what each part looks like with its pins, where the
+  probes go, and good and faulty waveforms side by side; plus colour-code,
+  marking and pinout reference cards and quick calculators.
 
 Also in recent alpha builds:
+- 0.29.0-alpha: Fixie goes down to component level, with Meterie, Scopie and Probie.
 - 0.28.2-alpha: Fixie checks every word against every device.
 - 0.28.1-alpha: Fixie's steps fit the device much more closely.
 - 0.28.0-alpha: Fixie works for any device and refuses dangerous ones.

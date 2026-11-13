@@ -40,7 +40,7 @@ Double-click `Tinkerie.exe` to open the launcher and pick an app. Each app opens
 | **Meterie** | PC multimeter: HoldPeak HP-90EPC, UNI-T, OWON, Brymen, Fluke and more | 0.8.2-alpha |
 | **Probie** | Serial monitor and logic analyser, with an Explain tab that explains captures in plain words (its own, and Scopie's and Meterie's). Probie was called Tracie before 0.11 | 0.8.2-alpha |
 | **Codie** | Code explainer: paste code and see what each line does and why, in 20+ languages (including Windows Go and the BASIC of the C64, ZX Spectrum and BBC Micro), with a game-development section and a Game school | 0.5.0-alpha |
-| **Fixie** | Repair guide down to component level, to keep old tech out of e-waste: quick checks for any device, board-level fault finding section by section, troubleshooting your own builds, and tests for 25 kinds of part, with steps that open Meterie, Scopie, Probie, Flashie and Wirie and take readings straight from them; refuses dangerous devices like microwaves, ovens and heaters | 0.3.0-alpha |
+| **Fixie** | Repair guide down to component level, to keep old tech out of e-waste: quick checks for any device, board-level fault finding section by section, troubleshooting your own builds, and tests for 25 kinds of part, with drawings of parts, probe hookups and expected waveforms, reference calculators, and steps that open Meterie, Scopie, Probie, Flashie and Wirie and take readings straight from them; refuses dangerous devices like microwaves, ovens and heaters | 0.4.0-alpha |
 
 Every app's own guide is its `README.md` in `apps\<name>\`.
 

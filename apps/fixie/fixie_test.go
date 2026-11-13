@@ -46,6 +46,8 @@ type gStep struct {
 		App string `json:"app"`
 		How string `json:"how"`
 	} `json:"apps"`
+	Pics    []string `json:"pics"`
+	Refs    []string `json:"refs"`
 	Measure *struct {
 		Src   string  `json:"src"`
 		Label string  `json:"label"`
@@ -123,8 +125,11 @@ type guide struct {
 		Problems []gStart `json:"problems"`
 	} `json:"build"`
 	Parts []struct {
-		ID    string `json:"id"`
+		ID    string   `json:"id"`
+		Pic   string   `json:"pic"`
+		Refs  []string `json:"refs"`
 		Tests []struct {
+			Pic string `json:"pic"`
 			App *struct {
 				App string `json:"app"`
 			} `json:"app"`
@@ -731,5 +736,49 @@ func TestWording(t *testing.T) {
 	sort.Strings(keys)
 	for _, k := range keys {
 		t.Errorf("%s\n        %s", k, found[k])
+	}
+}
+
+// TestPictures checks every drawing and reference card the guides name exists
+// in web/pics.js and web/refs.js.
+func TestPictures(t *testing.T) {
+	g := loadGuide(t)
+	read := func(f string, re *regexp.Regexp) map[string]bool {
+		b, err := os.ReadFile(f)
+		if err != nil {
+			t.Fatal(err)
+		}
+		out := map[string]bool{}
+		for _, m := range re.FindAllStringSubmatch(string(b), -1) {
+			out[m[1]] = true
+		}
+		return out
+	}
+	pics := read("web/pics.js", regexp.MustCompile(`(?:add\(|two\(\[)"([a-z0-9-]+)"`))
+	refs := read("web/refs.js", regexp.MustCompile(`add\("([a-z0-9]+)"`))
+	if len(pics) < 40 || len(refs) < 6 {
+		t.Fatalf("found only %d pictures and %d reference cards", len(pics), len(refs))
+	}
+	check := func(where string, ps, rs []string) {
+		for _, p := range ps {
+			if p != "" && !pics[p] {
+				t.Errorf("%s: no picture %q", where, p)
+			}
+		}
+		for _, r := range rs {
+			if !refs[r] {
+				t.Errorf("%s: no reference card %q", where, r)
+			}
+		}
+	}
+	for id, s := range g.Steps {
+		check(id, s.Pics, s.Refs)
+	}
+	for _, p := range g.Parts {
+		ps := []string{p.Pic}
+		for _, x := range p.Tests {
+			ps = append(ps, x.Pic)
+		}
+		check("part "+p.ID, ps, p.Refs)
 	}
 }

@@ -266,3 +266,102 @@ details.part[open] summary { margin-bottom: 8px; }
 .salv { font-size: 11.5px; color: var(--good); border: 1px solid rgba(74,222,128,.4); border-radius: 99px; padding: 0 8px; }
 .ptest { border-top: 1px dashed var(--line); padding-top: 12px; }
 .ptest .gb, .ptest .measure, .ptest .apps { margin-top: 8px; }
+
+/* ------------------------------------------------------------ pictures (pics.js) */
+.pics { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+.pic { margin: 0; border: 1px solid var(--line); background: var(--bg2); border-radius: var(--r-sm); padding: 8px; display: flex; flex-direction: column; gap: 4px; cursor: zoom-in; }
+.pic svg { width: 100%; height: auto; display: block; }
+.pic figcaption b { display: block; font-size: 13px; }
+.pic figcaption span { font-size: 12.5px; color: var(--muted); }
+.pop-card .pic { cursor: default; border: 0; padding: 0; background: none; }
+.pop-card.wide { max-width: 860px; }
+.pk-wire, .pk-lead, .pk-red, .pk-blk, .pk-sym, .pk-grid, .pk-trace, .pk-trace2, .pk-score, .pk-flat, .pk-hl, .pk-notch { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.pk-wire { stroke: #c9cfda; stroke-width: 2; }
+.pk-lead { stroke: #b8bfcc; stroke-width: 3; }
+.pk-red { stroke: #ef4444; stroke-width: 3; }
+.pk-blk { stroke: #8b93a5; stroke-width: 3; }
+.pk-redf { fill: #ef4444; }
+.pk-blkf { fill: #8b93a5; }
+.pk-sym { stroke: #ebedf3; stroke-width: 2; }
+.pk-symf { fill: #ebedf3; }
+.pk-symo { fill: none; stroke: #ebedf3; stroke-width: 1.6; }
+.pk-grid { stroke: #1f2633; stroke-width: 1; }
+.pk-trace { stroke: #f5b324; stroke-width: 2; }
+.pk-trace2 { stroke: #60a5fa; stroke-width: 2; }
+.pk-score { stroke: #9aa3b2; stroke-width: 1.5; }
+.pk-flat { stroke: #0b0c10; stroke-width: 3; }
+.pk-hl { stroke: #f5b324; stroke-width: 2; stroke-dasharray: 4 3; }
+.pk-notch { stroke: #0b0c10; stroke-width: 1.5; fill: #0b0c10; }
+.pk-txt { fill: #ebedf3; font: 600 12px var(--font); }
+.pk-small { fill: #a3aabb; font: 500 10.5px var(--font); }
+.pk-tiny { fill: #a3aabb; font: 500 9px var(--font); }
+.pk-tinydark { fill: #1b1f29; font: 600 9px var(--font); }
+.pk-big { fill: #ebedf3; font: 700 20px var(--font); }
+.pk-chip { fill: #e3e7ef; font: 700 12px var(--mono); }
+.pk-chipsm { fill: #e3e7ef; font: 700 10px var(--mono); }
+.pk-chipdark { fill: #1b1f29; font: 700 12px var(--mono); }
+.pk-lcd { fill: #9ef0b4; font: 700 15px var(--mono); }
+.pk-lcdbig { fill: #9ef0b4; font: 700 17px var(--mono); }
+.pk-lcdblock { fill: #1b2a4a; font: 700 14px var(--mono); letter-spacing: 1px; }
+.pk-scopetxt { fill: #9ef0b4; font: 600 9.5px var(--mono); }
+.pk-goodt { fill: #4ade80; font: 700 11px var(--font); }
+.pk-badt { fill: #f87171; font: 700 11px var(--font); }
+.pk-meter { fill: #f5b324; }
+.pk-screen { fill: #0a0e13; }
+.pk-body { fill: #2a2f3b; stroke: #3a4255; stroke-width: 1; }
+.pk-body2 { fill: #3a4255; }
+.pk-dot { fill: #8b93a5; }
+.pk-metal { fill: #b8bfcc; }
+.pk-metalf { fill: #b8bfcc; }
+.pk-hlpin { fill: #f5b324; }
+.pk-hlf { fill: #f5b324; }
+.pk-resbody { fill: #d8c49b; }
+.c-yellow { fill: #eab308; } .c-violet { fill: #8b5cf6; } .c-red { fill: #dc2626; } .c-gold { fill: #c9a14a; } .c-white { fill: #f3f4f6; } .c-green { fill: #16a34a; } .c-black { fill: #111; }
+.pk-capbody { fill: #2c4f8c; }
+.pk-capstripe { fill: #9fb4d8; }
+.pk-ceram { fill: #c8873a; }
+.pk-film { fill: #e1b82e; }
+.pk-mlcc { fill: #b58a5a; }
+.pk-mlccHot { fill: #ff8a4c; }
+.pk-band { fill: #d9dde6; }
+.pk-led { fill: rgba(239, 68, 68, .55); stroke: #f87171; stroke-width: 1.5; }
+.pk-inductor { fill: #2f2f2f; stroke: #555; }
+.pk-glass { fill: rgba(190, 220, 255, .15); stroke: #9fb3c8; stroke-width: 1.5; }
+.pk-soot { fill: rgba(30, 20, 15, .8); }
+.pk-ptc { fill: #d4a92a; }
+.pk-relay { fill: #2f6fd6; }
+.pk-cell { fill: #3d7d4f; }
+.pk-pcbblue { fill: #1e3a8a; }
+.pk-lcdglass { fill: #7fbf4d; }
+.pk-copperf { fill: #c9a14a; }
+.pk-board { fill: #1d5c45; }
+.pk-psu { fill: #3a4255; }
+.pk-probe { fill: #5b6475; }
+.pk-la { fill: #3a4255; }
+.pk-heat { fill: rgba(255, 120, 60, .35); }
+.pk-goodf { fill: #4ade80; }
+.pk-badf { fill: #f87171; }
+.pk-bb { fill: #e8e6df; }
+.pk-hole { fill: #9a988f; }
+.pk-strip { fill: #1b1f29; }
+.pk-ledsq { fill: #f3f4f6; }
+.pk-hot { fill: rgba(248, 113, 113, .1); stroke: rgba(248, 113, 113, .5); stroke-dasharray: 5 4; }
+.pk-cold { fill: rgba(74, 222, 128, .08); stroke: rgba(74, 222, 128, .45); stroke-dasharray: 5 4; }
+.pk-xfmr { fill: #6b4f2a; }
+.pk-glow { fill: #fde68a; }
+.pk-bulb { fill: #fef3c7; stroke: #c9a14a; stroke-width: 1.5; }
+
+/* reference cards and calculators */
+.refgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.calc { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 6px; }
+.calc select, .calc input { background: var(--card); border: 1px solid var(--line2); border-radius: 8px; padding: 6px 8px; }
+.calc input { width: 110px; }
+.calc .out { font: 700 16px var(--mono); color: var(--accent); min-width: 120px; }
+table.reftab { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.reftab td, table.reftab th { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: left; vertical-align: top; }
+table.reftab th { color: var(--muted); font-weight: 600; }
+table.reftab code { white-space: nowrap; }
+.swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 5px; border: 1px solid var(--line2); }
+.pk-lcdcell { fill: #1b2a4a; }
+.refgrid .ref.wide { grid-column: 1 / -1; }
+.refgrid .ref.wide .pics { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }

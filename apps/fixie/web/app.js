@@ -264,6 +264,8 @@
         ${s.tools ? `<div class="sect" data-help="Tools for this step"><h4>Tools</h4>${toolChips(s.tools, tags)}</div>` : ""}
         ${s.good || s.bad ? `<div class="sect"><h4>What to look for</h4><div class="gb">${s.good ? `<div class="g"><b>Good</b>${esc(s.good)}</div>` : ""}${s.bad ? `<div class="b"><b>Faulty</b>${esc(s.bad)}</div>` : ""}</div></div>` : ""}
         ${s.signs ? `<div class="sect" data-help="Signs for this step"><h4>What it looks like</h4>${signChips(s.signs, tags)}</div>` : ""}
+        ${s.pics ? `<div class="sect" data-help="Pictures for this step"><h4>Pictures</h4>${picsHTML(s.pics)}</div>` : ""}
+        ${s.refs ? `<div class="sect" data-help="Reference for this step"><h4>Reference</h4>${refChips(s.refs)}</div>` : ""}
         ${s.apps ? `<div class="sect" data-help="Tinkerie apps for this step"><h4>Use Tinkerie</h4>${appsHTML(s.apps)}</div>` : ""}
         ${s.measure ? `<div class="sect"><h4>Your reading</h4>${measureHTML(s.measure, at)}</div>` : ""}
         <div class="ask"><h3>${esc(s.q)}</h3><div class="answers" data-help="Answers">${answers.map(([a, i], k) =>
@@ -377,7 +379,15 @@
     $("#report", v).onclick = () => download(fileName(cur) + ".md", report(cur));
   }
 
+  // drawings (pics.js) and reference cards (refs.js)
+  const picHTML = id => PICS[id] ? `<figure class="pic" data-pic="${id}" title="Click to enlarge">${PICS[id].svg}<figcaption><b>${esc(PICS[id].t)}</b><span>${esc(PICS[id].say || "")}</span></figcaption></figure>` : "";
+  const picsHTML = ids => `<div class="pics">${ids.map(picHTML).join("")}</div>`;
+  const refChips = ids => `<div class="chips">${ids.filter(id => REFS[id]).map(id => `<button class="chip" data-ref="${id}">${esc(REFS[id].t)}</button>`).join("")}</div>`;
+  const refCard = id => `<div class="ref${REFS[id].pics ? " wide" : ""}" data-refcard="${id}"><h3>${esc(REFS[id].t)}</h3>${REFS[id].html()}${REFS[id].pics ? picsHTML(REFS[id].pics) : ""}</div>`;
+  function wireRefs(root) { $$("[data-refcard]", root).forEach(c => REFS[c.dataset.refcard].wire(c)); }
   function wireChips(root) {
+    $$("[data-pic]", root).forEach(f => f.onclick = () => { if (!f.closest(".pop-card")) openPop(`<div class="pic">${PICS[f.dataset.pic].svg}<figcaption><b>${esc(PICS[f.dataset.pic].t)}</b><span>${esc(PICS[f.dataset.pic].say || "")}</span></figcaption></div>`, true); });
+    $$("[data-ref]", root).forEach(b => b.onclick = () => { openPop(refCard(b.dataset.ref).replace('class="ref"', 'class="ref" style="border:0;padding:0"'), true); wireRefs($("#popCard")); });
     $$("[data-openapp]", root).forEach(b => b.onclick = () => openApp(b.dataset.openapp, b));
     $$("[data-tool]", root).forEach(b => b.onclick = () => popTool(b.dataset.tool));
     $$("[data-sign]", root).forEach(b => b.onclick = () => popSign(b.dataset.sign));
@@ -437,11 +447,16 @@
     const v = $("#v-parts"), groups = [...new Set(G.parts.map(p => p.group))];
     v.innerHTML = `<div class="wrap"><h2 class="h">Parts tests</h2>
       <p class="lead">How to test each kind of part: what it looks like, how it fails, and how to test it out of the circuit, in it, and powered up. Type a reading (or take it from Meterie or Scopie) and Fixie says whether it's good. Parts worth saving from scrap are marked.</p>
+      <div class="grp-h">Reference and calculators</div>
+      <div class="refgrid" data-help="Reference cards">${Object.keys(REFS).filter(k => typeof REFS[k] === "object" && REFS[k].html).map(refCard).join("")}</div>
       ${groups.map(g => `<div class="grp-h">${esc(g)}</div><div class="parts">${G.parts.filter(p => p.group === g).map(p => `
         <details class="part" data-help="Part test"><summary><b>${esc(p.name)}</b>${p.salvage && !/^(no|not)\b/i.test(p.salvage) ? `<span class="salv" title="${esc(p.salvage)}">♻ worth saving</span>` : ""}</summary>
           <p>${esc(p.what)}</p>
+          ${p.pic ? `<div class="pics" style="margin-top:8px">${picHTML(p.pic)}</div>` : ""}
+          ${p.refs ? `<div class="sect"><h4>Reference</h4>${refChips(p.refs)}</div>` : ""}
           <div class="sect"><h4>How it fails</h4><ul class="plain">${p.fails.map(f => `<li>${esc(f)}</li>`).join("")}</ul></div>
           ${p.tests.map((t, i) => `<div class="sect ptest"><h4>${esc(t.t)}</h4><ol class="do">${t.do.map(x => `<li>${esc(x)}</li>`).join("")}</ol>
+            ${t.pic ? `<div class="pics" style="margin-top:8px">${picHTML(t.pic)}</div>` : ""}
             <div class="gb"><div class="g"><b>Good</b>${esc(t.good)}</div><div class="b"><b>Faulty</b>${esc(t.bad)}</div></div>
             ${t.app ? appsHTML([t.app]) : ""}
             ${t.measure ? `<div class="measure" data-pt="${p.id}" data-ti="${i}"><label>${esc(t.measure.label)}<span class="in"><input type="number" step="any" class="pv"><span class="u">${esc(t.measure.unit)}</span></span></label>${t.measure.near ? `<label>${esc(t.measure.near.label)}<span class="in"><input type="number" step="any" class="pn"><span class="u">${esc(t.measure.unit)}</span></span></label>` : ""}${srcHTML(t.measure)}<span class="verdict"></span></div>` : ""}
@@ -449,7 +464,7 @@
           <div class="sect"><h4>Replacing it</h4><p>${esc(p.replace)}</p></div>
           ${p.salvage ? `<div class="sect"><h4>Saving it from scrap</h4><p>${esc(p.salvage)}</p></div>` : ""}
         </details>`).join("")}</div>`).join("")}</div>`;
-    wireChips(v);
+    wireChips(v); wireRefs(v);
     $$(".measure[data-pt]", v).forEach(box => {
       const t = G.parts.find(p => p.id === box.dataset.pt).tests[+box.dataset.ti], m = t.measure, at = {};
       const show = () => {
@@ -464,7 +479,8 @@
 
   // ------------------------------------------------------------ popovers
   const pop = $("#pop");
-  function openPop(html) {
+  function openPop(html, wide) {
+    $("#popCard").classList.toggle("wide", !!wide);
     $("#popCard").innerHTML = `<button class="btn sm ghost x" id="popX" title="Close (Esc)">Close</button>` + html;
     pop.hidden = false; $("#popX").onclick = closePop; wireChips($("#popCard"));
     const h = $("#popCard input[data-have]"); if (h) h.onchange = () => setHave(h.dataset.have, h.checked);

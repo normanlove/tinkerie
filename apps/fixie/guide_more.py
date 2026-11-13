@@ -719,3 +719,74 @@ step("u.led.1", "Check data level, resistor and power", "Addressable LEDs are fu
   ], "What did you find?",
   [("Data level too low", "r.levels"), ("Colours swapped", "r.settings"), ("Only the first few work", "r.ledjoint"), ("Flicker or wrong colours at the far end", "r.voltdrop")],
   tools=["scope"], live=True, apps=[("scopie", "CH1 on the data line at the first LED, 1µs/div: pulses should be clean and reach near the LED supply voltage.")])
+
+# ---------------------------------------------------------------- pictures and reference cards
+# pics: drawings from web/pics.js; refs: reference cards from web/refs.js
+stepPics = {
+  "b.vis.1": (["ic", "mcu"], ["labels", "pin1"]),
+  "b.in.1": (["meter-dcv", "dcjack"], []),
+  "b.in.2": (["meter-dcv", "diode", "fuse"], ["labels"]),
+  "b.in.3": (["inject-short", "ccap"], []),
+  "b.smps.1": (["smps-map", "bridge", "meter-diode", "mosfet"], ["pinouts"]),
+  "b.smps.2": (["smps-map", "meter-diode", "ecap"], []),
+  "b.smps.3": (["bulb", "smps-map"], []),
+  "b.reg.1": (["meter-dcv", "reg"], ["rails", "pinouts"]),
+  "b.reg.2": (["buck", "wave-switching", "reg"], ["pinouts"]),
+  "b.reg.3": (["inject-short", "ccap"], []),
+  "b.bat.1": (["cell-pack", "liion"], []),
+  "b.bat.2": (["cell-pack"], []),
+  "b.clk.1": (["scope-probe", "wave-crystal", "crystal"], []),
+  "b.clk.2": (["wave-reset", "mcu"], ["pin1"]),
+  "b.cpu.1": (["serial-hookup", "wave-uart", "logic-i2c"], []),
+  "b.cpu.2": (["wave-brownout", "serial-hookup"], []),
+  "b.bus.1": (["logic-i2c", "wave-i2c", "wave-uart"], []),
+  "b.bus.2": (["wave-i2c", "i2c-pullups"], []),
+  "b.bus.3": (["wave-i2c-edges", "i2c-pullups"], []),
+  "b.aud.1": (["signal-trace", "wave-tone"], []),
+  "b.aud.2": (["opamp", "wave-tone"], ["pinouts"]),
+  "b.aud.3": (["meter-dcv"], []),
+  "b.vid.1": (["wave-composite", "wave-vga"], ["pinouts"]),
+  "b.vid.2": (["wave-composite", "wave-vga"], []),
+  "b.vid.3": (["crystal", "wave-crystal"], []),
+  "b.out.1": (["driver-mosfet", "wave-pwm"], []),
+  "b.out.2": (["mosfet", "relay", "meter-diode"], ["pinouts"]),
+  "b.inp.1": (["key-matrix", "switch"], []),
+  "b.inp.2": (["switch", "meter-continuity"], []),
+  "b.con.1": (["meter-continuity", "usbpins"], []),
+  "u.pw.1": (["meter-dcv", "breadboard"], ["rails"]),
+  "u.pw.2": (["reg", "breadboard", "dcjack"], ["pinouts"]),
+  "u.pw.3": (["meter-current"], ["ohm"]),
+  "u.pw.4": (["meter-dcv", "usbpins"], ["ohm"]),
+  "u.hot.1": (["ecap", "diode", "led", "ic"], ["pin1", "pinouts"]),
+  "u.hot.2": (["reg"], ["ohm"]),
+  "u.hot.3": (["driver-mosfet", "mosfet"], ["pinouts"]),
+  "u.code.3": (["wave-brownout", "serial-hookup"], []),
+  "u.bus.1": (["logic-i2c", "wave-i2c"], []),
+  "u.bus.2": (["i2c-pullups", "wave-i2c-edges"], []),
+  "u.bus.3": (["wave-i2c"], []),
+  "u.bus.4": (["serial-hookup", "wave-uart"], []),
+  "u.wire.1": (["meter-continuity", "breadboard"], ["pin1", "pinouts"]),
+  "u.sig.1": (["wave-noise", "wave-pwm", "wave-tone"], []),
+  "u.sig.2": (["wave-servo", "wave-pwm"], []),
+  "u.noise.1": (["wave-brownout", "decoupling", "driver-mosfet"], []),
+  "u.mot.1": (["wave-servo", "driver-mosfet"], []),
+  "u.led.1": (["ws2812-hookup"], ["ohm"]),
+  "up.1": (["usbpins"], []),
+}
+for sid, (pics, refs) in stepPics.items():
+    assert sid in steps, sid
+    if pics: steps[sid]["pics"] = pics
+    if refs: steps[sid]["refs"] = refs
+partPics = {"res": "res", "ecap": "ecap", "ccap": "ccap", "diode": "diode", "zener": "diode", "led": "led", "bridge": "bridge", "bjt": "bjt", "mosfet": "mosfet",
+            "reg": "reg", "buck": "buck", "crystal": "crystal", "ic": "ic", "mcu": "mcu", "opamp": "opamp", "opto": "opto", "fuse": "fuse", "relay": "relay",
+            "switch": "switch", "conn": "usbpins", "liion": "liion", "display": "lcd1602", "tvs": "ccap"}
+testPics = {("res", 0): "meter-res", ("diode", 0): "meter-diode", ("led", 0): "meter-diode", ("bridge", 0): "meter-diode", ("bjt", 0): "meter-diode",
+            ("mosfet", 0): "meter-diode", ("reg", 0): "meter-dcv", ("buck", 1): "wave-switching", ("crystal", 0): "wave-crystal", ("fuse", 0): "meter-continuity",
+            ("switch", 0): "meter-continuity", ("conn", 0): "meter-continuity", ("ccap", 0): "inject-short", ("mcu", 0): "serial-hookup", ("opamp", 0): "wave-tone", ("motor", 1): "meter-current"}
+partRefs = {"res": ["colour", "smd"], "ccap": ["cap"], "ecap": ["cap"], "bjt": ["pinouts"], "mosfet": ["pinouts"], "reg": ["pinouts"], "opamp": ["pinouts"], "opto": ["pinouts"], "ic": ["pin1", "pinouts"], "mcu": ["pin1"], "led": ["ohm"]}
+for p in parts:
+    if p["id"] in partPics: p["pic"] = partPics[p["id"]]
+    if p["id"] in partRefs: p["refs"] = partRefs[p["id"]]
+    for i, tt in enumerate(p["tests"]):
+        if (p["id"], i) in testPics: tt["pic"] = testPics[(p["id"], i)]
+assert all(k[0] in {p["id"] for p in parts} for k in testPics)

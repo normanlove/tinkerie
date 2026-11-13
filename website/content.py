@@ -518,7 +518,7 @@ APPS = [
     pairs=[("flashie", "Flashie's Create tab builds firmware code and explains it as it goes."), ("probie", "Run your code on a board and watch what it prints.")],
   ),
   dict(
-    id="fixie", needshort="Nothing: a multimeter helps", name="Fixie", ver="0.3.0-alpha", color="#f5b324", icon="fixie.svg",
+    id="fixie", needshort="Nothing: a multimeter helps", name="Fixie", ver="0.4.0-alpha", color="#f5b324", icon="fixie.svg",
     tagline="Find the fault, down to the part. Keep it out of e-waste.",
     short="A repair guide down to component level: quick checks, board-level fault finding for old tech, and troubleshooting your own builds, with Meterie, Scopie and Probie doing the measuring.",
     need="Nothing to start; a multimeter for most repairs",
@@ -527,7 +527,7 @@ APPS = [
            "takes you through it one check at a time, easiest first: what to do, which tools to use, what a good and a bad result look like. "
            "Type in your meter reading and it tells you which it is. Each answer leads to the next check, until it reaches the likely fault, "
            "how hard it is to fix and the parts you'll need. It only asks you to open things up when it has to, and tells you how to do it safely."),
-    chips=["Component level", "Board sections", "Your own builds", "25 parts tests", "Live readings from Meterie, Scopie and Probie", "15 symptoms", "Over 130 steps", "Reads your meter readings", "Tools guide", "Pictures of failed parts", "Safety first", "Repair log and reports"],
+    chips=["Component level", "Board sections", "Your own builds", "25 parts tests", "55 drawings and waveforms", "Colour-code and marking calculators", "Live readings from Meterie, Scopie and Probie", "15 symptoms", "Over 130 steps", "Reads your meter readings", "Tools guide", "Pictures of failed parts", "Safety first", "Repair log and reports"],
     firsts=[
       ("Pick a guide", "Quick checks for any device, Board level to find the failed part, or My build for your own projects."),
       ("Say what it's doing", "Dead, won't charge, no picture, no sound, overheating, got wet, cuts out, trips the electricity…"),
@@ -536,7 +536,8 @@ APPS = [
     ],
     shots=[
       ("fixie-board", "Board level: measure each rail, with the reading taken straight from Meterie and judged for you."),
-      ("fixie-parts", "Parts tests: how each part fails and how to test it, out of the circuit, in it and powered."),
+      ("fixie-pics", "Pictures on each step: where the probe goes, what the part looks like, and a good and a faulty trace side by side."),
+      ("fixie-parts", "Parts tests with reference cards: colour codes, SMD and capacitor markings, pinouts, board labels and quick sums."),
       ("fixie-describe", "Describe what you're fixing: how it's powered and what it has. No product list to search."),
       ("fixie-measure", "Type in a reading, and Fixie says whether it's good and which answer it points to."),
       ("fixie-step", "Each step: what to do, the tools, what it looks like, and a safety check before opening anything up."),
@@ -559,6 +560,11 @@ APPS = [
       ("Works with Tinkerie", "Your instruments, in the steps.", [
         "Each step says which app to use and how to set it up, and opens it for you: Meterie, Scopie, Probie, Flashie or Wirie",
         "Fill a reading straight from Meterie's meter, a Scopie measurement (frequency, peak-to-peak, minimum…) or a Probie logic channel (frequency, duty cycle), converted to the step's units and judged",
+      ]),
+      ("Pictures and reference", "See what you're looking for.", [
+        "55 drawings: what each part looks like with its pins labelled, where the meter probes, scope probe or logic analyser clips go, and what a good and a faulty signal look like on the screen",
+        "Waveforms for crystals, switching regulators, I2C (ACK and NAK, weak pull-ups), serial, reset, composite video and VGA sync, PWM, servo pulses, brownouts, noise and clipping",
+        "Reference cards: resistor colour code and SMD resistor (including EIA-96) and capacitor marking decoders, common pinouts, what board labels like R, C, Q, U and Y mean, finding pin 1, rail voltages, and Ohm's law, LED resistor and regulator heat calculators",
       ]),
       ("Parts tests", "How to test each kind of part.", [
         "25 parts: resistors, pots, capacitors, diodes, zeners, LEDs, bridge rectifiers, transistors, MOSFETs, regulators, buck converters, crystals, logic chips, microcontrollers, op-amps, optocouplers, fuses, protection parts, relays, switches, connectors, speakers, motors, lithium cells and displays",
