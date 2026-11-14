@@ -1,3 +1,5 @@
+//go:build windows || js
+
 package droid
 
 import (

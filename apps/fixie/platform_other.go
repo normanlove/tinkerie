@@ -1,4 +1,4 @@
-//go:build !windows
+//go:build !windows && !js
 
 // Fixie on Linux, Raspberry Pi OS and macOS: the window comes from
 // shared/appwindow. Part of the nrmluvdev maker suite. Created by nrmluvdev.
