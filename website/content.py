@@ -285,7 +285,7 @@ APPS = [
     pairs=[("probie", "See what your freshly flashed board prints."), ("wirie", "Design the board you're flashing."), ("makie", "Print a case for it.")],
   ),
   dict(
-    id="scopie", needshort="Scope, or demo mode", name="Scopie", ver="0.11.2-alpha", color="#e8b416", icon="scopie.png",
+    id="scopie", needshort="Scope, or demo mode", name="Scopie", ver="0.11.3-alpha", color="#e8b416", icon="scopie.png",
     tagline="Turn your PC into the screen of an oscilloscope.",
     short="A friendly oscilloscope app for Hantek, Rigol, Siglent, OWON, PicoScope and more.",
     need="A USB or bench oscilloscope, or try Demo mode",

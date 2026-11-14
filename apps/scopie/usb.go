@@ -59,8 +59,8 @@ const (
 	usbClassIn   = 0xA1
 )
 
-var accessHelp = "• This scope needs the WinUSB driver: click 'Install USB driver…' in the Connect " +
-	"window (or run Zadig) and choose WinUSB for it.\n" +
+var accessHelp = "• This scope needs the WinUSB or libusb-win32 driver: click 'Install USB driver…' in the Connect " +
+	"window (or run Zadig) and choose WinUSB or libusb-win32 for it.\n" +
 	"• Close any other oscilloscope program that may be using it."
 
 // ---------------------------------------------------------------- device list cache

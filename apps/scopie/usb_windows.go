@@ -219,6 +219,7 @@ func listUSBDevices() []usbInfo {
 	guidPaths := map[winGUID]map[uint32]string{}
 	var generic map[uint32]string
 	var out []usbInfo
+	lu0Seen := map[[2]uint16]int{}
 	for i := uint32(0); ; i++ {
 		var di spDevinfoData
 		di.CbSize = uint32(unsafe.Sizeof(di))
@@ -248,6 +249,16 @@ func listUSBDevices() []usbInfo {
 		u.Key = inst
 		if parts := strings.Split(inst, `\`); len(parts) == 3 && u.MI < 0 && !strings.Contains(parts[2], "&") {
 			u.Serial = parts[2]
+		}
+		if strings.EqualFold(u.Service, "libusb0") && u.MI < 0 {
+			// libusb-win32 (Zadig's other common choice): opened through libusb0.dll.
+			k := [2]uint16{u.VID, u.PID}
+			n := lu0Seen[k]
+			lu0Seen[k] = n + 1
+			if loadLibusb0() == nil {
+				u.WinUSB = true
+				u.Path = libusb0Path(u.VID, u.PID, n)
+			}
 		}
 		if strings.EqualFold(u.Service, "WinUSB") {
 			u.WinUSB = true
@@ -310,6 +321,9 @@ type winusbPipeInfo struct {
 }
 
 func openUSBDevice(path string) (usbDevice, error) {
+	if strings.HasPrefix(path, "libusb0|") {
+		return openLibusb0(path)
+	}
 	p, err := syscall.UTF16PtrFromString(path)
 	if err != nil {
 		return nil, err
@@ -552,5 +566,13 @@ func loadDLL(path string) (*syscall.DLL, error) {
 
 // usbDriverHint says what to do when a device can't be used yet.
 func usbDriverHint(u usbInfo) string {
-	return fmt.Sprintf("USB %04X:%04X: needs the WinUSB driver. Click 'Install USB driver…'.", u.VID, u.PID)
+	switch strings.ToLower(u.Service) {
+	case "libusb0":
+		return fmt.Sprintf("USB %04X:%04X has the libusb-win32 driver, but libusb0.dll is missing from Windows\\System32. Reinstall libusb-win32 with Zadig, or pick WinUSB there.", u.VID, u.PID)
+	case "libusbk":
+		return fmt.Sprintf("USB %04X:%04X has the libusbK driver, which Scopie can't use. In Zadig (Options ▸ List All Devices), pick this scope, choose WinUSB or libusb-win32 and press Replace Driver.", u.VID, u.PID)
+	case "":
+		return fmt.Sprintf("USB %04X:%04X has no driver yet. Click 'Install USB driver…'.", u.VID, u.PID)
+	}
+	return fmt.Sprintf("USB %04X:%04X has the %s driver, which Scopie can't use. Click 'Install USB driver…', or in Zadig choose WinUSB or libusb-win32 for it.", u.VID, u.PID, u.Service)
 }

@@ -10,10 +10,10 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 
 Each package has a *READ ME FIRST.txt*.
 
-<!-- release notes for 0.30.1-alpha: package.sh checks this line, so update the notes with every version -->
+<!-- release notes for 0.30.2-alpha: package.sh checks this line, so update the notes with every version -->
 ### New in {VERSION}
-- **Fixie checked against every device you can describe.** All three guides were walked for every kind of device with every combination of power and features (952,320 descriptions), checking that every path ends at a fix, no step is empty, and no word or picture mentions something the device doesn't have. Over 100 mismatches were fixed: steps now fit builds without a hobby board, battery checks only appear for battery devices, motor and flyback advice only where there's a motor, and the audio, video and keyboard sections assume the device has them.
-- **Pictures match their steps.** Each drawing is checked against what its step says; a few that didn't fit were moved or removed (a TVS diode no longer shows a capacitor).
+- **Scopie works with the libusb-win32 driver.** On Windows, Scopie only accepted scopes with the WinUSB driver, so a Hantek 6022BE set up with Zadig's libusb-win32 option (as many older scope programs and guides use) was reported as needing a driver, and installing one didn't help because Windows kept the existing driver. Scopie now talks to libusb-win32 directly through the libusb0.dll that Zadig installs, so these scopes connect as they are, and other programs that use that driver keep working.
+- **Clearer driver messages.** When a scope has a driver Scopie can't use, such as libusbK, Scopie now says which driver it found and what to choose in Zadig.
 
 Licensed under GPL-3.0-or-later.
 
