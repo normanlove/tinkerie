@@ -361,12 +361,16 @@ func (a *App) tabAutodetect(r Rect) {
 		} else if strings.HasPrefix(hint, "Failed") {
 			hc = th.Bad
 		}
-		u.Text(hint, Rect{row.X + u.Px(48), row.Y + u.Px(36), row.W - u.Px(260), u.Px(18)}, u.F(12), hc, AlignLeft)
+		hintW := row.W - u.Px(260)
+		if p.NoDriver {
+			hc, hintW = th.Bad, row.W-u.Px(60)
+		}
+		u.Text(hint, Rect{row.X + u.Px(48), row.Y + u.Px(36), hintW, u.Px(18)}, u.F(12), hc, AlignLeft)
 		busy := strings.HasSuffix(probe[p.Path], "…")
 		if busy {
 			u.Ambient = true
 		}
-		if u.ButtonEx("ad#go"+itoa(i), Rect{row.Right() - u.Px(190), row.Y + u.Px(16), u.Px(176), u.Px(38)}, icSearch, "Detect & connect", BtnPrimary, !busy) {
+		if !p.NoDriver && u.ButtonEx("ad#go"+itoa(i), Rect{row.Right() - u.Px(190), row.Y + u.Px(16), u.Px(176), u.Px(38)}, icSearch, "Detect & connect", BtnPrimary, !busy) {
 			a.autoConnect(p)
 		}
 		yy += rowH + u.Px(8)
@@ -478,6 +482,9 @@ func (a *App) tabModels(r Rect) {
 	m.mu.Lock()
 	var ports []PortInfo
 	for _, p := range m.ports {
+		if p.NoDriver {
+			continue
+		}
 		if p.Kind == tr || (tr == TrSerial && p.Kind == TrSerial) {
 			ports = append(ports, p)
 		}

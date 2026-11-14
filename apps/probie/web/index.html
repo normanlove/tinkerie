@@ -348,7 +348,7 @@
       <h3>Logic analyser — one-time setup</h3>
       <p>Works with the cheap 24&nbsp;MHz 8-channel "Saleae-compatible" analysers (Cypress FX2, shows up as VID 0925 / PID 3881) using the open-source <b>fx2lafw</b> firmware from the sigrok project.</p>
       <ol>
-        <li><b>Driver:</b> download <span class="mono">Zadig</span> from zadig.akeo.ie, plug in the analyser, choose <i>Options → List All Devices</i>, pick the analyser (often "Unknown device #1"), select <b>WinUSB</b> and press <i>Install/Replace Driver</i>.</li>
+        <li><b>Driver:</b> download <span class="mono">Zadig</span> from zadig.akeo.ie, plug in the analyser, choose <i>Options → List All Devices</i>, pick the analyser (often "Unknown device #1"), select <b>WinUSB</b> and press <i>Install/Replace Driver</i>. An analyser that already has <b>libusb-win32</b> (from a PulseView set-up) works as it is; libusbK doesn't.</li>
         <li><b>Firmware:</b> if PulseView is installed, Probie finds the firmware automatically. Otherwise grab <span class="mono">fx2lafw-saleae-logic.fw</span> (sigrok-firmware-fx2lafw package) and drop it on the <i>Firmware needed</i> box.</li>
         <li>Press <b>Capture</b>. The first capture loads the firmware into the analyser (takes a second).</li>
       </ol>

@@ -41,7 +41,7 @@ Settings live in `%APPDATA%\Probie`, and CSV logs are saved to `Documents\Probie
 * **Demo signal generator** with UART, I²C, SPI and PWM on all 8 channels.
 
 ### One-time analyser setup
-1. **Driver.** Run Zadig (zadig.akeo.ie), choose *Options → List All Devices*, select the analyser, pick **WinUSB**, then *Install/Replace Driver*.
+1. **Driver.** Run Zadig (zadig.akeo.ie), choose *Options → List All Devices*, select the analyser, pick **WinUSB**, then *Install/Replace Driver*. Analysers that already have **libusb-win32** (common after a PulseView set-up) work as they are, through `shared/libusb0`; libusbK isn't supported.
 2. **Firmware.** If PulseView is installed, Probie finds the firmware automatically. Otherwise get `fx2lafw-saleae-logic.fw` (from sigrok's `sigrok-firmware-fx2lafw` package) and drop it on the *Firmware needed* box in the Logic sidebar.
 3. Press **Capture** (or Space). The firmware uploads on the first capture.
 
@@ -58,7 +58,7 @@ It's pure Go with no cgo and no third-party modules. The UI is HTML/CSS/JS embed
 | `serial.go` | serial session, CSV logging, demo board |
 | `serial_windows.go` | Win32 COM port driver |
 | `win_setupapi_windows.go` | port and USB enumeration (SetupAPI) |
-| `usb_windows.go` | WinUSB control and bulk streaming |
+| `usb_windows.go` | WinUSB control and bulk streaming, with libusb-win32 (`shared/libusb0`) as the fallback |
 | `fx2.go` | fx2lafw firmware upload and acquisition protocol |
 | `logic.go` | capture engine, trigger, edge index, VCD export |
 | `decode.go` | UART / I²C / SPI decoders |

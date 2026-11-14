@@ -285,7 +285,7 @@ APPS = [
     pairs=[("probie", "See what your freshly flashed board prints."), ("wirie", "Design the board you're flashing."), ("makie", "Print a case for it.")],
   ),
   dict(
-    id="scopie", needshort="Scope, or demo mode", name="Scopie", ver="0.11.3-alpha", color="#e8b416", icon="scopie.png",
+    id="scopie", needshort="Scope, or demo mode", name="Scopie", ver="0.11.4-alpha", color="#e8b416", icon="scopie.png",
     tagline="Turn your PC into the screen of an oscilloscope.",
     short="A friendly oscilloscope app for Hantek, Rigol, Siglent, OWON, PicoScope and more.",
     need="A USB or bench oscilloscope, or try Demo mode",
@@ -337,7 +337,7 @@ APPS = [
     pairs=[("probie", "Decode the digital signals you see."), ("meterie", "Log slow changes with your multimeter.")],
   ),
   dict(
-    id="meterie", needshort="Meter, or demo mode", name="Meterie", ver="0.8.2-alpha", color="#1fb4cc", icon="meterie.png",
+    id="meterie", needshort="Meter, or demo mode", name="Meterie", ver="0.8.3-alpha", color="#1fb4cc", icon="meterie.png",
     tagline="A big, friendly multimeter display, with graphs and logging.",
     short="Connect your multimeter to show huge readings, graph them, log them and run guided tests.",
     need="A multimeter with a PC link, or try the demo",
@@ -398,7 +398,7 @@ APPS = [
     pairs=[("wirie", "Calcie can use your meter's live reading."), ("scopie", "For fast signals a meter can't follow.")],
   ),
   dict(
-    id="probie", needshort="Board, or demo mode", name="Probie", ver="0.8.2-alpha", color="#25b39f", icon="probie.svg",
+    id="probie", needshort="Board, or demo mode", name="Probie", ver="0.8.3-alpha", color="#25b39f", icon="probie.svg",
     tagline="See what your board is saying and the signals on its wires, then have them explained in plain words.",
     short="A serial monitor with a live plotter, a logic analyser that decodes UART, I²C and SPI, and an Explain tab that tells you what a capture means. Probie was called Tracie.",
     need="A board on USB, or a cheap logic analyser (demo included)",

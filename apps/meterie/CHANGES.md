@@ -1,5 +1,11 @@
 # Meterie changes
 
+## 0.8.3-alpha
+
+* Windows: a meter cable whose driver was replaced (usually by Zadig, for sigrok
+  or a scope program) used to vanish from the list without a word. It's now
+  listed with what driver it has and how to give it back to Windows.
+
 ## 0.6.0-alpha
 
 New meters (every protocol checked against libsigrok's decoder source or the community

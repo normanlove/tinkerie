@@ -208,7 +208,7 @@ func probeFX2(info usbInfo, dataDir string) fx2Probe {
 		var de *driverError
 		if errors.As(err, &de) {
 			p.status = "driver"
-			p.detail = "Needs the WinUSB driver — run Zadig once (see Help)."
+			p.detail = "Needs the WinUSB or libusb-win32 driver — run Zadig once (see Help). libusbK isn't supported."
 		} else {
 			p.status = "error"
 			p.detail = err.Error()

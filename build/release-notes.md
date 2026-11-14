@@ -10,10 +10,14 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 
 Each package has a *READ ME FIRST.txt*.
 
-<!-- release notes for 0.30.2-alpha: package.sh checks this line, so update the notes with every version -->
+<!-- release notes for 0.30.3-alpha: package.sh checks this line, so update the notes with every version -->
 ### New in {VERSION}
-- **Scopie works with the libusb-win32 driver.** On Windows, Scopie only accepted scopes with the WinUSB driver, so a Hantek 6022BE set up with Zadig's libusb-win32 option (as many older scope programs and guides use) was reported as needing a driver, and installing one didn't help because Windows kept the existing driver. Scopie now talks to libusb-win32 directly through the libusb0.dll that Zadig installs, so these scopes connect as they are, and other programs that use that driver keep working.
-- **Clearer driver messages.** When a scope has a driver Scopie can't use, such as libusbK, Scopie now says which driver it found and what to choose in Zadig.
+A check of every app that talks to USB devices, after the Hantek 6022BE driver fix in 0.30.2:
+- **Probie's logic analysers work with the libusb-win32 driver.** On Windows, Probie only accepted analysers with WinUSB, so one set up for PulseView with Zadig's libusb-win32 option was reported as needing a driver. It now falls back to libusb-win32 (the same code Scopie uses, now shared), so these analysers work as they are.
+- **Meterie explains missing meter cables.** On Windows, a UNI-T, Victor, Brymen or USB-serial meter cable whose driver was replaced by Zadig (sigrok's guides do this) used to vanish from Meterie's list. It's now listed, in red, with the driver it has and how to give it back to Windows.
+- **Probie says when a COM port is busy**, like the other apps do, instead of "Access is denied".
+- **Scopie's Hantek DSO-2xxx/5xxx message** says libusb-win32 works as well as WinUSB.
+- **A new test** checks that the Linux and Raspberry Pi USB permission rule (install-usb.sh) covers every scope, logic analyser and HID meter cable the apps support. It does today.
 
 Licensed under GPL-3.0-or-later.
 

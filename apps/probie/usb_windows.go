@@ -5,8 +5,11 @@ package probie
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"syscall"
 	"unsafe"
+
+	"tinkerie/shared/libusb0"
 )
 
 var (
@@ -66,6 +69,11 @@ func openUSBDevice(path string) (usbDevice, error) {
 	var w uintptr
 	if r, _, e := procWinUsbInitialize.Call(uintptr(h), uintptr(unsafe.Pointer(&w))); r == 0 {
 		syscall.CloseHandle(h)
+		// Not WinUSB: it may have the libusb-win32 driver (Zadig's other
+		// common choice, used by many PulseView set-ups).
+		if d, ok := openLibusb0ByPath(path); ok {
+			return d, nil
+		}
 		return nil, &driverError{fmt.Sprintf("WinUSB driver not attached (%v)", e)}
 	}
 	d := &winUSB{h: h, w: w, path: path}
@@ -183,4 +191,33 @@ func (d *winUSB) Stream(ep uint8, size, count int, stop <-chan struct{}, fn func
 			return err
 		}
 	}
+}
+
+// openLibusb0ByPath opens the device at a USB device-interface path through
+// libusb-win32, matching it by VID:PID and its position among devices with
+// the same IDs.
+func openLibusb0ByPath(path string) (usbDevice, bool) {
+	if libusb0.Available() != nil {
+		return nil, false
+	}
+	v, p := parseVIDPID(path)
+	vid, e1 := strconv.ParseUint(v, 16, 16)
+	pid, e2 := strconv.ParseUint(p, 16, 16)
+	if e1 != nil || e2 != nil {
+		return nil, false
+	}
+	n := 0
+	for _, q := range usbDevicePaths() {
+		if strings.EqualFold(q, path) {
+			break
+		}
+		if qv, qp := parseVIDPID(q); strings.EqualFold(qv, v) && strings.EqualFold(qp, p) {
+			n++
+		}
+	}
+	d, err := libusb0.Open(uint16(vid), uint16(pid), n)
+	if err != nil {
+		return nil, false
+	}
+	return d, true
 }

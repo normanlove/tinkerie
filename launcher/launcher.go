@@ -24,7 +24,7 @@ import (
 )
 
 // Version is the suite version shown in the launcher.
-const Version = "0.30.2-alpha"
+const Version = "0.30.3-alpha"
 
 // App describes one tile in the launcher.
 type App struct {
@@ -43,9 +43,9 @@ var Apps = []App{
 	{"makie", "Makie", "3D-printing part designer. Builds cases for Wirie boards and keyboards", "0.14.0-alpha", "makie.png", "", false},
 	{"tunie", "Tunie", "3D printer tuning and calibration", "0.6.2-alpha", "tunie.png", "", false},
 	{"flashie", "Flashie", "Firmware flasher for ESP32, Pico, Arduino and STM32, keyboard firmware maker, and SD card / USB image writer", "0.10.2-alpha", "flashie.svg", "", false},
-	{"scopie", "Scopie", "Oscilloscope: Hantek 6022, network scopes and more", "0.11.3-alpha", "scopie.png", "", false},
-	{"meterie", "Meterie", "PC multimeter: HoldPeak, UNI-T, OWON, Brymen, Fluke…", "0.8.2-alpha", "meterie.png", "", false},
-	{"probie", "Probie", "Serial monitor and logic analyser that explains captures in plain words: its own, and Scopie's and Meterie's", "0.8.2-alpha", "probie.svg", "", false},
+	{"scopie", "Scopie", "Oscilloscope: Hantek 6022, network scopes and more", "0.11.4-alpha", "scopie.png", "", false},
+	{"meterie", "Meterie", "PC multimeter: HoldPeak, UNI-T, OWON, Brymen, Fluke…", "0.8.3-alpha", "meterie.png", "", false},
+	{"probie", "Probie", "Serial monitor and logic analyser that explains captures in plain words: its own, and Scopie's and Meterie's", "0.8.3-alpha", "probie.svg", "", false},
 	{"codie", "Codie", "Code explainer: what each line of code does and why", "0.5.0-alpha", "codie.svg", "", false},
 	{"fixie", "Fixie", "Repair guide: quick checks, board-level fault finding and your own builds, using Meterie, Scopie and Probie", "0.4.1-alpha", "fixie.svg", "", false},
 }

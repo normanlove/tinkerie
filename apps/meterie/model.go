@@ -13,7 +13,7 @@ import (
 
 const (
 	AppName    = "Meterie"
-	AppVersion = "0.8.2-alpha"
+	AppVersion = "0.8.3-alpha"
 	AppAuthor  = "nrmluvdev"
 )
 

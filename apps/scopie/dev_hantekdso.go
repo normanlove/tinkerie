@@ -368,7 +368,7 @@ func (s *hantekDSO) Open(progress func(string)) error {
 		u = waitFor(15, 250*time.Millisecond, func() *usbInfo { return s.find(true) })
 		if u == nil {
 			return devErr("The firmware was loaded but the scope did not come back. The scope now has "+
-				"USB ID 04B5:%04X, which also needs the WinUSB driver.", s.m.pid)
+				"USB ID 04B5:%04X, which also needs the WinUSB (or libusb-win32) driver.", s.m.pid)
 		}
 	}
 	d, err := openUSB(u)

@@ -30,6 +30,7 @@ type PortInfo struct {
 	Meters   []string
 	BLEAddr  uint64
 	RSSI     int
+	NoDriver bool // a known cable is plugged in but its driver stops Meterie using it (Hint says why)
 }
 
 // Device is a live connection.

@@ -479,5 +479,58 @@ func hidInstance(p string) string {
 }
 
 func platformListPorts() []PortInfo {
-	return append(listHID(), listSerialPorts()...)
+	return append(append(listHID(), listSerialPorts()...), listBlockedCables()...)
+}
+
+// listBlockedCables finds meter cables that are plugged in but have had
+// their driver replaced (usually by Zadig, for sigrok or a scope program),
+// so Windows no longer shows them as a HID device or COM port and Meterie
+// can't see them. They're listed with a hint instead of disappearing.
+func listBlockedCables() []PortInfo {
+	h, _, _ := pSetupDiGetClassDevsW.Call(0, uintptr(unsafe.Pointer(u16("USB"))), 0, 0x2|0x4) // DIGCF_PRESENT|DIGCF_ALLCLASSES
+	if h == invalidHandle {
+		return nil
+	}
+	defer pSetupDiDestroyDeviceInfoList.Call(h)
+	var out []PortInfo
+	for i := uint32(0); ; i++ {
+		var did spDevinfoData
+		did.cbSize = uint32(unsafe.Sizeof(did))
+		if r, _, _ := pSetupDiEnumDeviceInfo.Call(h, uintptr(i), uintptr(unsafe.Pointer(&did))); r == 0 {
+			break
+		}
+		vid, pid := parseVIDPID(devProp(h, &did, 0x01)) // SPDRP_HARDWAREID
+		if vid == 0 {
+			continue
+		}
+		var cable *usbID
+		for k := range knownUSB {
+			if knownUSB[k].VID == vid && knownUSB[k].PID == pid {
+				cable = &knownUSB[k]
+				break
+			}
+		}
+		if cable == nil {
+			continue
+		}
+		svc := devProp(h, &did, 0x04) // SPDRP_SERVICE
+		var drv string
+		switch strings.ToLower(svc) {
+		case "winusb":
+			drv = "WinUSB"
+		case "libusb0":
+			drv = "libusb-win32"
+		case "libusbk":
+			drv = "libusbK"
+		default:
+			continue // its normal driver: listed as a HID device or COM port already
+		}
+		name := cable.Label
+		if cable.Kind == TrSerial && cable.Meters == nil {
+			name = cable.Label + " cable"
+		}
+		out = append(out, PortInfo{Kind: cable.Kind, Name: name, VID: vid, PID: pid, NoDriver: true,
+			Hint: "Has the " + drv + " driver (from Zadig?), so Windows hides it from Meterie. Device Manager ▸ Uninstall device ▸ tick Delete driver ▸ replug."})
+	}
+	return out
 }

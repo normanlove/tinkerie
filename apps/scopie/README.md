@@ -87,7 +87,7 @@ bench scopes and CSV files work there today; USB needs a libusb/usbfs back end i
 | `dev_fx2.go` · `dev_hantekdso.go` · `dev_handheld.go` · `dev_owon.go` · `dev_scpi.go` · `dev_pico.go` · `dev_sim.go` | The drivers |
 | `link.go` | Instrument links: VXI-11, raw TCP, USBTMC, USB bulk |
 | `usb.go` / `usb_windows.go` | USB device list, WinUSB control/bulk/streaming, Intel-HEX and FX2 firmware upload |
-| `usb_libusb0_windows.go` | libusb-win32 devices on Windows, through `libusb0.dll` (no cgo) |
+| `usb_libusb0_windows.go` | libusb-win32 devices on Windows, through `shared/libusb0` (`libusb0.dll`, no cgo) |
 | `visa_windows.go` · `pico_windows.go` | Optional NI-VISA and PicoSDK libraries, used when installed |
 | `platform_windows.go` / `platform_other.go` | Window, folders, USB driver installers |
 | `web/` | The interface (HTML/CSS/JS, embedded into the exe) |

@@ -67,6 +67,12 @@ func openPort(name string, cfg PortConfig) (Port, error) {
 	}
 	h, err := syscall.CreateFile(path, syscall.GENERIC_READ|syscall.GENERIC_WRITE, 0, nil, syscall.OPEN_EXISTING, 0, 0)
 	if err != nil {
+		switch err {
+		case syscall.ERROR_ACCESS_DENIED:
+			return nil, fmt.Errorf("%s is busy — another program has it open (Arduino IDE serial monitor, PuTTY, Flashie, Meterie…). Close it and try again", name)
+		case syscall.ERROR_FILE_NOT_FOUND:
+			return nil, fmt.Errorf("%s isn't there any more — was the device unplugged?", name)
+		}
 		return nil, fmt.Errorf("open %s: %w", name, err)
 	}
 	fail := func(what string, e error) (Port, error) {
