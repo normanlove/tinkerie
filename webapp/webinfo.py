@@ -103,9 +103,11 @@ APPS = {
     works=['All three guides (Quick checks, Board level, My build) and Parts tests',
            'Pictures, reference cards and calculators',
            'Tools, signs, safety and the refusal list',
-           'Your repair log and reports'],
+           'Your repair log and reports',
+           'The Error logs tab: explaining Windows, macOS, Linux and Android logs you open, paste or drop'],
     differs=['Readings are typed in; reports are downloaded'],
-    missing=['Taking readings straight from Meterie, Scopie and Probie, and opening them from a step: the web versions can’t reach each other']),
+    missing=['Scan this computer (Error logs): a web page can’t read the computer’s own logs; save one (the tab shows how) and open it',
+             'Taking readings straight from Meterie, Scopie and Probie, and opening them from a step: the web versions can’t reach each other']),
 }
 
 ORDER = ['wirie', 'makie', 'tunie', 'flashie', 'scopie', 'meterie', 'probie', 'codie', 'fixie']

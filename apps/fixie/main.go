@@ -37,7 +37,7 @@ var webFS embed.FS
 
 const (
 	appName     = "Fixie"
-	appVersion  = "0.4.1-alpha"
+	appVersion  = "0.5.0-alpha"
 	appAuthor   = "nrmluvdev"
 	defaultPort = 47825 // Tinkerie ports: see PORTING.md
 	maxRepairs  = 4 << 20
@@ -248,6 +248,7 @@ func (s *server) routes() http.Handler {
 		}
 		writeJSON(w, res)
 	})
+	s.logRoutes(mux) // the error log explainer
 	mux.HandleFunc("/api/activate", func(w http.ResponseWriter, r *http.Request) {
 		s.mu.Lock()
 		n := s.clients

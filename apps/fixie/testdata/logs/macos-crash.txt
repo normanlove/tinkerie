@@ -1,0 +1,6 @@
+Process:               Preview [1234]
+Path:                  /System/Applications/Preview.app/Contents/MacOS/Preview
+OS Version:            macOS 14.5 (23F79)
+Exception Type:        EXC_BAD_ACCESS (SIGSEGV)
+Exception Codes:       KERN_INVALID_ADDRESS at 0x0000000000000010
+Termination Reason:    Namespace SIGNAL, Code 11 Segmentation fault: 11

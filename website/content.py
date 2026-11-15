@@ -518,16 +518,16 @@ APPS = [
     pairs=[("flashie", "Flashie's Create tab builds firmware code and explains it as it goes."), ("probie", "Run your code on a board and watch what it prints.")],
   ),
   dict(
-    id="fixie", needshort="Nothing: a multimeter helps", name="Fixie", ver="0.4.1-alpha", color="#f5b324", icon="fixie.svg",
+    id="fixie", needshort="Nothing: a multimeter helps", name="Fixie", ver="0.5.0-alpha", color="#f5b324", icon="fixie.svg",
     tagline="Find the fault, down to the part. Keep it out of e-waste.",
-    short="A repair guide down to component level: quick checks, board-level fault finding for old tech, and troubleshooting your own builds, with Meterie, Scopie and Probie doing the measuring.",
+    short="A repair guide down to component level: quick checks, board-level fault finding for old tech, troubleshooting your own builds, and explaining error logs, with Meterie, Scopie and Probie doing the measuring.",
     need="Nothing to start; a multimeter for most repairs",
     plain=("In plain words",
            "The TV has sound but no picture, the controller won't charge, the speaker went quiet. Say what it is, how it's powered and what it has, then what it's doing, and Fixie "
            "takes you through it one check at a time, easiest first: what to do, which tools to use, what a good and a bad result look like. "
            "Type in your meter reading and it tells you which it is. Each answer leads to the next check, until it reaches the likely fault, "
            "how hard it is to fix and the parts you'll need. It only asks you to open things up when it has to, and tells you how to do it safely."),
-    chips=["Component level", "Board sections", "Your own builds", "25 parts tests", "55 drawings and waveforms", "Colour-code and marking calculators", "Live readings from Meterie, Scopie and Probie", "15 symptoms", "Over 130 steps", "Reads your meter readings", "Tools guide", "Pictures of failed parts", "Safety first", "Repair log and reports"],
+    chips=["Component level", "Board sections", "Your own builds", "Explains error logs", "Windows, macOS, Linux and Android logs", "25 parts tests", "55 drawings and waveforms", "Colour-code and marking calculators", "Live readings from Meterie, Scopie and Probie", "15 symptoms", "Over 130 steps", "Reads your meter readings", "Tools guide", "Pictures of failed parts", "Safety first", "Repair log and reports"],
     firsts=[
       ("Pick a guide", "Quick checks for any device, Board level to find the failed part, or My build for your own projects."),
       ("Say what it's doing", "Dead, won't charge, no picture, no sound, overheating, got wet, cuts out, trips the electricity…"),
@@ -556,6 +556,13 @@ APPS = [
         "Power, current draw and regulator pinouts; wiring against your design (opens Wirie); code that won't run or keeps resetting",
         "I2C, SPI and serial parts that don't answer: addresses, pull-ups, levels, baud rates",
         "Signals, noise and decoupling, motors, servos and steppers, addressable LEDs",
+      ]),
+      ("Error logs", "What the computer's error messages mean.", [
+        "Open, paste or drop a log from Windows (Event Viewer as XML, text or CSV, PowerShell), macOS (the log, crash and panic reports), Linux and Raspberry Pi OS (journalctl, dmesg, syslog), ChromeOS or Android (logcat, bug reports)",
+        "The desktop app can scan the computer's own logs: Windows' event logs, the Linux journal and kernel log, a Raspberry Pi's power record, a Mac's log and crash reports",
+        "Over 160 known messages explained in plain words, with what to do: failing drives, bad memory, overheating, under-voltage, blue screen stop codes, kernel panics, crashing apps, USB and Wi-Fi faults, and the ones that look scary but are harmless",
+        "Lines that look like errors but aren't in the list are shown too, and the whole thing saves as a report",
+        "No AI and no internet: every message is matched against Fixie's own hand-written list, on your computer",
       ]),
       ("Works with Tinkerie", "Your instruments, in the steps.", [
         "Each step says which app to use and how to set it up, and opens it for you: Meterie, Scopie, Probie, Flashie or Wirie",

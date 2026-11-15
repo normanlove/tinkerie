@@ -1,0 +1,7 @@
+Nov 14 10:00:01 raspberrypi kernel: hwmon hwmon1: Undervoltage detected!
+Nov 14 10:00:05 raspberrypi kernel: hwmon hwmon1: Voltage normalised
+Nov 14 10:01:00 raspberrypi kernel: mmc0: Timeout waiting for hardware interrupt.
+Nov 14 10:02:00 raspberrypi systemd[1]: bluetooth.service: Failed with result 'exit-code'.
+Nov 14 10:02:10 raspberrypi kernel: usb 1-1.3: ch341-uart converter now attached to ttyUSB0
+Nov 14 10:02:11 raspberrypi kernel: usbfs: interface 0 claimed by ch341 while 'brltty' sets config #1
+Nov 14 10:03:00 raspberrypi kernel: usb 1-1.4: USB disconnect, device number 5

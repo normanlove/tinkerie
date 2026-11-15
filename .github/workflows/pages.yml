@@ -32,6 +32,8 @@ jobs:
         run: |
           GOOS=js GOARCH=wasm go test -c -o /tmp/usb.test ./shared/usb
           cd shared/usb && env -i PATH="$PATH" HOME=/tmp node "$(go env GOROOT)/lib/wasm/wasm_exec_node.js" /tmp/usb.test -test.v
+      - name: Check Fixie's error log explainer
+        run: python3 apps/fixie/logs.py /tmp/logrules.json && cmp /tmp/logrules.json apps/fixie/web/logrules.json && node apps/fixie/logscan_check.js
       - name: Build Tinkerie web (every app; fails if one is missing)
         run: python3 webapp/build.py
       - name: Put the site together

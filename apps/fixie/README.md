@@ -1,4 +1,4 @@
-# Fixie 0.4.1-alpha — repair guide
+# Fixie 0.5.0-alpha — repair guide
 
 Part of **Tinkerie**, the free maker tools by **nrmluvdev**.
 
@@ -11,6 +11,7 @@ Fixie never uses the internet. Repairs are saved on this computer.
 - **Quick checks**: for any device. Describe it (how it's powered, what it has) and say what it's doing; Fixie goes through the easy checks first.
 - **Board level**: component-level fault finding for repairing old tech. Pick a section of the board, or start from the beginning: power input and protection, mains power supply (cold tests, then a dim bulb tester), regulators and rails (finding a shorted part by injecting current), battery and charging, clock and reset, processor and memory (boot messages, corrupted firmware), data buses (decoding I2C, SPI and UART to see who doesn't answer), audio (following a test tone), video (sync and levels), outputs and drivers, inputs and keyboard matrices, and connectors and tracks. Results say what's worth salvaging when a board can't be saved.
 - **My build**: troubleshooting your own projects: power and current draw, parts fitted backwards, regulator pinouts, wiring against your design, code that won't run or keeps resetting, I2C/SPI/serial parts that don't answer, signals, noise and decoupling, motors, servos and steppers, and addressable LEDs.
+- **Error logs**: explains error logs from Windows, macOS, Linux (and Raspberry Pi OS and ChromeOS) and Android: which error messages are in it, what each means and what to do. See below.
 - **Parts tests**: how to test 25 kinds of part (out of the circuit, in it, and powered), what to replace them with, and whether they're worth saving from scrap.
 
 ## Pictures and reference
@@ -18,6 +19,19 @@ Fixie never uses the internet. Repairs are saved on this computer.
 Board level, My build and Parts tests steps show drawings (click one to see it bigger): what each part looks like with its pins labelled, where the meter probes, scope probe, logic analyser or serial adapter connect, and what the signal should look like next to a faulty one (crystals, switching nodes, I2C ACK/NAK and pull-up edges, serial bytes, reset lines, composite and VGA video, PWM, servo pulses, brownouts, noise, clipping, and what a dim bulb tester's bulb tells you). There are 55 in `web/pics.js`, drawn as SVG and coloured by the theme.
 
 Reference cards (on the Parts tests tab, and from a step's Reference chips): a resistor colour-code calculator, SMD resistor marking decoder (3- and 4-digit, R notation, EIA-96), capacitor marking decoder, common pinouts (78xx, 79xx, LM317, AMS1117, TL431, common transistors and MOSFETs, PC817, 555, dual op-amps, logic chips, USB, VGA), what board labels mean, finding pin 1, common rail voltages, and Ohm's law, LED resistor and regulator heat calculators. They're in `web/refs.js`.
+
+## Error logs
+
+Open, paste or drop a log, and Fixie lists the error messages it recognises, most serious first (Act now, Problem, Worth checking, Good to know, Usually harmless), each with what it means, what to do and the lines it was found in. Lines that look like errors but aren't in its list are shown under *Not recognised*. *Save report* saves it all.
+
+- **Windows**: Event Viewer logs saved as XML, text or CSV, `wevtutil` and PowerShell (`Get-WinEvent | Format-List`, UTF-16 too), CBS and setupapi logs. Events are matched by source and ID (Kernel-Power 41, WHEA, disk, NTFS, display driver resets, services, app crashes…), plus blue screen stop codes and exception and update codes.
+- **macOS**: the unified log, panic and crash reports (including the newer .ips files) and *Previous shutdown cause* codes.
+- **Linux, Raspberry Pi OS, ChromeOS**: dmesg, journalctl and syslog: disk, SATA, NVMe and SD card errors, file system damage, machine checks, memory errors, overheating, under-voltage, USB, graphics, kernel panics and lockups, out of memory, failed services.
+- **Android**: logcat and bug reports: app crashes and ANRs, native crashes, low memory, heat, battery and storage.
+
+**Scan this computer** (desktop app only) reads the computer's own logs with its own tools: `wevtutil` on Windows (System: critical, error and warning; Application: critical and error), `journalctl`, `dmesg` and `vcgencmd get_throttled` on Linux and Raspberry Pi, and `log show` plus the panic and crash reports on a Mac. Android only lets an app read its own log, so there you open a saved one.
+
+There's no AI and no internet involved: the 166 messages are a hand-written list (`logs.py` → `web/logrules.json`) of patterns, meanings and fixes, matched on your computer by `web/logscan.js`. `TestLogRules` checks every pattern works in Go and JavaScript and matches its examples, and that the sample logs in `testdata/logs` give the right findings.
 
 ## Working with the rest of Tinkerie
 
@@ -69,7 +83,7 @@ The full word list is in `guide.py`; `fixie_test.go` checks it refuses these and
 
 ## For developers
 
-The guide is data: `web/guide.json`, built by `guide.py` (Quick checks, devices, tools, signs, safety) and `guide_more.py` (Board level, My build, Parts tests) (`python3 apps/fixie/guide.py apps/fixie/web/guide.json`). Steps have a title, why, what to do (lines can depend on the device's tags), tools, signs, an optional measurement, a question and answers that lead to other steps; results have the cause, fix, parts and difficulty. Lines in a step (and in a fix) can depend on the device: `iff("motor&mains&!printer", …)` (`|` is or, `&` is and, `!` is not). `TestEverything` (in `exhaustive_test.go`) walks all three guides for every kind of device and every combination of power and features (952,320 descriptions, grouped by which conditions they make true), and checks every path ends at a result with no loops, that no step or fix is ever empty for the device in front of it, that every word a person can see (titles, explanations, instructions, questions, answers, readings, causes and fixes) only mentions things the device has (a battery, a screen, a fan, USB, mains, a motor, a phone, a printer and so on), and that every picture shown fits the device. `TestPictureRelevance` checks each picture matches what its step or part says. `fixie_test.go` checks every tool, sign, tag, picture and reference card named exists, and that the refusal list works. `TestRelevance` lists steps each kind of device must never be shown (a 3D printer never gets the hobby-board upload steps, a cordless tool never gets USB charging checks, and so on).
+The error log list is built by `python3 apps/fixie/logs.py apps/fixie/web/logrules.json`. The guide is data: `web/guide.json`, built by `guide.py` (Quick checks, devices, tools, signs, safety) and `guide_more.py` (Board level, My build, Parts tests) (`python3 apps/fixie/guide.py apps/fixie/web/guide.json`). Steps have a title, why, what to do (lines can depend on the device's tags), tools, signs, an optional measurement, a question and answers that lead to other steps; results have the cause, fix, parts and difficulty. Lines in a step (and in a fix) can depend on the device: `iff("motor&mains&!printer", …)` (`|` is or, `&` is and, `!` is not). `TestEverything` (in `exhaustive_test.go`) walks all three guides for every kind of device and every combination of power and features (952,320 descriptions, grouped by which conditions they make true), and checks every path ends at a result with no loops, that no step or fix is ever empty for the device in front of it, that every word a person can see (titles, explanations, instructions, questions, answers, readings, causes and fixes) only mentions things the device has (a battery, a screen, a fan, USB, mains, a motor, a phone, a printer and so on), and that every picture shown fits the device. `TestPictureRelevance` checks each picture matches what its step or part says. `fixie_test.go` checks every tool, sign, tag, picture and reference card named exists, and that the refusal list works. `TestRelevance` lists steps each kind of device must never be shown (a 3D printer never gets the hobby-board upload steps, a cordless tool never gets USB charging checks, and so on).
 
 Fixie runs on port 47825 (see PORTING.md) and keeps its repair log in `nrmluvdev/Fixie/state.json` in the system's settings folder.
 

@@ -10,14 +10,12 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 
 Each package has a *READ ME FIRST.txt*.
 
-<!-- release notes for 0.31.0-alpha: package.sh checks this line, so update the notes with every version -->
+<!-- release notes for 0.32.0-alpha: package.sh checks this line, so update the notes with every version -->
 ### New in {VERSION}
-- **Tinkerie web: every app in your browser.** [tinkerie.net/web](https://tinkerie.net/web/) runs Wirie, Makie, Tunie, Flashie, Scopie, Meterie, Probie, Codie and Fixie in Chrome or Edge with nothing to download. It's the same code as the desktop apps, running in the page on your own computer, and what you make is kept in your browser.
-  - **Devices work too**: flash ESP32, Arduino and STM32 boards, print to a USB printer, use Hantek 6022 and other USB scopes, fx2lafw logic analysers, serial monitors and meter cables, through the page's *Connect device* button.
-  - **Each app says what's different**: its *Web vs desktop* button (and its page on the website) lists what works the same, what works differently and what needs the desktop app (writing SD cards, compiling Arduino code, network scopes and printers, Bluetooth meters).
-  - Every update to the apps goes to the web versions automatically.
-  - `Tinkerie-web-{VERSION}.tar.gz` puts it on your own web server; `install-pi.sh` sets it up on a Raspberry Pi.
-- **Report a bug or ask for a feature** from [the website](https://tinkerie.net/feedback.html), or with the *Report a bug* button in each web app: a short form that opens a ready-filled GitHub issue, labelled with its app.
+- **Fixie explains error logs (Fixie 0.5.0).** A new *Error logs* tab reads logs from Windows, macOS, Linux, Raspberry Pi OS, ChromeOS and Android, and lists the error messages in them, most serious first, with what each means and what to do: failing drives, bad memory, overheating, under-voltage, blue screen stop codes, kernel panics, crashing apps, USB and Wi-Fi faults, and the scary-looking ones that are harmless.
+  - Open, paste or drop a log (Event Viewer's XML, text or CSV, PowerShell, journalctl, dmesg, macOS crash and panic reports, logcat), or in the desktop app press *Scan this computer* to read its own logs.
+  - No AI and no internet: 166 known messages, written by hand, matched on your computer. Lines that look like errors but aren't in the list are shown too.
+  - In Tinkerie web too, for logs you open or paste.
 
 Licensed under GPL-3.0-or-later.
 

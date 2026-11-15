@@ -1,0 +1,12 @@
+[    0.000000] Linux version 6.8.0-45-generic (buildd@lcy02-amd64-075) (x86_64-linux-gnu-gcc-13)
+[    0.512345] ACPI BIOS Error (bug): Could not resolve symbol [\_SB.PCI0.GPP0.SWUS], AE_NOT_FOUND (20230628/dswload2-162)
+[    1.234567] nvidia: loading out-of-tree module taints kernel.
+[  812.200001] ata1.00: exception Emask 0x0 SAct 0x40000 SErr 0x0 action 0x0
+[  812.200050] ata1.00: failed command: READ FPDMA QUEUED
+[  812.200090] ata1.00: error: { UNC }
+[  812.210000] blk_update_request: I/O error, dev sda, sector 123456789 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+[  900.000000] EXT4-fs error (device sda2): ext4_find_entry:1683: inode #131073: comm nautilus: reading directory lblock 0
+[ 1203.000000] Out of memory: Killed process 4242 (firefox) total-vm:9876543kB, anon-rss:5000000kB
+[ 1500.100000] usb 1-1.2: device descriptor read/64, error -71
+[ 1600.000000] CPU3: Core temperature above threshold, cpu clock throttled (total events = 24)
+[ 1700.000000] weird_driver: frobnicator error -5 while resetting

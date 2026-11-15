@@ -115,12 +115,18 @@
   }
   function render(t) {
     if (GUIDES.includes(t)) return renderGuide(t);
+    if (t === "logs") return window.FixieLogs.render($("#v-logs"), { api, toast: toastPop, loadJSON: p => fetch(p).then(r => r.json()) });
     ({ parts: renderParts, tools: renderTools, signs: renderSigns, safety: renderSafety, log: renderLog })[t]();
   }
   function renderAll() { for (const g of GUIDES) { cur = openIn[g]; renderGuide(g); } cur = GUIDES.includes(tab) ? openIn[tab] : cur; renderParts(); renderTools(); renderSigns(); renderSafety(); renderLog(); save(); }
 
   $("#newRepair").onclick = () => { const g = GUIDES.includes(tab) ? tab : "repair"; openIn[g] = null; cur = null; picks[g] = newPick(); save(); showTab(g); };
   $("#saveReport").onclick = () => {
+    if (tab === "logs") { // the error log report
+      const t = window.FixieLogs.report();
+      if (!t) return toastPop("Nothing to save yet", "Open, paste or scan a log first.");
+      return download("Fixie error log report " + new Date().toISOString().slice(0, 10) + ".md", t);
+    }
     const r = cur || state.repairs[0];
     if (!r) return toastPop("Nothing to save yet", "Start a repair first: the report lists every step, answer, reading and note.");
     download(fileName(r) + ".md", report(r));

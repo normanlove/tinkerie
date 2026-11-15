@@ -1,0 +1,5 @@
+Level,Date and Time,Source,Event ID,Task Category
+Error,14/11/2026 10:00:00,Service Control Manager,7000,None,"The Foo Updater service failed to start due to the following error: 
+The system cannot find the file specified."
+Warning,14/11/2026 09:59:00,Microsoft-Windows-Kernel-Processor-Power,37,(7),The speed of processor 0 in group 0 is being limited by system firmware. The processor has been in this reduced performance state for 71 seconds since the last report.
+Information,14/11/2026 09:58:00,Microsoft-Windows-Power-Troubleshooter,1,None,The system has returned from a low power state.

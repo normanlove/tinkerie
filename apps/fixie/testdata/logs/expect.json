@@ -1,0 +1,11 @@
+{
+  "windows-events.xml": {"os": "windows", "has": ["w.kp41", "w.whea", "w.dcom10016", "w.disk7"]},
+  "windows-events.txt": {"os": "windows", "has": ["w.bugcheck", "w.stop.dpc_watchdog_violation", "w.tdr", "w.apperr", "w.code.c0000005"]},
+  "windows-events.csv": {"os": "windows", "has": ["w.scm7000", "w.cputhrottle", "w.sleep"]},
+  "linux-dmesg.txt": {"os": "linux", "has": ["l.acpi", "l.taint", "l.ata", "l.ataunc", "l.ioerr", "l.ext4", "l.oom", "l.usberr", "l.thermal"], "unknown": ["frobnicator"]},
+  "pi-journal.txt": {"os": "linux", "has": ["l.undervolt", "l.voltok", "l.mmc", "l.svcfail", "l.serialbusy", "l.usbdisconnect"]},
+  "macos-panic.txt": {"os": "macos", "has": ["m.panic", "m.watchdog", "m.shut-128"]},
+  "macos-crash.txt": {"os": "macos", "has": ["m.crash.segv"]},
+  "android-logcat.txt": {"os": "android", "has": ["a.fatal", "a.anr", "a.lmk"]},
+  "healthy.txt": {"os": "linux", "has": ["l.acpi", "l.usbdisconnect"], "worst": "harmless"}
+}

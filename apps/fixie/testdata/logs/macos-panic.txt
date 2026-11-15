@@ -1,0 +1,6 @@
+panic(cpu 4 caller 0xfffffe0012345678): userspace watchdog timeout: no successful checkins from WindowServer in 120 seconds
+Debugger message: panic
+Kernel Extensions in backtrace:
+   com.example.driver(1.0)[ABCD]@0xffffff7f80000000->0xffffff7f80010000
+Darwin Kernel Version 23.5.0
+2026-11-14 10:00:00.000 kernel[0]: Previous shutdown cause: -128

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Events>
+<Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-Kernel-Power' Guid='{331c3b3a-2005-44c2-ac5e-77220c37d6b4}'/><EventID>41</EventID><Version>8</Version><Level>1</Level><Task>63</Task><TimeCreated SystemTime='2026-11-14T08:01:12.5000000Z'/><Computer>DESKTOP</Computer></System><EventData><Data Name='BugcheckCode'>0</Data><Data Name='PowerButtonTimestamp'>0</Data></EventData><RenderingInfo Culture='en-GB'><Message>The system has rebooted without cleanly shutting down first. This error could be caused if the system stopped responding, crashed, or lost power unexpectedly.</Message><Level>Critical</Level></RenderingInfo></Event>
+<Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-WHEA-Logger'/><EventID>18</EventID><Level>2</Level><TimeCreated SystemTime='2026-11-14T08:00:58.0000000Z'/></System><RenderingInfo Culture='en-GB'><Message>A fatal hardware error has occurred.
+
+Reported by component: Processor Core
+Error Source: Machine Check Exception</Message><Level>Error</Level></RenderingInfo></Event>
+<Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-DistributedCOM' EventSourceName='DCOM'/><EventID Qualifiers='0'>10016</EventID><Level>3</Level><TimeCreated SystemTime='2026-11-14T07:00:00.0000000Z'/></System><EventData><Data Name='param1'>application-specific</Data><Data Name='param2'>Local</Data></EventData></Event>
+<Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='disk'/><EventID Qualifiers='49156'>7</EventID><Level>2</Level><TimeCreated SystemTime='2026-11-13T21:10:00.0000000Z'/></System><EventData><Data>\Device\Harddisk0\DR0</Data></EventData><RenderingInfo Culture='en-GB'><Message>The device, \Device\Harddisk0\DR0, has a bad block.</Message></RenderingInfo></Event>
+</Events>
