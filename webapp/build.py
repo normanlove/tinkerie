@@ -54,7 +54,10 @@ SHELL = '''<!doctype html>
 </main>
 <div class="tk-modal" id="tkFiles" hidden><div class="tk-box">
   <h2><span>{title} files</span><label class="tk-btn">Add files…<input type="file" id="tkImport" multiple></label><button class="tk-btn" id="tkFilesClose">Close</button></h2>
-  <div class="body"><p class="tk-dim">Saved in this browser only. Download anything you want to keep.{note}</p><div id="tkFilesList"></div></div>
+  <div class="body"><p class="tk-dim">Saved in this browser only, on this computer: nobody else's browser can see it. Download anything you want to keep.{note}</p><div id="tkFilesList"></div>
+    <h3>On a shared computer?</h3>
+    <p class="tk-dim">Anyone who uses this browser profile after you will see your {title} work. Use your own browser profile or a guest window, or clear it when you've finished.</p>
+    <button class="tk-btn" id="tkClear" title="Delete everything {title} saved in this browser, and forget its devices">Clear my {title} data</button></div>
 </div></div>
 <div class="tk-modal" id="tkDevs" hidden><div class="tk-box">
   <h2><span>Connect a device</span><button class="tk-btn" id="tkDevsClose">Close</button></h2>
@@ -70,6 +73,7 @@ SHELL = '''<!doctype html>
   <h2><span>{title}: web and desktop</span><button class="tk-btn" id="tkWebClose">Close</button></h2>
   <div class="body">{webinfo}</div>
 </div></div>
+<div class="tk-twice" id="tkTwice" hidden>{title} is open in another tab too. Both tabs save to the same files in this browser, so one can overwrite the other’s work: use one tab, or close the other.</div>
 <div id="tkToasts"></div>
 <script src="../wasm_exec.js"></script>
 <script src="../memfs.js"></script>
@@ -97,8 +101,14 @@ and what you make is saved in this browser. Version {ver}.</p>
 with the <b>Connect device</b> button. Firefox and Safari run the apps but can’t connect to devices. A few things need the desktop app
 (writing SD cards, compiling Arduino code, network scopes and printers): each app’s <b>Web vs desktop</b> button lists them, and the
 <a href="https://tinkerie.net">desktop download</a> is free too. Something wrong, or an idea? <a href="https://tinkerie.net/feedback.html?where=Tinkerie%20web%20(in%20Chrome)">Report it</a>. Made by nrmluvdev.</p>
+<h2 class="priv">Your work is yours</h2>
+<p class="note">There are no accounts and no server: each app runs in your own browser, and what you make is saved only in this browser on this computer,
+so nobody else can see it. Each tab and each app keeps to itself. <b>On a shared computer</b> (a school, library or club), anyone who uses this
+browser profile after you will see your work: use your own browser profile or a guest window, or clear it when you’ve finished.</p>
+<p><button class="tk-btn" id="clearAll">Clear all my Tinkerie web data</button> <span class="tk-dim" id="clearMsg"></span></p>
 </div>
 <script>if (!window.isSecureContext) document.getElementById('insecure').hidden = false;</script>
+<script src="home.js" data-apps="{apps}"></script>
 </body></html>
 '''
 
@@ -113,7 +123,7 @@ def main():
         if os.path.exists(p):
             shutil.copy(p, OUT)
             break
-    for f in ('memfs.js', 'shell.js', 'shell.css', 'sw.js', 'tkdev.js'):
+    for f in ('memfs.js', 'shell.js', 'shell.css', 'sw.js', 'tkdev.js', 'iso.js', 'home.js'):
         shutil.copy(os.path.join(ROOT, 'webapp', 'static', f), OUT)
     shutil.copy(os.path.join(ROOT, 'launcher', 'web', 'tinkerie.png'), os.path.join(OUT, 'icons'))
     env = dict(os.environ, GOOS='js', GOARCH='wasm', CGO_ENABLED='0')
@@ -142,7 +152,7 @@ def main():
         cards.append('<a class="card" href="%s/"><img src="icons/%s" alt=""><div><b>%s</b><div class="d">%s</div>%s</div></a>' % (
             name, icon, html.escape(title), html.escape(desc),
             '<div class="n">Desktop only: %s%s</div>' % (html.escape(short[0].lower() + short[1:]), ', and more' if len(info['missing']) > 1 else '') if short else ''))
-    open(os.path.join(OUT, 'index.html'), 'w').write(INDEX.format(ver=html.escape(ver), cards='\n'.join(cards)))
+    open(os.path.join(OUT, 'index.html'), 'w').write(INDEX.format(ver=html.escape(ver), cards='\n'.join(cards), apps=','.join(webinfo.ORDER)))
     json.dump({'version': ver, 'apps': webinfo.ORDER}, open(os.path.join(OUT, 'version.json'), 'w'))
     shutil.copy(os.path.join(ROOT, 'webapp', 'install-pi.sh'), os.path.join(ROOT, 'dist', 'web'))
     tgz = os.path.join(ROOT, 'dist', 'Tinkerie-web-%s.tar.gz' % ver)

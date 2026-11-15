@@ -114,7 +114,8 @@ ORDER = ['wirie', 'makie', 'tunie', 'flashie', 'scopie', 'meterie', 'probie', 'c
 
 # Everything in the web versions, whatever the app.
 ALL = ['Nothing is installed and nothing is uploaded: the app runs in the page, on your computer',
-       'What you make is kept in this browser until you clear its site data. Download anything you want to keep',
+       'There are no accounts and no server: what you make is kept only in this browser on this computer, so nobody else can see it. Each tab and each app keeps to itself',
+       'On a shared computer, use your own browser profile or a guest window, or use Clear my data (in Files) when you’ve finished. Download anything you want to keep',
        'Devices are used through Chrome and Edge’s Web Serial, WebUSB and WebHID. Firefox and Safari run the apps, but can’t connect to devices']
 
 
@@ -129,4 +130,5 @@ def html_list(name, esc):
         if not items:
             continue
         out.append('<div class="%s"><h4>%s</h4><ul>%s</ul></div>' % (cls, head, ''.join('<li>%s</li>' % esc(i) for i in items)))
+    out.append('<div class="all"><h4>In every web app</h4><ul>%s</ul></div>' % ''.join('<li>%s</li>' % esc(i) for i in ALL))
     return '<div class="tk-web">%s</div>' % ''.join(out)

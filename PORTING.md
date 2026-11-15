@@ -116,6 +116,8 @@ Devices go through Chrome and Edge's Web Serial, WebUSB and WebHID (`webapp/stat
 
 `webinfo.py` feeds both the web apps' *Web vs desktop* box and each app's page on the website.
 
+**Keeping sessions apart.** Nothing is shared between people: there's no server, and everything lives in the visitor's browser. Within one browser: each tab has a random 128-bit id (`tksid`, claimed with a Web Lock, so a duplicated tab takes a new one), and the service worker sends a frame's requests only to the tab with its id. Each app gets its own part of localStorage, sessionStorage and cookies through `iso.js`, which the service worker puts first in every page an app serves (keys `tk.<app>.…`, cookies `tk_<app>_…`), as separate ports do on the desktop. Its files are in IndexedDB `tinkerie-<app>`. A second tab of the same app shows a warning (a Web Lock per app). Don't use storage outside these from app code.
+
 ## Android
 
 `android/` is a small Java app (no libraries) around the same Go program, built for each Android ABI with the NDK (`android/build.sh`) and shipped inside the APK as `lib/<abi>/libtinkerie.so`, so Android lets it run. The Java side:

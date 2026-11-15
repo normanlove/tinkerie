@@ -36,7 +36,7 @@
   <nav class="crumbs" aria-label="You are here"><a href="index.html">Tinkerie</a><span aria-hidden="true">›</span><a href="index.html#apps">Apps</a><span aria-hidden="true">›</span><span>Scopie</span></nav>
   <div class="grid">
     <div>
-      <div class="app-title"><img src="img/icons/scopie.png" alt=""><div><h1>Scopie</h1><span class="ver">Version 0.11.4-alpha · in Tinkerie 0.32.0-alpha</span><span class="alpha-pill">Alpha</span></div></div>
+      <div class="app-title"><img src="img/icons/scopie.png" alt=""><div><h1>Scopie</h1><span class="ver">Version 0.11.4-alpha · in Tinkerie 0.32.1-alpha</span><span class="alpha-pill">Alpha</span></div></div>
       <p class="lead">Turn your PC into the screen of an oscilloscope.</p>
       <div class="plain"><span class="label">In plain words</span><p>An oscilloscope draws a voltage as a line moving over time, so you can see signals: a PWM output, a serial message, a noisy power supply. Scopie gives your scope a big, clear screen on your PC, and every button explains itself. No scope yet? Demo mode has 13 practice signals.</p></div>
       <div class="chips"><span class="chip">Hantek 6022BE / BL</span><span class="chip">Rigol, Siglent, Keysight, Tektronix</span><span class="chip">OWON</span><span class="chip">PicoScope</span><span class="chip">FFT</span><span class="chip">Demo mode</span></div>
@@ -64,7 +64,7 @@
 </div></section>
 
 <section class="band" id="web"><div class="wrap">
-  <div class="head"><div><span class="label">Tinkerie web</span><h2>Scopie in your browser</h2><p>Nothing to download or install: Scopie runs in the page, on your own computer, and what you make stays in your browser. Made for Chrome or Edge on a computer (Windows, Mac, Linux or Chromebook). Devices are connected with the page's <b>Connect device</b> button.</p></div>
+  <div class="head"><div><span class="label">Tinkerie web</span><h2>Scopie in your browser</h2><p>Nothing to download or install: Scopie runs in the page, on your own computer. There are no accounts and no server, so what you make stays in your browser and nobody else can see it. Made for Chrome or Edge on a computer (Windows, Mac, Linux or Chromebook). Devices are connected with the page's <b>Connect device</b> button.</p></div>
   <a class="btn btn-go" href="https://tinkerie.net/web/scopie/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01"/></svg>Open Scopie in your browser</a></div>
   <div class="webcols"><div class="webcol yes"><h3>Works the same</h3><ul><li>The full scope screen: channels, trigger, cursors, 13 measurements, FFT, XY, persistence and averaging</li><li>USB scopes over WebUSB: the Hantek 6022 family (firmware built in), OWON, Hantek handhelds and old Hantek DSOs, and Rigol, Keysight, Tektronix and Siglent bench scopes on USB</li><li>Demo mode, CSV import and export, PNG screenshots, saved setups</li></ul></div><div class="webcol mid"><h3>Works, but differently</h3><ul><li>Pick the scope once with the Connect button. A Hantek 6022 restarts as a new device after Scopie loads its firmware, so pick it again the first time</li><li>On Windows the browser can only use a USB scope with the WinUSB driver (Zadig installs it); libusb-win32, NI-VISA and makers’ own drivers don’t work in a browser, and the desktop app’s driver installer isn’t in the web version</li><li>Old Hantek DSO firmware is imported from a file you add, not from the installed driver</li><li>Screenshots and CSV files are downloaded instead of saved to a folder</li></ul></div><div class="webcol no"><h3>Desktop app only</h3><ul><li>Network bench scopes (SCPI over LAN, VXI-11): web pages can’t open network connections to instruments</li><li>PicoScope and other scopes that need their maker’s driver (DLL), and NI-VISA</li><li>“Explain in Probie” opening Probie directly: save the CSV and add it in Probie web</li></ul></div></div>
 </div></section>
@@ -82,7 +82,7 @@
 <footer><div class="wrap">
   <div class="stack">
     <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
-    <p>Free maker tools, designed and created by <b>nrmluvdev</b>. Version 0.32.0-alpha: Tinkerie is in alpha.</p>
+    <p>Free maker tools, designed and created by <b>nrmluvdev</b>. Version 0.32.1-alpha: Tinkerie is in alpha.</p>
     <p>Free software under the GNU GPL, version 3 or later. It comes with no warranty.</p>
   </div>
   <div><h4>The apps</h4><ul><li><a href="wirie.html">Wirie</a></li><li><a href="makie.html">Makie</a></li><li><a href="tunie.html">Tunie</a></li><li><a href="flashie.html">Flashie</a></li><li><a href="scopie.html">Scopie</a></li><li><a href="meterie.html">Meterie</a></li><li><a href="probie.html">Probie</a></li><li><a href="codie.html">Codie</a></li><li><a href="fixie.html">Fixie</a></li></ul></div>

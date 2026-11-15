@@ -66,3 +66,6 @@ body.home { overflow: auto; }
 .tk-web .yes h4 { color: var(--mat); }
 .tk-web .no h4 { color: var(--bad); }
 #tkDevBtn.need { border-color: var(--mat); background: color-mix(in srgb, var(--mat) 16%, transparent); }
+.tk-twice { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); max-width: min(640px, calc(100vw - 32px)); z-index: 20;
+  background: color-mix(in srgb, var(--bad) 18%, var(--bg, #111)); border: 1px solid var(--bad); color: var(--ink); border-radius: 12px; padding: 10px 14px; box-shadow: 0 6px 24px rgba(0,0,0,.3); }
+.tk-twice[hidden] { display: none; }

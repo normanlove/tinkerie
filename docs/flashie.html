@@ -36,7 +36,7 @@
   <nav class="crumbs" aria-label="You are here"><a href="index.html">Tinkerie</a><span aria-hidden="true">›</span><a href="index.html#apps">Apps</a><span aria-hidden="true">›</span><span>Flashie</span></nav>
   <div class="grid">
     <div>
-      <div class="app-title"><img src="img/icons/flashie.svg" alt=""><div><h1>Flashie</h1><span class="ver">Version 0.10.2-alpha · in Tinkerie 0.32.0-alpha</span><span class="alpha-pill">Alpha</span></div></div>
+      <div class="app-title"><img src="img/icons/flashie.svg" alt=""><div><h1>Flashie</h1><span class="ver">Version 0.10.2-alpha · in Tinkerie 0.32.1-alpha</span><span class="alpha-pill">Alpha</span></div></div>
       <p class="lead">Put new firmware on your boards, and operating systems on SD cards.</p>
       <div class="plain"><span class="label">In plain words</span><p>Firmware is the program that runs on a little board like an ESP32 or Arduino. Flashie copies it onto the board over USB, checks every byte, and restarts the board. It can also put a whole operating system, like Raspberry Pi OS, onto an SD card, or turn a Windows ISO into a USB installer.</p></div>
       <div class="chips"><span class="chip">ESP32 / ESP8266</span><span class="chip">Raspberry Pi Pico</span><span class="chip">Arduino</span><span class="chip">STM32</span><span class="chip">Block programming</span><span class="chip">Keyboard firmware</span><span class="chip">SD card and USB writer</span></div>
@@ -64,7 +64,7 @@
 </div></section>
 
 <section class="band" id="web"><div class="wrap">
-  <div class="head"><div><span class="label">Tinkerie web</span><h2>Flashie in your browser</h2><p>Nothing to download or install: Flashie runs in the page, on your own computer, and what you make stays in your browser. Made for Chrome or Edge on a computer (Windows, Mac, Linux or Chromebook). Devices are connected with the page's <b>Connect device</b> button.</p></div>
+  <div class="head"><div><span class="label">Tinkerie web</span><h2>Flashie in your browser</h2><p>Nothing to download or install: Flashie runs in the page, on your own computer. There are no accounts and no server, so what you make stays in your browser and nobody else can see it. Made for Chrome or Edge on a computer (Windows, Mac, Linux or Chromebook). Devices are connected with the page's <b>Connect device</b> button.</p></div>
   <a class="btn btn-go" href="https://tinkerie.net/web/flashie/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01"/></svg>Open Flashie in your browser</a></div>
   <div class="webcols"><div class="webcol yes"><h3>Works the same</h3><ul><li>Flashing ESP32 and ESP8266 boards over USB serial (esptool’s protocol, built in)</li><li>Flashing Arduino Uno, Nano, Mega and Pro Mini (.hex files) over serial</li><li>STM32 boards through their serial bootloader</li><li>MicroPython: installing it, the REPL, and uploading your program</li><li>The Create tab: blocks to MicroPython, with teaching mode and templates</li><li>The Cheap Yellow Display database and board tips</li></ul></div><div class="webcol mid"><h3>Works, but differently</h3><ul><li>Pick the board’s port once with the Connect button. A board that restarts as a different USB device (Leonardo and Micro in their bootloader, an ESP32-S2/S3 in download mode) has to be picked again the first time</li><li>Firmware from your computer is added with Files → Add files</li><li>Some sites in the firmware library don’t let web pages download their files: if one fails, download it yourself and add it with Files → Add files</li></ul></div><div class="webcol no"><h3>Desktop app only</h3><ul><li>Writing SD card and USB images (Raspberry Pi OS, Windows and Linux installers): browsers can’t write to drives</li><li>Copying .uf2 files to a Raspberry Pi Pico in BOOTSEL mode: browsers can’t write to drives; download the .uf2 and drag it onto the RPI-RP2 drive yourself</li><li>Compiling Arduino code (blocks for Uno and Nano, and keyboard firmware): it needs arduino-cli on your computer</li><li>Android phones and tablets over USB</li></ul></div></div>
 </div></section>
@@ -82,7 +82,7 @@
 <footer><div class="wrap">
   <div class="stack">
     <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
-    <p>Free maker tools, designed and created by <b>nrmluvdev</b>. Version 0.32.0-alpha: Tinkerie is in alpha.</p>
+    <p>Free maker tools, designed and created by <b>nrmluvdev</b>. Version 0.32.1-alpha: Tinkerie is in alpha.</p>
     <p>Free software under the GNU GPL, version 3 or later. It comes with no warranty.</p>
   </div>
   <div><h4>The apps</h4><ul><li><a href="wirie.html">Wirie</a></li><li><a href="makie.html">Makie</a></li><li><a href="tunie.html">Tunie</a></li><li><a href="flashie.html">Flashie</a></li><li><a href="scopie.html">Scopie</a></li><li><a href="meterie.html">Meterie</a></li><li><a href="probie.html">Probie</a></li><li><a href="codie.html">Codie</a></li><li><a href="fixie.html">Fixie</a></li></ul></div>

@@ -11,13 +11,38 @@
     status('This needs a secure page (https://) and a modern browser.', true);
     return;
   }
-  // One id per open tab, so two tabs of the same app don't mix.
-  let sid = sessionStorage.getItem('tksid-' + app);
-  if (!sid) { sid = Math.random().toString(36).slice(2, 10); sessionStorage.setItem('tksid-' + app, sid); }
+  // One id per open tab, so tabs never mix: the service worker sends each
+  // app frame's requests only to the tab with its id. The id is random and
+  // unguessable, kept for reloads, and claimed with a browser lock while the
+  // tab is open, so a duplicated tab (which copies the address and
+  // sessionStorage) notices and takes a new one.
+  const newId = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, '0')).join('');
+  const u = new URL(location.href);
+  let sid = u.searchParams.get('tksid') || sessionStorage.getItem('tksid-' + app);
+  if (!sid || !/^[0-9a-f]{32}$/.test(sid)) sid = newId();
+  const claim = (id) => new Promise((resolve) => {
+    if (!navigator.locks) return resolve(true);
+    navigator.locks.request('tinkerie-tab-' + id, { ifAvailable: true }, (lock) => {
+      resolve(!!lock);
+      return lock ? new Promise(() => {}) : undefined; // held until the tab closes or reloads
+    });
+  });
+  while (!(await claim(sid))) sid = newId();
+  sessionStorage.setItem('tksid-' + app, sid);
   // The service worker finds this tab by the id in its address, so it must be
   // there from the start (a rewritten address isn't seen by service workers).
-  const u = new URL(location.href);
   if (u.searchParams.get('tksid') !== sid) { u.searchParams.set('tksid', sid); location.replace(u); return; }
+
+  // The same app in another tab shares this browser's saved files: say so.
+  if (navigator.locks) {
+    navigator.locks.request('tinkerie-app-' + app, { ifAvailable: true }, (lock) => {
+      if (lock) return new Promise(() => {});
+      const w = $('#tkTwice');
+      if (w) w.hidden = false;
+      // when the other tab closes, this one takes over and the warning goes
+      navigator.locks.request('tinkerie-app-' + app, () => { if (w) w.hidden = true; return new Promise(() => {}); });
+    });
+  }
 
   status('Starting ' + document.title + '…');
   const reg = await navigator.serviceWorker.register('../sw.js', { scope: '../' });
@@ -171,6 +196,20 @@
       if (api) api.addEventListener('connect', () => listDevs()), api.addEventListener('disconnect', () => listDevs());
     }
   }
+
+  // ---- Clear my data: for shared computers
+  const clear = $('#tkClear');
+  if (clear) clear.onclick = async () => {
+    if (!confirm('Delete everything ' + document.title + ' has saved in this browser (files, autosaves and settings), and forget the devices it may use? Download anything you want to keep first.')) return;
+    await tkFS.wipe();
+    try {
+      for (const k of Object.keys(localStorage)) if (k.startsWith('tk.' + app + '.')) localStorage.removeItem(k);
+      for (const c of document.cookie.split('; ')) { const n = c.split('=')[0]; if (n.startsWith('tk_' + app + '_')) document.cookie = n + '=; path=/; max-age=0'; }
+    } catch {}
+    for (const d of await tkDev.granted()) if (kinds.includes(d.kind)) { try { await d.obj.forget(); } catch {} }
+    sessionStorage.removeItem('tksid-' + app);
+    location.href = location.pathname;
+  };
 
   $('#tkFilesBtn').onclick = showFiles;
   $('#tkFilesClose').onclick = () => { $('#tkFiles').hidden = true; };

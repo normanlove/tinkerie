@@ -331,7 +331,7 @@ def web_section(a):
         return f'<div class="webcol {cls}"><h3>{title}</h3><ul>{"".join(f"<li>{e(x)}</li>" for x in items)}</ul></div>'
     dev = f" Devices are connected with the page's <b>Connect device</b> button." if w["devices"] else ""
     return f"""<section class="band" id="web"><div class="wrap">
-  <div class="head"><div><span class="label">Tinkerie web</span><h2>{a['name']} in your browser</h2><p>Nothing to download or install: {a['name']} runs in the page, on your own computer, and what you make stays in your browser. Made for {e(webinfo.BROWSERS)}.{dev}</p></div>
+  <div class="head"><div><span class="label">Tinkerie web</span><h2>{a['name']} in your browser</h2><p>Nothing to download or install: {a['name']} runs in the page, on your own computer. There are no accounts and no server, so what you make stays in your browser and nobody else can see it. Made for {e(webinfo.BROWSERS)}.{dev}</p></div>
   <a class="btn btn-go" href="{WEB}/{a['id']}/">{svg("browser")}Open {a['name']} in your browser</a></div>
   <div class="webcols">{col("works", "Works the same", "yes")}{col("differs", "Works, but differently", "mid")}{col("missing", "Desktop app only", "no", "Nothing: everything is in the browser version too")}</div>
 </div></section>"""

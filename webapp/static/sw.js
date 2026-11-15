@@ -14,6 +14,7 @@ async function route(event) {
   if (url.origin !== self.location.origin) return null;
   let sid = null, path = null;
   const base = new URL('./', self.registration.scope).pathname; // "/tinkerie/"
+  if (url.pathname === base + 'iso.js') return null; // Tinkerie's own, from the web server
   const m = url.pathname.startsWith(base) ? url.pathname.slice(base.length - 1).match(UI) : null;
   if (req.mode === 'navigate') {
     if (!m) return null;
@@ -36,7 +37,21 @@ async function route(event) {
   const shells = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
   const shell = shells.find((s) => sidOf(s.url) === sid && !UI.test(new URL(s.url).pathname));
   if (!shell) return new Response('This Tinkerie app was closed — reopen it from the Tinkerie page.', { status: 503 });
-  return forward(shell, sid, req, path);
+  const app = (new URL(shell.url).pathname.slice(base.length).match(/^([a-z]+)\//) || [])[1];
+  const res = await forward(shell, sid, req, path);
+  return app ? isolate(res, app) : res;
+}
+
+// Every page an app serves starts with iso.js, which gives the app its own
+// part of the browser's storage (see iso.js).
+async function isolate(res, app) {
+  if (!/text\/html/i.test(res.headers.get('content-type') || '') || !res.body) return res;
+  let html = await res.text();
+  const iso = new URL('iso.js?app=' + app, self.registration.scope);
+  const tag = '<script src="' + iso.pathname + iso.search + '"></script>';
+  const m = html.match(/<head[^>]*>/i) || html.match(/<!doctype[^>]*>/i);
+  html = m ? html.slice(0, m.index + m[0].length) + tag + html.slice(m.index + m[0].length) : tag + html;
+  return new Response(html, { status: res.status, headers: res.headers });
 }
 
 async function forward(shell, sid, req, path) {
