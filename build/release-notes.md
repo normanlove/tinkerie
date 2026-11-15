@@ -10,14 +10,14 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 
 Each package has a *READ ME FIRST.txt*.
 
-<!-- release notes for 0.30.3-alpha: package.sh checks this line, so update the notes with every version -->
+<!-- release notes for 0.31.0-alpha: package.sh checks this line, so update the notes with every version -->
 ### New in {VERSION}
-A check of every app that talks to USB devices, after the Hantek 6022BE driver fix in 0.30.2:
-- **Probie's logic analysers work with the libusb-win32 driver.** On Windows, Probie only accepted analysers with WinUSB, so one set up for PulseView with Zadig's libusb-win32 option was reported as needing a driver. It now falls back to libusb-win32 (the same code Scopie uses, now shared), so these analysers work as they are.
-- **Meterie explains missing meter cables.** On Windows, a UNI-T, Victor, Brymen or USB-serial meter cable whose driver was replaced by Zadig (sigrok's guides do this) used to vanish from Meterie's list. It's now listed, in red, with the driver it has and how to give it back to Windows.
-- **Probie says when a COM port is busy**, like the other apps do, instead of "Access is denied".
-- **Scopie's Hantek DSO-2xxx/5xxx message** says libusb-win32 works as well as WinUSB.
-- **A new test** checks that the Linux and Raspberry Pi USB permission rule (install-usb.sh) covers every scope, logic analyser and HID meter cable the apps support. It does today.
+- **Tinkerie web: every app in your browser.** [tinkerie.net/web](https://tinkerie.net/web/) runs Wirie, Makie, Tunie, Flashie, Scopie, Meterie, Probie, Codie and Fixie in Chrome or Edge with nothing to download. It's the same code as the desktop apps, running in the page on your own computer, and what you make is kept in your browser.
+  - **Devices work too**: flash ESP32, Arduino and STM32 boards, print to a USB printer, use Hantek 6022 and other USB scopes, fx2lafw logic analysers, serial monitors and meter cables, through the page's *Connect device* button.
+  - **Each app says what's different**: its *Web vs desktop* button (and its page on the website) lists what works the same, what works differently and what needs the desktop app (writing SD cards, compiling Arduino code, network scopes and printers, Bluetooth meters).
+  - Every update to the apps goes to the web versions automatically.
+  - `Tinkerie-web-{VERSION}.tar.gz` puts it on your own web server; `install-pi.sh` sets it up on a Raspberry Pi.
+- **Report a bug or ask for a feature** from [the website](https://tinkerie.net/feedback.html), or with the *Report a bug* button in each web app: a short form that opens a ready-filled GitHub issue, labelled with its app.
 
 Licensed under GPL-3.0-or-later.
 

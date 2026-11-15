@@ -1,0 +1,79 @@
+name: Report a bug
+description: Something in Tinkerie doesn't work, or works wrongly.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting this. nrmluvdev reads every report. The more exact the steps, the quicker it's fixed.
+        Please don't include passwords, Wi-Fi details or anything private.
+  - type: dropdown
+    id: app
+    attributes:
+      label: App
+      options:
+        - Wirie (and Keebie)
+        - Makie
+        - Tunie
+        - Flashie
+        - Scopie
+        - Meterie
+        - Probie
+        - Codie
+        - Fixie
+        - The Tinkerie launcher
+        - The website or downloads
+        - Something else
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where were you using it?
+      options:
+        - Desktop app (Windows)
+        - Desktop app (Mac)
+        - Desktop app (Linux)
+        - Desktop app (Raspberry Pi)
+        - Android app
+        - Tinkerie web (in Chrome)
+        - Tinkerie web (in Edge)
+        - Tinkerie web (another browser)
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Shown at the top of the app, or in the download's name (for example 0.30.3-alpha).
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What went wrong, and any message you saw.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How can it be made to happen again?
+      description: Step by step, from opening the app.
+      placeholder: |
+        1. Open Flashie
+        2. Pick ESP32 and COM5
+        3. Press Flash
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect instead?
+  - type: input
+    id: hardware
+    attributes:
+      label: Hardware involved (if any)
+      description: Board, scope, meter, analyser, printer or cable, with its model.
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Screenshots, log files or saved projects help a lot. Drag them in here.

@@ -1,4 +1,4 @@
-//go:build !windows && !linux && !(darwin && cgo)
+//go:build !windows && !linux && !(darwin && cgo) && !js
 
 // Systems without a USB back end: demo mode, network bench scopes and CSV
 // files still work.

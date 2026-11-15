@@ -105,6 +105,11 @@ jobs:
           cp Tinkerie.exe swap/Tinkerie-$v-windows/
           (cd swap && zip -q ../Tinkerie-$v-windows.zip Tinkerie-$v-windows/Tinkerie.exe)
           rm -rf swap
+      - name: Build Tinkerie web (for install-pi.sh and your own web server)
+        if: steps.v.outputs.new == 'yes'
+        run: |
+          python3 webapp/build.py
+          cp dist/Tinkerie-web-*.tar.gz dist/packages/
       - name: Publish release
         if: steps.v.outputs.new == 'yes'
         run: |

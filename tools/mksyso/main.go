@@ -3,7 +3,7 @@
 //
 // Usage (from the repository root):
 //
-//	go run ./tools/mksyso -ico build/tinkerie.ico -out rsrc_windows_amd64.syso -version 0.30.3-alpha
+//	go run ./tools/mksyso -ico build/tinkerie.ico -out rsrc_windows_amd64.syso -version 0.31.0-alpha
 package main
 
 import (

@@ -94,7 +94,7 @@ func listDrives() []Drive {
 }
 
 func listSerialPorts() []string {
-	if droid.Active() {
+	if droid.Active() || runtime.GOOS == "js" { // Android and the web version: shared/serialport
 		var out []string
 		for _, p := range serialport.List() {
 			out = append(out, p.Path)
@@ -113,7 +113,7 @@ func listSerialPorts() []string {
 }
 
 func openSerial(name string, baud int) (serialPort, error) {
-	if droid.Active() {
+	if droid.Active() || runtime.GOOS == "js" {
 		return serialport.Open(name, serialport.Config{Baud: baud})
 	}
 	if !strings.HasPrefix(name, "/dev/") {

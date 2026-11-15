@@ -1,0 +1,34 @@
+# Labels each new bug report or feature request with its app (app: flashie…)
+# and with "web" when it's about Tinkerie web, so they're easy to sort.
+# Made by nrmluvdev.
+name: Label issues
+on:
+  issues:
+    types: [opened, edited]
+permissions:
+  issues: write
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.issue.body || '';
+            const field = (name) => { const m = body.match(new RegExp('### ' + name + '[^\\n]*\\n+([^\\n]+)')); return m ? m[1].trim() : ''; };
+            const app = field('App');
+            const where = field('Where were you using it\\?');
+            const want = [];
+            const m = app.match(/^(Wirie|Makie|Tunie|Flashie|Scopie|Meterie|Probie|Codie|Fixie)\b/);
+            if (m) want.push('app: ' + m[1].toLowerCase());
+            else if (/launcher/i.test(app)) want.push('app: launcher');
+            else if (/website/i.test(app)) want.push('website');
+            else if (/new app/i.test(app)) want.push('new app');
+            if (/Tinkerie web/.test(where)) want.push('web');
+            if (/Android/.test(where)) want.push('android');
+            const colours = { web: '1d76db', android: '3ddc84', website: 'c5def5', 'new app': 'fbca04' };
+            for (const name of want) {
+              try { await github.rest.issues.getLabel({ ...context.repo, name }); }
+              catch { await github.rest.issues.createLabel({ ...context.repo, name, color: colours[name] || 'ededed' }).catch(() => {}); }
+            }
+            if (want.length) await github.rest.issues.addLabels({ ...context.repo, issue_number: context.payload.issue.number, labels: want });

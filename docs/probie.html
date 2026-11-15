@@ -22,6 +22,8 @@
   <nav class="nav" aria-label="Main">
     <div class="apps-menu"><button type="button" aria-expanded="false" aria-haspopup="true">Apps <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><div class="menu"><a href="wirie.html"><img src="img/icons/wirie.png" alt=""><span><b>Wirie</b><small>Design circuit boards and custom keyboards</small></span></a><a href="makie.html"><img src="img/icons/makie.png" alt=""><span><b>Makie</b><small>A Tinkercad-style 3D designer with threads</small></span></a><a href="tunie.html"><img src="img/icons/tunie.png" alt=""><span><b>Tunie</b><small>Print a test</small></span></a><a href="flashie.html"><img src="img/icons/flashie.svg" alt=""><span><b>Flashie</b><small>Flash ESP32</small></span></a><a href="scopie.html"><img src="img/icons/scopie.png" alt=""><span><b>Scopie</b><small>A friendly oscilloscope app for Hantek</small></span></a><a href="meterie.html"><img src="img/icons/meterie.png" alt=""><span><b>Meterie</b><small>Connect your multimeter to show huge readings</small></span></a><a href="probie.html"><img src="img/icons/probie.svg" alt=""><span><b>Probie</b><small>A serial monitor with a live plotter</small></span></a><a href="codie.html"><img src="img/icons/codie.svg" alt=""><span><b>Codie</b><small>A code explainer for 20+ languages</small></span></a><a href="fixie.html"><img src="img/icons/fixie.svg" alt=""><span><b>Fixie</b><small>A repair guide down to component level: quick checks</small></span></a><a class="menu-start" href="start.html">Getting started guide →</a></div></div>
     <a class="hide-s" href="start.html">Getting started</a>
+    <a class="hide-s" href="https://tinkerie.net/web/">Use in browser</a>
+    <a class="hide-s" href="feedback.html">Report a bug</a>
     <a class="hide-s" href="about.html">About Tinkerie</a>
     <a class="hide-s" href="https://github.com/normanlove/tinkerie">GitHub</a>
     <a class="btn btn-go" href="index.html#download" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg><span class="lbl">Download</span></a>
@@ -34,11 +36,11 @@
   <nav class="crumbs" aria-label="You are here"><a href="index.html">Tinkerie</a><span aria-hidden="true">›</span><a href="index.html#apps">Apps</a><span aria-hidden="true">›</span><span>Probie</span></nav>
   <div class="grid">
     <div>
-      <div class="app-title"><img src="img/icons/probie.svg" alt=""><div><h1>Probie</h1><span class="ver">Version 0.8.3-alpha · in Tinkerie 0.30.3-alpha</span><span class="alpha-pill">Alpha</span></div></div>
+      <div class="app-title"><img src="img/icons/probie.svg" alt=""><div><h1>Probie</h1><span class="ver">Version 0.8.3-alpha · in Tinkerie 0.31.0-alpha</span><span class="alpha-pill">Alpha</span></div></div>
       <p class="lead">See what your board is saying and the signals on its wires, then have them explained in plain words.</p>
       <div class="plain"><span class="label">In plain words</span><p>When your Arduino or ESP32 prints messages, Probie shows them, and turns any numbers into live graphs automatically. With a cheap 8-channel logic analyser it also records the digital signals on your wires and decodes them into readable bytes. Then the Explain tab tells you what it all means, the way Codie explains code: which chip is talking, what it said, and what looks wrong. It explains Scopie waveforms and Meterie readings too.</p></div>
       <div class="chips"><span class="chip">Serial monitor</span><span class="chip">Live plotter</span><span class="chip">UART, I²C, SPI decoders</span><span class="chip">8-channel logic analyser</span><span class="chip">Shared timeline</span><span class="chip">Explains captures in plain words</span><span class="chip">Explains Scopie and Meterie captures</span></div>
-      <div class="hero" style="padding:0"><div class="cta"><a class="btn btn-go" href="index.html#download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg>Download Tinkerie</a><a class="btn btn-line" href="#first">First five minutes</a></div><p class="osnote">You'll need: A board on USB, or a cheap logic analyser (demo included).</p></div>
+      <div class="hero" style="padding:0"><div class="cta"><a class="btn btn-go" href="index.html#download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg>Download Tinkerie</a><a class="btn btn-line" href="https://tinkerie.net/web/probie/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01"/></svg>Open in your browser</a><a class="btn btn-line" href="#first">First five minutes</a></div><p class="osnote">You'll need: A board on USB, or a cheap logic analyser (demo included). <a href="#web">What the browser version can and can't do</a>.</p></div>
     </div>
     <figure><div class="shot"><span class="tag">Probie</span><button class="zoom" type="button" data-full="img/shots/probie-serial.webp" data-caption="Serial: the demo board&#x27;s messages, plotted live." aria-label="Enlarge: Serial: the demo board&#x27;s messages, plotted live."><img src="img/shots/probie-serial.webp" alt="Serial: the demo board&#x27;s messages, plotted live." width="1440" height="900"></button></div><figcaption>Serial: the demo board&#x27;s messages, plotted live.</figcaption></figure>
   </div>
@@ -58,6 +60,12 @@
 
 
 
+<section class="band" id="web"><div class="wrap">
+  <div class="head"><div><span class="label">Tinkerie web</span><h2>Probie in your browser</h2><p>Nothing to download or install: Probie runs in the page, on your own computer, and what you make stays in your browser. Made for Chrome or Edge on a computer (Windows, Mac, Linux or Chromebook). Devices are connected with the page's <b>Connect device</b> button.</p></div>
+  <a class="btn btn-go" href="https://tinkerie.net/web/probie/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01"/></svg>Open Probie in your browser</a></div>
+  <div class="webcols"><div class="webcol yes"><h3>Works the same</h3><ul><li>The serial monitor, with every baud rate, line ending, hex view, logging and plotting</li><li>fx2lafw logic analysers (the cheap 8-channel “Saleae clones”), over WebUSB</li><li>UART, I²C and SPI decoders</li><li>The Explain tab and the Timeline tab</li><li>Demo devices</li></ul></div><div class="webcol mid"><h3>Works, but differently</h3><ul><li>Pick the port or analyser once with the Connect button. An analyser restarts as a new device after Probie loads its firmware, so pick it again the first time</li><li>On Windows the browser can only use an analyser with the WinUSB driver (Zadig installs it)</li><li>The fx2lafw firmware isn’t found in a PulseView install: drop the firmware file on the Firmware needed box once</li><li>Captures and logs are downloaded instead of saved to a folder; files from Scopie and Meterie are added with Files → Add files</li></ul></div><div class="webcol no"><h3>Desktop app only</h3><ul><li>Opening captures from the other apps directly (Explain in Probie)</li></ul></div></div>
+</div></section>
+
 <section class="band alt"><div class="wrap stack">
   <div class="head" style="margin:0"><div><span class="label">Before you start</span><h2>Good to know</h2></div></div><div class="stack"><div class="callout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-9.5v.5"/></svg><p>Logic analysers need a one-time setup: a USB driver on Windows (Zadig) and the free fx2lafw firmware, which Probie finds automatically if PulseView is installed. On a Mac nothing extra is needed; on Linux and Raspberry Pi, run install-usb.sh once instead.</p></div></div>
   <div class="head" style="margin:30px 0 0"><div><span class="label">Works well with</span><h2>Pairs nicely with</h2></div></div>
@@ -71,7 +79,7 @@
 <footer><div class="wrap">
   <div class="stack">
     <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
-    <p>Free maker tools, designed and created by <b>nrmluvdev</b>. Version 0.30.3-alpha: Tinkerie is in alpha.</p>
+    <p>Free maker tools, designed and created by <b>nrmluvdev</b>. Version 0.31.0-alpha: Tinkerie is in alpha.</p>
     <p>Free software under the GNU GPL, version 3 or later. It comes with no warranty.</p>
   </div>
   <div><h4>The apps</h4><ul><li><a href="wirie.html">Wirie</a></li><li><a href="makie.html">Makie</a></li><li><a href="tunie.html">Tunie</a></li><li><a href="flashie.html">Flashie</a></li><li><a href="scopie.html">Scopie</a></li><li><a href="meterie.html">Meterie</a></li><li><a href="probie.html">Probie</a></li><li><a href="codie.html">Codie</a></li><li><a href="fixie.html">Fixie</a></li></ul></div>
@@ -81,7 +89,9 @@
     <li><a href="index.html#faq">Questions</a></li>
     <li><a href="https://github.com/normanlove/tinkerie/releases">All downloads</a></li>
     <li><a href="https://github.com/normanlove/tinkerie">Source code on GitHub</a></li>
-    <li><a href="https://github.com/normanlove/tinkerie/issues">Report a problem</a></li>
+    <li><a href="https://tinkerie.net/web/">Tinkerie web (in your browser)</a></li>
+    <li><a href="feedback.html">Report a bug or ask for a feature</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie/issues">Open reports and ideas</a></li>
     <li><a href="code-signing.html">Code signing policy</a></li>
   </ul></div>
 </div></footer>

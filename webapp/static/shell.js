@@ -108,6 +108,70 @@
     }
     $('#tkFiles').hidden = false;
   }
+  // ---- Report a bug: the website's form, filled in with this app and browser
+  const bug = $('#tkBug');
+  if (bug) {
+    const where = /Edg\//.test(navigator.userAgent) ? 'Tinkerie web (in Edge)' : /Chrome\//.test(navigator.userAgent) ? 'Tinkerie web (in Chrome)' : 'Tinkerie web (another browser)';
+    bug.href = 'https://tinkerie.net/feedback.html?' + new URLSearchParams({ app: bug.dataset.app, version: bug.dataset.ver, where });
+  }
+
+  // ---- Web vs desktop notes
+  $('#tkWebBtn').onclick = () => { $('#tkWeb').hidden = false; };
+  $('#tkWebClose').onclick = () => { $('#tkWeb').hidden = true; };
+
+  // ---- Devices: the browser only lets the page use what the person picks.
+  const kinds = (document.body.dataset.devices || '').split(',').filter(Boolean);
+  const ASK = {
+    serial: ['A serial port', 'USB-serial adapters, Arduino, ESP32, Raspberry Pi Pico, 3D printers, meter cables that show up as a COM port', 'serial'],
+    usb: ['A USB device', 'USB oscilloscopes and logic analysers', 'usb'],
+    hid: ['A USB-HID meter cable', 'UNI-T UT-D04, Victor, Brymen BU-86X and CP2110 cables', 'hid'],
+  };
+  const devBtn = $('#tkDevBtn');
+  if (devBtn) {
+    const supported = (k) => tkDev[k].supported();
+    async function showDevs() {
+      const ask = $('#tkAsk');
+      ask.innerHTML = '';
+      $('#tkNoDev').hidden = kinds.some(supported);
+      for (const k of kinds) {
+        if (!supported(k)) continue;
+        const b = document.createElement('button');
+        b.innerHTML = '<b></b><span></span>';
+        b.querySelector('b').textContent = ASK[k][0] + '…';
+        b.querySelector('span').textContent = ASK[k][1];
+        b.onclick = async () => {
+          try { await tkDev.ask[k](); status('Connected. Pick it in ' + document.title + '’s device list (refresh the list if it’s open).'); setTimeout(() => status(''), 7000); }
+          catch (e) { if (e.name !== 'NotFoundError') status('The browser said: ' + e.message, true); }
+          listDevs();
+        };
+        ask.appendChild(b);
+      }
+      await listDevs();
+      $('#tkDevs').hidden = false;
+    }
+    async function listDevs() {
+      const box = $('#tkGranted');
+      const all = (await tkDev.granted()).filter((d) => kinds.includes(d.kind));
+      box.innerHTML = all.length ? '' : '<p class="tk-dim">None yet.</p>';
+      for (const d of all) {
+        const row = document.createElement('div');
+        row.className = 'tk-dev';
+        row.innerHTML = '<span class="n"></span><button class="tk-btn" title="Stop letting this page use it">Forget</button>';
+        row.querySelector('.n').textContent = d.name;
+        row.querySelector('button').onclick = async () => { try { await d.obj.forget(); } catch {} listDevs(); };
+        box.appendChild(row);
+      }
+      devBtn.classList.toggle('need', !all.length);
+    }
+    devBtn.onclick = showDevs;
+    $('#tkDevsClose').onclick = () => { $('#tkDevs').hidden = true; };
+    listDevs();
+    for (const k of kinds) {
+      const api = { serial: navigator.serial, usb: navigator.usb, hid: navigator.hid }[k];
+      if (api) api.addEventListener('connect', () => listDevs()), api.addEventListener('disconnect', () => listDevs());
+    }
+  }
+
   $('#tkFilesBtn').onclick = showFiles;
   $('#tkFilesClose').onclick = () => { $('#tkFiles').hidden = true; };
   $('#tkImport').onchange = async (e) => {

@@ -12,12 +12,16 @@ import html, os, re, shutil, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from content import APPS, APP, FAQ  # noqa: E402
+sys.path.insert(0, os.path.join(os.path.dirname(HERE), "webapp"))
+import webinfo  # noqa: E402  what each app does in Tinkerie web
 
 ROOT = os.path.dirname(HERE)
 OUT = os.path.join(ROOT, "docs")
 REPO = "https://github.com/normanlove/tinkerie"
 VERSION = re.search(r"^VERSION=(\S+)", open(os.path.join(ROOT, "build.sh")).read(), re.M).group(1)
 REL = f"{REPO}/releases/download/v{VERSION}"
+SITE = "https://tinkerie.net"
+WEB = f"{SITE}/web"  # Tinkerie web: the apps in the browser (built by webapp/build.py)
 FONTS = ("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400"
          "&family=JetBrains+Mono:wght@500;700&family=Unbounded:wght@500;600;700&display=swap")
 
@@ -25,6 +29,9 @@ e = html.escape
 
 ICON = {
   "download": '<path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/>',
+  "browser": '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01"/>',
+  "bug": '<path d="M8 8V6a4 4 0 0 1 8 0v2M6 10h12v4a6 6 0 0 1-12 0zM12 14v6M3 13h3m12 0h3M4 7l3 3m13-3-3 3M4 20l3-3m13 3-3-3"/>',
+  "idea": '<path d="M9 18h6m-5 3h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
   "arrow": '<path d="M5 12h14m-6-6 6 6-6 6"/>',
   "back": '<path d="M19 12H5m6-6-6 6 6 6"/>',
   "free": '<path d="M20 12v8H4v-8M2 7h20v5H2zM12 20V7m0 0H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7zm0 0h4.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7z"/>',
@@ -83,6 +90,8 @@ def header(current):
   <nav class="nav" aria-label="Main">
     <div class="apps-menu"><button type="button" aria-expanded="false" aria-haspopup="true">Apps {svg("chev")}</button><div class="menu">{menu}<a class="menu-start" href="start.html">Getting started guide →</a></div></div>
     <a class="hide-s" href="start.html"{cur("start")}>Getting started</a>
+    <a class="hide-s" href="{WEB}/">Use in browser</a>
+    <a class="hide-s" href="feedback.html"{cur("feedback")}>Report a bug</a>
     <a class="hide-s" href="about.html"{cur("about")}>About Tinkerie</a>
     <a class="hide-s" href="{REPO}">GitHub</a>
     <a class="btn btn-go" href="index.html#download" aria-label="Download">{svg("download")}<span class="lbl">Download</span></a>
@@ -106,7 +115,9 @@ def footer():
     <li><a href="index.html#faq">Questions</a></li>
     <li><a href="{REPO}/releases">All downloads</a></li>
     <li><a href="{REPO}">Source code on GitHub</a></li>
-    <li><a href="{REPO}/issues">Report a problem</a></li>
+    <li><a href="{WEB}/">Tinkerie web (in your browser)</a></li>
+    <li><a href="feedback.html">Report a bug or ask for a feature</a></li>
+    <li><a href="{REPO}/issues">Open reports and ideas</a></li>
     <li><a href="code-signing.html">Code signing policy</a></li>
   </ul></div>
 </div></footer>
@@ -174,6 +185,7 @@ def build_index():
     <p class="lead">Design circuit boards and 3D prints, flash microcontrollers, write SD cards, and turn your PC into an oscilloscope, multimeter and serial monitor.</p>
     <div class="cta">
       <a class="btn btn-go" id="heroDownload" href="#download">{svg("download")}<span>Download Tinkerie</span></a>
+      <a class="btn btn-line" href="{WEB}/">{svg("browser")}<span>Use it in your browser</span></a>
       <a class="btn btn-line" href="start.html">New here? Start here</a>
     </div>
     <div class="facts">
@@ -187,7 +199,7 @@ def build_index():
 </div></section>
 
 <section class="band" style="padding-block:0 40px"><div class="wrap">
-  <div class="callout alpha">{svg("info")}<div class="stack" style="gap:6px"><p><b>Tinkerie is in alpha.</b> Every app works and you can use them today, but they're still being tested on real hardware, so expect a few rough edges and changes between versions.</p><p class="muted">Found something that doesn't work? <a href="{REPO}/issues">Tell us on GitHub</a>. It really helps.</p></div></div>
+  <div class="callout alpha">{svg("info")}<div class="stack" style="gap:6px"><p><b>Tinkerie is in alpha.</b> Every app works and you can use them today, but they're still being tested on real hardware, so expect a few rough edges and changes between versions.</p><p class="muted">Found something that doesn't work, or want something new? <a href="feedback.html">Report a bug or ask for a feature</a>. It really helps.</p></div></div>
 </div></section>
 
 <section class="band alt" id="apps"><div class="wrap">
@@ -218,6 +230,7 @@ def build_index():
   <div class="head"><div><span class="label">Download · alpha version {VERSION}</span><h2>Get Tinkerie</h2><p>The one marked "Your computer" should suit you. Each download has a READ ME FIRST file that explains how to start it.</p></div>
   <a class="btn btn-line" href="{REPO}/releases">All files and release notes {svg("arrow")}</a></div>
   <div class="dl">{dl_rows()}</div>
+  <div class="callout" style="margin-top:18px">{svg("browser")}<p><b>Or don't download anything:</b> <a href="{WEB}/">Tinkerie web</a> runs every app in Chrome or Edge, and connects to boards, scopes, meters and analysers over USB. A few things need the desktop app (writing SD cards, compiling Arduino code, network scopes and printers); each app's page lists exactly what.</p></div>
   <p class="osnote">Windows: see the <a href="code-signing.html">Code signing policy</a>. Free code signing provided by <a href="https://signpath.io">SignPath.io</a>, certificate by <a href="https://signpath.org">SignPath Foundation</a>.</p>
 </div></section>
 
@@ -308,6 +321,22 @@ def build_start():
 
 # ---------------------------------------------------------------- apps
 
+def web_section(a):
+    """What this app does in Tinkerie web, from webapp/webinfo.py."""
+    w = webinfo.APPS[a["id"]]
+    def col(key, title, cls, none=None):
+        items = w[key] or ([none] if none else [])
+        if not items:
+            return ""
+        return f'<div class="webcol {cls}"><h3>{title}</h3><ul>{"".join(f"<li>{e(x)}</li>" for x in items)}</ul></div>'
+    dev = f" Devices are connected with the page's <b>Connect device</b> button." if w["devices"] else ""
+    return f"""<section class="band" id="web"><div class="wrap">
+  <div class="head"><div><span class="label">Tinkerie web</span><h2>{a['name']} in your browser</h2><p>Nothing to download or install: {a['name']} runs in the page, on your own computer, and what you make stays in your browser. Made for {e(webinfo.BROWSERS)}.{dev}</p></div>
+  <a class="btn btn-go" href="{WEB}/{a['id']}/">{svg("browser")}Open {a['name']} in your browser</a></div>
+  <div class="webcols">{col("works", "Works the same", "yes")}{col("differs", "Works, but differently", "mid")}{col("missing", "Desktop app only", "no", "Nothing: everything is in the browser version too")}</div>
+</div></section>"""
+
+
 def build_app(i, a):
     prev_a, next_a = APPS[i - 1], APPS[(i + 1) % len(APPS)]
     chips = "".join(f'<span class="chip">{e(c)}</span>' for c in a["chips"])
@@ -336,7 +365,7 @@ def build_app(i, a):
       <p class="lead">{e(a['tagline'])}</p>
       <div class="plain"><span class="label">{e(a['plain'][0])}</span><p>{e(a['plain'][1])}</p></div>
       <div class="chips">{chips}</div>
-      <div class="hero" style="padding:0"><div class="cta"><a class="btn btn-go" href="index.html#download">{svg("download")}Download Tinkerie</a><a class="btn btn-line" href="#first">First five minutes</a></div><p class="osnote">You'll need: {e(a['need'])}.</p></div>
+      <div class="hero" style="padding:0"><div class="cta"><a class="btn btn-go" href="index.html#download">{svg("download")}Download Tinkerie</a><a class="btn btn-line" href="{WEB}/{a['id']}/">{svg("browser")}Open in your browser</a><a class="btn btn-line" href="#first">First five minutes</a></div><p class="osnote">You'll need: {e(a['need'])}. <a href="#web">What the browser version can and can't do</a>.</p></div>
     </div>
     {main_shot}
   </div>
@@ -355,6 +384,8 @@ def build_app(i, a):
 </div></section>
 
 {table}
+
+{web_section(a)}
 
 <section class="band{alt_after}"><div class="wrap stack">
   {f'<div class="head" style="margin:0"><div><span class="label">Before you start</span><h2>Good to know</h2></div></div><div class="stack">{calls}</div>' if calls else ''}
@@ -400,6 +431,79 @@ ABOUT = '''<div class="ruler" aria-hidden="true"></div>
 </div></div></section>'''
 
 
+def build_feedback():
+    opts = "".join(f'<option value="{e(webinfo.APPS[n]["title"] + (" (and Keebie)" if n == "wirie" else ""))}">{e(webinfo.APPS[n]["title"])}</option>' for n in webinfo.ORDER)
+    opts += '<option value="The Tinkerie launcher">The Tinkerie launcher</option><option value="The website or downloads">The website or downloads</option><option value="Something else">Something else</option>'
+    body = f"""<div class="ruler" aria-hidden="true"></div>
+<section class="hero" style="padding-bottom:30px"><div class="wrap">
+  <span class="tape">Help make Tinkerie better</span>
+  <h1>Report a bug or ask for a feature</h1>
+  <p class="lead" style="max-width:58ch">Fill this in and press the button: it opens a ready-made report on GitHub, where nrmluvdev reads every one and you can follow what happens to it. You'll need a free GitHub account to post it.</p>
+</div></section>
+<section class="band alt" style="padding-top:36px"><div class="wrap">
+  <form class="fb" id="fb" novalidate>
+    <fieldset class="fb-kind"><legend class="label">What is it?</legend>
+      <label><input type="radio" name="kind" value="bug" checked><span>{svg("bug")}<b>Something's wrong</b><small>A bug, a crash, a wrong result, or a device that won't work</small></span></label>
+      <label><input type="radio" name="kind" value="feature"><span>{svg("idea")}<b>An idea</b><small>A feature, a device or board to support, or something to make easier</small></span></label>
+    </fieldset>
+    <div class="fb-row">
+      <label>App<select name="app" required><option value="">Choose…</option>{opts}<option value="A new app" data-only="feature">A new app</option></select></label>
+      <label data-only="bug">Where were you using it?<select name="where">
+        <option>Desktop app (Windows)</option><option>Desktop app (Mac)</option><option>Desktop app (Linux)</option><option>Desktop app (Raspberry Pi)</option><option>Android app</option>
+        <option>Tinkerie web (in Chrome)</option><option>Tinkerie web (in Edge)</option><option>Tinkerie web (another browser)</option></select></label>
+      <label data-only="bug">Version<input name="version" placeholder="{VERSION}"></label>
+    </div>
+    <label>Short title<input name="title" required maxlength="120" placeholder="For example: Flashie can't find my ESP32-C3"></label>
+    <label data-only="bug">What happened?<textarea name="what" rows="4" required placeholder="What went wrong, and any message you saw"></textarea></label>
+    <label data-only="bug">How can it be made to happen again?<textarea name="steps" rows="4" placeholder="1. Open Flashie&#10;2. Pick ESP32 and COM5&#10;3. Press Flash"></textarea></label>
+    <label data-only="bug">What did you expect instead?<textarea name="expected" rows="2"></textarea></label>
+    <label data-only="feature">What would you like?<textarea name="idea" rows="4" placeholder="Describe the feature"></textarea></label>
+    <label data-only="feature">What would it help you do?<textarea name="why" rows="3" placeholder="The project or problem behind it"></textarea></label>
+    <label>Hardware involved (if any)<input name="hardware" placeholder="Board, scope, meter, analyser, printer or cable, with its model"></label>
+    <p class="osnote">Screenshots, logs and saved files can be dragged into the report on GitHub before you post it. Please leave out passwords, Wi-Fi details and anything private: reports are public.</p>
+    <div class="cta"><button class="btn btn-go" type="submit">{svg("arrow")}Continue on GitHub</button><a class="btn btn-line" href="{REPO}/issues">See open reports and ideas</a></div>
+    <p class="fb-err" id="fbErr" role="alert" hidden></p>
+  </form>
+</div></section>
+<script>
+(function () {{
+  const f = document.getElementById('fb');
+  const q = new URLSearchParams(location.search);
+  for (const k of ['app', 'where', 'version', 'kind']) {{
+    const v = q.get(k); if (!v) continue;
+    const el = f.elements[k];
+    if (el && el.length && el[0] && el[0].type === 'radio') {{ for (const r of el) r.checked = r.value === v; }}
+    else if (el) {{ if (el.tagName === 'SELECT') {{ const o = [...el.options].find((o) => o.value.toLowerCase().startsWith(v.toLowerCase())); if (o) el.value = o.value; }} else el.value = v; }}
+  }}
+  const kind = () => f.elements.kind.value;
+  function show() {{
+    for (const el of f.querySelectorAll('[data-only]')) {{
+      const on = el.dataset.only === kind();
+      if (el.tagName === 'OPTION') {{ el.hidden = !on; el.disabled = !on; }} else el.hidden = !on;
+    }}
+  }}
+  for (const r of f.elements.kind) r.addEventListener('change', show);
+  show();
+  f.addEventListener('submit', (ev) => {{
+    ev.preventDefault();
+    const v = (n) => (f.elements[n] && f.elements[n].value || '').trim();
+    const err = document.getElementById('fbErr');
+    const need = kind() === 'bug' ? ['app', 'title', 'what'] : ['app', 'title', 'idea'];
+    const missing = need.filter((n) => !v(n));
+    if (missing.length) {{ err.textContent = 'Please fill in: ' + missing.map((n) => ({{ app: 'App', title: 'Short title', what: 'What happened?', idea: 'What would you like?' }})[n]).join(', '); err.hidden = false; f.elements[missing[0]].focus(); return; }}
+    err.hidden = true;
+    const p = new URLSearchParams();
+    const fields = kind() === 'bug' ? ['app', 'where', 'version', 'what', 'steps', 'expected', 'hardware'] : ['app', 'idea', 'why', 'hardware'];
+    p.set('template', kind() === 'bug' ? 'bug.yml' : 'feature.yml');
+    p.set('title', (kind() === 'bug' ? '[Bug] ' : '[Idea] ') + v('title'));
+    for (const n of fields) if (v(n)) p.set(n, v(n));
+    window.open('{REPO}/issues/new?' + p.toString(), '_blank', 'noopener');
+  }});
+}})();
+</script>"""
+    page("feedback.html", "Report a Bug or Request a Feature · Tinkerie", "Tell nrmluvdev about a bug in Tinkerie, or ask for a feature: a short form that opens a ready-made GitHub issue.", "feedback", body)
+
+
 def build_about():
     page("about.html", "About Tinkerie", "Why Tinkerie exists, nrmluvdev's view on using AI as a tool to build it, and the promise that every tool stays free forever.", "about", ABOUT.format(info=svg("info"), repo=REPO))
 
@@ -431,10 +535,11 @@ def main():
     build_start()
     build_policy()
     build_about()
+    build_feedback()
     for i, a in enumerate(APPS):
         build_app(i, a)
     build_redirects()
-    print("built", len(APPS) + 3, "pages into", OUT, "for version", VERSION)
+    print("built", len(APPS) + 4, "pages into", OUT, "for version", VERSION)
 
 
 if __name__ == "__main__":

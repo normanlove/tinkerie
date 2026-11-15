@@ -12,11 +12,12 @@ Everything, in every app. Every app has teaching mode: point at anything to see 
 F2 turns it off.
 
 New in {VERSION}:
-- On Windows, Probie's logic analysers work with the libusb-win32 driver too,
-  and Meterie lists meter cables whose driver was replaced (by Zadig, for
-  sigrok) with how to fix them, instead of hiding them.
+- Tinkerie web: every app also runs in Chrome or Edge, with no download,
+  at https://tinkerie.net/web/ (boards, scopes and meters connect too).
+- Report a bug or ask for a feature at https://tinkerie.net/feedback.html
 
 Also in recent alpha builds:
+- 0.30.3-alpha: USB checks across the suite (libusb-win32, hidden meter cables).
 - 0.30.2-alpha: Scopie works with the libusb-win32 driver (Hantek 6022BE).
 - 0.30.1-alpha: Fixie checked against every device you can describe.
 - 0.30.0-alpha: Fixie shows pictures of parts, probe hookups and waveforms.

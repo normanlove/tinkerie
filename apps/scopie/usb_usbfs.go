@@ -1,4 +1,4 @@
-//go:build linux || (darwin && cgo)
+//go:build linux || (darwin && cgo) || js
 
 // USB scopes on Linux, Raspberry Pi OS, Android and macOS, through
 // shared/usb (usbfs on Linux and Android, IOKit on a Mac).

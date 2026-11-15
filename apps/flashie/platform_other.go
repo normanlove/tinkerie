@@ -1,4 +1,4 @@
-//go:build !windows && !linux && !darwin
+//go:build !windows && !linux && !darwin && !js
 
 // Flashie — placeholders for systems other than Windows, Linux and macOS.
 // Made by nrmluvdev.

@@ -13,13 +13,13 @@ import html, json, os, re, shutil, subprocess, sys, tarfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'dist', 'web', 'tinkerie')
 
-# name, title, one-line description, what the web version leaves out
-APPS = [
-    ('wirie', 'Wirie', 'Wiring diagrams, PCBs and Keebie keyboards', ''),
-    ('makie', 'Makie', '3D part designer for 3D printing', ''),
-    ('codie', 'Codie', 'Explains code, line by line, in plain words', ''),
-    ('fixie', 'Fixie', 'Step-by-step repair guide for almost any device', 'Readings are typed in: the web version can’t take them straight from Meterie, Scopie or Probie.'),
-]
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import webinfo  # what each web version does and doesn't do
+
+def launcher_apps():
+    """The apps the desktop launcher has: every one must have a web version."""
+    src = open(os.path.join(ROOT, 'launcher', 'launcher.go')).read()
+    return re.findall(r'^\t\{"([a-z]+)", "[A-Z][a-z]+", "', src, re.M)
 
 def version():
     m = re.search(r'^VERSION=(\S+)', open(os.path.join(ROOT, 'build.sh')).read(), re.M)
@@ -37,25 +37,43 @@ SHELL = '''<!doctype html>
 <link rel="icon" href="../icons/{icon}">
 <link rel="stylesheet" href="../shell.css">
 </head>
-<body class="shell" data-app="{name}">
+<body class="shell" data-app="{name}" data-devices="{devices}">
 <div class="tk-bar">
   <a class="home" href="../" title="All Tinkerie apps"><img src="../icons/{icon}" alt="">{title}</a>
   <span class="tk-dim">{ver} · web</span>
   <span class="sp"></span>
   <span id="tkStatus"></span>
+{devbtn}
+  <a class="tk-btn" id="tkBug" target="_blank" rel="noopener" data-app="{title}" data-ver="{ver}" href="https://tinkerie.net/feedback.html" title="Something wrong, or an idea? Tell nrmluvdev">Report a bug</a>
+  <button class="tk-btn" id="tkWebBtn" title="What the web version does and doesn’t do, compared with the desktop app">Web vs desktop</button>
   <button class="tk-btn" id="tkFilesBtn" title="Download what this app saved, or add files to it">Files</button>
 </div>
 <main>
   <div id="tkLoading"><div><div class="spin"></div>Loading {title}…</div></div>
-  <iframe id="tkFrame" title="{title}" allow="serial; usb; hid; camera; clipboard-read; clipboard-write; fullscreen"></iframe>
+  <iframe id="tkFrame" title="{title}" allow="serial; usb; hid; camera; microphone; clipboard-read; clipboard-write; fullscreen"></iframe>
 </main>
 <div class="tk-modal" id="tkFiles" hidden><div class="tk-box">
   <h2><span>{title} files</span><label class="tk-btn">Add files…<input type="file" id="tkImport" multiple></label><button class="tk-btn" id="tkFilesClose">Close</button></h2>
   <div class="body"><p class="tk-dim">Saved in this browser only. Download anything you want to keep.{note}</p><div id="tkFilesList"></div></div>
 </div></div>
+<div class="tk-modal" id="tkDevs" hidden><div class="tk-box">
+  <h2><span>Connect a device</span><button class="tk-btn" id="tkDevsClose">Close</button></h2>
+  <div class="body">
+    <p class="tk-dim">The browser only lets {title} use a device you pick here. Plug it in, then click the kind it is and choose it in the list the browser shows. The browser remembers it, so next time {title} finds it by itself.</p>
+    <div class="tk-ask" id="tkAsk"></div>
+    <div class="tk-warn" id="tkNoDev" hidden>This browser can’t connect to devices. Open this page in <b>Chrome</b> or <b>Edge</b> on a computer (Windows, Mac, Linux or Chromebook).</div>
+    <h3>Devices {title} may use</h3>
+    <div id="tkGranted"></div>
+  </div>
+</div></div>
+<div class="tk-modal" id="tkWeb" hidden><div class="tk-box">
+  <h2><span>{title}: web and desktop</span><button class="tk-btn" id="tkWebClose">Close</button></h2>
+  <div class="body">{webinfo}</div>
+</div></div>
 <div id="tkToasts"></div>
 <script src="../wasm_exec.js"></script>
 <script src="../memfs.js"></script>
+<script src="../tkdev.js"></script>
 <script src="../shell.js"></script>
 </body></html>
 '''
@@ -75,9 +93,10 @@ and what you make is saved in this browser. Version {ver}.</p>
 <div class="grid">
 {cards}
 </div>
-<p class="note">Works best in Chrome or Edge on a computer. Firefox and Safari run the apps; the parts that talk to USB or serial devices
-need Chrome or Edge. For flashing SD cards, compiling Arduino code and network scopes, use the desktop download from
-<a href="https://tinkerie.net">tinkerie.net</a>. Made by nrmluvdev.</p>
+<p class="note">Made for Chrome and Edge on a computer (Windows, Mac, Linux or Chromebook): they connect to serial ports, USB scopes and analysers and meter cables
+with the <b>Connect device</b> button. Firefox and Safari run the apps but can’t connect to devices. A few things need the desktop app
+(writing SD cards, compiling Arduino code, network scopes and printers): each app’s <b>Web vs desktop</b> button lists them, and the
+<a href="https://tinkerie.net">desktop download</a> is free too. Something wrong, or an idea? <a href="https://tinkerie.net/feedback.html?where=Tinkerie%20web%20(in%20Chrome)">Report it</a>. Made by nrmluvdev.</p>
 </div>
 <script>if (!window.isSecureContext) document.getElementById('insecure').hidden = false;</script>
 </body></html>
@@ -94,12 +113,18 @@ def main():
         if os.path.exists(p):
             shutil.copy(p, OUT)
             break
-    for f in ('memfs.js', 'shell.js', 'shell.css', 'sw.js'):
+    for f in ('memfs.js', 'shell.js', 'shell.css', 'sw.js', 'tkdev.js'):
         shutil.copy(os.path.join(ROOT, 'webapp', 'static', f), OUT)
     shutil.copy(os.path.join(ROOT, 'launcher', 'web', 'tinkerie.png'), os.path.join(OUT, 'icons'))
     env = dict(os.environ, GOOS='js', GOARCH='wasm', CGO_ENABLED='0')
+    missing = [a for a in launcher_apps() if a not in webinfo.APPS]
+    if missing:
+        sys.exit('webapp/webinfo.py has no web version for: ' + ', '.join(missing) +
+                 ' (every app needs one, or its features listed under missing)')
     cards = []
-    for name, title, desc, note in APPS:
+    for name in webinfo.ORDER:
+        info = webinfo.APPS[name]
+        title, desc = info['title'], info['desc']
         icon = next(f for f in os.listdir(os.path.join(ROOT, 'launcher', 'web', 'icons')) if f.startswith(name + '.'))
         shutil.copy(os.path.join(ROOT, 'launcher', 'web', 'icons', icon), os.path.join(OUT, 'icons'))
         d = os.path.join(OUT, name)
@@ -108,14 +133,17 @@ def main():
         subprocess.check_call(['go', 'build', '-trimpath', '-ldflags', '-s -w', '-o', os.path.join(d, 'app.wasm'),
                                './webapp/apps/' + name], cwd=ROOT, env=env)
         av = app_version(name)
+        devbtn = ('  <button class="tk-btn" id="tkDevBtn" title="Let %s use a serial port, USB device or meter cable">Connect device</button>' % html.escape(title)) if info['devices'] else ''
+        note = ' Devices: pick them with Connect device (Chrome or Edge).' if info['devices'] else ''
         open(os.path.join(d, 'index.html'), 'w').write(SHELL.format(
-            title=html.escape(title), name=name, icon=icon, ver=html.escape(av),
-            note=(' ' + html.escape(note)) if note else ''))
+            title=html.escape(title), name=name, icon=icon, ver=html.escape(av), devices=','.join(info['devices']),
+            devbtn=devbtn, webinfo=webinfo.html_list(name, html.escape), note=note))
+        short = info['missing'][0].split(':')[0] if info['missing'] else ''
         cards.append('<a class="card" href="%s/"><img src="icons/%s" alt=""><div><b>%s</b><div class="d">%s</div>%s</div></a>' % (
             name, icon, html.escape(title), html.escape(desc),
-            '<div class="n">%s</div>' % html.escape(note) if note else ''))
+            '<div class="n">Desktop only: %s%s</div>' % (html.escape(short[0].lower() + short[1:]), ', and more' if len(info['missing']) > 1 else '') if short else ''))
     open(os.path.join(OUT, 'index.html'), 'w').write(INDEX.format(ver=html.escape(ver), cards='\n'.join(cards)))
-    json.dump({'version': ver, 'apps': [a[0] for a in APPS]}, open(os.path.join(OUT, 'version.json'), 'w'))
+    json.dump({'version': ver, 'apps': webinfo.ORDER}, open(os.path.join(OUT, 'version.json'), 'w'))
     shutil.copy(os.path.join(ROOT, 'webapp', 'install-pi.sh'), os.path.join(ROOT, 'dist', 'web'))
     tgz = os.path.join(ROOT, 'dist', 'Tinkerie-web-%s.tar.gz' % ver)
     with tarfile.open(tgz, 'w:gz') as t:

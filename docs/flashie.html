@@ -22,6 +22,8 @@
   <nav class="nav" aria-label="Main">
     <div class="apps-menu"><button type="button" aria-expanded="false" aria-haspopup="true">Apps <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><div class="menu"><a href="wirie.html"><img src="img/icons/wirie.png" alt=""><span><b>Wirie</b><small>Design circuit boards and custom keyboards</small></span></a><a href="makie.html"><img src="img/icons/makie.png" alt=""><span><b>Makie</b><small>A Tinkercad-style 3D designer with threads</small></span></a><a href="tunie.html"><img src="img/icons/tunie.png" alt=""><span><b>Tunie</b><small>Print a test</small></span></a><a href="flashie.html"><img src="img/icons/flashie.svg" alt=""><span><b>Flashie</b><small>Flash ESP32</small></span></a><a href="scopie.html"><img src="img/icons/scopie.png" alt=""><span><b>Scopie</b><small>A friendly oscilloscope app for Hantek</small></span></a><a href="meterie.html"><img src="img/icons/meterie.png" alt=""><span><b>Meterie</b><small>Connect your multimeter to show huge readings</small></span></a><a href="probie.html"><img src="img/icons/probie.svg" alt=""><span><b>Probie</b><small>A serial monitor with a live plotter</small></span></a><a href="codie.html"><img src="img/icons/codie.svg" alt=""><span><b>Codie</b><small>A code explainer for 20+ languages</small></span></a><a href="fixie.html"><img src="img/icons/fixie.svg" alt=""><span><b>Fixie</b><small>A repair guide down to component level: quick checks</small></span></a><a class="menu-start" href="start.html">Getting started guide →</a></div></div>
     <a class="hide-s" href="start.html">Getting started</a>
+    <a class="hide-s" href="https://tinkerie.net/web/">Use in browser</a>
+    <a class="hide-s" href="feedback.html">Report a bug</a>
     <a class="hide-s" href="about.html">About Tinkerie</a>
     <a class="hide-s" href="https://github.com/normanlove/tinkerie">GitHub</a>
     <a class="btn btn-go" href="index.html#download" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg><span class="lbl">Download</span></a>
@@ -34,11 +36,11 @@
   <nav class="crumbs" aria-label="You are here"><a href="index.html">Tinkerie</a><span aria-hidden="true">›</span><a href="index.html#apps">Apps</a><span aria-hidden="true">›</span><span>Flashie</span></nav>
   <div class="grid">
     <div>
-      <div class="app-title"><img src="img/icons/flashie.svg" alt=""><div><h1>Flashie</h1><span class="ver">Version 0.10.2-alpha · in Tinkerie 0.30.3-alpha</span><span class="alpha-pill">Alpha</span></div></div>
+      <div class="app-title"><img src="img/icons/flashie.svg" alt=""><div><h1>Flashie</h1><span class="ver">Version 0.10.2-alpha · in Tinkerie 0.31.0-alpha</span><span class="alpha-pill">Alpha</span></div></div>
       <p class="lead">Put new firmware on your boards, and operating systems on SD cards.</p>
       <div class="plain"><span class="label">In plain words</span><p>Firmware is the program that runs on a little board like an ESP32 or Arduino. Flashie copies it onto the board over USB, checks every byte, and restarts the board. It can also put a whole operating system, like Raspberry Pi OS, onto an SD card, or turn a Windows ISO into a USB installer.</p></div>
       <div class="chips"><span class="chip">ESP32 / ESP8266</span><span class="chip">Raspberry Pi Pico</span><span class="chip">Arduino</span><span class="chip">STM32</span><span class="chip">Block programming</span><span class="chip">Keyboard firmware</span><span class="chip">SD card and USB writer</span></div>
-      <div class="hero" style="padding:0"><div class="cta"><a class="btn btn-go" href="index.html#download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg>Download Tinkerie</a><a class="btn btn-line" href="#first">First five minutes</a></div><p class="osnote">You'll need: A microcontroller board, or an SD card / USB drive.</p></div>
+      <div class="hero" style="padding:0"><div class="cta"><a class="btn btn-go" href="index.html#download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg>Download Tinkerie</a><a class="btn btn-line" href="https://tinkerie.net/web/flashie/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01"/></svg>Open in your browser</a><a class="btn btn-line" href="#first">First five minutes</a></div><p class="osnote">You'll need: A microcontroller board, or an SD card / USB drive. <a href="#web">What the browser version can and can't do</a>.</p></div>
     </div>
     <figure><div class="shot"><span class="tag">Flashie</span><button class="zoom" type="button" data-full="img/shots/flashie-flash.webp" data-caption="Flash in three steps: pick the board, pick the firmware, flash." aria-label="Enlarge: Flash in three steps: pick the board, pick the firmware, flash."><img src="img/shots/flashie-flash.webp" alt="Flash in three steps: pick the board, pick the firmware, flash." width="1440" height="900"></button></div><figcaption>Flash in three steps: pick the board, pick the firmware, flash.</figcaption></figure>
   </div>
@@ -61,6 +63,12 @@
   <div class="table-wrap"><table><thead><tr><th>Family</th><th>Examples</th><th>File</th></tr></thead><tbody><tr><td>ESP32 family</td><td>DevKitC, CYD, XIAO, M5Stack, LilyGO T-Display, Nano ESP32</td><td>.bin</td></tr><tr><td>ESP8266</td><td>NodeMCU, Wemos D1 Mini, ESP-01</td><td>.bin</td></tr><tr><td>RP2040 / RP2350</td><td>Pico, Pico W, Pico 2, RP2040-Zero, XIAO RP2040</td><td>.uf2 (a .bin is converted)</td></tr><tr><td>Arduino AVR</td><td>Uno, Nano, Pro Mini, Mega 2560, Leonardo, Micro, Pro Micro</td><td>.hex</td></tr><tr><td>STM32</td><td>Blue Pill (F103), Black Pill (F401/F411)</td><td>.bin or .hex</td></tr></tbody></table></div>
 </div></section>
 
+<section class="band" id="web"><div class="wrap">
+  <div class="head"><div><span class="label">Tinkerie web</span><h2>Flashie in your browser</h2><p>Nothing to download or install: Flashie runs in the page, on your own computer, and what you make stays in your browser. Made for Chrome or Edge on a computer (Windows, Mac, Linux or Chromebook). Devices are connected with the page's <b>Connect device</b> button.</p></div>
+  <a class="btn btn-go" href="https://tinkerie.net/web/flashie/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01"/></svg>Open Flashie in your browser</a></div>
+  <div class="webcols"><div class="webcol yes"><h3>Works the same</h3><ul><li>Flashing ESP32 and ESP8266 boards over USB serial (esptool’s protocol, built in)</li><li>Flashing Arduino Uno, Nano, Mega and Pro Mini (.hex files) over serial</li><li>STM32 boards through their serial bootloader</li><li>MicroPython: installing it, the REPL, and uploading your program</li><li>The Create tab: blocks to MicroPython, with teaching mode and templates</li><li>The Cheap Yellow Display database and board tips</li></ul></div><div class="webcol mid"><h3>Works, but differently</h3><ul><li>Pick the board’s port once with the Connect button. A board that restarts as a different USB device (Leonardo and Micro in their bootloader, an ESP32-S2/S3 in download mode) has to be picked again the first time</li><li>Firmware from your computer is added with Files → Add files</li><li>Some sites in the firmware library don’t let web pages download their files: if one fails, download it yourself and add it with Files → Add files</li></ul></div><div class="webcol no"><h3>Desktop app only</h3><ul><li>Writing SD card and USB images (Raspberry Pi OS, Windows and Linux installers): browsers can’t write to drives</li><li>Copying .uf2 files to a Raspberry Pi Pico in BOOTSEL mode: browsers can’t write to drives; download the .uf2 and drag it onto the RPI-RP2 drive yourself</li><li>Compiling Arduino code (blocks for Uno and Nano, and keyboard firmware): it needs arduino-cli on your computer</li><li>Android phones and tablets over USB</li></ul></div></div>
+</div></section>
+
 <section class="band"><div class="wrap stack">
   <div class="head" style="margin:0"><div><span class="label">Before you start</span><h2>Good to know</h2></div></div><div class="stack"><div class="callout warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 20h20L12 3zm0 7v5m0 3v.5"/></svg><p>Writing an image erases the whole drive. Flashie asks you to confirm the drive and shows its name and size, so check it&#x27;s the right one.</p></div></div>
   <div class="head" style="margin:30px 0 0"><div><span class="label">Works well with</span><h2>Pairs nicely with</h2></div></div>
@@ -74,7 +82,7 @@
 <footer><div class="wrap">
   <div class="stack">
     <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
-    <p>Free maker tools, designed and created by <b>nrmluvdev</b>. Version 0.30.3-alpha: Tinkerie is in alpha.</p>
+    <p>Free maker tools, designed and created by <b>nrmluvdev</b>. Version 0.31.0-alpha: Tinkerie is in alpha.</p>
     <p>Free software under the GNU GPL, version 3 or later. It comes with no warranty.</p>
   </div>
   <div><h4>The apps</h4><ul><li><a href="wirie.html">Wirie</a></li><li><a href="makie.html">Makie</a></li><li><a href="tunie.html">Tunie</a></li><li><a href="flashie.html">Flashie</a></li><li><a href="scopie.html">Scopie</a></li><li><a href="meterie.html">Meterie</a></li><li><a href="probie.html">Probie</a></li><li><a href="codie.html">Codie</a></li><li><a href="fixie.html">Fixie</a></li></ul></div>
@@ -84,7 +92,9 @@
     <li><a href="index.html#faq">Questions</a></li>
     <li><a href="https://github.com/normanlove/tinkerie/releases">All downloads</a></li>
     <li><a href="https://github.com/normanlove/tinkerie">Source code on GitHub</a></li>
-    <li><a href="https://github.com/normanlove/tinkerie/issues">Report a problem</a></li>
+    <li><a href="https://tinkerie.net/web/">Tinkerie web (in your browser)</a></li>
+    <li><a href="feedback.html">Report a bug or ask for a feature</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie/issues">Open reports and ideas</a></li>
     <li><a href="code-signing.html">Code signing policy</a></li>
   </ul></div>
 </div></footer>

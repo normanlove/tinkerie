@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Report a Bug or Request a Feature · Tinkerie</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Tell nrmluvdev about a bug in Tinkerie, or ask for a feature: a short form that opens a ready-made GitHub issue.">
+<meta property="og:title" content="Report a Bug or Request a Feature · Tinkerie">
+<meta property="og:description" content="Tell nrmluvdev about a bug in Tinkerie, or ask for a feature: a short form that opens a ready-made GitHub issue.">
+<link rel="icon" href="img/icons/tinkerie.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&family=Unbounded:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top"><div class="wrap">
+  <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
+  <nav class="nav" aria-label="Main">
+    <div class="apps-menu"><button type="button" aria-expanded="false" aria-haspopup="true">Apps <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><div class="menu"><a href="wirie.html"><img src="img/icons/wirie.png" alt=""><span><b>Wirie</b><small>Design circuit boards and custom keyboards</small></span></a><a href="makie.html"><img src="img/icons/makie.png" alt=""><span><b>Makie</b><small>A Tinkercad-style 3D designer with threads</small></span></a><a href="tunie.html"><img src="img/icons/tunie.png" alt=""><span><b>Tunie</b><small>Print a test</small></span></a><a href="flashie.html"><img src="img/icons/flashie.svg" alt=""><span><b>Flashie</b><small>Flash ESP32</small></span></a><a href="scopie.html"><img src="img/icons/scopie.png" alt=""><span><b>Scopie</b><small>A friendly oscilloscope app for Hantek</small></span></a><a href="meterie.html"><img src="img/icons/meterie.png" alt=""><span><b>Meterie</b><small>Connect your multimeter to show huge readings</small></span></a><a href="probie.html"><img src="img/icons/probie.svg" alt=""><span><b>Probie</b><small>A serial monitor with a live plotter</small></span></a><a href="codie.html"><img src="img/icons/codie.svg" alt=""><span><b>Codie</b><small>A code explainer for 20+ languages</small></span></a><a href="fixie.html"><img src="img/icons/fixie.svg" alt=""><span><b>Fixie</b><small>A repair guide down to component level: quick checks</small></span></a><a class="menu-start" href="start.html">Getting started guide →</a></div></div>
+    <a class="hide-s" href="start.html">Getting started</a>
+    <a class="hide-s" href="https://tinkerie.net/web/">Use in browser</a>
+    <a class="hide-s" href="feedback.html" aria-current="page">Report a bug</a>
+    <a class="hide-s" href="about.html">About Tinkerie</a>
+    <a class="hide-s" href="https://github.com/normanlove/tinkerie">GitHub</a>
+    <a class="btn btn-go" href="index.html#download" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg><span class="lbl">Download</span></a>
+    <button class="theme" id="theme" type="button" aria-label="Switch theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></button>
+  </nav>
+</div></header>
+<main id="main">
+<div class="ruler" aria-hidden="true"></div>
+<section class="hero" style="padding-bottom:30px"><div class="wrap">
+  <span class="tape">Help make Tinkerie better</span>
+  <h1>Report a bug or ask for a feature</h1>
+  <p class="lead" style="max-width:58ch">Fill this in and press the button: it opens a ready-made report on GitHub, where nrmluvdev reads every one and you can follow what happens to it. You'll need a free GitHub account to post it.</p>
+</div></section>
+<section class="band alt" style="padding-top:36px"><div class="wrap">
+  <form class="fb" id="fb" novalidate>
+    <fieldset class="fb-kind"><legend class="label">What is it?</legend>
+      <label><input type="radio" name="kind" value="bug" checked><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 8V6a4 4 0 0 1 8 0v2M6 10h12v4a6 6 0 0 1-12 0zM12 14v6M3 13h3m12 0h3M4 7l3 3m13-3-3 3M4 20l3-3m13 3-3-3"/></svg><b>Something's wrong</b><small>A bug, a crash, a wrong result, or a device that won't work</small></span></label>
+      <label><input type="radio" name="kind" value="feature"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6m-5 3h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg><b>An idea</b><small>A feature, a device or board to support, or something to make easier</small></span></label>
+    </fieldset>
+    <div class="fb-row">
+      <label>App<select name="app" required><option value="">Choose…</option><option value="Wirie (and Keebie)">Wirie</option><option value="Makie">Makie</option><option value="Tunie">Tunie</option><option value="Flashie">Flashie</option><option value="Scopie">Scopie</option><option value="Meterie">Meterie</option><option value="Probie">Probie</option><option value="Codie">Codie</option><option value="Fixie">Fixie</option><option value="The Tinkerie launcher">The Tinkerie launcher</option><option value="The website or downloads">The website or downloads</option><option value="Something else">Something else</option><option value="A new app" data-only="feature">A new app</option></select></label>
+      <label data-only="bug">Where were you using it?<select name="where">
+        <option>Desktop app (Windows)</option><option>Desktop app (Mac)</option><option>Desktop app (Linux)</option><option>Desktop app (Raspberry Pi)</option><option>Android app</option>
+        <option>Tinkerie web (in Chrome)</option><option>Tinkerie web (in Edge)</option><option>Tinkerie web (another browser)</option></select></label>
+      <label data-only="bug">Version<input name="version" placeholder="0.31.0-alpha"></label>
+    </div>
+    <label>Short title<input name="title" required maxlength="120" placeholder="For example: Flashie can't find my ESP32-C3"></label>
+    <label data-only="bug">What happened?<textarea name="what" rows="4" required placeholder="What went wrong, and any message you saw"></textarea></label>
+    <label data-only="bug">How can it be made to happen again?<textarea name="steps" rows="4" placeholder="1. Open Flashie&#10;2. Pick ESP32 and COM5&#10;3. Press Flash"></textarea></label>
+    <label data-only="bug">What did you expect instead?<textarea name="expected" rows="2"></textarea></label>
+    <label data-only="feature">What would you like?<textarea name="idea" rows="4" placeholder="Describe the feature"></textarea></label>
+    <label data-only="feature">What would it help you do?<textarea name="why" rows="3" placeholder="The project or problem behind it"></textarea></label>
+    <label>Hardware involved (if any)<input name="hardware" placeholder="Board, scope, meter, analyser, printer or cable, with its model"></label>
+    <p class="osnote">Screenshots, logs and saved files can be dragged into the report on GitHub before you post it. Please leave out passwords, Wi-Fi details and anything private: reports are public.</p>
+    <div class="cta"><button class="btn btn-go" type="submit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>Continue on GitHub</button><a class="btn btn-line" href="https://github.com/normanlove/tinkerie/issues">See open reports and ideas</a></div>
+    <p class="fb-err" id="fbErr" role="alert" hidden></p>
+  </form>
+</div></section>
+<script>
+(function () {
+  const f = document.getElementById('fb');
+  const q = new URLSearchParams(location.search);
+  for (const k of ['app', 'where', 'version', 'kind']) {
+    const v = q.get(k); if (!v) continue;
+    const el = f.elements[k];
+    if (el && el.length && el[0] && el[0].type === 'radio') { for (const r of el) r.checked = r.value === v; }
+    else if (el) { if (el.tagName === 'SELECT') { const o = [...el.options].find((o) => o.value.toLowerCase().startsWith(v.toLowerCase())); if (o) el.value = o.value; } else el.value = v; }
+  }
+  const kind = () => f.elements.kind.value;
+  function show() {
+    for (const el of f.querySelectorAll('[data-only]')) {
+      const on = el.dataset.only === kind();
+      if (el.tagName === 'OPTION') { el.hidden = !on; el.disabled = !on; } else el.hidden = !on;
+    }
+  }
+  for (const r of f.elements.kind) r.addEventListener('change', show);
+  show();
+  f.addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    const v = (n) => (f.elements[n] && f.elements[n].value || '').trim();
+    const err = document.getElementById('fbErr');
+    const need = kind() === 'bug' ? ['app', 'title', 'what'] : ['app', 'title', 'idea'];
+    const missing = need.filter((n) => !v(n));
+    if (missing.length) { err.textContent = 'Please fill in: ' + missing.map((n) => ({ app: 'App', title: 'Short title', what: 'What happened?', idea: 'What would you like?' })[n]).join(', '); err.hidden = false; f.elements[missing[0]].focus(); return; }
+    err.hidden = true;
+    const p = new URLSearchParams();
+    const fields = kind() === 'bug' ? ['app', 'where', 'version', 'what', 'steps', 'expected', 'hardware'] : ['app', 'idea', 'why', 'hardware'];
+    p.set('template', kind() === 'bug' ? 'bug.yml' : 'feature.yml');
+    p.set('title', (kind() === 'bug' ? '[Bug] ' : '[Idea] ') + v('title'));
+    for (const n of fields) if (v(n)) p.set(n, v(n));
+    window.open('https://github.com/normanlove/tinkerie/issues/new?' + p.toString(), '_blank', 'noopener');
+  });
+})();
+</script>
+</main>
+<footer><div class="wrap">
+  <div class="stack">
+    <a class="brand" href="index.html"><img src="img/icons/tinkerie.png" alt="">Tinkerie</a>
+    <p>Free maker tools, designed and created by <b>nrmluvdev</b>. Version 0.31.0-alpha: Tinkerie is in alpha.</p>
+    <p>Free software under the GNU GPL, version 3 or later. It comes with no warranty.</p>
+  </div>
+  <div><h4>The apps</h4><ul><li><a href="wirie.html">Wirie</a></li><li><a href="makie.html">Makie</a></li><li><a href="tunie.html">Tunie</a></li><li><a href="flashie.html">Flashie</a></li><li><a href="scopie.html">Scopie</a></li><li><a href="meterie.html">Meterie</a></li><li><a href="probie.html">Probie</a></li><li><a href="codie.html">Codie</a></li><li><a href="fixie.html">Fixie</a></li></ul></div>
+  <div><h4>Help and source</h4><ul>
+    <li><a href="start.html">Getting started</a></li>
+    <li><a href="about.html">About Tinkerie</a></li>
+    <li><a href="index.html#faq">Questions</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie/releases">All downloads</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie">Source code on GitHub</a></li>
+    <li><a href="https://tinkerie.net/web/">Tinkerie web (in your browser)</a></li>
+    <li><a href="feedback.html">Report a bug or ask for a feature</a></li>
+    <li><a href="https://github.com/normanlove/tinkerie/issues">Open reports and ideas</a></li>
+    <li><a href="code-signing.html">Code signing policy</a></li>
+  </ul></div>
+</div></footer>
+<script src="site.js"></script>
+</div>
+</body>
+</html>

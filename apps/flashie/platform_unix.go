@@ -1,4 +1,4 @@
-//go:build linux || darwin
+//go:build linux || darwin || js
 
 // Flashie on Linux, Raspberry Pi OS and macOS: serial ports through
 // shared/serialport, Pico BOOTSEL drives from the mounted volumes, and the

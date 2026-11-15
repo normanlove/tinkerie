@@ -30,5 +30,8 @@ func usbDriverHint(u usbInfo) string {
 	if runtime.GOOS == "darwin" {
 		return fmt.Sprintf("USB %04X:%04X: another app or driver is using it. Quit the scope's own software, then replug it.", u.VID, u.PID)
 	}
+	if runtime.GOOS == "js" {
+		return fmt.Sprintf("USB %04X:%04X: the browser couldn't use it. Pick it with Connect device at the top of the page; on Windows it needs the WinUSB driver (Zadig).", u.VID, u.PID)
+	}
 	return fmt.Sprintf("USB %04X:%04X: USB scopes aren't supported on this system yet.", u.VID, u.PID)
 }

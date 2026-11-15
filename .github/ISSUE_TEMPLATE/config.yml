@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Getting started guide
+    url: https://tinkerie.net/start.html
+    about: How to download, open and start using each app.
+  - name: Report or request from the website
+    url: https://tinkerie.net/feedback.html
+    about: A short form that fills these in for you.

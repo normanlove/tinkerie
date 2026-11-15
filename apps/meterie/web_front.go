@@ -1,4 +1,4 @@
-//go:build linux || darwin
+//go:build linux || darwin || js
 
 package meterie
 
@@ -326,7 +326,11 @@ func runWeb() {
 		}
 	}
 
-	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	addr := "127.0.0.1:0"
+	if v := os.Getenv("METERIE_ADDR"); v != "" { // the web version: a fixed in-page address
+		addr = v
+	}
+	ln, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,4 +1,4 @@
-//go:build linux || darwin
+//go:build linux || darwin || js
 
 package meterie
 
@@ -134,6 +134,9 @@ func platformOpenDialog(title, filter, pattern string) (string, bool) {
 		p, err := droid.PickFile(title, patRe.FindAllString(pattern+" "+filter, -1))
 		return p, err == nil
 	}
+	if runtime.GOOS == "js" { // the web version: the newest matching file added with Files → Add files
+		return newestImported(patRe.FindAllString(pattern+" "+filter, -1))
+	}
 	dir := defaultDialogDir()
 	if runtime.GOOS == "darwin" {
 		out, err := exec.Command("osascript", "-e",
@@ -187,4 +190,24 @@ func platformOffscreen(w, h int) (*Canvas, TextEngine, func()) {
 		return c, front.text.forCanvas(c), func() {}
 	}
 	return c, &previewText{}, func() {}
+}
+
+// newestImported is the web version's "open" dialog: the newest file the
+// person added with the page's Files → Add files that matches one of pats.
+func newestImported(pats []string) (string, bool) {
+	home, _ := os.UserHomeDir()
+	ents, _ := os.ReadDir(filepath.Join(home, "Imported"))
+	best, bestT := "", time.Time{}
+	for _, e := range ents {
+		in, err := e.Info()
+		if err != nil || e.IsDir() {
+			continue
+		}
+		for _, p := range pats {
+			if ok, _ := filepath.Match(strings.ToLower(p), strings.ToLower(e.Name())); ok && in.ModTime().After(bestT) {
+				best, bestT = filepath.Join(home, "Imported", e.Name()), in.ModTime()
+			}
+		}
+	}
+	return best, best != ""
 }

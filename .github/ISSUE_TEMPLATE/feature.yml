@@ -1,0 +1,49 @@
+name: Request a feature
+description: An idea for something Tinkerie should do, or do better.
+title: "[Idea] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for the idea. nrmluvdev reads every request; popular ones (add a 👍 to the ones you'd like too) come first.
+  - type: dropdown
+    id: app
+    attributes:
+      label: App
+      options:
+        - Wirie (and Keebie)
+        - Makie
+        - Tunie
+        - Flashie
+        - Scopie
+        - Meterie
+        - Probie
+        - Codie
+        - Fixie
+        - The Tinkerie launcher
+        - The website or downloads
+        - Something else
+        - A new app
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: What would it help you do?
+      description: The project or problem behind it helps get it right.
+  - type: input
+    id: hardware
+    attributes:
+      label: Hardware it's about (if any)
+      description: A board, scope, meter, printer or part, with its model.
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Links, pictures or examples.

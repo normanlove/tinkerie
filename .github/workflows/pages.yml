@@ -1,0 +1,62 @@
+# Publishes tinkerie.net: the website (docs/, made by website/build.py) and
+# Tinkerie web (every app, built from this same source by webapp/build.py) at
+# tinkerie.net/web/. Runs on every push to main, so the web versions always
+# match the desktop apps. Made by nrmluvdev.
+#
+# GitHub Pages must use "GitHub Actions" as its source (Settings → Pages).
+name: Website and Tinkerie web
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Test the browser device layer
+        run: |
+          GOOS=js GOARCH=wasm go test -c -o /tmp/usb.test ./shared/usb
+          cd shared/usb && env -i PATH="$PATH" HOME=/tmp node "$(go env GOROOT)/lib/wasm/wasm_exec_node.js" /tmp/usb.test -test.v
+      - name: Build Tinkerie web (every app; fails if one is missing)
+        run: python3 webapp/build.py
+      - name: Put the site together
+        run: |
+          mkdir _site
+          cp -r docs/. _site/
+          cp -r dist/web/tinkerie _site/web
+          du -sh _site
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Use GitHub Actions as the Pages source (once)
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/${{ github.repository }}/pages --jq .build_type || true
+          gh api -X PUT repos/${{ github.repository }}/pages -f build_type=workflow && echo "switched to workflow" || echo "Couldn't switch it: set Settings → Pages → Source to GitHub Actions"
+      - id: deploy
+        uses: actions/deploy-pages@v4

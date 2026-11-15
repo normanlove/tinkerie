@@ -26,6 +26,12 @@ On Android, open the .apk on your phone and allow installing from your browser o
 
 Each desktop package has a **READ ME FIRST.txt** that explains how to start it and what works on that system. Windows may warn about an unrecognised app the first time: choose *More info* then *Run anyway*. Macs need the one-time *Open Anyway* step in System Settings ▸ Privacy & Security.
 
+## Use it in your browser
+
+**[Tinkerie web](https://tinkerie.net/web/)** runs every app in Chrome or Edge with nothing to download: the apps' own code, compiled to WebAssembly, runs in the page on your computer, and what you make is kept in your browser. Boards, USB scopes, logic analysers and meter cables connect through Web Serial, WebUSB and WebHID (the page's *Connect device* button). A few things need the desktop app: writing SD cards, compiling Arduino code, copying to a Pico's drive, network scopes and printers, Bluetooth meters, and the apps reading each other's live data. Each app's *Web vs desktop* button, and its page on the website, lists exactly what works, what works differently and what doesn't.
+
+To run it on your own web server or a Raspberry Pi, use `Tinkerie-web-….tar.gz` from a release, or `webapp/install-pi.sh`.
+
 ## Using it
 
 Double-click `Tinkerie.exe` to open the launcher and pick an app. Each app opens in its own window and process, so you can run several at once. They keep running after you close the launcher.
@@ -123,4 +129,4 @@ Parts made by others keep their own licences, listed with them: Go's zstd decode
 
 ## Reporting problems
 
-Found a bug, or a board, scope or meter that doesn't work? Open an [issue](https://github.com/normanlove/tinkerie/issues) and say which app, which system, and what happened.
+Found a bug, a board, scope or meter that doesn't work, or have an idea? Use the [form on the website](https://tinkerie.net/feedback.html) (each web app's *Report a bug* button fills in the app and browser for you), or open an [issue](https://github.com/normanlove/tinkerie/issues/new/choose) directly: there are forms for bug reports and feature requests, and new issues are labelled with their app automatically.

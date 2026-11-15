@@ -101,6 +101,21 @@ Wirie, Makie, Tunie, Flashie, Probie and Codie are web pages. Each loads `teach-
 - The apps' own READMEs still describe building them as separate programs. In this repository, build from the root instead.
 - On Windows the launcher looks for Edge, Chrome or Brave and falls back to the default browser. Elsewhere it tries Chromium-based browsers, then `xdg-open` or `open`.
 
+## Tinkerie web
+
+`webapp/` builds every app for the browser (`python3 webapp/build.py`; `.github/workflows/pages.yml` does it on every push and publishes it at tinkerie.net/web/ with the website). Each app's own `Main` runs unchanged in the page (`webapp/webhost`): its server listens on Go's in-page network, and the service worker (`webapp/static/sw.js`) passes the app frame's requests to it. Files live in IndexedDB (`memfs.js`).
+
+Devices go through Chrome and Edge's Web Serial, WebUSB and WebHID (`webapp/static/tkdev.js`, called from Go through `shared/webjs`). The back ends are the same packages the desktop uses, built for `js`: `shared/serialport/web_js.go`, `shared/usb/web_js.go` and Meterie's `hid_js.go`, so an app's own device code (esptool, STK500, fx2lafw, the Hantek drivers, meter protocols) is shared with the desktop. Ports are named `web:N`, HID cables `webhid:N`. A page can only use devices the person picked with the shell's *Connect device* button.
+
+**Keeping the web versions up to date.** They are built from the same source on every push, so app changes reach the web versions by themselves. When you change an app:
+
+- if the change needs something a browser can't do (a drive, a program on the computer, a raw network socket, another app's local API), keep it behind the platform files (`platform_unix.go` covers `js` too; add a `_js.go` file or a `runtime.GOOS == "js"` check), and list it under `missing` in `webapp/webinfo.py`;
+- if it works differently in a browser, list it under `differs`; new features that just work go under `works`;
+- a new app needs a `webapp/apps/<name>/main.go` and an entry in `webapp/webinfo.py`: the web build fails without one;
+- `GOOS=js GOARCH=wasm go build ./webapp/apps/...` must still build.
+
+`webinfo.py` feeds both the web apps' *Web vs desktop* box and each app's page on the website.
+
 ## Android
 
 `android/` is a small Java app (no libraries) around the same Go program, built for each Android ABI with the NDK (`android/build.sh`) and shipped inside the APK as `lib/<abi>/libtinkerie.so`, so Android lets it run. The Java side:
