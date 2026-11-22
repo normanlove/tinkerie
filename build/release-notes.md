@@ -10,14 +10,14 @@ Free maker tools by **nrmluvdev**: Wirie, Makie, Tunie, Flashie, Scopie, Meterie
 
 Each package has a *READ ME FIRST.txt*.
 
-<!-- release notes for 0.32.1-alpha: package.sh checks this line, so update the notes with every version -->
+<!-- release notes for 0.33.0-alpha: package.sh checks this line, so update the notes with every version -->
 ### New in {VERSION}
-- **Tinkerie web keeps everyone's work apart.** There are no accounts and no server: each person's work stays in their own browser. Now each tab and each app keeps to itself too:
-  - every open tab gets its own random id, claimed while it's open, so a duplicated tab can never talk to another tab's app;
-  - each app has its own part of the browser's storage and cookies (as the desktop apps do), so apps never see or overwrite each other's settings or autosaves;
-  - opening the same app in a second tab shows a warning, since both save to the same files;
-  - for shared computers: **Clear my data** in each app's Files, and **Clear all my Tinkerie web data** on the Tinkerie web page (files, settings and device permissions).
-- Also in 0.32.0: Fixie explains error logs from Windows, macOS, Linux, Raspberry Pi OS and Android, with no AI and no internet.
+- **Install Tinkerie, and keep it up to date, from the launcher.** Click **Install & updates** at the bottom of the launcher:
+  - **Install on this computer** puts Tinkerie in your Start menu (Windows) or applications menu (Linux, Raspberry Pi) with a shortcut for every app. No administrator rights or password are needed. On Windows you can add a desktop shortcut too, and remove it again from *Settings ▸ Apps*.
+  - **Check for updates** asks GitHub whether there's a newer Tinkerie, and **Update now** downloads it, checks it against the SHA-256 GitHub publishes for it, and swaps it in (Windows, Linux and Raspberry Pi; on a Mac it opens the download page). Apps that are open keep running until you close them.
+  - Tinkerie only asks GitHub when you press the button, unless you tick *Check for updates when Tinkerie starts* (at most once a day). Nothing about you or your computer is sent.
+  - Running Tinkerie straight from the download still works exactly as before.
+- Also in 0.32.1: Tinkerie web keeps every tab, app and person's work apart.
 
 Licensed under GPL-3.0-or-later.
 

@@ -34,7 +34,7 @@ To run it on your own web server or a Raspberry Pi, use `Tinkerie-web-….tar.gz
 
 ## Using it
 
-Double-click `Tinkerie.exe` to open the launcher and pick an app. Each app opens in its own window and process, so you can run several at once. They keep running after you close the launcher.
+Double-click `Tinkerie.exe` to open the launcher and pick an app (or install it first: see [Installing and updating](#installing-and-updating)). Each app opens in its own window and process, so you can run several at once. They keep running after you close the launcher.
 
 | App | What it does | Version |
 |---|---|---|
@@ -49,6 +49,14 @@ Double-click `Tinkerie.exe` to open the launcher and pick an app. Each app opens
 | **Fixie** | Repair guide down to component level, to keep old tech out of e-waste: quick checks for any device, board-level fault finding section by section, troubleshooting your own builds, and tests for 25 kinds of part, with drawings of parts, probe hookups and expected waveforms, reference calculators, and steps that open Meterie, Scopie, Probie, Flashie and Wirie and take readings straight from them; refuses dangerous devices like microwaves, ovens and heaters | 0.5.0-alpha |
 
 Every app's own guide is its `README.md` in `apps\<name>\`.
+
+## Installing and updating
+
+Tinkerie runs from wherever you downloaded it, so installing is optional. The launcher's **Install & updates** button (in its footer) can:
+
+- **Install Tinkerie for you**, with no administrator rights or password. On Windows it goes in `%LOCALAPPDATA%\Programs\Tinkerie`, with a Start-menu shortcut for the launcher and every app, an optional desktop shortcut, and an entry in *Settings ▸ Apps* to remove it. On Linux and Raspberry Pi it goes in `~/.local/share/tinkerie`, with a menu entry for the launcher and every app. On a Mac, drag Tinkerie.app into Applications instead.
+- **Update Tinkerie** when there's a new version: *Check for updates* asks GitHub for the list of releases, and *Update now* downloads the file for your system, checks it against the SHA-256 GitHub lists for it, and puts it in place of the old one (Windows, Linux and Raspberry Pi). Apps that are open keep running until you close them. Tick *Check for updates when Tinkerie starts* to be told about new versions (at most once a day); it's off until you turn it on. On a Mac and Android it opens the release page instead.
+- **Uninstall** it again. Your designs, files and settings are kept.
 
 ## Teaching mode
 
@@ -90,7 +98,7 @@ go test ./...         runs every app's tests (Makie's geometry tests take about 
 
 The Android app is built with `android/build.sh` (needs the Android SDK and NDK, Java 17 and Gradle); GitHub builds it for every release and tries it on Android 5, 10 and 15 emulators.
 
-Mac builds come out as `dist/<name>/Tinkerie.app`, Linux and Pi builds as `dist/<name>/tinkerie` with an `install.sh` that adds Tinkerie to the applications menu.
+Mac builds come out as `dist/<name>/Tinkerie.app`, Linux and Pi builds as `dist/<name>/tinkerie` with an `install.sh` that adds Tinkerie to the applications menu (the launcher's *Install & updates* does the same, with an entry for every app).
 
 ## Platforms
 
@@ -115,7 +123,7 @@ Free code signing provided by [SignPath.io](https://signpath.io), certificate by
 - **What is signed:** `Tinkerie.exe` on each [release](https://github.com/normanlove/tinkerie/releases), built from this repository by GitHub Actions on GitHub-hosted runners ([release workflow](.github/workflows/release.yml)). Nothing built elsewhere is signed.
 - **Committers and reviewers:** [nrmluvdev (normanlove)](https://github.com/normanlove). Changes from anyone else (pull requests) are reviewed before they're merged.
 - **Approvers:** [nrmluvdev (normanlove)](https://github.com/normanlove), who approves every signing request by hand.
-- **Privacy:** This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. Only Flashie downloads things (firmware and OS images, from the projects' own servers, when you choose them); Tunie and Scopie connect only to a printer or scope at the address you give. There's no tracking or telemetry.
+- **Privacy:** This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. Only Flashie downloads things (firmware and OS images, from the projects' own servers, when you choose them); Tunie and Scopie connect only to a printer or scope at the address you give. The launcher asks GitHub for the list of Tinkerie releases only when you press *Check for updates* (or once a day if you turn on automatic checks), and downloads a new version only when you press *Update now*. There's no tracking or telemetry.
 
 The full policy is on the website: <https://tinkerie.net/code-signing.html>. Setup notes for the maintainer are in [.signpath/README.md](.signpath/README.md).
 

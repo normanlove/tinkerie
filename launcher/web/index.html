@@ -15,6 +15,7 @@
   --display: "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html, body { margin: 0; height: 100%; }
 body {
   background: radial-gradient(1200px 500px at 15% -10%, rgba(124, 92, 255, .16), transparent 60%),
@@ -61,6 +62,36 @@ footer b { color: var(--muted); font-weight: 600; }
 #toast.bad { border-color: rgba(248, 113, 113, .5); }
 #toast .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--good); margin-right: 8px; }
 #toast.bad .dot { background: var(--bad); }
+.bar { display: none; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 32px 6px; padding: 10px 14px;
+  border: 1px solid var(--line2); border-radius: 12px; background: var(--card); }
+.bar.show { display: flex; }
+.bar .txt { flex: 1; min-width: 220px; color: var(--muted); }
+.bar .txt b { color: var(--text); font-weight: 600; }
+.bar.new { border-color: rgba(124, 92, 255, .55); background: linear-gradient(90deg, rgba(124, 92, 255, .14), var(--card) 70%); }
+.btn { font: 600 13px var(--font); color: var(--text); background: var(--card2); border: 1px solid var(--line2);
+  border-radius: 9px; padding: 6px 12px; cursor: pointer; }
+.btn:hover, .btn:focus-visible { border-color: var(--accent); outline: none; }
+.btn.main { background: var(--grad); border-color: transparent; color: #fff; }
+.btn.quiet { background: none; border-color: transparent; color: var(--muted); }
+.btn:disabled { opacity: .5; cursor: default; }
+.link { font: inherit; color: var(--muted); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline;
+  text-decoration-color: var(--line2); text-underline-offset: 3px; }
+.link:hover, .link:focus-visible { color: var(--text); outline: none; }
+dialog { width: min(560px, calc(100vw - 32px)); color: var(--text); background: var(--card); border: 1px solid var(--line2);
+  border-radius: var(--r); padding: 22px 24px; box-shadow: 0 20px 60px rgba(0, 0, 0, .5); font: 14px/1.45 var(--font); }
+dialog::backdrop { background: rgba(5, 6, 10, .6); }
+dialog h2 { font: 650 18px var(--display); margin: 0 0 4px; }
+dialog h3 { font: 650 14px var(--display); margin: 18px 0 6px; }
+dialog p { margin: 4px 0; color: var(--muted); }
+dialog .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+dialog label { display: flex; gap: 8px; align-items: flex-start; color: var(--muted); margin-top: 10px; cursor: pointer; }
+dialog label input { margin-top: 3px; accent-color: var(--accent); }
+dialog .path { font: 12px ui-monospace, Consolas, monospace; color: var(--dim); word-break: break-all; }
+dialog .msg { margin-top: 10px; min-height: 1.4em; }
+dialog .msg.bad { color: var(--bad); }
+dialog .msg.good { color: var(--good); }
+progress { width: 100%; height: 8px; accent-color: var(--accent); margin-top: 10px; }
+.x { position: absolute; top: 12px; right: 14px; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } .tile { opacity: 1; } }
 </style>
 <script src="look.js"></script>
@@ -74,10 +105,47 @@ footer b { color: var(--muted); font-weight: 600; }
   </div>
 </header>
 <main><div class="grid" id="grid"></div></main>
+<div class="bar" id="installBar" role="region" aria-label="Install Tinkerie">
+  <span class="txt" id="installTxt"></span>
+  <button class="btn main" id="installGo" type="button"></button>
+  <button class="btn quiet" id="installLater" type="button" title="Don't ask again (Install & updates in the footer still has it)">Not now</button>
+</div>
+<div class="bar new" id="updateBar" role="region" aria-label="Update available">
+  <span class="txt" id="updateTxt"></span>
+  <button class="btn main" id="updateGo" type="button">Update now</button>
+  <button class="btn" id="updateNotes" type="button" title="Open the release page on GitHub">What's new</button>
+  <button class="btn quiet" id="updateLater" type="button">Later</button>
+</div>
 <footer>
-  <span>Tinkerie <span id="ver"></span> · designed and created by <b>nrmluvdev</b></span>
+  <span>Tinkerie <span id="ver"></span> · designed and created by <b>nrmluvdev</b> · <button class="link" id="selfBtn" type="button" title="Install Tinkerie on this computer, and check for new versions">Install &amp; updates</button></span>
   <span>Tip: press a number to start that app. Apps keep running when you close this window.</span>
 </footer>
+<dialog id="self" aria-labelledby="selfTitle">
+  <button class="btn quiet x" type="button" id="selfClose" aria-label="Close">✕</button>
+  <h2 id="selfTitle">Install &amp; updates</h2>
+  <p id="selfWhere"></p>
+  <h3>Updates</h3>
+  <p>Tinkerie only asks GitHub for its list of releases when you check (or once a day if you tick the box). Nothing about you or your computer is sent.</p>
+  <div class="row">
+    <button class="btn" id="checkGo" type="button">Check for updates</button>
+    <button class="btn main" id="applyGo" type="button" hidden>Update now</button>
+    <button class="btn" id="pageGo" type="button" hidden title="Open the release page on GitHub">Release page</button>
+  </div>
+  <label><input type="checkbox" id="autoCheck"> Check for updates when Tinkerie starts (at most once a day)</label>
+  <progress id="prog" max="1" value="0" hidden></progress>
+  <div class="msg" id="updMsg" role="status" aria-live="polite"></div>
+  <div id="installBox">
+    <h3>Install</h3>
+    <p id="installAbout"></p>
+    <label id="deskRow" hidden><input type="checkbox" id="desk" checked> Also put Tinkerie on the desktop</label>
+    <div class="row">
+      <button class="btn main" id="installGo2" type="button" hidden>Install on this computer</button>
+      <button class="btn" id="openInstalled" type="button" hidden>Open the installed Tinkerie</button>
+      <button class="btn" id="uninstallGo" type="button" hidden>Uninstall</button>
+    </div>
+    <div class="msg" id="insMsg" role="status" aria-live="polite"></div>
+  </div>
+</dialog>
 <div id="toast"><span class="dot"></span><span id="msg"></span></div>
 <script>
 const grid = document.getElementById('grid');
@@ -125,10 +193,183 @@ fetch('/api/apps').then(r => r.json()).then(d => {
     grid.append(b);
   });
   addEventListener('keydown', e => {
+    if (document.querySelector('dialog[open]')) return; // typing in the Install & updates panel
     const n = parseInt(e.key, 10);
     if (n >= 1 && n <= d.apps.length && !e.ctrlKey && !e.altKey && !e.metaKey) grid.children[n - 1].click();
   });
 }).catch(() => toast('The launcher stopped. Start Tinkerie again.', true));
+// ---- installing and updating (launcher/self.go) ----
+const $ = id => document.getElementById(id);
+async function api(path, body) {
+  const r = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
+  let d = {};
+  try { d = await r.json(); } catch (_) {}
+  if (!r.ok) throw new Error(d.error || r.statusText);
+  return d;
+}
+let self = null, latest = null;
+function msg(el, text, kind) { el.textContent = text || ''; el.className = 'msg' + (kind ? ' ' + kind : ''); }
+function closeSoon(text) {
+  // The new launcher opens its own window; this one goes.
+  document.body.style.opacity = '.5';
+  toast(text);
+  setTimeout(() => { window.close(); }, 900);
+  setTimeout(() => toast('You can close this window.'), 2500);
+}
+function showSelf() {
+  const s = self;
+  $('selfWhere').textContent = s.installed
+    ? `Tinkerie ${s.version} is installed in ${s.installDir}.`
+    : `Tinkerie ${s.version} is running from ${s.running || 'its download folder'}.`;
+  $('autoCheck').checked = !!s.autoCheck;
+  const box = $('installBox');
+  if (!s.installOK) {
+    $('installAbout').textContent = s.installWhy;
+    ['installGo2', 'openInstalled', 'uninstallGo', 'deskRow'].forEach(id => $(id).hidden = true);
+  } else if (s.installed) {
+    $('installAbout').textContent = navigator.userAgent.includes('Windows')
+      ? 'Tinkerie is in your Start menu, with a shortcut for every app. To remove it, use Uninstall here or Settings ▸ Apps. Your designs and settings are kept either way.'
+      : 'Tinkerie and every app are in your applications menu. Uninstall removes the program and its menu entries; your designs and settings are kept.';
+    $('installGo2').hidden = $('openInstalled').hidden = $('deskRow').hidden = true;
+    $('uninstallGo').hidden = false;
+  } else {
+    const other = s.installedVersion;
+    $('installAbout').textContent = (other ? `Tinkerie ${other === '?' ? '' : other + ' '}is already installed in ${s.installDir}. Installing replaces it with this copy (${s.version}). ` : '')
+      + (s.desktopOption
+        ? `Installing copies Tinkerie to ${s.installDir} and adds it to the Start menu, with a shortcut for every app and an entry in Settings ▸ Apps. No administrator rights are needed.`
+        : `Installing copies Tinkerie to ${s.installDir} and adds it and every app to your applications menu. No password is needed.`);
+    $('installGo2').hidden = false;
+    $('deskRow').hidden = !s.desktopOption;
+    $('openInstalled').hidden = !other;
+    $('uninstallGo').hidden = true;
+  }
+  // The install banner
+  const bar = $('installBar');
+  if (s.installOK && !s.installed && s.installedVersion && s.installedVersion !== '?' && cmpNewer(s.installedVersion, s.version)) {
+    $('installTxt').innerHTML = '';
+    $('installTxt').append('A newer Tinkerie (', Object.assign(document.createElement('b'), { textContent: s.installedVersion }), ') is installed on this computer.');
+    $('installGo').textContent = 'Open it';
+    $('installGo').onclick = openInstalled;
+    bar.classList.add('show');
+  } else if (s.prompt) {
+    $('installTxt').innerHTML = '';
+    $('installTxt').append(Object.assign(document.createElement('b'), { textContent: 'Tinkerie isn’t installed.' }),
+      s.desktopOption ? ' Install it to get a Start-menu shortcut for every app, and updates in one place.' : ' Install it to add every app to your applications menu, and get updates in one place.');
+    $('installGo').textContent = 'Install';
+    $('installGo').onclick = () => { $('self').showModal(); $('installGo2').focus(); };
+    bar.classList.add('show');
+  } else bar.classList.remove('show');
+  if (s.update) showUpdate(s.update, false);
+}
+// cmpNewer: is version a newer than b? (only used for the banner; the launcher decides updates)
+function cmpNewer(a, b) {
+  const p = v => { const [m, pre] = v.replace(/^v/, '').split('-'); return { n: m.split('.').map(Number), pre }; };
+  const x = p(a), y = p(b);
+  for (let i = 0; i < 3; i++) if ((x.n[i] || 0) !== (y.n[i] || 0)) return (x.n[i] || 0) > (y.n[i] || 0);
+  if (!x.pre !== !y.pre) return !x.pre;
+  return (x.pre || '') > (y.pre || '');
+}
+function showUpdate(u, fromCheck) {
+  latest = u;
+  const m = $('updMsg');
+  $('applyGo').hidden = !(u.newer && u.canApply);
+  $('pageGo').hidden = !u.newer;
+  if (!u.newer) {
+    if (fromCheck) msg(m, `You have the newest version (${u.current}).`, 'good');
+    $('updateBar').classList.remove('show');
+    return;
+  }
+  msg(m, `Tinkerie ${u.latest} is available (you have ${u.current}).` + (u.canApply ? '' : ' ' + u.why));
+  $('updateTxt').innerHTML = '';
+  $('updateTxt').append(Object.assign(document.createElement('b'), { textContent: `Tinkerie ${u.latest} is available.` }), ` You have ${u.current}.`);
+  $('updateGo').hidden = !u.canApply;
+  $('updateBar').classList.add('show');
+}
+async function check(auto) {
+  const m = $('updMsg');
+  if (!auto) { msg(m, 'Asking GitHub…'); $('checkGo').disabled = true; }
+  try {
+    const d = await api('/api/update/check', { auto });
+    if (d.update) showUpdate(d.update, !auto);
+  } catch (e) {
+    if (!auto) msg(m, `Couldn't check: ${e.message}`, 'bad');
+  } finally { $('checkGo').disabled = false; }
+}
+async function applyUpdate() {
+  const m = $('updMsg'), prog = $('prog');
+  if (!$('self').open) $('self').showModal();
+  $('applyGo').disabled = $('updateGo').disabled = $('checkGo').disabled = true;
+  try {
+    await api('/api/update/apply');
+    prog.hidden = false;
+    for (;;) {
+      await new Promise(r => setTimeout(r, 400));
+      const u = await (await fetch('/api/update/status')).json();
+      if (u.state === 'downloading') {
+        prog.max = u.total || 1; prog.value = u.got;
+        msg(m, `Downloading… ${(u.got / 1048576).toFixed(1)} of ${(u.total / 1048576).toFixed(1)} MB`);
+      } else if (u.state === 'checking') {
+        prog.removeAttribute('value'); msg(m, 'Checking the download…');
+      } else if (u.state === 'done') {
+        prog.hidden = true;
+        $('updateBar').classList.remove('show');
+        msg(m, `Updated to ${u.to}. Restart the launcher to use it. Apps that are open keep running the old version until you close them.`, 'good');
+        $('applyGo').hidden = true;
+        const b = $('restartGo') || Object.assign(document.createElement('button'), { id: 'restartGo', type: 'button', className: 'btn main', textContent: 'Restart Tinkerie' });
+        b.onclick = async () => { try { await api('/api/self/open', { which: 'self' }); closeSoon('Restarting Tinkerie…'); } catch (e) { msg(m, e.message, 'bad'); } };
+        $('checkGo').parentNode.append(b);
+        b.focus();
+        return;
+      } else if (u.state === 'error') {
+        prog.hidden = true; msg(m, `The update didn't work: ${u.msg}. Nothing was changed.`, 'bad');
+        return;
+      }
+    }
+  } catch (e) {
+    prog.hidden = true; msg(m, `The update didn't start: ${e.message}`, 'bad');
+  } finally { $('applyGo').disabled = $('updateGo').disabled = $('checkGo').disabled = false; }
+}
+async function openInstalled() {
+  try { await api('/api/self/open', { which: 'installed' }); closeSoon('Opening the installed Tinkerie…'); }
+  catch (e) { toast(`Couldn't open it: ${e.message}`, true); }
+}
+async function loadSelf() {
+  try { self = await (await fetch('/api/self')).json(); showSelf(); } catch (_) {}
+  return self;
+}
+$('selfBtn').onclick = () => $('self').showModal();
+$('selfClose').onclick = () => $('self').close();
+$('checkGo').onclick = () => check(false);
+$('applyGo').onclick = $('updateGo').onclick = applyUpdate;
+$('pageGo').onclick = $('updateNotes').onclick = () => api('/api/self/page').catch(e => toast(e.message, true));
+$('updateLater').onclick = () => $('updateBar').classList.remove('show');
+$('installLater').onclick = async () => { $('installBar').classList.remove('show'); try { self = await api('/api/self/settings', { noInstallPrompt: true }); } catch (_) {} };
+$('autoCheck').onchange = async e => {
+  try { self = await api('/api/self/settings', { autoCheck: e.target.checked }); if (e.target.checked) check(false); }
+  catch (err) { msg($('updMsg'), err.message, 'bad'); }
+};
+$('openInstalled').onclick = openInstalled;
+$('installGo2').onclick = async () => {
+  const m = $('insMsg');
+  $('installGo2').disabled = true; msg(m, 'Installing…');
+  try {
+    const d = await api('/api/self/install', { desktop: $('desk').checked });
+    msg(m, `Installed in ${d.dir}.` + (d.note ? ` Note: ${d.note}.` : '') + ' Opening the installed Tinkerie…', d.note ? '' : 'good');
+    setTimeout(openInstalled, d.note ? 2500 : 900);
+  } catch (e) { msg(m, `Couldn't install: ${e.message}`, 'bad'); }
+  finally { $('installGo2').disabled = false; }
+};
+$('uninstallGo').onclick = async () => {
+  if (!confirm('Remove Tinkerie from this computer?\n\nClose any Tinkerie apps first. Your designs, files and settings are kept.')) return;
+  const m = $('insMsg');
+  try {
+    await api('/api/self/uninstall');
+    msg(m, 'Tinkerie has been removed. This window will close.', 'good');
+    closeSoon('Tinkerie has been removed.');
+  } catch (e) { msg(m, `Couldn't uninstall: ${e.message}`, 'bad'); }
+};
+loadSelf().then(s => { if (s && s.autoCheck) check(true); });
+
 // Holding this connection open tells the launcher its window is still here.
 new EventSource('/api/live');
 </script>

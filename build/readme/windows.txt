@@ -5,17 +5,21 @@ Free software under the GNU GPL, version 3 or later (see source/LICENSE). No war
 Source and updates: https://github.com/normanlove/tinkerie
 
 Starting Tinkerie
-Double-click Tinkerie.exe. It needs nothing installed.
+Double-click Tinkerie.exe. It needs nothing installed. To install it anyway (Start-menu
+shortcuts for every app, and updates), click "Install & updates" at the bottom of the launcher.
+No administrator rights are needed, and Settings > Apps can remove it again.
 
 What works on this system
 Everything, in every app. Every app has teaching mode: point at anything to see what it does.
 F2 turns it off.
 
 New in {VERSION}:
-- Tinkerie web keeps every tab, app and person's work separate, with
-  Clear my data buttons for shared computers.
+- Install Tinkerie from the launcher (Start-menu shortcuts for every app,
+  no administrator rights), and update it in one click when there's a new
+  version. Both are under "Install & updates" at the bottom of the launcher.
 
 Also in recent alpha builds:
+- 0.32.1-alpha: Tinkerie web keeps every tab, app and person's work separate.
 - 0.32.0-alpha: Fixie explains error logs (Windows, macOS, Linux, Android).
 - 0.31.0-alpha: Every app runs in Chrome or Edge too (Tinkerie web).
 - 0.30.3-alpha: USB checks across the suite (libusb-win32, hidden meter cables).

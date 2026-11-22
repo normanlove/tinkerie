@@ -2,6 +2,7 @@
 //
 //	Tinkerie                      opens the launcher
 //	Tinkerie --app makie [args]   runs one app (the launcher starts apps this way)
+//	Tinkerie --uninstall          removes the installed copy (Settings > Apps runs this)
 //
 // A copy or link of the program named after an app (makie.exe, ./wirie) runs that
 // app directly. Each app runs in its own process, so several can be open at once.
@@ -42,6 +43,14 @@ var mains = map[string]func(){
 }
 
 func main() {
+	// Settings > Apps > Uninstall on Windows runs "Tinkerie.exe --uninstall".
+	if len(os.Args) > 1 && os.Args[1] == "--uninstall" {
+		if len(os.Args) > 2 && os.Args[2] == "--quiet" {
+			launcher.SetQuiet()
+		}
+		launcher.Uninstall(true)
+		return
+	}
 	name, rest := pickApp(os.Args)
 	if name == "" {
 		launcher.Run()

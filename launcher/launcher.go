@@ -9,6 +9,7 @@ package launcher
 import (
 	"embed"
 	"encoding/json"
+	"errors"
 	"io"
 	"io/fs"
 	"log"
@@ -24,7 +25,7 @@ import (
 )
 
 // Version is the suite version shown in the launcher.
-const Version = "0.32.1-alpha"
+const Version = "0.33.0-alpha"
 
 // App describes one tile in the launcher.
 type App struct {
@@ -84,6 +85,10 @@ var webFS embed.FS
 
 // Run shows the launcher and returns once its window has been closed.
 func Run() {
+	if !droid.Active() {
+		cleanUpOld()
+		go refreshInstall() // can take a moment on Windows: don't hold up the window
+	}
 	ln, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		log.Fatal(err)
@@ -124,11 +129,25 @@ func Run() {
 			}
 		}
 	})
-	mux.HandleFunc("/api/launch", func(w http.ResponseWriter, r *http.Request) {
-		// Only the launcher page may start apps: a POST with a JSON body, which
-		// other web pages can't send to this port without a CORS preflight.
+	// Only the launcher page may start apps, install or update: a POST with a
+	// JSON body, which other web pages can't send to this port without a CORS
+	// preflight, addressed to this port by number (not a name that some other
+	// site could point here).
+	host := ln.Addr().String()
+	post := func(w http.ResponseWriter, r *http.Request) bool {
 		if r.Method != http.MethodPost || r.Header.Get("Content-Type") != "application/json" {
 			http.Error(w, "use POST with JSON", http.StatusMethodNotAllowed)
+			return false
+		}
+		if r.Host != host {
+			http.Error(w, "wrong host", http.StatusForbidden)
+			return false
+		}
+		return true
+	}
+	selfRoutes(mux, post, func() { os.Exit(0) })
+	mux.HandleFunc("/api/launch", func(w http.ResponseWriter, r *http.Request) {
+		if !post(w, r) {
 			return
 		}
 		var req struct{ App string }
@@ -185,9 +204,9 @@ func known(name string) bool {
 
 // start runs one app as a separate process of this same program.
 func start(name string) error {
-	exe, err := os.Executable()
-	if err != nil {
-		return err
+	exe := selfExe // after an update, this is the new version
+	if exe == "" {
+		return errors.New("Tinkerie couldn't find its own program file")
 	}
 	cmd := exec.Command(exe, "--app", name)
 	cmd.Dir = filepath.Dir(exe)
@@ -198,6 +217,14 @@ func start(name string) error {
 	log.Printf("started %s (pid %d)", name, cmd.Process.Pid)
 	go cmd.Wait()
 	return nil
+}
+
+// launcherCommand starts another copy's launcher (no arguments).
+func launcherCommand(exe string) *exec.Cmd {
+	cmd := exec.Command(exe)
+	cmd.Dir = filepath.Dir(exe)
+	detach(cmd)
+	return cmd
 }
 
 // dataDir holds the launcher window's browser profile.

@@ -16,6 +16,7 @@ main.go              dispatcher: no arguments -> launcher; --app NAME -> that ap
 launcher/            the launcher (local web page in a Chromium "app" window)
   launcher.go        app list, /api/apps, /api/launch, /api/live; quits when its window closes
   window_*.go        opening the window and detaching started apps, per OS
+  self*.go           installing for the current user, updating from GitHub releases, uninstalling
   web/               the page and the app icons
 apps/<name>/         one package per app; Main() is the app's old main()
 shared/serialport/   serial ports on Linux, Raspberry Pi and macOS (pure Go, no cgo)
@@ -55,6 +56,15 @@ Meterie draws its whole interface itself, the same on every system. On Windows i
 ### Hardware
 
 Serial ports on Linux, Pi and macOS go through `shared/serialport`. It sets ports up with termios ioctls (any baud rate: `termios2` on Linux, `IOSSIOSPEED` on macOS), reads through Go's runtime poller, and lists ports with USB IDs from sysfs (Linux) or `ioreg` (macOS). Its tests run on Linux pseudo-terminals. Flashie's `TestESP32FlashOverRealSerial` flashes a simulated ESP32 through it. Raw USB on Linux and Pi goes through `shared/usb` (usbfs ioctls, with queued URBs for streaming; `abi_linux_test.go` checks every ioctl number and struct layout against the kernel headers). `build/install-usb.sh` adds a udev rule so normal users may open the supported devices. macOS USB needs IOKit, which normally means cgo, so it's not done.
+
+## Installing and updating
+
+The launcher's *Install & updates* (`launcher/self.go`, with `self_windows.go` and `self_other.go`):
+
+- **Install** copies the running program into a per-user folder and makes shortcuts: `%LOCALAPPDATA%\Programs\Tinkerie` with Start-menu shortcuts (made through PowerShell's `WScript.Shell`; apps with a PNG icon get it as an .ico), an optional desktop shortcut and an *Settings ▸ Apps* entry under `HKCU\…\Uninstall\Tinkerie` on Windows; `$XDG_DATA_HOME/tinkerie` (`~/.local/share/tinkerie`) with a `.desktop` entry per app on Linux and Pi. No administrator rights. `installed.json` in that folder records the version that made the shortcuts: when a newer version first starts there, it redoes them, so new apps get shortcuts after an update. Not on a Mac (drag the .app) or Android (the .apk).
+- **Update** reads `api.github.com/repos/normanlove/tinkerie/releases` only when asked (or once a day with the opt-in setting), takes the newest release (alphas only for someone already on one), downloads that release's file for this system (`Tinkerie-<v>-windows.exe`, or the program out of `…-linux-x86_64`/`pi-64bit`/`pi-32bit.tar.gz`), and refuses it unless its size and SHA-256 match the `digest` GitHub lists for it. Then it puts the new program in place: on Windows the running .exe is renamed to `.old` (deleted at the next start) and the new one takes its name; elsewhere a rename replaces it. Running apps carry on with the old program until they're closed. So keep the release file names as they are: `TestAssetNames` checks `package.sh` and the release workflow still make them.
+- **Uninstall**: `Tinkerie --uninstall` (what *Settings ▸ Apps* runs; it asks first, `--quiet` doesn't) or the launcher's button. It removes the shortcuts, the menu or registry entries, the "Open with" entries Makie made for the installed copy, and the program's folder. The person's files and settings stay.
+- The install and update API is POST-with-JSON only and checks the `Host` header is the launcher's own `127.0.0.1:port`, so other web pages can't use it.
 
 ## Ports
 

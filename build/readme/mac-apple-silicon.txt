@@ -21,10 +21,11 @@ What works on this system
 Every app has teaching mode: point at anything to see what it does. F2 turns it off.
 
 New in {VERSION}:
-- Tinkerie web keeps every tab, app and person's work separate, with
-  Clear my data buttons for shared computers.
+- "Install & updates" in the launcher tells you when there's a new version
+  (when you ask, or once a day if you turn it on) and opens its download page.
 
 Also in recent alpha builds:
+- 0.32.1-alpha: Tinkerie web keeps every tab, app and person's work separate.
 - 0.32.0-alpha: Fixie explains error logs (Windows, macOS, Linux, Android).
 - 0.31.0-alpha: Every app runs in Chrome or Edge too (Tinkerie web).
 - 0.30.3-alpha: USB checks across the suite (libusb-win32, hidden meter cables).
