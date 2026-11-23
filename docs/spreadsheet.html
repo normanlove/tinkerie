@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'unsafe-inline'; img-src 'self' blob: data:; connect-src 'self' blob: data:; worker-src 'self' blob:; form-action 'none'; base-uri 'none'">
+<title>Image to Spreadsheet</title>
+<style>
+  :root { color-scheme: light dark; --bg:#f4f5f7; --card:#fff; --ink:#1c2230; --mute:#6a7385; --line:#d8dce4; --acc:#1d6f42; --accink:#fff; --err:#b3261e; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#14171d; --card:#1e232c; --ink:#e8ebf0; --mute:#9aa3b2; --line:#343b48; --acc:#35a96a; --accink:#08140d; --err:#ff8a80; } }
+  * { box-sizing: border-box; }
+  body { margin:0; font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--ink); }
+  main { max-width:1100px; margin:0 auto; padding:20px 16px 60px; }
+  h1 { font-size:1.5rem; margin:0 0 4px; }
+  .sub { color:var(--mute); margin:0 0 18px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px; margin-bottom:16px; }
+  button, .btn { font:inherit; border:1px solid var(--line); background:var(--card); color:var(--ink); padding:8px 14px; border-radius:8px; cursor:pointer; }
+  button.primary { background:var(--acc); color:var(--accink); border-color:var(--acc); font-weight:600; }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  input[type=text], input[type=password] { font:inherit; width:100%; padding:9px 10px; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--ink); }
+  label { display:block; font-size:.9rem; color:var(--mute); margin:10px 0 4px; }
+  #login { max-width:340px; margin:12vh auto 0; }
+  #loginerr, #err { color:var(--err); min-height:1.4em; margin:8px 0 0; }
+  #drop { border:2px dashed var(--line); border-radius:12px; padding:34px 16px; text-align:center; color:var(--mute); }
+  #drop.over { border-color:var(--acc); background:rgba(53,169,106,.08); }
+  #drop b { color:var(--ink); }
+  .row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:12px; }
+  .row label { margin:0; display:flex; gap:6px; align-items:center; }
+  select { font:inherit; padding:6px 8px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--ink); }
+  #preview { max-width:100%; max-height:340px; display:block; margin:14px auto 0; border:1px solid var(--line); border-radius:8px; }
+  progress { width:100%; height:10px; margin-top:12px; }
+  #status { color:var(--mute); font-size:.9rem; margin-top:4px; min-height:1.3em; }
+  #tablewrap { overflow:auto; max-height:70vh; border:1px solid var(--line); border-radius:8px; }
+  table { border-collapse:collapse; width:100%; font-size:.92rem; }
+  td { border:1px solid var(--line); padding:4px 8px; min-width:60px; white-space:pre-wrap; }
+  td:focus { outline:2px solid var(--acc); outline-offset:-2px; }
+  tr:first-child td { font-weight:600; }
+  .note { font-size:.85rem; color:var(--mute); }
+  .hidden { display:none !important; }
+</style>
+</head>
+<body>
+<main>
+
+<form id="login" class="card" autocomplete="off">
+  <h1>Sign in</h1>
+  <label for="u">Username</label>
+  <input id="u" type="text" autocomplete="username" autocapitalize="off" spellcheck="false">
+  <label for="p">Password</label>
+  <input id="p" type="password" autocomplete="current-password">
+  <p id="loginerr" role="alert"></p>
+  <button class="primary" type="submit" id="loginbtn">Sign in</button>
+</form>
+
+<div id="app" class="hidden">
+  <h1>Image to Spreadsheet</h1>
+  <p class="sub">Turns a picture of a spreadsheet into a table you can download as CSV. Everything happens inside this browser tab: your image is never uploaded anywhere.</p>
+
+  <div class="card">
+    <div id="drop">
+      <p><b>Drop an image here</b>, paste one (Ctrl+V), or</p>
+      <button id="pick" type="button">Choose an image</button>
+      <input id="file" type="file" accept="image/*" class="hidden">
+    </div>
+    <img id="preview" class="hidden" alt="Your image">
+    <div class="row">
+      <label>Grid lines
+        <select id="grid"><option value="remove" selected>Remove (best for bordered tables)</option><option value="keep">Keep</option></select>
+      </label>
+      <label>Layout
+        <select id="psm"><option value="6" selected>Table</option><option value="11">Scattered text</option></select>
+      </label>
+      <button id="go" class="primary" type="button" disabled>Convert</button>
+    </div>
+    <progress id="bar" max="1" value="0" class="hidden"></progress>
+    <div id="status"></div>
+    <p id="err" role="alert"></p>
+  </div>
+
+  <div class="card hidden" id="result">
+    <div class="row" style="margin-top:0">
+      <label>Column splitting
+        <input id="gap" type="range" min="0.3" max="3" step="0.1" value="1">
+      </label>
+      <span class="note">Slide left for more columns, right for fewer. Click any cell to correct it.</span>
+    </div>
+    <div class="row">
+      <button id="csv" class="primary" type="button">Download CSV</button>
+      <button id="copy" type="button">Copy for pasting into Excel</button>
+      <span id="size" class="note"></span>
+    </div>
+    <div id="tablewrap" style="margin-top:12px"><table id="tbl"></table></div>
+    <p class="note">Text recognition is never perfect, so check the numbers before relying on them.</p>
+  </div>
+</div>
+
+</main>
+
+<script src="spreadsheet_files/layout.js"></script>
+<script src="spreadsheet_files/app.js"></script>
+</body>
+</html>
