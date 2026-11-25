@@ -37,6 +37,11 @@
   td:focus { outline:2px solid var(--acc); outline-offset:-2px; }
   tr:first-child td { font-weight:600; }
   .note { font-size:.85rem; color:var(--mute); }
+  td.low { background:rgba(245,166,35,.28); }
+  td.vlow { background:rgba(224,60,49,.30); }
+  td.fixed { box-shadow:inset 0 -3px 0 var(--acc); }
+  .legend i { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-1px; margin:0 4px 0 10px; border:1px solid var(--line); }
+  .legend i.a { background:rgba(245,166,35,.55); } .legend i.r { background:rgba(224,60,49,.55); } .legend i.g { background:var(--acc); }
   .hidden { display:none !important; }
 </style>
 </head>
@@ -73,6 +78,16 @@
       </label>
       <button id="go" class="primary" type="button" disabled>Convert</button>
     </div>
+    <div class="row">
+      <label>Lighting
+        <select id="light"><option value="auto" selected>Automatic (tries both, slower)</option><option value="even">Even (screenshot or scan)</option><option value="uneven">Uneven (photo, shadows)</option></select>
+      </label>
+      <label>Content
+        <select id="content"><option value="mixed" selected>Text and numbers</option><option value="numbers">Numbers only</option></select>
+      </label>
+      <label><input type="checkbox" id="deskew" checked> Straighten tilted photos</label>
+      <label><input type="checkbox" id="fixdigits" checked> Double-check numbers and fix £ read as F, O as 0, l as 1</label>
+    </div>
     <progress id="bar" max="1" value="0" class="hidden"></progress>
     <div id="status"></div>
     <p id="err" role="alert"></p>
@@ -88,8 +103,10 @@
     <div class="row">
       <button id="csv" class="primary" type="button">Download CSV</button>
       <button id="copy" type="button">Copy for pasting into Excel</button>
+      <button id="nextlow" type="button">Next doubtful cell</button>
       <span id="size" class="note"></span>
     </div>
+    <p class="note legend" id="legend"><i class="a"></i>unsure <i class="r"></i>very unsure <i class="g"></i>digits corrected (hover to see the original) <span id="flagcount"></span></p>
     <div id="tablewrap" style="margin-top:12px"><table id="tbl"></table></div>
     <p class="note">Text recognition is never perfect, so check the numbers before relying on them.</p>
   </div>
