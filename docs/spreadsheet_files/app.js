@@ -17,6 +17,7 @@
   }
 
   function openApp() {
+    setTimeout(preload, 0);
     $('login').classList.add('hidden');
     $('app').classList.remove('hidden');
     try { sessionStorage.setItem('sheet-ok', HASH); } catch (e) {}
@@ -114,6 +115,9 @@
       }
       for (i = 0; i < n; i++) dark[i] = g[i] <= thr ? 1 : 0;
     }
+    var inkCount = 0;
+    for (i = 0; i < n; i++) inkCount += dark[i];
+    if (inkCount > n / 2) for (i = 0; i < n; i++) dark[i] = 1 - dark[i];   // light text on a dark background
     return { d: d, dark: dark };
   }
 
@@ -122,8 +126,17 @@
   function prepare(opts) {
     var w = img.naturalWidth, h = img.naturalHeight;
     var scale = 1;
-    if (w < 2000) scale = Math.min(3, 2000 / w);
-    else if (w > 4000) scale = 4000 / w;
+    if (w > 4000) scale = 4000 / w;
+    else {
+      // Measure the text at its real size; only enlarge when it is small (OCR time grows with pixel count).
+      var m = document.createElement('canvas'); m.width = w; m.height = h;
+      var mx = m.getContext('2d', { willReadFrequently: true });
+      mx.fillStyle = '#fff'; mx.fillRect(0, 0, w, h); mx.drawImage(img, 0, 0);
+      var th = SheetLayout.estimateTextHeight(binarize(mx, w, h, false).dark, w, h);
+      if (th) scale = Math.min(3, Math.max(1, 26 / th));
+      else if (w < 2000) scale = Math.min(3, 2000 / w);
+      if (scale < 1.05) scale = 1;
+    }
     if (w * h * scale * scale > 12e6) scale = Math.sqrt(12e6 / (w * h));   // keep memory sane
     var cw = Math.round(w * scale), ch = Math.round(h * scale);
     var c = document.createElement('canvas');
@@ -185,7 +198,18 @@
     });
   }
 
-  async function getWorker() {
+  var workerP = null;
+  function getWorker() {
+    if (worker) return Promise.resolve(worker);
+    if (!workerP) workerP = makeWorker().then(function (w) { worker = w; return w; }, function (e) { workerP = null; throw e; });
+    return workerP;
+  }
+  function preload() {
+    quiet = true;
+    getWorker().then(function () { quiet = false; }, function () { quiet = false; });
+  }
+
+  async function makeWorker() {
     if (worker) return worker;
     if (!window.Tesseract) await loadScript('spreadsheet_files/tesseract.min.js');
     var base = new URL('spreadsheet_files/', location.href).href.replace(/\/$/, '');
@@ -255,6 +279,7 @@
     $('bar').classList.remove('hidden'); $('bar').value = 0;
     $('result').classList.add('hidden');
     try {
+      var t0 = performance.now();
       setStatus('Preparing the image...');
       await new Promise(function (r) { setTimeout(r, 30); });
       var wk = await getWorker();
@@ -282,12 +307,12 @@
       if (list.length && $('fixdigits').checked) await refineNumbers(list, prep.canvas, userParams);
       words = list;
       if (!words.length) { setErr('No text was found in that image. Try a clearer or larger picture.'); setStatus(''); }
-      else { render(); setStatus(prep.angle ? 'Done (page straightened by ' + Math.abs(prep.angle) + ' degrees).' : 'Done.'); $('result').classList.remove('hidden'); }
+      else { render(); setStatus('Done in ' + ((performance.now() - t0) / 1000).toFixed(1) + ' s' + (prep.angle ? ' (page straightened by ' + Math.abs(prep.angle) + ' degrees).' : '.')); $('result').classList.remove('hidden'); }
     } catch (e) {
       setErr('Something went wrong: ' + (e && e.message ? e.message : e));
       setStatus('');
       try { if (worker) await worker.terminate(); } catch (x) {}
-      worker = null;
+      worker = null; workerP = null;
     }
     $('bar').classList.add('hidden');
     $('go').disabled = false;

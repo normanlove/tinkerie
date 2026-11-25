@@ -225,6 +225,32 @@
     return s;
   }
 
+  /* ---- text size ----
+     dark: Uint8Array (cw*ch), 1 = ink. Returns the typical height in pixels of
+     a line of text (median height of runs of rows that contain ink), or 0 if it
+     cannot tell. Long vertical and horizontal table lines are ignored so they
+     do not join the lines of text together. */
+  function estimateTextHeight(dark, cw, ch) {
+    var skip = new Uint8Array(cw * ch), x, y, run, k;
+    var minRun = Math.max(40, Math.round(ch * 0.08));
+    for (x = 0; x < cw; x++) {
+      run = 0;
+      for (y = 0; y <= ch; y++) {
+        if (y < ch && dark[y * cw + x]) run++;
+        else { if (run >= minRun) for (k = y - run; k < y; k++) skip[k * cw + x] = 1; run = 0; }
+      }
+    }
+    var lim = cw * 0.5, runs = [];
+    run = 0;
+    for (y = 0; y <= ch; y++) {
+      var cnt = 0;
+      if (y < ch) { var o = y * cw; for (x = 0; x < cw; x++) if (dark[o + x] && !skip[o + x]) cnt++; }
+      if (y < ch && cnt > 0 && cnt < lim) run++;
+      else { if (run >= 3) runs.push(run); run = 0; }
+    }
+    return runs.length ? median(runs) : 0;
+  }
+
   /* ---- tilt detection ----
      dark: Uint8Array (cw*ch) with 1 where a pixel is ink. Finds the angle (in
      degrees, positive = page turned clockwise as seen on screen) at which the
@@ -276,7 +302,7 @@
 
   var api = {
     buildGrid: buildGrid, buildTable: buildTable, trimGrid: trimGrid, trimTable: trimTable,
-    fixNumberColumns: fixNumberColumns, estimateSkew: estimateSkew, rereadCandidates: rereadCandidates, acceptReread: acceptReread, scoreWords: scoreWords, toCSV: toCSV, toTSV: toTSV, cleanWords: cleanWords
+    fixNumberColumns: fixNumberColumns, estimateSkew: estimateSkew, estimateTextHeight: estimateTextHeight, rereadCandidates: rereadCandidates, acceptReread: acceptReread, scoreWords: scoreWords, toCSV: toCSV, toTSV: toTSV, cleanWords: cleanWords
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.SheetLayout = api;
